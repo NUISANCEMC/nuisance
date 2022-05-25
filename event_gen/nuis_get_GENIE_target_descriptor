@@ -21,6 +21,8 @@ elif [ "${TARG}" = "O" ]; then
   echo "1000060120[1]"
 elif [ "${TARG}" = "H2O" ]; then
   echo "1000080160[.888888],1000010010[.111112]"
+elif [ "${TARG}" = "Cl" ]; then
+  echo "1000170350[1]"
 elif [ "${TARG}" = "Ar" ]; then
   echo "1000180400[1]"
 elif [ "${TARG}" = "Fe" ]; then

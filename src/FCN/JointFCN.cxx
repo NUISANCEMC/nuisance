@@ -121,8 +121,8 @@ void JointFCN::CreateIterationTree(std::string name, FitWeight *rw) {
 
   // Setup Containers
   fSampleN = fSamples.size() + fPulls.size();
-  fSampleLikes = new double[fSampleN];
-  fSampleNDOF = new int[fSampleN];
+  fSampleLikes = new double[fSampleN+1];
+  fSampleNDOF = new int[fSampleN+1];
 
   // Add Dials
   std::vector<std::string> dials = rw->GetDialNames();
@@ -181,6 +181,7 @@ void JointFCN::WriteIterationTree() {
 
   // Write to file
   itree->Write();
+  delete[] vals;
 }
 
 //***************************************************

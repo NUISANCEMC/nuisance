@@ -127,8 +127,11 @@ Double_t StatUtils::GetChi2FromCov(TH1D *data, TH1D *mc, TMatrixDSym *invcov,
 
   // If a mask if applied we need to apply it before the matrix is inverted
   if (mask) {
+    delete calc_cov; 
     calc_cov = ApplyInvertedMatrixMasking(invcov, mask);
+    delete calc_data;
     calc_data = ApplyHistogramMasking(data, mask);
+    delete calc_mc;
     calc_mc = ApplyHistogramMasking(mc, mask);
   }
 

@@ -12,6 +12,7 @@ FLUX=""
 TARG=""
 NEVENTS=""
 OUPNAME=""
+ENERGY_RANGE="0.1,20"
 
 while [[ ${#} -gt 0 ]]; do
 
@@ -78,6 +79,18 @@ while [[ ${#} -gt 0 ]]; do
       shift # past argument
       ;;
 
+      -e|--energy-range)
+
+      if [[ ${#} -lt 2 ]]; then
+        echo "[ERROR]: ${1} expected a value."
+        exit 1
+      fi
+
+      ENERGY_RANGE="$2"
+      echo "[OPT]: Using neutrino energy range: ${ENERGY_RANGE}"
+      shift # past argument
+      ;;
+
     -?|--help)
               # unknown option
       echo "Arguments:"
@@ -88,6 +101,7 @@ while [[ ${#} -gt 0 ]]; do
       echo -e "\tOptional:"
       echo -e "\t  -p|--probe <neutrino pdg>          : defaults to 14"
       echo -e "\t  -o|--output-file <output.root>     : defaults to GENIE.<probepdg>.<flux_file>.<flux_hist>.<seed>.ghep.root"
+      echo -e "\t  -e|--energy-range [min,max]        : Energy cuts in GeV, defaults to 0.1,10 GeV"
       echo -e ""
       echo -e "\t  -?|--help"
       exit 0
@@ -156,7 +170,7 @@ fi
 
 gevgen \
  -p ${PROBE} -t ${TARG} \
- -r ${SEED} -e 0.1,10 \
+ -r ${SEED} -e ${ENERGY_RANGE} \
  -f ${FLUX_FILE},${FLUX_HIST} \
  -n ${NEVENTS} --seed ${SEED} \
  --cross-sections ${GENIE_XSEC_FILE} \

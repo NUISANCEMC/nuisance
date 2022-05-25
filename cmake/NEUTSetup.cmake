@@ -37,82 +37,151 @@ if(HAVENEUTCONFIG)
     --version OUTPUT_VARIABLE NEUT_VER
              OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-  execute_process (COMMAND neut-config
-    --incdir OUTPUT_VARIABLE NEUT_INCLUDE_DIRS
-             OUTPUT_STRIP_TRAILING_WHITESPACE)
+  if(NEUT_VER VERSION_GREATER_EQUAL 5.5.0)
+    cmake_policy(SET CMP0074 NEW)
+    find_package(NEUT REQUIRED)
 
-  execute_process (COMMAND neut-config
-    --libdir OUTPUT_VARIABLE NEUT_LINK_DIRS
-             OUTPUT_STRIP_TRAILING_WHITESPACE)
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(NEUT QUIET NEUT)
 
-  GETLIBDIRS(neut-config --cernflags CERN_LIB_DIR)
-  LIST(APPEND NEUT_LINK_DIRS ${CERN_LIB_DIR})
-  GETLIBS(neut-config --cernflags CERN_LIBS)
-
-  if(NOT DEFINED USE_NEUT_REWEIGHT)
-    if(USE_REWEIGHT)
-      SET(USE_NEUT_REWEIGHT ON)
-    else()
-      SET(USE_NEUT_REWEIGHT OFF)
-    endif()
-  endif()
-
-  PrefixList(NEUT_INCLUDE_DIRS "-I" ${NEUT_INCLUDE_DIRS})
-
-  if(USE_REWEIGHT AND USE_NEUT_REWEIGHT)
+    #Can just rely on the above and link against 'modern' cmake imported targets, but for my sanity, just copy the manual way of doing it and update neut-config flags
     execute_process (COMMAND neut-config
-      --rwlibflags OUTPUT_VARIABLE NEUT_RWLIBS
+      --incdir OUTPUT_VARIABLE NEUT_INCLUDE_DIRS
                OUTPUT_STRIP_TRAILING_WHITESPACE)
-    GETLIBS(neut-config --rwlibflags NEUT_RWLIBS)
-    LIST(APPEND NEUT_LIBS ${NEUT_RWLIBS})
-    LIST(APPEND EXTRA_CXX_FLAGS ${NEUT_INCLUDE_DIRS} -D__USE_NEUT_REWEIGHT__)
+
+    execute_process (COMMAND neut-config
+      --libdir OUTPUT_VARIABLE NEUT_LINK_DIRS
+               OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+    GetLibDirs(CONFIG_APP pkg-config ARGS NEUT --variable=CERN_FLAGS OUTPUT_VARIABLE CERN_LIB_DIR)
+    LIST(APPEND NEUT_LINK_DIRS ${CERN_LIB_DIR})
+    GetLibs(CONFIG_APP pkg-config ARGS NEUT --variable=CERN_FLAGS OUTPUT_VARIABLE CERN_LIBS)
+
+    #Cannot yet directly link to NEUT_ReWeight
+    SET(USE_NEUT_REWEIGHT OFF)
+
+    GetLibs(CONFIG_APP neut-config ARGS --libs OUTPUT_VARIABLE NEUT_GENLIBS)
+    GetLibs(CONFIG_APP neut-config ARGS --iolibs OUTPUT_VARIABLE NEUT_LIBS)
+    LIST(APPEND NEUT_LIBS ${NEUT_IOLIBS})
+    LIST(APPEND NEUT_LIBS ${NEUT_GENLIBS})
+
+    LIST(APPEND NEUT_LIBS ${CERN_LIBS};gfortran)
+    LIST(APPEND EXTRA_LIBS ${NEUT_LIBS})
+
+    string(REPLACE "." "" NEUT_VERSION ${NEUT_VER})
+
+    LIST(APPEND EXTRA_CXX_FLAGS -I${NEUT_INCLUDE_DIRS} -D__NEUT_ENABLED__ -D__NEUT_VERSION__=${NEUT_VERSION})
+
+    LIST(APPEND EXTRA_LINK_DIRS ${NEUT_LINK_DIRS})
+
+    include(CheckCXXCompilerFlag)
+    CHECK_CXX_COMPILER_FLAG(-Wl,--allow-multiple-definition COMPILER_SUPPORTS_ALLOW_MULTIPLE_DEFINITION)
+
+    IF(COMPILER_SUPPORTS_ALLOW_MULTIPLE_DEFINITION)
+      LIST(APPEND EXTRA_LINK_FLAGS -Wl,--allow-multiple-definition)
+    ENDIF()
+
+    CHECK_CXX_COMPILER_FLAG(-no-pie COMPILER_SUPPORTS_NO_PIE)
+    CHECK_CXX_COMPILER_FLAG(-fno-pie COMPILER_SUPPORTS_FNO_PIE)
+    CHECK_CXX_COMPILER_FLAG(-fno-PIE COMPILER_SUPPORTS_FNO_PIE_CAP)
+    if(COMPILER_SUPPORTS_NO_PIE)
+      set(PIE_FLAGS "-no-pie")
+    elseif(COMPILER_SUPPORTS_FNO_PIE)
+      set(PIE_FLAGS "-fno-pie")
+    elseif(COMPILER_SUPPOERTS_FNO_PIE_CAP)
+      set(PIE_FLAGS "-fno-PIE")
+    else()
+      message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
+    endif()
+
+    LIST(APPEND EXTRA_EXE_FLAGS
+      ${PIE_FLAGS})
+
+    cmessage(STATUS "NEUT")
+    cmessage(STATUS "     Version   : ${NEUT_VER}")
+    cmessage(STATUS "     Flags     : ${NEUT_CXX_FLAGS}")
+    cmessage(STATUS "     Includes  : ${NEUT_INCLUDE_DIRS}")
+    cmessage(STATUS "     Link Dirs : ${NEUT_LINK_DIRS}")
+    cmessage(STATUS "     Libs      : ${NEUT_LIBS}")
+    cmessage(STATUS "     Exe Flags : ${EXTRA_EXE_FLAGS}")
   else()
-      GETLIBS(neut-config --libflags NEUT_GENLIBS)
-      GETLIBS(neut-config --iolibflags NEUT_LIBS)
-      LIST(APPEND NEUT_LIBS ${NEUT_IOLIBS})
-      LIST(APPEND NEUT_LIBS ${NEUT_GENLIBS})
+
+    execute_process (COMMAND neut-config
+      --incdir OUTPUT_VARIABLE NEUT_INCLUDE_DIRS
+               OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+    execute_process (COMMAND neut-config
+      --libdir OUTPUT_VARIABLE NEUT_LINK_DIRS
+               OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+    GetLibDirs(CONFIG_APP neut-config ARGS --cernflags OUTPUT_VARIABLE CERN_LIB_DIR)
+    LIST(APPEND NEUT_LINK_DIRS ${CERN_LIB_DIR})
+    GetLibs(CONFIG_APP neut-config ARGS --cernflags OUTPUT_VARIABLE CERN_LIBS)
+
+    if(NOT DEFINED USE_NEUT_REWEIGHT)
+      if(USE_REWEIGHT)
+        SET(USE_NEUT_REWEIGHT ON)
+      else()
+        SET(USE_NEUT_REWEIGHT OFF)
+      endif()
+    endif()
+
+    PrefixList(NEUT_INCLUDE_DIRS "-I" ${NEUT_INCLUDE_DIRS})
+
+    if(USE_REWEIGHT AND USE_NEUT_REWEIGHT)
+      execute_process (COMMAND neut-config
+        --rwlibflags OUTPUT_VARIABLE NEUT_RWLIBS
+                 OUTPUT_STRIP_TRAILING_WHITESPACE)
+      GetLibs(CONFIG_APP neut-config ARGS --rwlibflags OUTPUT_VARIABLE NEUT_RWLIBS)
+      LIST(APPEND NEUT_LIBS ${NEUT_RWLIBS})
+      LIST(APPEND EXTRA_CXX_FLAGS ${NEUT_INCLUDE_DIRS} -D__USE_NEUT_REWEIGHT__)
+    else()
+        GetLibs(CONFIG_APP neut-config ARGS --libflags OUTPUT_VARIABLE NEUT_GENLIBS)
+        GetLibs(CONFIG_APP neut-config ARGS --iolibflags OUTPUT_VARIABLE NEUT_LIBS)
+        LIST(APPEND NEUT_LIBS ${NEUT_IOLIBS})
+        LIST(APPEND NEUT_LIBS ${NEUT_GENLIBS})
+    endif()
+
+    LIST(APPEND NEUT_LIBS ${CERN_LIBS};gfortran)
+    LIST(APPEND EXTRA_LIBS ${NEUT_LIBS})
+
+    string(REPLACE "." "" NEUT_VERSION ${NEUT_VER})
+
+    LIST(APPEND EXTRA_CXX_FLAGS ${NEUT_INCLUDE_DIRS} -D__NEUT_ENABLED__ -D__NEUT_VERSION__=${NEUT_VERSION})
+
+    LIST(APPEND EXTRA_LINK_DIRS ${NEUT_LINK_DIRS})
+
+    include(CheckCXXCompilerFlag)
+    CHECK_CXX_COMPILER_FLAG(-Wl,--allow-multiple-definition COMPILER_SUPPORTS_ALLOW_MULTIPLE_DEFINITION)
+
+    IF(COMPILER_SUPPORTS_ALLOW_MULTIPLE_DEFINITION)
+      LIST(APPEND EXTRA_LINK_FLAGS -Wl,--allow-multiple-definition)
+    ENDIF()
+
+    CHECK_CXX_COMPILER_FLAG(-no-pie COMPILER_SUPPORTS_NO_PIE)
+    CHECK_CXX_COMPILER_FLAG(-fno-pie COMPILER_SUPPORTS_FNO_PIE)
+    CHECK_CXX_COMPILER_FLAG(-fno-PIE COMPILER_SUPPORTS_FNO_PIE_CAP)
+    if(COMPILER_SUPPORTS_NO_PIE)
+      set(PIE_FLAGS "-no-pie")
+    elseif(COMPILER_SUPPORTS_FNO_PIE)
+      set(PIE_FLAGS "-fno-pie")
+    elseif(COMPILER_SUPPOERTS_FNO_PIE_CAP)
+      set(PIE_FLAGS "-fno-PIE")
+    else()
+      message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
+    endif()
+
+    LIST(APPEND EXTRA_EXE_FLAGS
+      ${PIE_FLAGS})
+
+    cmessage(STATUS "NEUT")
+    cmessage(STATUS "     Version   : ${NEUT_VER}")
+    cmessage(STATUS "     Flags     : ${NEUT_CXX_FLAGS}")
+    cmessage(STATUS "     Includes  : ${NEUT_INCLUDE_DIRS}")
+    cmessage(STATUS "     Link Dirs : ${NEUT_LINK_DIRS}")
+    cmessage(STATUS "     Libs      : ${NEUT_LIBS}")
+    cmessage(STATUS "     Exe Flags : ${EXTRA_EXE_FLAGS}")
   endif()
-
-  LIST(APPEND NEUT_LIBS ${CERN_LIBS};gfortran)
-  LIST(APPEND EXTRA_LIBS ${NEUT_LIBS})
-
-  string(REPLACE "." "" NEUT_VERSION ${NEUT_VER})
-
-  LIST(APPEND EXTRA_CXX_FLAGS ${NEUT_INCLUDE_DIRS} -D__NEUT_ENABLED__ -D__NEUT_VERSION__=${NEUT_VERSION})
-
-  LIST(APPEND EXTRA_LINK_DIRS ${NEUT_LINK_DIRS})
-
-  include(CheckCXXCompilerFlag)
-  CHECK_CXX_COMPILER_FLAG(-Wl,--allow-multiple-definition COMPILER_SUPPORTS_ALLOW_MULTIPLE_DEFINITION)
-
-  IF(COMPILER_SUPPORTS_ALLOW_MULTIPLE_DEFINITION)
-    LIST(APPEND EXTRA_LINK_FLAGS -Wl,--allow-multiple-definition)
-  ENDIF()
-
-  CHECK_CXX_COMPILER_FLAG(-no-pie COMPILER_SUPPORTS_NO_PIE)
-  CHECK_CXX_COMPILER_FLAG(-fno-pie COMPILER_SUPPORTS_FNO_PIE)
-  CHECK_CXX_COMPILER_FLAG(-fno-PIE COMPILER_SUPPORTS_FNO_PIE_CAP)
-  if(COMPILER_SUPPORTS_NO_PIE)
-    set(PIE_FLAGS "-no-pie")
-  elseif(COMPILER_SUPPORTS_FNO_PIE)
-    set(PIE_FLAGS "-fno-pie")
-  elseif(COMPILER_SUPPOERTS_FNO_PIE_CAP)
-    set(PIE_FLAGS "-fno-PIE")
-  else()
-    message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
-  endif()
-
-  LIST(APPEND EXTRA_EXE_FLAGS
-    ${PIE_FLAGS})
-
-  cmessage(STATUS "NEUT")
-  cmessage(STATUS "     Version   : ${NEUT_VER}")
-  cmessage(STATUS "     Flags     : ${NEUT_CXX_FLAGS}")
-  cmessage(STATUS "     Includes  : ${NEUT_INCLUDE_DIRS}")
-  cmessage(STATUS "     Link Dirs : ${NEUT_LINK_DIRS}")
-  cmessage(STATUS "     Libs      : ${NEUT_LIBS}")
-  cmessage(STATUS "     Exe Flags : ${EXTRA_EXE_FLAGS}")
-
 
 else() # Everything better be set up already
 

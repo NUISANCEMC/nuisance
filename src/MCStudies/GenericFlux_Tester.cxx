@@ -81,10 +81,10 @@ GenericFlux_Tester::GenericFlux_Tester(std::string name, std::string inputfile,
   // histogram. This method is used here as it now respects EnuMin and EnuMax
   // correctly.
   this->fScaleFactor =
-      (this->PredictedEventRate("width", 0, 1000) / double(fNEvents)) /
+      (this->PredictedEventRate("width") / double(fNEvents)) /
       this->TotalIntegratedFlux();
   if (fScaleFactor <= 0.0) {
-    NUIS_ABORT("SCALE FACTOR TOO LOW ");
+    NUIS_ABORT("SCALE FACTOR TOO LOW: " << fScaleFactor);
   }
 
   NUIS_LOG(SAM, " Generic Flux Scaling Factor = "

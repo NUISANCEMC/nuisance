@@ -23,6 +23,13 @@
 
 nusystematicsWeightEngine::nusystematicsWeightEngine() {
   fUseCV = false;
+
+  // This is a bit hacky...
+  if (Config::HasPar("GENIETune")) {
+    setenv("GENIE_XSEC_TUNE", Config::GetParS("GENIETune").c_str(), true);
+    NUIS_LOG(DEB, "Set GENIE_XSEC_TUNE=" << Config::GetParS("GENIETune"));
+  }
+
   Config();
 }
 
@@ -50,6 +57,7 @@ int nusystematicsWeightEngine::ConvDial(std::string name) {
     NUIS_ABORT("nusystematicsWeightEngine passed dial: "
                << name << " that it does not understand.");
   }
+  NUIS_LOG(FIT, "Added NuSyst param, " << name << " with ID: " << DUNErwt.GetHeaderId(name));
   return DUNErwt.GetHeaderId(name);
 }
 
@@ -156,12 +164,15 @@ double nusystematicsWeightEngine::CalcWeight(BaseFitEvt *evt) {
       weight *= resp.CV_response;
     } else { // This is very inefficient for fitting, as it recalculates the
              // spline every time.
-      systtools::ParamValue const &pval =
-          GetParamElementFromContainer(EnabledParams, resp.pid);
+
+      //this is a completely backwards way of doing this loop, but the whole thing is broken anyway.
+      size_t index = GetParamContainerIndex(EnabledParams, resp.pid);
+      if(index != systtools::kParamUnhandled<size_t>){
       weight *= (resp.CV_response *
-                 DUNErwt.GetParameterResponse(resp.pid, pval.val,
+                 DUNErwt.GetParameterResponse(resp.pid, EnabledParams[index].val,
                                               systtools::event_unit_response_t{
                                                   {resp.pid, resp.responses}}));
+      }
     }
   }
 

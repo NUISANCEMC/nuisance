@@ -335,6 +335,7 @@ void SystematicRoutines::SetupFCN() {
   if (fSampleFCN)
     delete fSampleFCN;
   fSampleFCN = new JointFCN(fOutputRootFile);
+  fSampleFCN->SetNParams(int(fParams.size()));
   SetFakeData();
 
   return;
@@ -912,8 +913,6 @@ void SystematicRoutines::GenerateThrows() {
                   (mytime.tv_usec / 1000.);
   gRandom->SetSeed(seed);
 
-  //  int seed = (gRandom->Uniform(0.0,1.0)*100000 + 100000000*(startthrows +
-  //  endthrows) + time(NULL) + int(getpid()) ); gRandom->SetSeed(seed);
   NUIS_LOG(FIT, "Using Seed : " << seed);
   NUIS_LOG(FIT, "nthrows = " << nthrows);
   NUIS_LOG(FIT, "startthrows = " << startthrows);
@@ -946,12 +945,8 @@ void SystematicRoutines::GenerateThrows() {
   // Run Throws and save
   for (Int_t i = 0; i < endthrows + 1; i++) {
 
-    // Generate Random Parameter Throw
-    ThrowCovariance(uniformly);
-    if (i < startthrows)
-      continue;
-    if (i == 0)
-      continue;
+    if (i < startthrows) continue;
+    if (i == 0) continue;
     NUIS_LOG(FIT, "Throw " << i << "/" << endthrows
                        << " ================================");
 
@@ -959,10 +954,13 @@ void SystematicRoutines::GenerateThrows() {
         (TDirectory *)tempfile->mkdir(Form("throw_%i", i));
     throwfolder->cd();
 
+    // Generate Random Parameter Throw
+    ThrowCovariance(uniformly);
+
     // Run Eval
     double *vals = FitUtils::GetArrayFromMap(fParams, fThrownVals);
     fSampleFCN->DoEval(vals);
-    delete vals;
+    delete[] vals;
 
     // Save the FCN
     fSampleFCN->Write();
@@ -970,7 +968,6 @@ void SystematicRoutines::GenerateThrows() {
 
   tempfile->cd();
   fSampleFCN->WriteIterationTree();
-
   tempfile->Close();
 }
 
@@ -1104,22 +1101,23 @@ void SystematicRoutines::MergeThrows() {
                      nbins, 0, nbins, "S");
 
     // Setup The TTREE
-    double *bincontents;
-    bincontents = new double[nbins];
+    // double *bincontents;
+    // bincontents = new double[nbins];
+    std::vector<double> bincontents = std::vector<double>(nbins, 0);
 
-    double *binlowest;
-    binlowest = new double[nbins];
+    // double *binlowest;
+    // binlowest = new double[nbins];
 
-    double *binhighest;
-    binhighest = new double[nbins];
+    // double *binhighest;
+    // binhighest = new double[nbins];
 
     errorDIR->cd();
     TTree *bintree =
         new TTree((plotname + "_tree").c_str(), (plotname + "_tree").c_str());
-    for (Int_t i = 0; i < nbins; i++) {
-      bincontents[i] = 0.0;
-      binhighest[i] = 0.0;
-      binlowest[i] = 0.0;
+    for (int i = 0; i < nbins; i++) {
+      // bincontents[i] = 0.0;
+      // binhighest[i] = 0.0;
+      // binlowest[i] = 0.0;
       bintree->Branch(Form("content_%i", i), &bincontents[i],
                       Form("content_%i/D", i));
     }
@@ -1154,15 +1152,10 @@ void SystematicRoutines::MergeThrows() {
         for (Int_t j = 0; j < nbins; j++) {
           tprof->Fill(j + 0.5, newplot->GetBinContent(j + 1));
           bincontents[j] = newplot->GetBinContent(j + 1);
-
-          if (bincontents[j] < binlowest[j] or i == 0)
-            binlowest[j] = bincontents[j];
-          if (bincontents[j] > binhighest[j] or i == 0)
-            binhighest[j] = bincontents[j];
         }
 
         errorDIR->cd();
-        bintree->Fill();
+	bintree->Fill();
       }
 
       throwfile->Close();
@@ -1180,18 +1173,11 @@ void SystematicRoutines::MergeThrows() {
     for (Int_t j = 0; j < nbins; j++) {
 
       if (!uniformly) {
-        //	if ((baseplot->GetBinError(j+1)/baseplot->GetBinContent(j+1))
-        //< 1.0) {
-        // baseplot->SetBinError(j+1,sqrt(pow(tprof->GetBinError(j+1),2)
-        //+ pow(baseplot->GetBinError(j+1),2))); 	} else {
         baseplot->SetBinContent(j + 1, tprof->GetBinContent(j + 1));
         baseplot->SetBinError(j + 1, tprof->GetBinError(j + 1));
-        //	}
       } else {
-        baseplot->SetBinContent(j + 1,
-                                0.0); //(binlowest[j] + binhighest[j]) / 2.0);
-        baseplot->SetBinError(j + 1,
-                              0.0); //(binhighest[j] - binlowest[j])/2.0);
+        baseplot->SetBinContent(j + 1, 0.0);
+        baseplot->SetBinError(j + 1, 0.0); 
       }
     }
 
@@ -1212,10 +1198,9 @@ void SystematicRoutines::MergeThrows() {
     delete baseplot;
     delete tprof;
     delete bintree;
-    delete[] bincontents;
   }
-fOutputRootFile->Write();
-fOutputRootFile->Close();
+  fOutputRootFile->Write();
+  fOutputRootFile->Close();
 };
 
 void SystematicRoutines::EigenErrors() {
