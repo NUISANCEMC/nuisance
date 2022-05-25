@@ -105,6 +105,7 @@ private:
 	// For GiBUU specific normalization
 	std::vector<int> jointrequested;
 	std::vector<int> jointtype;
+	std::vector<int> jointnnucl;
 };
 #endif
 #endif

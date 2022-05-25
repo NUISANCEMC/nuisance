@@ -414,6 +414,9 @@ void GiBUUNativeInputHandler::RegisterJointInput(std::string input, int process_
 
   // To keep track of how many of each type there are
   jointtype .push_back(nnucleons*1000+process_ID*10 + flavor_ID);
+  
+  // For scaling by nnucleons later
+  jointnnucl .push_back(nnucleons);
 
 }
 
@@ -441,7 +444,7 @@ void GiBUUNativeInputHandler::SetupJointInputs() {
     if (!fFluxHist) fFluxHist = (TH1D*)jointfluxinputs[i]->Clone();
 
     // Get the list of unique nuclei nuclei
-    int this_nucl = jointtype[i]/1000;
+    int this_nucl = jointnnucl[i];
     if (std::find(unique_nucl.begin(), unique_nucl.end(), this_nucl) == unique_nucl.end()){
       unique_nucl.push_back(this_nucl);
       total_unique_nucl += this_nucl;
@@ -462,7 +465,7 @@ void GiBUUNativeInputHandler::SetupJointInputs() {
     nsame_vect.push_back(nsame);
 
     // Need to average events with the same run config, and add others
-    this_evt_total->Scale(jointtype[i]/1000/double(nsame));
+    this_evt_total->Scale(jointnnucl[i]/double(nsame));
     if (!fEventHist) fEventHist = (TH1D*)this_evt_total->Clone();
     else fEventHist ->Add(this_evt_total);
     delete this_evt_total;
@@ -478,7 +481,7 @@ void GiBUUNativeInputHandler::SetupJointInputs() {
     double scale = fFluxHist->Integral("width")*fNEvents/fEventHist->Integral("width");
 
     // Need to correctly weight by the number of nucleons to arrive at the /nucleon XSEC for a compound target
-    scale *= jointtype[i]/1000/double(total_unique_nucl)/nsame_vect[i];
+    scale *= jointnnucl[i]/double(total_unique_nucl)/nsame_vect[i];
 
     jointindexscale.push_back(scale);
   }
