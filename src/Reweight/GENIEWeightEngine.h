@@ -1,20 +1,14 @@
 #ifndef WEIGHT_ENGINE_GENIE_H
 #define WEIGHT_ENGINE_GENIE_H
 
-#ifdef __GENIE_ENABLED__
-#ifdef GENIE_PRE_R3
-#ifndef __NO_REWEIGHT__
-#include "ReWeight/GSyst.h"
-#include "ReWeight/GReWeight.h"
-#endif
-#else
-#ifndef __NO_REWEIGHT__
+#ifdef GENIE3_API_ENABLED
 #include "RwFramework/GSyst.h"
 #include "RwFramework/GReWeight.h"
 using namespace genie;
 using namespace genie::rew;
-#endif
-#endif
+#else
+#include "ReWeight/GSyst.h"
+#include "ReWeight/GReWeight.h"
 #endif
 
 #include "GeneratorUtils.h"
@@ -34,13 +28,8 @@ public:
 	double CalcWeight(BaseFitEvt* evt);
 	inline bool NeedsEventReWeight() { return true; };
 
-#ifdef __GENIE_ENABLED__
-#ifndef __NO_REWEIGHT__
 	std::vector<genie::rew::GSyst_t> fGENIESysts;
 	genie::rew::GReWeight* fGenieRW;  //!< Genie RW Object
-#endif
-#endif
-
 };
 
 #endif

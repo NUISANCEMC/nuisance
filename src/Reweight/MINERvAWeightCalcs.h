@@ -1,37 +1,16 @@
 #ifndef MINERVA_WEIGHT_CALCS
 #define MINERVA_WEIGHT_CALCS
 
-#include <string>
-
-#ifdef __MINERVA_RW_ENABLED__
-#ifdef __GENIE_ENABLED__
-#ifdef GENIE_PRE_R3
-#include "Conventions/Units.h"
-#include "EVGCore/EventRecord.h"
-#include "GHEP/GHepParticle.h"
-#include "GHEP/GHepRecord.h"
-#include "GHEP/GHepUtils.h"
-#include "Ntuple/NtpMCEventRecord.h"
-#include "PDG/PDGUtils.h"
-#else
-#include "Framework/Conventions/Units.h"
-#include "Framework/EventGen/EventRecord.h"
-#include "Framework/GHEP/GHepParticle.h"
-#include "Framework/GHEP/GHepRecord.h"
-#include "Framework/GHEP/GHepUtils.h"
-#include "Framework/Ntuple/NtpMCEventRecord.h"
-#include "Framework/ParticleData/PDGUtils.h"
-using namespace genie;
-#endif
-
 #include "NUISANCEWeightCalcs.h"
 #include "GeneralUtils.h"
 #include "NUISANCESyst.h"
 #include "FitEvent.h"
 #include "WeightUtils.h"
 #include "weightRPA.h"
-class BaseFitEvt;
 
+#include <string>
+
+class BaseFitEvt;
 
 namespace nuisance {
   namespace reweight {
@@ -202,8 +181,5 @@ namespace nuisance {
 
   };  // namespace reweight
 };  // namespace nuisance
-
-#endif // __GENIE_ENABLED__
-#endif //__MINERVA_RW_ENABLED__
 
 #endif

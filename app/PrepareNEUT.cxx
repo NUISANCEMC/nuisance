@@ -17,6 +17,7 @@ std::string fFluxFile = "";
 bool fFluxInGeV = false;
 bool fIsMonoEFlux = false;
 double fMonoEEnergy = 0xdeadbeef;
+double fXSecOverride = 0;
 
 void PrintOptions();
 void ParseOptions(int argc, char *argv[]);
@@ -86,7 +87,10 @@ void AddMonoRateHistogram(std::string inputList, double MonoE,
     NeutPart *part = fNeutVect->PartInfo(0);
     double E = part->fP.E();
     double xsec = fNeutVect->Totcrs;
-
+    if(fXSecOverride > 0){
+      xsec = fXSecOverride;
+    }
+    std::cout << "MonoE[" << i << "]: " << E << ", xsec = " << xsec << std::endl;
     // Unit conversion
     if (fFluxInGeV)
       E *= 1E-3;
@@ -389,6 +393,9 @@ void ParseOptions(int argc, char *argv[]) {
         fIsMonoEFlux = true;
         fMonoEEnergy = GeneralUtils::StrToDbl(argv[i + 1]);
         ++i;
+      } else if (!std::strcmp(argv[i],"-X")){
+        fXSecOverride = GeneralUtils::StrToDbl(argv[i + 1]);
+	++i;
       } else {
         NUIS_ERR(FTL, "ERROR: unknown command line option given! - '"
                         << argv[i] << " " << argv[i + 1] << "'");

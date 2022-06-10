@@ -1,6 +1,6 @@
 #ifndef GIBUUNATIVEINPUTHANDLER_H
 #define GIBUUNATIVEINPUTHANDLER_H
-#ifdef __GiBUU_ENABLED__
+#ifdef GiBUU_ENABLED
 /*!
  *  \addtogroup InputHandler
  *  @{

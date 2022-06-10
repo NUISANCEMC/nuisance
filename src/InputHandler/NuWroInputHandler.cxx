@@ -1,4 +1,4 @@
-#ifdef __NUWRO_ENABLED__
+#ifdef NuWro_ENABLED
 #include "NuWroInputHandler.h"
 #include "InputUtils.h"
 
@@ -141,7 +141,7 @@ FitEvent *NuWroInputHandler::GetNuisanceEvent(const UInt_t ent,
   if (!lightweight) {
     CalcNUISANCEKinematics();
   }
-#ifdef __PROB3PP_ENABLED__
+#ifdef Prob3plusplus_ENABLED
   for (size_t i = 0; i < fNUISANCEEvent->fNuwroEvent->in.size(); i++) {
     if (std::count(PhysConst::pdg_neutrinos, PhysConst::pdg_neutrinos + 4,
                    fNUISANCEEvent->fNuwroEvent->in[i].pdg)) {
@@ -445,7 +445,7 @@ void NuWroInputHandler::Print(){
 	   << "\t\t|->       dis = " << fNuWroEvent->flag.dis << std::endl
 	   << "\t\t|->       coh = " << fNuWroEvent->flag.coh << std::endl
 	   << "\t\t|->       mec = " << fNuWroEvent->flag.mec << std::endl
-	   << "\t\t|->       hip = " << fNuWroEvent->flag.hip << std::endl
+	   << "\t\t|->       hyp = " << fNuWroEvent->flag.hyp << std::endl
 	   << "\t\t|->        nc = " << fNuWroEvent->flag.nc << std::endl
 	   << "\t\t|->        cc = " << fNuWroEvent->flag.cc << std::endl
 	   << "\t\t|->      anty = " << fNuWroEvent->flag.anty << std::endl

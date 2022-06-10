@@ -487,7 +487,7 @@ double FitEvent::GetQ2() {
   if (!neutrino || !lepton) {
     //if (!neutrino) std::cout << "no incoming neutrino!" << std::endl;
     //if (!lepton) std::cout << "no outgoing lepton!" << std::endl;
-#ifdef __NEUT_ENABLED__
+#ifdef NEUT_ENABLED
     //fNeutVect->Dump();
 #endif
     return -999;

@@ -30,7 +30,7 @@
 #include "TMatrixD.h"
 #include "TVectorD.h"
 
-#ifdef ROOT6_USE_FIT_FITTER_INTERFACE
+#ifdef ROOT_FIT_FITTER_INTERFACE_ENABLED
 #include "Fit/Fitter.h"
 #else
 #include "Minuit2/FCNBase.h"

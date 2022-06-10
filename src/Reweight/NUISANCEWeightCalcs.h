@@ -3,16 +3,8 @@
 
 #include "BaseFitEvt.h"
 #include "BeRPA.h"
-#ifdef __GENIE_ENABLED__
-#ifdef GENIE_PRE_R3
-#include "Conventions/Units.h"
-#include "EVGCore/EventRecord.h"
-#include "GHEP/GHepParticle.h"
-#include "GHEP/GHepRecord.h"
-#include "GHEP/GHepUtils.h"
-#include "Ntuple/NtpMCEventRecord.h"
-#include "PDG/PDGUtils.h"
-#else
+#ifdef GENIE_ENABLED
+#ifdef GENIE3_API_ENABLED
 #include "Framework/Conventions/Units.h"
 #include "Framework/EventGen/EventRecord.h"
 #include "Framework/GHEP/GHepParticle.h"
@@ -21,6 +13,14 @@
 #include "Framework/Ntuple/NtpMCEventRecord.h"
 #include "Framework/ParticleData/PDGUtils.h"
 using namespace genie;
+#else
+#include "Conventions/Units.h"
+#include "EVGCore/EventRecord.h"
+#include "GHEP/GHepParticle.h"
+#include "GHEP/GHepRecord.h"
+#include "GHEP/GHepUtils.h"
+#include "Ntuple/NtpMCEventRecord.h"
+#include "PDG/PDGUtils.h"
 #endif // End GENIE pre v3
 #endif // End GENIE enabled
 

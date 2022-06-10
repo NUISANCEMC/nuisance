@@ -24,7 +24,7 @@
 
 #include "ISmearcepter.h"
 
-#ifdef __PROB3PP_ENABLED__
+#ifdef Prob3plusplus_ENABLED
 #include "OscWeightEngine.h"
 #endif
 

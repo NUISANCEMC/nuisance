@@ -16,53 +16,19 @@
 #    You should have received a copy of the GNU General Public License
 #    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
-set(IMPLFILES
-ComparisonRoutines.cxx
-SystematicRoutines.cxx
-SplineRoutines.cxx
-BayesianRoutines.cxx
+
+set(Routines_Impl_Files
+  ComparisonRoutines.cxx
+  SystematicRoutines.cxx
+  SplineRoutines.cxx
+  BayesianRoutines.cxx
 )
 
-if(USE_MINIMIZER)
-  set(IMPLFILES ${IMPLFILES};MinimizerRoutines.cxx)
+if(MINIMIZER_ENABLED)
+  LIST(APPEND Routines_Impl_Files MinimizerRoutines.cxx)
 endif()
 
-set(HEADERFILES
-ComparisonRoutines.h
-SystematicRoutines.h
-BayesianRoutines.h
-SplineRoutines.h
-)
+add_library(Routines SHARED ${Routines_Impl_Files})
+target_link_libraries(Routines CoreIncludes ROOT::ROOT)
 
-if(USE_MINIMIZER)
-  set(HEADERFILES ${HEADERFILES};MinimizerRoutines.h)
-endif()
-
-set(LIBNAME Routines)
-
-if(CMAKE_BUILD_TYPE MATCHES DEBUG)
-  add_library(${LIBNAME} STATIC ${IMPLFILES})
-else(CMAKE_BUILD_TYPE MATCHES RELEASE)
-  add_library(${LIBNAME} SHARED ${IMPLFILES})
-endif()
-
-include_directories(${EXP_INCLUDE_DIRECTORIES})
-
-include_directories(${MINIMUM_INCLUDE_DIRECTORIES})
-
-include_directories(${CMAKE_SOURCE_DIR}/src/FCN)
-include_directories(${CMAKE_SOURCE_DIR}/src/MCStudies)
-
-set_target_properties(${LIBNAME} PROPERTIES VERSION
-  "${NUISANCE_VERSION_MAJOR}.${NUISANCE_VERSION_MINOR}.${NUISANCE_VERSION_REVISION}")
-#set_target_properties(${LIBNAME} PROPERTIES LINK_FLAGS ${ROOT_LD_FLAGS})
-
-if(DEFINED PROJECTWIDE_EXTRA_DEPENDENCIES)
-  add_dependencies(${LIBNAME} ${PROJECTWIDE_EXTRA_DEPENDENCIES})
-endif()
-
-install(TARGETS ${LIBNAME} DESTINATION lib)
-#Can uncomment this to install the headers... but is it really neccessary?
-install(FILES ${HEADERFILES} DESTINATION include/Routines)
-
-set(MODULETargets ${MODULETargets} ${LIBNAME} PARENT_SCOPE)
+install(TARGETS Routines DESTINATION lib)

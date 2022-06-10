@@ -2,7 +2,7 @@
 #include "NUISANCEWeightCalcs.h"
 
 #ifdef __MINERVA_RW_ENABLED__
-#ifdef __GENIE_ENABLED__
+#ifdef GENIE_ENABLED
 #include "MINERvAWeightCalcs.h"
 #endif
 #endif
@@ -35,7 +35,7 @@ NUISANCEWeightEngine::NUISANCEWeightEngine(std::string name) {
 
   // The MINERvA calculators that rely on GENIE variables (so need GENIE support)
 #ifdef __MINERVA_RW_ENABLED__
-#ifdef __GENIE_ENABLED__
+#ifdef GENIE_ENABLED
   fWeightCalculators.push_back(new nuisance::reweight::MINERvAReWeight_QE());
   fWeightCalculators.push_back(new nuisance::reweight::MINERvAReWeight_MEC());
   fWeightCalculators.push_back(new nuisance::reweight::MINERvAReWeight_RES());
@@ -79,7 +79,7 @@ void NUISANCEWeightEngine::IncludeDial(std::string name, double startval) {
   }
 
   // Set Value if given
-  if (startval != _UNDEF_DIAL_VALUE_) {
+  if (startval != UNDEF_DIAL_VALUE) {
     SetDialValue(nuisenum, startval);
   }
 };

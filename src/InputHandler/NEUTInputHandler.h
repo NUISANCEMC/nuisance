@@ -1,7 +1,6 @@
 #ifndef NEUTINPUTHANDLER_H
 #define NEUTINPUTHANDLER_H
 
-#if defined(__NEUT_ENABLED__) || defined(NEUT_EVENT_ENABLED)
 #include "InputHandler.h"
 #include "TargetUtils.h"
 
@@ -68,10 +67,9 @@ public:
 };
 
 namespace NEUTUtils {
-#ifdef NEED_FILL_NEUT_COMMONS
+#ifdef NEUT_BUILTIN_FILL_NEUT_COMMONS
 void FillNeutCommons(NeutVect* nvect);
 #endif
 }
 
-#endif
 #endif

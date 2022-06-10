@@ -16,68 +16,30 @@
 #    You should have received a copy of the GNU General Public License
 #    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
-set(IMPLFILES
-ExpMultDist_CCQE_XSec_1DVar_FakeStudy.cxx
-ExpMultDist_CCQE_XSec_2DVar_FakeStudy.cxx
-GenericFlux_Tester.cxx
-GenericFlux_Vectors.cxx
-#MCStudy_KaonPreSelection.cxx
-MCStudy_MuonValidation.cxx
-ElectronFlux_FlatTree.cxx
-T2K2017_FakeData.cxx
-MCStudy_CCQEHistograms.cxx
-OfficialNIWGPlots.cxx
-Smearceptance_Tester.cxx
-Simple_Osc.cxx
-Smear_SVDUnfold_Propagation_Osc.cxx
-SigmaEnuHists.cxx
+
+set(MCStudies_Impl_Files
+  ExpMultDist_CCQE_XSec_1DVar_FakeStudy.cxx
+  ExpMultDist_CCQE_XSec_2DVar_FakeStudy.cxx
+  GenericFlux_Tester.cxx
+  GenericFlux_Vectors.cxx
+  #MCStudy_KaonPreSelection.cxx
+  MCStudy_MuonValidation.cxx
+  ElectronFlux_FlatTree.cxx
+  T2K2017_FakeData.cxx
+  MCStudy_CCQEHistograms.cxx
+  OfficialNIWGPlots.cxx
+  Smearceptance_Tester.cxx
+  
+  SigmaEnuHists.cxx
 )
 
-set(HEADERFILES
-ExpMultDist_CCQE_XSec_1DVar_FakeStudy.h
-ExpMultDist_CCQE_XSec_2DVar_FakeStudy.h
-GenericFlux_Tester.h
-GenericFlux_Vectors.h
-#MCStudy_KaonPreSelection.h
-MCStudy_MuonValidation.h
-ElectronFlux_FlatTree.h
-T2K2017_FakeData.h
-MCStudy_CCQEHistograms.h
-OfficialNIWGPlots.h
-Smearceptance_Tester.h
-Simple_Osc.h
-Smear_SVDUnfold_Propagation_Osc.h
-SigmaEnuHists.h
-)
-
-set(LIBNAME MCStudies)
-
-if(CMAKE_BUILD_TYPE MATCHES DEBUG)
-  add_library(${LIBNAME} STATIC ${IMPLFILES})
-else(CMAKE_BUILD_TYPE MATCHES RELEASE)
-  add_library(${LIBNAME} SHARED ${IMPLFILES})
+if(Prob3plusplus_ENABLED)
+  LIST(APPEND MCStudies_Impl_Files 
+    Simple_Osc.cxx
+    Smear_SVDUnfold_Propagation_Osc.cxx)
 endif()
 
-include_directories(${MINIMUM_INCLUDE_DIRECTORIES})
+add_library(MCStudies SHARED ${MCStudies_Impl_Files})
+target_link_libraries(MCStudies Experiments CoreIncludes ROOT::ROOT)
 
-# Needed for experiment specific signal flags
-include_directories(${CMAKE_SOURCE_DIR}/src/T2K)
-include_directories(${CMAKE_SOURCE_DIR}/src/MINERvA)
-include_directories(${CMAKE_SOURCE_DIR}/src/Smearceptance)
-
-set_target_properties(${LIBNAME} PROPERTIES VERSION
-  "${NUISANCE_VERSION_MAJOR}.${NUISANCE_VERSION_MINOR}.${NUISANCE_VERSION_REVISION}")
-#set_target_properties(${LIBNAME} PROPERTIES LINK_FLAGS ${ROOT_LD_FLAGS})
-if(DEFINED PROJECTWIDE_EXTRA_DEPENDENCIES)
-  add_dependencies(${LIBNAME} ${PROJECTWIDE_EXTRA_DEPENDENCIES})
-endif()
-
-if(USE_PROB3PP)
-  add_dependencies(${LIBNAME} prob3pp)
-endif()
-
-install(TARGETS ${LIBNAME} DESTINATION lib)
-#Can uncomment this to install the headers... but is it really neccessary?
-install(FILES ${HEADERFILES} DESTINATION include/MCStudies)
-
-set(MODULETargets ${MODULETargets} ${LIBNAME} PARENT_SCOPE)
+install(TARGETS MCStudies DESTINATION lib)

@@ -19,9 +19,6 @@
 
 #include "OfficialNIWGPlots.h"
 
-#include "T2K_SignalDef.h"
-#include "MINERvA_SignalDef.h"
-
 //********************************************************************
 OfficialNIWGPlots::OfficialNIWGPlots(nuiskey samplekey) {
 //********************************************************************

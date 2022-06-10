@@ -90,7 +90,7 @@ bool isCC1pip_MINERvA(FitEvent *event, double EnuMin, double EnuMax,
   double hadMass = 9999.99;
 
   // Actual cut is True GENIE Ws! Arg.! Use gNtpcConv definition.
-#ifdef __GENIE_ENABLED__
+#ifdef GENIE_ENABLED
   if (event->fType == kGENIE) {
     EventRecord *gevent = static_cast<EventRecord *>(event->genie_event->event);
     const Interaction *interaction = gevent->Summary();
@@ -208,7 +208,7 @@ bool isCCNpip_MINERvA(FitEvent *event, double EnuMin, double EnuMax,
 
   // Actual cut is True GENIE Ws! Arg.! Use gNtpcConv definition.
   if (isWtrue) {
-#ifdef __GENIE_ENABLED__
+#ifdef GENIE_ENABLED
     if (event->fType == kGENIE) {
       GHepRecord *ghep = static_cast<GHepRecord *>(event->genie_event->event);
       const Interaction *interaction = ghep->Summary();

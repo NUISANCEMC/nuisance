@@ -16,34 +16,13 @@
 #    You should have received a copy of the GNU General Public License
 #    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
-set(IMPLFILES
-GGM_CC1ppip_Evt_1DQ2_nu.cxx
-GGM_CC1ppip_XSec_1DEnu_nu.cxx
+
+set(GGM_Impl_Files
+  GGM_CC1ppip_Evt_1DQ2_nu.cxx
+  GGM_CC1ppip_XSec_1DEnu_nu.cxx
 )
 
-set(HEADERFILES
-GGM_CC1ppip_Evt_1DQ2_nu.h
-GGM_CC1ppip_XSec_1DEnu_nu.h
-)
+add_library(GGM SHARED ${GGM_Impl_Files})
+target_link_libraries(GGM CoreIncludes)
 
-set(LIBNAME expGGM)
-
-if(CMAKE_BUILD_TYPE MATCHES DEBUG)
-  add_library(${LIBNAME} STATIC ${IMPLFILES})
-else(CMAKE_BUILD_TYPE MATCHES RELEASE)
-  add_library(${LIBNAME} SHARED ${IMPLFILES})
-endif()
-
-include_directories(${MINIMUM_INCLUDE_DIRECTORIES})
-
-set_target_properties(${LIBNAME} PROPERTIES VERSION
-  "${NUISANCE_VERSION_MAJOR}.${NUISANCE_VERSION_MINOR}.${NUISANCE_VERSION_REVISION}")
-#set_target_properties(${LIBNAME} PROPERTIES LINK_FLAGS ${ROOT_LD_FLAGS})
-if(DEFINED PROJECTWIDE_EXTRA_DEPENDENCIES)
-  add_dependencies(${LIBNAME} ${PROJECTWIDE_EXTRA_DEPENDENCIES})
-endif()
-install(TARGETS ${LIBNAME} DESTINATION lib)
-#Can uncomment this to install the headers... but is it really neccessary?
-install(FILES ${HEADERFILES} DESTINATION include/GGM)
-
-set(MODULETargets ${MODULETargets} ${LIBNAME} PARENT_SCOPE)
+install(TARGETS GGM DESTINATION lib)

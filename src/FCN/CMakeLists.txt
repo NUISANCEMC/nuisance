@@ -16,44 +16,13 @@
 #    You should have received a copy of the GNU General Public License
 #    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
-set(IMPLFILES
-JointFCN.cxx
-SampleList.cxx
+
+set(LikelihoodFunction_Impl_Files
+  JointFCN.cxx
+  SampleList.cxx
 )
 
-set(HEADERFILES
-JointFCN.h
-MinimizerFCN.h
-SampleList.h
-)
+add_library(FCN SHARED ${LikelihoodFunction_Impl_Files})
+target_link_libraries(FCN Experiments CoreIncludes ROOT::ROOT)
 
-set(LIBNAME FCN)
-
-if(CMAKE_BUILD_TYPE MATCHES DEBUG)
-  add_library(${LIBNAME} STATIC ${IMPLFILES})
-else(CMAKE_BUILD_TYPE MATCHES RELEASE)
-  add_library(${LIBNAME} SHARED ${IMPLFILES})
-endif()
-
-include_directories(${MINIMUM_INCLUDE_DIRECTORIES})
-include_directories(${EXP_INCLUDE_DIRECTORIES})
-
-include_directories(${CMAKE_SOURCE_DIR}/src/Electron)
-
-include_directories(${CMAKE_SOURCE_DIR}/src/MCStudies)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-
-
-set_target_properties(${LIBNAME} PROPERTIES VERSION
-  "${NUISANCE_VERSION_MAJOR}.${NUISANCE_VERSION_MINOR}.${NUISANCE_VERSION_REVISION}")
-#set_target_properties(${LIBNAME} PROPERTIES LINK_FLAGS ${ROOT_LD_FLAGS})
-
-if(DEFINED PROJECTWIDE_EXTRA_DEPENDENCIES)
-  add_dependencies(${LIBNAME} ${PROJECTWIDE_EXTRA_DEPENDENCIES})
-endif()
-
-install(TARGETS ${LIBNAME} DESTINATION lib)
-#Can uncomment this to install the headers... but is it really neccessary?
-install(FILES ${HEADERFILES} DESTINATION include/FCN)
-
-set(MODULETargets ${MODULETargets} ${LIBNAME} PARENT_SCOPE)
+install(TARGETS FCN DESTINATION lib)

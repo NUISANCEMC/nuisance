@@ -1,8 +1,6 @@
 #ifndef WEIGHT_ENGINE_NIWG_H
 #define WEIGHT_ENGINE_NIWG_H
 
-#ifdef __NIWG_ENABLED__
-#ifdef __NEUT_ENABLED__
 #include "NIWGReWeight.h"
 #include "NIWGReWeight1piAngle.h"
 #include "NIWGReWeight2010a.h"
@@ -10,15 +8,17 @@
 #include "NIWGReWeight2014a.h"
 #include "NIWGReWeightDeltaMass.h"
 #include "NIWGReWeightEffectiveRPA.h"
-#ifdef HAVE_NIWGRW_LOWQ2
+
+#ifdef NIWGRW_HAVE_LOWQ2
 #include "NIWGReWeightEffectiveQELowQ2Suppression.h"
 #endif
-#ifdef HAVE_NIWGRW_2P2HENU
+#ifdef NIWGRW_HAVE_2P2HENU
 #include "NIWGReWeight2p2hEdep.h"
 #endif
-#ifdef HAVE_NIWGRW_RESLOWQ2
+#ifdef NIWGRW_HAVE_RESLOWQ2
 #include "NIWGReWeightSPPLowQ2Suppression.h"
 #endif
+
 #include "NIWGReWeightHadronMultSwitch.h"
 #include "NIWGReWeightMEC.h"
 #include "NIWGReWeightPiMult.h"
@@ -35,7 +35,7 @@
 #include "NReWeightNuXSecCCQE.h"
 #include "NReWeightNuXSecRES.h"
 // Dials removed in NEUT 5.4.1
-#if __NEUT_VERSION__ < 541
+#if NEUT_VERSION < 541
 #include "NReWeightCasc.h"
 #include "NReWeightNuclPiless.h"
 #include "NReWeightNuXSecNCRES.h"
@@ -51,8 +51,6 @@
 #include "neutpart.h"
 #include "neutvect.h"
 #include "NEUTInputHandler.h"
-#endif
-#endif
 
 #include "FitLogger.h"
 
@@ -76,13 +74,9 @@ public:
 
 	inline bool NeedsEventReWeight() { return true; };
 
-#ifdef __NIWG_ENABLED__
-#ifdef __NEUT_ENABLED__
 	std::vector<niwg::rew::NIWGSyst_t> fNIWGSysts;
 	niwg::rew::NIWGEvent* GetNIWGEventLocal(NeutVect* nvect);
 	niwg::rew::NIWGReWeight* fNIWGRW;
-#endif
-#endif
 };
 
 #endif

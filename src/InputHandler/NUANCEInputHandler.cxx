@@ -1,4 +1,4 @@
-#ifdef __NUANCE_ENABLED__
+#ifdef NUANCE_ENABLED
 #include "NUANCEInputHandler.h"
 #include "InputUtils.h"
 

@@ -116,7 +116,7 @@ function(GetLibDir)
                       "${oneValueArgs}"
                       "${multiValueArgs}" ${ARGN})
 
-  foreach(ARG "CONFIG_APP;OUTPUT_VARIABLE")
+  foreach(ARG CONFIG_APP OUTPUT_VARIABLE)
     if(NOT DEFINED OPTS_${ARG})
       dump_cmake_variables("OPTS_")
       cmessage(FATAL_ERROR "GetLibDir called without required argument ${ARG}\n\tARGN:\n\t\t${ARGN}")

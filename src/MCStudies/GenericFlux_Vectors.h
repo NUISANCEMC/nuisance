@@ -155,7 +155,7 @@ public:
   bool flagNC1pim;
   bool flagCC1pi0;
   bool flagNC1pi0;
-#ifndef __NO_MINERvA__
+#ifdef MINERvA_ENABLED
   bool flagCC0piMINERvA;
 #endif
 

@@ -7,6 +7,8 @@
 
 #include "WeightEngineBase.h"
 
+#include <cmath>
+
 using namespace Reweight;
 
 ModeNormCalc::ModeNormCalc() { fNormRES = 1.0; }
@@ -64,7 +66,7 @@ double MINOSRPA::CalcWeight(BaseFitEvt* evt) {
   double w = 1.0;
 
   // If GENIE is enabled, use old code
-#ifdef __GENIE_ENABLED__
+#ifdef GENIE_ENABLED
   // Extract the GENIE Record
   GHepRecord* ghep = static_cast<GHepRecord*>(evt->genie_event->event);
   const Interaction* interaction = ghep->Summary();
@@ -181,7 +183,7 @@ double LagrangeRPA::CalcWeight(BaseFitEvt* evt) {
   double w = 1.0;
 
   // If GENIE is enabled, use old code
-#ifdef __GENIE_ENABLED__
+#ifdef GENIE_ENABLED
   // Extract the GENIE Record
   GHepRecord* ghep = static_cast<GHepRecord*>(evt->genie_event->event);
   const Interaction* interaction = ghep->Summary();
@@ -678,7 +680,7 @@ double GaussianModeCorr::GetGausWeight(double q0, double q3, double vals[]) {
       ret = norm * exp( -0.5 * z / (1 - corr*corr) );
     }
 
-    if (ret != ret or ret < 0.0 or isnan(ret)) {
+    if (ret != ret or ret < 0.0 or std::isnan(ret)) {
       return 1.0;
     }
 

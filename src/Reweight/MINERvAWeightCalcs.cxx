@@ -1,7 +1,26 @@
-#ifdef __MINERVA_RW_ENABLED__
-#ifdef __GENIE_ENABLED__
-
 #include "MINERvAWeightCalcs.h"
+
+#ifdef GENIE3_API_ENABLED
+#include "Framework/Conventions/Units.h"
+#include "Framework/EventGen/EventRecord.h"
+#include "Framework/GHEP/GHepParticle.h"
+#include "Framework/GHEP/GHepRecord.h"
+#include "Framework/GHEP/GHepUtils.h"
+#include "Framework/Ntuple/NtpMCEventRecord.h"
+#include "Framework/ParticleData/PDGUtils.h"
+using namespace genie;
+#else
+#include "Conventions/Units.h"
+#include "EVGCore/EventRecord.h"
+#include "GHEP/GHepParticle.h"
+#include "GHEP/GHepRecord.h"
+#include "GHEP/GHepUtils.h"
+#include "Ntuple/NtpMCEventRecord.h"
+#include "PDG/PDGUtils.h"
+#endif
+
+#include "WeightEngineBase.h"
+
 #include "BaseFitEvt.h"
 
 namespace nuisance {
@@ -867,5 +886,3 @@ bool WEnhancement::IsHandled(int rwenum) {
 
 } // namespace reweight
 } // namespace nuisance
-#endif
-#endif

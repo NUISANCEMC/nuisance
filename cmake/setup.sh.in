@@ -17,7 +17,12 @@
 #    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 
-#!/bin/sh
+if [ ${BASH_VERSINFO[0]} -le 2 ]; then
+  echo "[ERROR]: You must source this setup script (not run it in a sub-shell). Use like $ source setup.sh"
+  exit 1
+fi
+
+if ! type add_to_PATH &> /dev/null; then
 
 ### Adapted from https://unix.stackexchange.com/questions/4965/keep-duplicates-out-of-path-on-source
 function add_to_PATH () {
@@ -40,6 +45,10 @@ function add_to_PATH () {
   done
 }
 
+fi
+
+if ! type add_to_LD_LIBRARY_PATH &> /dev/null; then
+
 function add_to_LD_LIBRARY_PATH () {
   for d; do
 
@@ -60,111 +69,21 @@ function add_to_LD_LIBRARY_PATH () {
   done
 }
 
-if [ "@EXTRA_SETUP_SCRIPT@" ]; then
-  if [ ! -e @EXTRA_SETUP_SCRIPT@ ]; then
-      echo "[WARN]: Extra setup script \"@EXTRA_SETUP_SCRIPT@\" requested, but could not be found. Skipping..."
-  else
-    echo "[INFO]: Sourcing extra setup from \"@EXTRA_SETUP_SCRIPT@\"."
-    . @EXTRA_SETUP_SCRIPT@
-  fi
+fi
+
+if ! type is_in_PATH &> /dev/null; then
+
+function is_in_PATH () {
+  case ":$PATH:" in
+  *:${1}:*) return 0 ;;
+  *) return 1 ;;
+  esac
+}
+
 fi
 
 add_to_PATH "@CMAKE_INSTALL_PREFIX@/bin"
 
 add_to_LD_LIBRARY_PATH "@CMAKE_INSTALL_PREFIX@/lib"
-
-if [ ! "${ROOTSYS}" ]; then
-  echo "[INFO]: Sourcing ROOT from: @CMAKE_ROOTSYS@"
-  source "@CMAKE_ROOTSYS@/bin/thisroot.sh"
-fi
-
-if [ "@USE_T2K@" != "FALSE" ]; then
-  echo "[INFO]: Adding T2K paths to the environment."
-  export T2KREWEIGHT=@T2KREWEIGHT@
-  add_to_LD_LIBRARY_PATH "@T2KREWEIGHT@/lib"
-fi
-
-if [ "@USE_NIWG@" != "FALSE" ]; then
-  echo "[INFO]: Adding NIWG paths to the environment."
-  export NIWG=@NIWG_ROOT@
-  export NIWGREWEIGHT_INPUTS=@NIWG_ROOT@/inputs
-  add_to_LD_LIBRARY_PATH "@NIWG_ROOT@"
-fi
-
-if [ "@USE_NEUT@" != "FALSE" ]; then
-  echo "[INFO]: Adding NEUT library paths to the environment."
-  export NEUT_ROOT=@NEUT_ROOT@
-  export CERN=@CERN@
-  export CERN_LEVEL=@CERN_LEVEL@
-  add_to_LD_LIBRARY_PATH "${NEUT_LIB_DIR}" "${NEUT_ROOT}/src/reweight"
-fi
-
-if [ "@USE_NuWro@" != "FALSE" ]; then
-  if [ "@NUWRO_BUILT_FROM_FILE@" == "FALSE" ]; then
-    echo "[INFO]: Adding NuWro library paths to the environment."
-    export NUWRO="@NUWRO@"
-
-    add_to_PATH "@NUWRO@/bin"
-    add_to_LD_LIBRARY_PATH "@NUWRO@/build/@CMAKE_SYSTEM_NAME@/lib"
-
-    if [ "@NUWRO_INC@" ]; then
-      export NUWRO_INC=@NUWRO_INC@
-    fi
-
-  else
-    echo "[INFO]: NuWro support included from input event file."
-  fi
-fi
-
-if [ "@NEED_PYTHIA6@" != "FALSE" ]; then
-  echo "[INFO]: Adding PYTHIA6 library paths to the environment."
-  export PYTHIA6="@PYTHIA6@"
-
-  add_to_LD_LIBRARY_PATH "@PYTHIA6@"
-fi
-
-if [ "@USE_GENIE@" != "FALSE" ]; then
-  echo "[INFO]: Adding GENIE paths to the environment."
-
-  export GENIE="@GENIE@"
-
-  export LHAPDF_LIB="@LHAPDF_LIB@"
-  export LHAPDF_INC="@LHAPDF_INC@"
-
-  export LIBXML2_LIB="@LIBXML2_LIB@"
-  export LIBXML2_INC="@LIBXML2_INC@"
-
-  export LOG4CPP_LIB="@LOG4CPP_LIB@"
-  export LOG4CPP_INC="@LOG4CPP_INC@"
-
-  if [ "@LHAPATH@" ]; then
-    export LHAPATH="@LHAPATH@"
-  fi
-
-  add_to_PATH "@GENIE@/bin"
-
-  add_to_LD_LIBRARY_PATH "@GENIE@/lib" "@LHAPDF_LIB@" "@LIBXML2_LIB@" "@LOG4CPP_LIB@"
-
-  if [ "@GENIE_REWEIGHT@" ]; then
-    export GENIE_REWEIGHT="@GENIE_REWEIGHT@"
-    add_to_LD_LIBRARY_PATH "@GENIE_REWEIGHT@/lib"
-  fi
-
-fi
-
-if [ "@BUILD_GiBUU@" != "FALSE" ]; then
-  echo "[INFO]: Sourcing GiBUU tools."
-  source @CMAKE_BINARY_DIR@/GiBUUTools/src/GiBUUTools-build/Linux/setup.sh
-fi
-
-if [ "@USE_NOvARwgt@" != "FALSE" ]; then
-  export NOVARWGT=@NOVARWGT@
-  add_to_LD_LIBRARY_PATH @NOVARWGT@/lib
-fi
-
-if [ "@USE_HEPMCNUEVT@" == "TRUE" ]; then
-  add_to_LD_LIBRARY_PATH @HEPMC_LIBDIR@
-  add_to_LD_LIBRARY_PATH @HEPMCNUEVTTOOLSROOT@/lib
-fi
 
 export NUISANCE="@CMAKE_SOURCE_DIR@"

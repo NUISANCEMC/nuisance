@@ -16,13 +16,20 @@
  *    You should have received a copy of the GNU General Public License
  *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
-#ifdef __GENIE_ENABLED__
 #include "GENIEInputHandler.h"
 
-#ifdef GENIE_PRE_R3
-#include "Messenger/Messenger.h"
-#else
+#ifdef GENIE3_API_ENABLED
+#include "Framework/GHEP/GHepParticle.h"
+#include "Framework/ParticleData/PDGUtils.h"
+#include "Framework/GHEP/GHepUtils.h"
+#include "Framework/Conventions/Units.h"
 #include "Framework/Messenger/Messenger.h"
+#else
+#include "GHEP/GHepParticle.h"
+#include "PDG/PDGUtils.h"
+#include "GHEP/GHepUtils.h"
+#include "Conventions/Units.h"
+#include "Messenger/Messenger.h"
 #endif
 
 #include "InputUtils.h"
@@ -262,7 +269,7 @@ FitEvent *GENIEInputHandler::GetNuisanceEvent(const UInt_t ent,
     CalcNUISANCEKinematics();
   }
 
-#ifdef __PROB3PP_ENABLED__
+#ifdef Prob3plusplus_ENABLED
   else {
     // Check for GENIE Event
     if (!fGenieNtpl)
@@ -368,9 +375,7 @@ int GENIEInputHandler::GetGENIEParticleStatus(genie::GHepParticle *p,
 
   return state;
 }
-#endif
 
-#ifdef __GENIE_ENABLED__
 int GENIEInputHandler::ConvertGENIEReactionCode(GHepRecord *gheprec) {
 
   // I randomly picked 53 here because NEUT doesn't have an appropriate mode...
@@ -423,7 +428,7 @@ int GENIEInputHandler::ConvertGENIEReactionCode(GHepRecord *gheprec) {
         return 2;
       else if (pdg::IsAntiNeutrino(gheprec->Summary()->InitState().ProbePdg()))
         return -2;
-#ifndef GENIE_PRE_R3
+#ifdef GENIE3_API_ENABLED
     } else if (gheprec->Summary()->ProcInfo().IsDiffractive()) {
       if (pdg::IsNeutrino(gheprec->Summary()->InitState().ProbePdg()))
         return 15;
@@ -443,7 +448,7 @@ int GENIEInputHandler::ConvertGENIEReactionCode(GHepRecord *gheprec) {
         return 32;
       else if (pdg::IsAntiNeutrino(gheprec->Summary()->InitState().ProbePdg()))
         return -32;
-#ifndef GENIE_PRE_R3
+#ifdef GENIE3_API_ENABLED
     } else if (gheprec->Summary()->ProcInfo().IsDiffractive()) {
       if (pdg::IsNeutrino(gheprec->Summary()->InitState().ProbePdg()))
         return 35;
@@ -631,5 +636,3 @@ void GENIEInputHandler::CalcNUISANCEKinematics() {
 }
 
 void GENIEInputHandler::Print() {}
-
-#endif

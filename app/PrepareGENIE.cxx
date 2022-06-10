@@ -7,16 +7,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#ifdef __GENIE_ENABLED__
-#ifdef GENIE_PRE_R3
-#include "Conventions/Units.h"
-#include "GHEP/GHepParticle.h"
-#include "PDG/PDGUtils.h"
-#else
+#ifdef GENIE3_API_ENABLED
 #include "Framework/Conventions/Units.h"
 #include "Framework/GHEP/GHepParticle.h"
 #include "Framework/ParticleData/PDGUtils.h"
-#endif
+#else
+#include "Conventions/Units.h"
+#include "GHEP/GHepParticle.h"
+#include "PDG/PDGUtils.h"
 #endif
 
 std::string gInputFiles = "";

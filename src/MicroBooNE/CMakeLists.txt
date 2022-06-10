@@ -16,37 +16,13 @@
 #    You should have received a copy of the GNU General Public License
 #    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
-set(IMPLFILES
-MicroBooNE_CCInc_XSec_2DPcos_nu.cxx
-MicroBooNE_CC1MuNp_XSec_1D_nu.cxx
-MicroBooNE_SignalDef.cxx
+set(MicroBooNE_Impl_Files
+  MicroBooNE_CCInc_XSec_2DPcos_nu.cxx
+  MicroBooNE_CC1MuNp_XSec_1D_nu.cxx
+  MicroBooNE_SignalDef.cxx
 )
 
-set(HEADERFILES
-MicroBooNE_CCInc_XSec_2DPcos_nu.h
-MicroBooNE_CC1MuNp_XSec_1D_nu.h
-MicroBooNE_SignalDef.h
-)
+add_library(MicroBooNE SHARED ${MicroBooNE_Impl_Files})
+target_link_libraries(MicroBooNE CoreIncludes)
 
-set(LIBNAME expMicroBooNE)
-
-if(CMAKE_BUILD_TYPE MATCHES DEBUG)
-  add_library(${LIBNAME} STATIC ${IMPLFILES})
-else(CMAKE_BUILD_TYPE MATCHES RELEASE)
-  add_library(${LIBNAME} SHARED ${IMPLFILES})
-endif()
-
-include_directories(${MINIMUM_INCLUDE_DIRECTORIES})
-
-set_target_properties(${LIBNAME} PROPERTIES VERSION
-  "${NUISANCE_VERSION_MAJOR}.${NUISANCE_VERSION_MINOR}.${NUISANCE_VERSION_REVISION}")
-#set_target_properties(${LIBNAME} PROPERTIES LINK_FLAGS ${ROOT_LD_FLAGS})
-if(DEFINED PROJECTWIDE_EXTRA_DEPENDENCIES)
-  add_dependencies(${LIBNAME} ${PROJECTWIDE_EXTRA_DEPENDENCIES})
-endif()
-
-install(TARGETS ${LIBNAME} DESTINATION lib)
-#Can uncomment this to install the headers... but is it really neccessary?
-install(FILES ${HEADERFILES} DESTINATION include/MicroBooNE)
-
-set(MODULETargets ${MODULETargets} ${LIBNAME} PARENT_SCOPE)
+install(TARGETS MicroBooNE DESTINATION lib)

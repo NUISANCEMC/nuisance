@@ -20,7 +20,7 @@
 function(CheckAndSetDefaultEnv VARNAME DEFAULT CACHETYPE DOCSTRING ENVNAME)
   #cmessage(DEBUG "Trying to assign variable ${VARNAME} into the cache.")
   if(NOT DEFINED ${VARNAME})
-    if(DEFINED ENV{${ENVNAME}} AND NOT $ENV{${ENVNAME}} STREQUAL "")
+    if(DEFINED ENV{${ENVNAME}} AND NOT "$ENV{${ENVNAME}}x" STREQUAL "x")
       set(${VARNAME} $ENV{${ENVNAME}} CACHE ${CACHETYPE} ${DOCSTRING})
       cmessage(DEBUG "    Read ${VARNAME} from ENVVAR ${ENVNAME} as $ENV{${ENVNAME}}.")
     else()

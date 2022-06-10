@@ -1,6 +1,6 @@
 #ifndef GIBUUINPUTHANDLER_H
 #define GIBUUINPUTHANDLER_H
-#ifdef __GiBUU_ENABLED__
+#ifdef GiBUU_ENABLED
 /*!
  *  \addtogroup InputHandler
  *  @{

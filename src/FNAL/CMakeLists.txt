@@ -16,40 +16,15 @@
 #    You should have received a copy of the GNU General Public License
 #    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
-set(IMPLFILES
-FNAL_CC1ppip_Evt_1DQ2_nu.cxx
-FNAL_CC1ppip_XSec_1DEnu_nu.cxx
-FNAL_CC1ppip_XSec_1DQ2_nu.cxx
-FNAL_CCQE_Evt_1DQ2_nu.cxx
-FNAL_CC1ppim_XSec_1DEnu_antinu.cxx
+set(FNAL_Impl_Files
+  FNAL_CC1ppip_Evt_1DQ2_nu.cxx
+  FNAL_CC1ppip_XSec_1DEnu_nu.cxx
+  FNAL_CC1ppip_XSec_1DQ2_nu.cxx
+  FNAL_CCQE_Evt_1DQ2_nu.cxx
+  FNAL_CC1ppim_XSec_1DEnu_antinu.cxx
 )
 
-set(HEADERFILES
-FNAL_CC1ppim_XSec_1DEnu_antinu.h
-FNAL_CC1ppip_Evt_1DQ2_nu.h
-FNAL_CC1ppip_XSec_1DEnu_nu.h
-FNAL_CC1ppip_XSec_1DQ2_nu.h
-FNAL_CCQE_Evt_1DQ2_nu.h
-)
+add_library(FNAL SHARED ${FNAL_Impl_Files})
+target_link_libraries(FNAL CoreIncludes)
 
-set(LIBNAME expFNAL)
-
-if(CMAKE_BUILD_TYPE MATCHES DEBUG)
-  add_library(${LIBNAME} STATIC ${IMPLFILES})
-else(CMAKE_BUILD_TYPE MATCHES RELEASE)
-  add_library(${LIBNAME} SHARED ${IMPLFILES})
-endif()
-
-include_directories(${MINIMUM_INCLUDE_DIRECTORIES})
-
-set_target_properties(${LIBNAME} PROPERTIES VERSION
-  "${NUISANCE_VERSION_MAJOR}.${NUISANCE_VERSION_MINOR}.${NUISANCE_VERSION_REVISION}")
-#set_target_properties(${LIBNAME} PROPERTIES LINK_FLAGS ${ROOT_LD_FLAGS})
-if(DEFINED PROJECTWIDE_EXTRA_DEPENDENCIES)
-  add_dependencies(${LIBNAME} ${PROJECTWIDE_EXTRA_DEPENDENCIES})
-endif()
-install(TARGETS ${LIBNAME} DESTINATION lib)
-#Can uncomment this to install the headers... but is it really neccessary?
-install(FILES ${HEADERFILES} DESTINATION include/FNAL)
-
-set(MODULETargets ${MODULETargets} ${LIBNAME} PARENT_SCOPE)
+install(TARGETS FNAL DESTINATION lib)

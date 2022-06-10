@@ -1,4 +1,3 @@
-#if defined(__NEUT_ENABLED__) || defined(NEUT_EVENT_ENABLED)
 #include "NEUTInputHandler.h"
 #include "InputUtils.h"
 
@@ -20,7 +19,7 @@
 
 #include "posinnucC.h"
 
-#ifdef __NEUT_NUCFSI_ENABLED__
+#ifdef NEUT_NUCFSI_ENABLED
 #include "neutnucfsistep.h"
 #include "neutnucfsivert.h"
 #include "nucleonfsihistC.h"
@@ -138,7 +137,7 @@ NEUTInputHandler::NEUTInputHandler(std::string const &handle,
   fEventType = kNEUT;
   fNeutVect = NULL;
   fNEUTTree->SetBranchAddress("vectorbranch", &fNeutVect);
-  #if defined(ROOT6) && defined(__NEUT_VERSION__) && (__NEUT_VERSION__ >= 541)
+  #if defined(ROOT6) && defined(NEUT_VERSION) && (NEUT_VERSION >= 541)
   fNEUTTree->SetAutoDelete(true);
   #endif
   fNEUTTree->GetEntry(0);
@@ -189,7 +188,7 @@ FitEvent *NEUTInputHandler::GetNuisanceEvent(const UInt_t ent,
   if (!lightweight) {
     CalcNUISANCEKinematics();
   }
-#ifdef __PROB3PP_ENABLED__
+#ifdef Prob3plusplus_ENABLED
   else {
 
     UInt_t npart = fNeutVect->Npart();
@@ -401,9 +400,7 @@ void NEUTInputHandler::CalcNUISANCEKinematics() {
   return;
 }
 
-#endif
-
-#ifdef NEED_FILL_NEUT_COMMONS
+#ifdef NEUT_BUILTIN_FILL_NEUT_COMMONS
 
 void NEUTUtils::FillNeutCommons(NeutVect *nvect) {
   // WARNING: This has only been implemented for a neuttree and not GENIE
@@ -418,7 +415,7 @@ void NEUTUtils::FillNeutCommons(NeutVect *nvect) {
   nework_.modene = nvect->Mode;
   nework_.numne = nvect->Npart();
 
-#ifdef NEUT_COMMON_QEAV
+#if (NEUT_VERSION == 542)
   nemdls_.mdlqeaf = nvect->QEAVForm;
 #else
   nemdls_.mdlqeaf = nvect->QEVForm;

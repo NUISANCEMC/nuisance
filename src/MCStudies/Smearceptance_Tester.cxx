@@ -777,7 +777,7 @@ void Smearceptance_Tester::Write(std::string drawOpt) {
 
 #endif
 
-#ifdef __PROB3PP_ENABLED__
+#ifdef Prob3plusplus_ENABLED
   FitWeight *fw = FitBase::GetRW();
   if (fw->HasRWEngine(kOSCILLATION)) {
     OscWeightEngine *oscWE =

@@ -1,21 +1,21 @@
 // Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
-*    This file is part of NUISANCE.
-*
-*    NUISANCE is free software: you can redistribute it and/or modify
-*    it under the terms of the GNU General Public License as published by
-*    the Free Software Foundation, either version 3 of the License, or
-*    (at your option) any later version.
-*
-*    NUISANCE is distributed in the hope that it will be useful,
-*    but WITHOUT ANY WARRANTY; without even the implied warranty of
-*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*    GNU General Public License for more details.
-*
-*    You should have received a copy of the GNU General Public License
-*    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
-*******************************************************************************/
+ *    This file is part of NUISANCE.
+ *
+ *    NUISANCE is free software: you can redistribute it and/or modify
+ *    it under the terms of the GNU General Public License as published by
+ *    the Free Software Foundation, either version 3 of the License, or
+ *    (at your option) any later version.
+ *
+ *    NUISANCE is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *    GNU General Public License for more details.
+ *
+ *    You should have received a copy of the GNU General Public License
+ *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
+ *******************************************************************************/
 
 //#define DEBUG_OSC_WE
 
@@ -46,15 +46,14 @@ nuTypes GetNuType(int pdg) {
       return kNumubarType;
     case -12:
       return kNuebarType;
-    default: { NUIS_ABORT("Attempting to convert \"neutrino pdg\": " << pdg); }
+    default: {
+      NUIS_ABORT("Attempting to convert \"neutrino pdg\": " << pdg);
+    }
   }
 }
 
 OscWeightEngine::OscWeightEngine()
-    :
-#ifdef __PROB3PP_ENABLED__
-      bp(),
-#endif
+    : bp(),
       theta12(0.825),
       theta13(0.10),
       theta23(1.0),
@@ -72,10 +71,10 @@ void OscWeightEngine::Config() {
 
   if (OscParam.size() < 1) {
     NUIS_ERR(WRN,
-          "Oscillation parameters specified but no OscParam element "
-          "configuring the experimental characteristics found.\nExpect at "
-          "least <OscParam baseline_km=\"XXX\" />. Pausing for "
-          "10...");
+             "Oscillation parameters specified but no OscParam element "
+             "configuring the experimental characteristics found.\nExpect at "
+             "least <OscParam baseline_km=\"XXX\" />. Pausing for "
+             "10...");
     sleep(10);
     return;
   }
@@ -93,12 +92,12 @@ void OscWeightEngine::Config() {
     LengthParam = cos(OscParam[0].GetD("detection_zenith_deg") * deg2rad);
   } else {
     NUIS_ERR(WRN,
-          "It appeared that you wanted to set up an oscillation weight "
-          "branch, but it was not correctly configured. You need to specify "
-          "either: detection_zenith_deg or baseline_km attributes on the "
-          "OscParam element, and if baseline_km is specified, you can "
-          "optionally also set matter_density for oscillations through a "
-          "constant matter density. Pausing for 10...");
+             "It appeared that you wanted to set up an oscillation weight "
+             "branch, but it was not correctly configured. You need to specify "
+             "either: detection_zenith_deg or baseline_km attributes on the "
+             "OscParam element, and if baseline_km is specified, you can "
+             "optionally also set matter_density for oscillations through a "
+             "constant matter density. Pausing for 10...");
     sleep(10);
     return;
   }
@@ -122,15 +121,15 @@ void OscWeightEngine::Config() {
   NUIS_LOG(FIT, "Configured oscillation weighter:");
 
   if (LengthParamIsZenith) {
-    NUIS_LOG(FIT,
-         "Earth density profile with detection cos(zenith) = " << LengthParam);
+    NUIS_LOG(FIT, "Earth density profile with detection cos(zenith) = "
+                      << LengthParam);
   } else {
     if (constant_density != 0xdeadbeef) {
       NUIS_LOG(FIT,
-           "Constant density with experimental baseline = " << LengthParam);
+               "Constant density with experimental baseline = " << LengthParam);
     } else {
-      NUIS_LOG(FIT,
-           "Vacuum oscillations with experimental baseline = " << LengthParam);
+      NUIS_LOG(FIT, "Vacuum oscillations with experimental baseline = "
+                        << LengthParam);
     }
   }
 
@@ -154,7 +153,6 @@ void OscWeightEngine::Config() {
     NUIS_LOG(FIT, "\tForceFromNuPDG: " << ForceFromNuPDG);
   }
 
-#ifdef __PROB3PP_ENABLED__
   bp.SetMNS(params[theta12_idx], params[theta13_idx], params[theta23_idx],
             params[dm12_idx], params[dm23_idx], params[dcp_idx], 1, true, 2);
   bp.DefinePath(LengthParam, 0);
@@ -162,7 +160,6 @@ void OscWeightEngine::Config() {
   if (LengthParamIsZenith) {
     NUIS_LOG(FIT, "\tBaseline   : " << (bp.GetBaseline() / 100.0) << " km.");
   }
-#endif
 }
 
 void OscWeightEngine::IncludeDial(std::string name, double startval) {
@@ -171,15 +168,16 @@ void OscWeightEngine::IncludeDial(std::string name, double startval) {
 #endif
   int dial = SystEnumFromString(name);
   if (!dial) {
-    NUIS_ABORT("OscWeightEngine passed dial: " << name
-                                          << " that it does not understand.");
+    NUIS_ABORT("OscWeightEngine passed dial: "
+               << name << " that it does not understand.");
   }
   params[dial - 1] = startval;
 }
 
 void OscWeightEngine::SetDialValue(int nuisenum, double val) {
 #ifdef DEBUG_OSC_WE
-  std::cout << "SetDial: " << (nuisenum % NUIS_DIAL_OFFSET) << " at " << val << std::endl;
+  std::cout << "SetDial: " << (nuisenum % NUIS_DIAL_OFFSET) << " at " << val
+            << std::endl;
 #endif
   fHasChanged = (params[(nuisenum % NUIS_DIAL_OFFSET) - 1] - val) >
                 std::numeric_limits<double>::epsilon();
@@ -191,8 +189,8 @@ void OscWeightEngine::SetDialValue(std::string name, double val) {
 #endif
   int dial = SystEnumFromString(name);
   if (!dial) {
-    NUIS_ABORT("OscWeightEngine passed dial: " << name
-                                          << " that it does not understand.");
+    NUIS_ABORT("OscWeightEngine passed dial: "
+               << name << " that it does not understand.");
   }
 
   fHasChanged =
@@ -204,22 +202,23 @@ bool OscWeightEngine::IsDialIncluded(std::string name) {
   return SystEnumFromString(name);
 }
 bool OscWeightEngine::IsDialIncluded(int nuisenum) {
-  return ((nuisenum % NUIS_DIAL_OFFSET) > 0) && ((nuisenum % NUIS_DIAL_OFFSET) < 6);
+  return ((nuisenum % NUIS_DIAL_OFFSET) > 0) &&
+         ((nuisenum % NUIS_DIAL_OFFSET) < 6);
 }
 
 double OscWeightEngine::GetDialValue(std::string name) {
   int dial = SystEnumFromString(name);
   if (!dial) {
-    NUIS_ABORT("OscWeightEngine passed dial: " << name
-                                          << " that it does not understand.");
+    NUIS_ABORT("OscWeightEngine passed dial: "
+               << name << " that it does not understand.");
   }
   return params[dial - 1];
 }
 double OscWeightEngine::GetDialValue(int nuisenum) {
   if (!(nuisenum % NUIS_DIAL_OFFSET) || (nuisenum % NUIS_DIAL_OFFSET) > 6) {
     NUIS_ABORT("OscWeightEngine passed dial enum: "
-          << (nuisenum % NUIS_DIAL_OFFSET)
-          << " that it does not understand, expected [1,6].");
+               << (nuisenum % NUIS_DIAL_OFFSET)
+               << " that it does not understand, expected [1,6].");
   }
   return params[(nuisenum % NUIS_DIAL_OFFSET) - 1];
 }
@@ -238,8 +237,8 @@ double OscWeightEngine::CalcWeight(BaseFitEvt* evt) {
   if (evt->probe_E == 0xdeadbeef) {
     if (!Warned) {
       NUIS_ERR(WRN,
-            "Oscillation weights asked for but using 'litemode' or "
-            "unsupported generator input. Pasuing for 10...");
+               "Oscillation weights asked for but using 'litemode' or "
+               "unsupported generator input. Pasuing for 10...");
       sleep(10);
       Warned = true;
     }
@@ -253,7 +252,6 @@ double OscWeightEngine::CalcWeight(double ENu, int PDGNu, int TargetPDGNu) {
   if (LengthParam == 0xdeadbeef) {  // not configured.
     return 1;
   }
-#ifdef __PROB3PP_ENABLED__
   int NuType = (ForceFromNuPDG != 0) ? ForceFromNuPDG : GetNuType(PDGNu);
   bp.SetMNS(params[theta12_idx], params[theta13_idx], params[theta23_idx],
             params[dm12_idx], params[dm23_idx], params[dcp_idx], ENu, true,
@@ -282,23 +280,20 @@ double OscWeightEngine::CalcWeight(double ENu, int PDGNu, int TargetPDGNu) {
   }
 #ifdef DEBUG_OSC_WE
   if (prob_weight != prob_weight) {
-    NUIS_ABORT("Calculated bad prob weight: " << prob_weight << "(Osc Type: " << pmt
-                                         << " -- " << NuType << " -> "
-                                         << TargetPDGNu << ")");
+    NUIS_ABORT("Calculated bad prob weight: " << prob_weight << "(Osc Type: "
+                                              << pmt << " -- " << NuType
+                                              << " -> " << TargetPDGNu << ")");
   }
   if (prob_weight > 1) {
-    NUIS_ABORT("Calculated bad prob weight: " << prob_weight << "(Osc Type: " << pmt
-                                         << " -- " << NuType << " -> "
-                                         << TargetPDGNu << ")");
+    NUIS_ABORT("Calculated bad prob weight: " << prob_weight << "(Osc Type: "
+                                              << pmt << " -- " << NuType
+                                              << " -> " << TargetPDGNu << ")");
   }
 
   std::cout << NuType << " -> " << TargetPDGNu << ": " << ENu << " = "
             << prob_weight << "%%." << std::endl;
 #endif
   return prob_weight;
-#else
-  return 1;
-#endif
 }
 
 int OscWeightEngine::SystEnumFromString(std::string const& name) {
