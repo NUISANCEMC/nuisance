@@ -445,7 +445,7 @@ void NuWroInputHandler::Print(){
 	   << "\t\t|->       dis = " << fNuWroEvent->flag.dis << std::endl
 	   << "\t\t|->       coh = " << fNuWroEvent->flag.coh << std::endl
 	   << "\t\t|->       mec = " << fNuWroEvent->flag.mec << std::endl
-	   << "\t\t|->       hip = " << fNuWroEvent->flag.hip << std::endl
+	   //<< "\t\t|->       hip = " << fNuWroEvent->flag.hip << std::endl
 	   << "\t\t|->        nc = " << fNuWroEvent->flag.nc << std::endl
 	   << "\t\t|->        cc = " << fNuWroEvent->flag.cc << std::endl
 	   << "\t\t|->      anty = " << fNuWroEvent->flag.anty << std::endl
