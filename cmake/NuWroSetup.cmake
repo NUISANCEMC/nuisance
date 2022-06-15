@@ -77,7 +77,7 @@ else()
       ${NUWRO}/src/reweight
       ${NUWRO_INC}/nuwro)
 
-    LIST(APPEND EXTRA_LINK_DIRS ${NUWRO}/build/${CMAKE_SYSTEM_NAME}/lib)
+    #LIST(APPEND EXTRA_LINK_DIRS ${NUWRO}/build/${CMAKE_SYSTEM_NAME}/lib)
     LIST(APPEND EXTRA_LIBS reweight event)
 
   else ()
@@ -95,7 +95,7 @@ else()
 
         LIST(APPEND RWENGINE_INCLUDE_DIRECTORIES ${NUWRO_INC}/nuwro)
 
-        LIST(APPEND EXTRA_LINK_DIRS ${NUWRO}/build/${CMAKE_SYSTEM_NAME}/lib)
+        #LIST(APPEND EXTRA_LINK_DIRS ${NUWRO}/build/${CMAKE_SYSTEM_NAME}/lib)
         LIST(APPEND EXTRA_LIBS -Wl,--no-as-needed event -Wl,--as-needed)
       else()
         cmessage(FATAL_ERROR "Expected to find the NuWro event library in: ${NUWRO}/bin/event1.so, or if using NuWro with reweight support: ${NUWRO}/build/${CMAKE_SYSTEM_NAME}/lib/libevent.a. Is NuWro built?")
