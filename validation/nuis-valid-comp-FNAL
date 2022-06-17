@@ -12,7 +12,7 @@ for (( i=0; i < ${#GENLIST[@]}; ++i )); do
     GEN=${GENLIST[${i}]}
     GENTAG=${GENTAGLIST[${i}]}
 
-    if [ ! -e ${EXP}.${GENTAG}.nu.numu.D2.comp.root ] || [ "${FORCE}" == "ON" ]; then
+    if [ ! -e ${EXP}.${GENTAG}.nu.numu.D2.comp.root ] || [ "${NUIS_FORCE}" == "ON" ]; then
         nuis comp ${EXP}.${GENTAG}.nu.numu.D2.root \
             -f -t ${GEN} \
             -o ${EXP}.${GENTAG}.nu.numu.D2.comp.root \
@@ -29,7 +29,7 @@ for (( i=0; i < ${#GENLIST[@]}; ++i )); do
     GEN=${GENLIST[${i}]}
     GENTAG=${GENTAGLIST[${i}]}
 
-    if [ ! -e ${EXP}.${GENTAG}.nubar.numubar.D2.comp.root ] || [ "${FORCE}" == "ON" ]; then
+    if [ ! -e ${EXP}.${GENTAG}.nubar.numubar.D2.comp.root ] || [ "${NUIS_FORCE}" == "ON" ]; then
         nuis comp ${EXP}.${GENTAG}.nubar.numubar.D2.root \
             -f -t ${GEN} \
             -o ${EXP}.${GENTAG}.nubar.numubar.D2.comp.root \

@@ -12,7 +12,7 @@ for (( i=0; i < ${#GENLIST[@]}; ++i )); do
     GEN=${GENLIST[${i}]}
     GENTAG=${GENTAGLIST[${i}]}
 
-    if [ ! -e ${EXP}.${GENTAG}.nu.numu.CH2.comp.root ] || [ "${FORCE}" == "ON" ]; then
+    if [ ! -e ${EXP}.${GENTAG}.nu.numu.CH2.comp.root ] || [ "${NUIS_FORCE}" == "ON" ]; then
         nuis comp ${EXP}.${GENTAG}.nu.numu.CH2.root \
             -f -t ${GEN} \
             -o ${EXP}.${GENTAG}.nu.numu.CH2.comp.root \
@@ -45,7 +45,7 @@ for (( i=0; i < ${#GENLIST[@]}; ++i )); do
             --config UseSVDInverse=1
     fi
 
-    if [ ! -e ${EXP}.${GENTAG}.nubar.numubar.CH2.comp.root ] || [ "${FORCE}" == "ON" ]; then
+    if [ ! -e ${EXP}.${GENTAG}.nubar.numubar.CH2.comp.root ] || [ "${NUIS_FORCE}" == "ON" ]; then
         nuis comp ${EXP}.${GENTAG}.nubar.numubar.CH2.root \
             -f -t ${GEN} \
             -o ${EXP}.${GENTAG}.nubar.numubar.CH2.comp.root \
@@ -60,7 +60,7 @@ for (( i=0; i < ${#GENLIST[@]}; ++i )); do
             --config UseSVDInverse=1
     fi
 
-    if [ ! -e ${EXP}.${GENTAG}.nubar.numubar.C.comp.root ] || [ "${FORCE}" == "ON" ]; then
+    if [ ! -e ${EXP}.${GENTAG}.nubar.numubar.C.comp.root ] || [ "${NUIS_FORCE}" == "ON" ]; then
         nuis comp ${EXP}.${GENTAG}.nubar.numubar.C.root \
             -f -t ${GEN} \
             -o ${EXP}.${GENTAG}.nubar.numubar.C.comp.root \

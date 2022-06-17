@@ -358,7 +358,7 @@ if [ "${NUIS_DEBUG}" == "ON" ]; then
   CMD="gdb --args neutroot2"
 fi
 
-if [ "${QUIET}" == "TRUE" ]; then
+if [ "${NUIS_QUIET}" == "ON" ]; then
   set -x
   ${CMD} ${CARDNAME} ${OUTPUT_FILENAME%%.root}.neutvect.root &> /dev/null
   set +x

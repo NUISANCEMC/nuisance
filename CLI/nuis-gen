@@ -21,7 +21,6 @@ function nuis_gen_help {
   echo -e "\t  -P|--probe <numu|nue|numubar|nuebar> : Set probe particle. If -e is used, this is also passed to \'nuis flux\'."
   echo -e "\t  -o|--output-file <output.root>       : defaults to <GENERATOR>.<probe>.<flux_file>.<flux_hist>.<seed>.evts.root"
   echo -e "\t  --seed <int>                         : Integer to use as random seed. Defaults to \${RANDOM}"
-  echo -e "\t  --quiet                              : Pipe gevgen output to /dev/null"
   echo -e ""
 }
 
@@ -72,7 +71,6 @@ FLUX_DESCRIPTOR=""
 FLUX_MeV="off"
 
 SEED=
-QUIET=FALSE
 
 FORWARDED_ARGS=()
 
@@ -198,11 +196,6 @@ while [[ ${#} -gt 0 ]]; do
       shift # past argument
       ;;
 
-  --quiet)
-
-      QUIET=TRUE
-      ;;
-
     *) # unknown option
       FORWARDED_ARGS+=("${key}")
       ;;
@@ -297,7 +290,6 @@ echo "[CLI DEBUG](BrCr: ${NUIS_BREADCRUMBS}): " NUIS_BREADCRUMBS=${NUIS_BREADCRU
   FLUX_FILE_NAME=${FLUX_FILE_NAME} \
   FLUX_MeV=${FLUX_MeV} \
   SEED=${SEED} \
-  QUIET=${QUIET} \
   ${COMMAND}-${VERB} "${FORWARDED_ARGS[@]}"
 fi
 
@@ -313,5 +305,4 @@ NUIS_BREADCRUMBS=${NUIS_BREADCRUMBS} \
   FLUX_FILE_NAME=${FLUX_FILE_NAME} \
   FLUX_MeV=${FLUX_MeV} \
   SEED=${SEED} \
-  QUIET=${QUIET} \
   ${COMMAND}-${VERB} "${FORWARDED_ARGS[@]}"

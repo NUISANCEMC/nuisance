@@ -146,9 +146,14 @@ else
   exit 1
 fi
  
-if [ "${QUIET}" == "TRUE" ]; then
+CMD=gevgen
+if [ "${NUIS_DEBUG}" == "ON" ]; then
+  CMD="gdb --args gevgen"
+fi
+
+if [ "${NUIS_QUIET}" == "ON" ]; then
   set -x
-  gevgen \
+  ${CMD} \
    -p ${PROBE_PDG} -t ${GENIE_TARGET} \
    -r ${SEED} \
    -f ${FLUX_FILE},${FLUX_HIST} \
@@ -157,7 +162,7 @@ if [ "${QUIET}" == "TRUE" ]; then
    set +x
 else
   set -x
-  gevgen \
+  ${CMD} \
    -p ${PROBE_PDG} -t ${GENIE_TARGET} \
    -r ${SEED} \
    -f ${FLUX_FILE},${FLUX_HIST} \

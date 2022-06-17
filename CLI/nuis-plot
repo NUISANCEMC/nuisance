@@ -108,7 +108,8 @@ HEADERLINE="Samples"
 
 for (( i=0; i<${#MC_TAGS[@]}; ++i )); do 
   COLS="${COLS}|c"
-  HEADERLINE="${HEADERLINE} & ${MC_TAGS[${i}]}"
+  MC_TAG_HYPHEN=$(echo ${MC_TAGS[${i}]} | sed 's:_:-:g')
+  HEADERLINE="${HEADERLINE} & ${MC_TAG_HYPHEN}"
 done
 
 cat << EOF >> ${OUTPUTFILE}

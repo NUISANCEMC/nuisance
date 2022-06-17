@@ -1,0 +1,202 @@
+#!/bin/bash
+
+set -e
+
+source $(nuis internal valid.funcs)
+nuis_valid_parse_argments ${@}
+nuis_check_gen_enabled ${GENLIST[@]}
+
+EXP=MINERvA
+
+# MINERvA_CC0pi_XSec_1DEe_nue
+# MINERvA_CC0pi_XSec_1DQ2_nue
+# MINERvA_CC0pi_XSec_1DThetae_nue
+
+for (( i=0; i < ${#GENLIST[@]}; ++i )); do
+    GEN=${GENLIST[${i}]}
+    GENTAG=${GENTAGLIST[${i}]}
+
+    if [ ! -e ${EXP}.${GENTAG}.nu.numu.CH.comp.root ] || [ "${NUIS_FORCE}" == "ON" ]; then
+        nuis comp ${EXP}.${GENTAG}.nu.numu.CH.root \
+            -f -t ${GEN} \
+            -o ${EXP}.${GENTAG}.nu.numu.CH.comp.root \
+                -s MINERvA_CCQE_XSec_1DQ2_nu \
+                -s MINERvA_CCQE_XSec_1DQ2_nu_20deg \
+                -s MINERvA_CCQE_XSec_1DQ2_nu_oldflux \
+                -s MINERvA_CCQE_XSec_1DQ2_nu_20deg_oldflux \
+                -s MINERvA_CC0pinp_STV_XSec_1Dpmu_nu \
+                -s MINERvA_CC0pinp_STV_XSec_1Dthmu_nu \
+                -s MINERvA_CC0pinp_STV_XSec_1Dpprot_nu \
+                -s MINERvA_CC0pinp_STV_XSec_1Dthprot_nu \
+                -s MINERvA_CC0pinp_STV_XSec_1Dpnreco_nu \
+                -s MINERvA_CC0pinp_STV_XSec_1Ddalphat_nu \
+                -s MINERvA_CC0pinp_STV_XSec_1Ddpt_nu \
+                -s MINERvA_CC0pinp_STV_XSec_1Ddphit_nu \
+                -s MINERvA_CC0pi_XSec_1DQ2_nu_proton \
+                -s MINERvA_CC0pi_XSec_1DQ2_TgtCH_nu \
+                -s MINERvA_CC0pi_XSec_2Dptpz_nu \
+                -s MINERvA_CC0pi_XSec_3DptpzTp_nu \
+                -s MINERvA_CC0pi_XSec_1Dpt_nu \
+                -s MINERvA_CC0pi_XSec_1Dpz_nu \
+                -s MINERvA_CC0pi_XSec_1DQ2QE_nu \
+                -s MINERvA_CC0pi_XSec_1DEnuQE_nu \
+                -s MINERvA_CC1pip_XSec_1DTpi_nu \
+                -s MINERvA_CC1pip_XSec_1DTpi_nu_20deg \
+                -s MINERvA_CC1pip_XSec_1DTpi_nu_fluxcorr \
+                -s MINERvA_CC1pip_XSec_1DTpi_nu_20deg_fluxcorr \
+                -s MINERvA_CC1pip_XSec_1Dth_nu \
+                -s MINERvA_CC1pip_XSec_1Dth_nu_20deg \
+                -s MINERvA_CC1pip_XSec_1Dth_nu_fluxcorr \
+                -s MINERvA_CC1pip_XSec_1Dth_nu_20deg_fluxcorr \
+                -s MINERvA_CC1pip_XSec_1DTpi_nu_2017 \
+                -s MINERvA_CC1pip_XSec_1Dth_nu_2017 \
+                -s MINERvA_CC1pip_XSec_1Dpmu_nu_2017 \
+                -s MINERvA_CC1pip_XSec_1Dthmu_nu_2017 \
+                -s MINERvA_CC1pip_XSec_1DQ2_nu_2017 \
+                -s MINERvA_CC1pip_XSec_1DEnu_nu_2017 \
+                -s MINERvA_CCNpip_XSec_1Dth_nu \
+                -s MINERvA_CCNpip_XSec_1Dth_nu_2015 \
+                -s MINERvA_CCNpip_XSec_1Dth_nu_2016 \
+                -s MINERvA_CCNpip_XSec_1Dth_nu_2015_20deg \
+                -s MINERvA_CCNpip_XSec_1Dth_nu_2015_fluxcorr \
+                -s MINERvA_CCNpip_XSec_1Dth_nu_2015_20deg_fluxcorr \
+                -s MINERvA_CCNpip_XSec_1DTpi_nu \
+                -s MINERvA_CCNpip_XSec_1DTpi_nu_2015 \
+                -s MINERvA_CCNpip_XSec_1DTpi_nu_2016 \
+                -s MINERvA_CCNpip_XSec_1DTpi_nu_2015_20deg \
+                -s MINERvA_CCNpip_XSec_1DTpi_nu_2015_fluxcorr \
+                -s MINERvA_CCNpip_XSec_1DTpi_nu_2015_20deg_fluxcorr \
+                -s MINERvA_CCNpip_XSec_1Dthmu_nu \
+                -s MINERvA_CCNpip_XSec_1Dpmu_nu \
+                -s MINERvA_CCNpip_XSec_1DQ2_nu \
+                -s MINERvA_CCNpip_XSec_1DEnu_nu \
+                -s MINERvA_CC1pi0_XSec_1DTpi_nu \
+                -s MINERvA_CC1pi0_XSec_1Dth_nu \
+                -s MINERvA_CC1pi0_XSec_1Dpmu_nu \
+                -s MINERvA_CC1pi0_XSec_1Dthmu_nu \
+                -s MINERvA_CC1pi0_XSec_1DQ2_nu \
+                -s MINERvA_CC1pi0_XSec_1DEnu_nu \
+                -s MINERvA_CC1pi0_XSec_1DWexp_nu \
+                -s MINERvA_CC1pi0_XSec_1DPPi0Mass_nu \
+                -s MINERvA_CC1pi0_XSec_1DPPi0MassDelta_nu \
+                -s MINERvA_CC1pi0_XSec_1DCosAdler_nu \
+                -s MINERvA_CC1pi0_XSec_1DPhiAdler_nu \
+                -s MINERvA_CCinc_XSec_2DEavq3_nu \
+                -s MINERvA_CCCOHPI_XSec_1DEnu_nu \
+                -s MINERvA_CCCOHPI_XSec_1DEpi_nu \
+                -s MINERvA_CCCOHPI_XSec_1Dth_nu \
+                -s MINERvA_CCCOHPI_XSec_1DQ2_nu \
+            --config UseSVDInverse=1
+    fi
+
+
+    if [ ! -e ${EXP}.${GENTAG}.nu.numu.CCOH.comp.root ] || [ "${NUIS_FORCE}" == "ON" ]; then
+        nuis comp ${EXP}.${GENTAG}.nu.numu.C.root \
+            -f -t ${GEN} \
+            -o ${EXP}.${GENTAG}.nu.numu.CCOH.comp.root \
+                -s MINERvA_CCCOHPI_XSec_1DEnu_nu \
+                -s MINERvA_CCCOHPI_XSec_1DEpi_nu \
+                -s MINERvA_CCCOHPI_XSec_1Dth_nu \
+                -s MINERvA_CCCOHPI_XSec_1DQ2_nu \
+            --config UseSVDInverse=1
+    fi
+
+    for TGT in C Fe Pb; do
+
+        TGTA=12
+        if [ "${TGT}" == "Fe" ]; then
+            TGT=56
+        elif [ "${TGT}" == "Pb" ]; then
+            TGT=208
+        fi
+
+        if [ ! -e ${EXP}.${GENTAG}.nu.numu.${TGT}.comp.root ] || [ "${NUIS_FORCE}" == "ON" ]; then
+            nuis comp ${EXP}.${GENTAG}.nu.numu.${TGT}.root \
+                -f -t ${GEN} \
+                -o ${EXP}.${GENTAG}.nu.numu.${TGT}.comp.root \
+                    -s MINERvA_CC0pi_XSec_1DQ2_Tgt${TGT}_nu \
+                --config UseSVDInverse=1
+        fi
+
+        if [ ! -e ${EXP}.${GENTAG}.nu.numu.${TGT}CH.comp.root ] || [ "${NUIS_FORCE}" == "ON" ]; then
+            nuis comp ${EXP}.${GENTAG}.nu.numu.${TGT}.root ${EXP}.${GENTAG}.nu.numu.CH.root \
+                -f -t ${GEN} \
+                -o ${EXP}.${GENTAG}.nu.numu.${TGT}CH.comp.root \
+                    -s MINERvA_CC0pi_XSec_1DQ2_TgtRatio${TGT}_nu \
+                    -s MINERvA_CCinc_XSec_1Dx_ratio_${TGT}${TGTA}_CH \
+                    -s MINERvA_CCinc_XSec_1DEnu_ratio_${TGT}${TGTA}_CH \
+                    -s MINERvA_CCDIS_XSec_1Dx_ratio_${TGT}${TGTA}_CH \
+                    -s MINERvA_CCDIS_XSec_1DEnu_ratio_${TGT}${TGTA}_CH \
+                --config UseSVDInverse=1
+        fi
+
+    done
+
+
+    if [ ! -e ${EXP}.${GENTAG}.nubar.numubar.CH.comp.root ] || [ "${NUIS_FORCE}" == "ON" ]; then
+        nuis comp ${EXP}.${GENTAG}.nubar.numubar.CH.root \
+            -f -t ${GEN} \
+            -o ${EXP}.${GENTAG}.nubar.numubar.CH.comp.root \
+                -s MINERvA_CCQE_XSec_1DQ2_antinu \
+                -s MINERvA_CCQE_XSec_1DQ2_antinu_20deg \
+                -s MINERvA_CCQE_XSec_1DQ2_antinu_oldflux \
+                -s MINERvA_CCQE_XSec_1DQ2_antinu_20deg_oldflux \
+                -s MINERvA_CC0pi_XSec_2Dptpz_antinu \
+                -s MINERvA_CC0pi_XSec_2DQ2QEEnuQE_antinu \
+                -s MINERvA_CC0pi_XSec_2DQ2QEEnuTrue_antinu \
+                -s MINERvA_CC1pim_XSec_1DEnu_antinu \
+                -s MINERvA_CC1pim_XSec_1DQ2_antinu \
+                -s MINERvA_CC1pim_XSec_1DTpi_antinu \
+                -s MINERvA_CC1pim_XSec_1Dpmu_antinu \
+                -s MINERvA_CC1pim_XSec_1Dth_antinu \
+                -s MINERvA_CC1pim_XSec_1Dthmu_antinu \
+                -s MINERvA_CC1pi0_XSec_1Dth_antinu \
+                -s MINERvA_CC1pi0_XSec_1Dth_antinu_2015 \
+                -s MINERvA_CC1pi0_XSec_1Dth_antinu_2016 \
+                -s MINERvA_CC1pi0_XSec_1Dth_antinu_fluxcorr \
+                -s MINERvA_CC1pi0_XSec_1Dth_antinu_2015_fluxcorr \
+                -s MINERvA_CC1pi0_XSec_1Dth_antinu_2016_fluxcorr \
+                -s MINERvA_CC1pi0_XSec_1Dppi0_antinu \
+                -s MINERvA_CC1pi0_XSec_1Dppi0_antinu_fluxcorr \
+                -s MINERvA_CC1pi0_XSec_1DTpi0_antinu \
+                -s MINERvA_CC1pi0_XSec_1DQ2_antinu \
+                -s MINERvA_CC1pi0_XSec_1Dthmu_antinu \
+                -s MINERvA_CC1pi0_XSec_1Dpmu_antinu \
+                -s MINERvA_CC1pi0_XSec_1DEnu_antinu \
+            --config UseSVDInverse=1
+    fi
+
+    if [ ! -e ${EXP}.${GENTAG}.nubar.numubar.CCOH.comp.root ] || [ "${NUIS_FORCE}" == "ON" ]; then
+        nuis comp ${EXP}.${GENTAG}.nubar.numubar.C.root \
+            -f -t ${GEN} \
+            -o ${EXP}.${GENTAG}.nubar.numubar.CCOH.comp.root \
+                -s MINERvA_CCCOHPI_XSec_1DEnu_antinu \
+                -s MINERvA_CCCOHPI_XSec_1DEpi_antinu \
+                -s MINERvA_CCCOHPI_XSec_1Dth_antinu \
+                -s MINERvA_CCCOHPI_XSec_1DQ2_antinu \
+            --config UseSVDInverse=1
+    fi
+
+    if [ ! -e ${EXP}.${GENTAG}.nunubar.numunumubar.CH.comp.root ] || [ "${NUIS_FORCE}" == "ON" ]; then
+        nuis comp ${EXP}.${GENTAG}.nu.numu.CH.root ${EXP}.${GENTAG}.nubar.numubar.CH.root \
+            -f -t ${GEN} \
+            -o ${EXP}.${GENTAG}.nunubar.numunumubar.CH.comp.root \
+                -s MINERvA_CCQE_XSec_1DQ2_joint_oldflux \
+                -s MINERvA_CCQE_XSec_1DQ2_joint_20deg_oldflux \
+                -s MINERvA_CCQE_XSec_1DQ2_joint \
+                -s MINERvA_CCQE_XSec_1DQ2_joint_20deg \
+            --config UseSVDInverse=1
+    fi
+
+    if [ ! -e ${EXP}.${GENTAG}.nunubar.numunumubar.CCOH.comp.root ] || [ "${NUIS_FORCE}" == "ON" ]; then
+        nuis comp ${EXP}.${GENTAG}.nu.numu.C.root ${EXP}.${GENTAG}.nubar.numubar.C.root \
+            -f -t ${GEN} \
+            -o ${EXP}.${GENTAG}.nunubar.numunumubar.CCOH.comp.root \
+                -s MINERvA_CCCOHPI_XSec_1DEnu_joint \
+                -s MINERvA_CCCOHPI_XSec_1DEpi_joint \
+                -s MINERvA_CCCOHPI_XSec_1Dth_joint \
+                -s MINERvA_CCCOHPI_XSec_1DQ2_joint \
+            --config UseSVDInverse=1
+    fi
+
+done

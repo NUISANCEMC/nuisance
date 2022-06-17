@@ -24,6 +24,8 @@ function nuis_help {
   echo -e "\t  plot        : Plot the output of nuis comp"
   echo -e "\tGlobal options:"
   echo -e "\t  --debug     : Enable debugging options where implemented"  
+  echo -e "\t  --force     : Force process where implemented, usually ignores errors related to extant output files."  
+  echo -e "\t  --quiet     : Tries to produce less output to the terminal"  
   echo -e "Try ${NUIS_BREADCRUMBS} <verb> help for further help for a specific verb."
 }
 
@@ -32,11 +34,46 @@ if [ "${1}" == "help" ]; then
   exit 0
 fi
 
-if [ "${1}" == "--debug" ]; then
-  echo "[INFO]: Enabling debugging"
-  export NUIS_DEBUG=ON
-  shift
-fi
+NUIS_DEBUG=OFF
+NUIS_QUIET=OFF
+NUIS_FORCE=OFF
+
+# ## Take global options
+# while [[ ${#} -gt 0 ]]; do
+
+#   KEYARG=${1}
+#   echo "KEYARG: ${KEYARG}"
+
+#   if [ "${KEYARG::1}" != "-" ]; then
+#     echo "break"
+#     break;
+#   fi
+
+#   case $key in
+
+#     --debug)
+#       NUIS_DEBUG=ON
+#     ;;
+
+#     --quiet)
+#       NUIS_QUIET=ON
+#     ;;
+
+#     --force)
+#       NUIS_FORCE=ON
+#     ;;
+
+#   esac
+
+#   shift
+# done
+
+# export NUIS_DEBUG
+# export NUIS_QUIET
+# export NUIS_FORCE
+
+# # echo "NUIS_QUIET: ${NUIS_QUIET}"
+# # exit 0
 
 if [ "${#}" -lt 1 ]; then
   echo -e "[ERROR]: Expected to be passed a sub-command verb like:"

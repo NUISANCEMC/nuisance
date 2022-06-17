@@ -12,7 +12,7 @@ for (( i=0; i < ${#GENLIST[@]}; ++i )); do
     GEN=${GENLIST[${i}]}
     GENTAG=${GENTAGLIST[${i}]}
 
-    if [ ! -e ${EXP}.${GENTAG}.nu.numu.H2O.comp.root ] || [ "${FORCE}" == "ON" ]; then
+    if [ ! -e ${EXP}.${GENTAG}.nu.numu.H2O.comp.root ] || [ "${NUIS_FORCE}" == "ON" ]; then
         nuis comp ${EXP}.${GENTAG}.nu.numu.H2O.root \
             -f -t ${GEN} \
             -o ${EXP}.${GENTAG}.nu.numu.H2O.comp.root \
