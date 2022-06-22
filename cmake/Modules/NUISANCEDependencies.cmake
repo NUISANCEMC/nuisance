@@ -97,7 +97,6 @@ endif()
 
 if (GENIE_ENABLED)
   find_package(GENIE)
-
   if(NOT GENIE_FOUND)
     if(GENIE_REQUIRED)
       cmessage(FATAL_ERROR "GENIE was explicitly enabled but cannot be found.")

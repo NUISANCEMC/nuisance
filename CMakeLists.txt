@@ -70,17 +70,27 @@ add_subdirectory(app)
 
 configure_file(cmake/Templates/setup.sh.in
   "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/setup.sh" @ONLY)
+configure_file(cmake/Templates/BuildDynamicSample.in
+  "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/BuildDynamicSample" @ONLY)
+configure_file(cmake/Templates/BuildDynamicSmearcepter.in
+  "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/BuildDynamicSmearcepter" @ONLY)
+
 install(FILES
-  "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/setup.sh" DESTINATION
-  ${CMAKE_INSTALL_PREFIX})
+  "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/setup.sh" 
+  DESTINATION
+    ${CMAKE_INSTALL_PREFIX})
+
+install(FILES
+  "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/BuildDynamicSample" 
+  "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/BuildDynamicSmearcepter" 
+  DESTINATION
+    ${CMAKE_INSTALL_PREFIX}/bin)
 
 install(PROGRAMS
   "${PROJECT_SOURCE_DIR}/scripts/nuissamples" DESTINATION
   bin)
 
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/data DESTINATION
-                  ${CMAKE_INSTALL_PREFIX})
-install(DIRECTORY ${PROJECT_SOURCE_DIR}/event_gen DESTINATION
                   ${CMAKE_INSTALL_PREFIX})
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/parameters DESTINATION
                   ${CMAKE_INSTALL_PREFIX})

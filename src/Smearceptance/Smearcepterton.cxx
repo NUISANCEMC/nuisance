@@ -28,8 +28,6 @@
 
 #include <vector>
 
-#ifdef __USE_DYNSAMPLES__
-
 #include "TRegexp.h"
 
 #include <dirent.h>
@@ -276,8 +274,6 @@ ISmearcepter* DynamicSmearceptorFactory::CreateSmearceptor(
 }
 
 DynamicSmearceptorFactory::~DynamicSmearceptorFactory() { Manifests.clear(); }
-
-#endif
 
 Smearcepterton* Smearcepterton::_inst = NULL;
 Smearcepterton& Smearcepterton::Get() {

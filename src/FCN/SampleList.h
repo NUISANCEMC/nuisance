@@ -13,7 +13,6 @@ class FitWeight;
 class nuiskey;
 class MeasurementBase;
 
-#ifdef __USE_DYNSAMPLES__
 /// Expect each .so containing samples to supply 4 c-style methods.
 /// int DSF_NSamples();
 /// char const * DSF_GetSampleName(int);
@@ -64,8 +63,6 @@ class DynamicSampleFactory {
 
   ~DynamicSampleFactory();
 };
-
-#endif
 
 //! Functions to make it easier for samples to be created and handled.
 namespace SampleUtils {

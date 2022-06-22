@@ -385,8 +385,6 @@
 #include "NuisConfig.h"
 #include "NuisKey.h"
 
-#ifdef __USE_DYNSAMPLES__
-
 #include "TRegexp.h"
 
 #include <dirent.h>
@@ -626,8 +624,6 @@ MeasurementBase *DynamicSampleFactory::CreateSample(nuiskey &samplekey) {
 }
 
 DynamicSampleFactory::~DynamicSampleFactory() { Manifests.clear(); }
-
-#endif
 
 //! Functions to make it easier for samples to be created and handled.
 namespace SampleUtils {
