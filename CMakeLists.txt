@@ -44,21 +44,31 @@ endif()
 
 LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
 
-#Set this to TRUE to enable build debugging messages
-set(BUILD_DEBUG_MSGS TRUE)
-include(CMessage)
-include(NUISANCEUtils)
+include(CPM)
+CPMFindPackage(
+    NAME CMakeModules
+    GIT_TAG v0.0.3
+    GITHUB_REPOSITORY NuHepMC/CMakeModules
+    DOWNLOAD_ONLY
+)
+LIST(APPEND CMAKE_MODULE_PATH ${CMakeModules_SOURCE_DIR})
 
 ################################################################################
 #                            Check Dependencies
 ################################################################################
+
+#Set this to TRUE to enable build debugging messages
+set(BUILD_DEBUG_MSGS TRUE)
+include(CMessage)
+include(NuHepMCUtils)
+
 include(NUISANCEDependencies)
 
 add_subdirectory(src)
 
 add_subdirectory(app)
 
-configure_file(cmake/setup.sh.in
+configure_file(cmake/Templates/setup.sh.in
   "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/setup.sh" @ONLY)
 install(FILES
   "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/setup.sh" DESTINATION

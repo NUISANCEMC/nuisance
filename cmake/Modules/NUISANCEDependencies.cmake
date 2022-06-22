@@ -1,3 +1,5 @@
+include(NUISANCEUtils)
+
 include(ROOT)
 
 ##########################  Optional Modules  ###############################
@@ -13,7 +15,6 @@ DefineEnabledRequiredSwitch(NEUT)
 DefineEnabledRequiredSwitch(GENIE)
 DefineEnabledRequiredSwitch(NuWro)
 DefineEnabledRequiredSwitch(Prob3plusplus)
-
 
 if (T2KReWeight_ENABLED)
   include(T2KReWeight)
@@ -92,7 +93,7 @@ if (NEUT_ENABLED)
 endif()
 
 if (GENIE_ENABLED)
-  include(GENIE)
+  find_package(GENIE)
 
   if(NOT GENIE_FOUND)
     if(GENIE_REQUIRED)
@@ -104,7 +105,7 @@ if (GENIE_ENABLED)
 endif()
 
 if (NuWro_ENABLED)
-  include(NuWro)
+  find_package(NuWro)
 
   if(NOT NuWro_FOUND)
     if(NuWro_REQUIRED)
