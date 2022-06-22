@@ -2,6 +2,12 @@ include(NUISANCEUtils)
 
 include(ROOT)
 
+if(DEFINED ROOT_CXX_STANDARD)
+  if(NOT DEFINED CMAKE_CXX_STANDARD OR ROOT_CXX_STANDARD GREATER CMAKE_CXX_STANDARD)
+    set(CMAKE_CXX_STANDARD ${ROOT_CXX_STANDARD})
+  endif()
+endif()
+
 ##########################  Optional Modules  ###############################
 
 add_library(GeneratorCompileDependencies INTERFACE)
@@ -53,10 +59,7 @@ if (NOvARwgt_ENABLED)
 endif()
 
 if (nusystematics_ENABLED)
-  SET(OLD_CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}")
-  UNSET(CMAKE_MODULE_PATH)
-  find_package(nusystematics)
-  SET(CMAKE_MODULE_PATH "${OLD_CMAKE_MODULE_PATH}")
+  find_package(nusystematics 1.00.3)
 
   if(NOT nusystematics_FOUND)
     if(nusystematics_REQUIRED)

@@ -47,11 +47,11 @@ LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
 include(CPM)
 CPMFindPackage(
     NAME CMakeModules
-    GIT_TAG v0.0.3
+    GIT_TAG v0.0.6
     GITHUB_REPOSITORY NuHepMC/CMakeModules
     DOWNLOAD_ONLY
 )
-LIST(APPEND CMAKE_MODULE_PATH ${CMakeModules_SOURCE_DIR})
+include(${CMakeModules_SOURCE_DIR}/NuHepMCModules.cmake)
 
 ################################################################################
 #                            Check Dependencies
