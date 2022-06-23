@@ -48,17 +48,14 @@ if(GENIEReWeight_ENABLED)
   LIST(APPEND Reweight_Impl_Files 
     MINERvAWeightCalcs.cxx)
   LIST(APPEND Reweight_Hdr_Files 
-    MINERvAWeightCalcs.h)
+    MINERvAWeightCalcs.h
+    GENIEWeightEngine.h)
   if(GENIE3_API_ENABLED)
     LIST(APPEND Reweight_Impl_Files 
       GENIE3WeightEngine.cxx)
-    LIST(APPEND Reweight_Hdr_Files 
-      GENIE3WeightEngine.h)
   else()
     LIST(APPEND Reweight_Impl_Files 
       GENIE2WeightEngine.cxx)
-    LIST(APPEND Reweight_Hdr_Files 
-      GENIE2WeightEngine.h)
   endif()
 endif()
 
