@@ -120,6 +120,7 @@ namespace SignalDef {
 
   bool isCC0pi_MINERvAPTPZ(FitEvent *event, int nuPDG, double EnuMin = 0, double EnuMax = 0);
   bool isCC0pi_anti_MINERvAPTPZ(FitEvent* event, int nuPDG, double EnuMin = 0, double EnuMax = 0);
+  bool isCC0pi_anti_MINERvAPTPZ_ME(FitEvent* event, int nuPDG, double EnuMin = 0, double EnuMax = 0);
 
 }
 

@@ -1,7 +1,3 @@
-// Adrian Orea
-// I used the file MINERvA_CCinc_XSec_2DEavq3_nu.cxx as a template
-// Also, I am fully aware of the naming typo (should be ptpz), but Everything is already named the same way so...
-
 // Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
@@ -36,12 +32,19 @@
 void MINERvA_CC0pi_XSec_2D_antinu::SetupDataSettings() {
 //********************************************************************  
 
+  if (IsME) {
+    std::cerr << "Medium energy implementation does not support covariance" << std::endl;
+    std::cerr << "If you want to run anyway, comment me out" << std::endl;
+    std::cerr << "I'm in " << __FILE__ << ":" << __LINE__ << std::endl;
+    throw;
+  }
+
   // Set Distribution
   // See header file for enum and some descriptions
   std::string name = fSettings.GetS("name");
 
-  // We're lucky to have three different MINERvA CC0pi anti-numu 2D distributions
-  if      (!name.compare("MINERvA_CC0pi_XSec_2Dptpz_antinu")) fDist = kPtPz;
+  // We're lucky to have three different MINERvA CC0pi anti-numu 2D distributions, only for LE
+  if           (!name.compare("MINERvA_CC0pi_XSec_2Dptpz_antinu")) fDist = kPtPz;
   else if      (!name.compare("MINERvA_CC0pi_XSec_2DQ2QEEnuQE_antinu")) fDist = kQ2QEEnuQE;
   else if      (!name.compare("MINERvA_CC0pi_XSec_2DQ2QEEnuTrue_antinu")) fDist = kQ2QEEnuTrue;
 
@@ -58,12 +61,17 @@ void MINERvA_CC0pi_XSec_2D_antinu::SetupDataSettings() {
   // N.B. fScaleFactor also needs to be set dependent on the distribution. The EnuQE and EnuTrue distributions flux integrate in the Enu dimension and flux average in the Q2 dimension
   switch (fDist) {
     case (kPtPz):
-      datafile += "cross_sections_muonpz_muonpt_lowangleqelike_minerva_2d.csv";
-      covfile += "cross_sections_muonpz_muonpt_lowangleqelike_minerva_covariance.csv";
-      xbinning += "cross_sections_muonpt_lowangleqelike_minerva_intmuonpz_bins_1d.csv";
-      ybinning += "cross_sections_muonpz_lowangleqelike_minerva_intmuonpt_bins_1d.csv";
-      titles    = "MINERvA CC0#pi #bar{#nu}_{#mu} p_{t} p_{z};p_{t} (GeV);p_{z} (GeV);d^{2}#sigma/dp_{t}dp_{z} (cm^{2}/GeV^{2}/nucleon)";
       distdescript = "MINERvA_CC0pi_XSec_2Dptpz_antinu sample";
+      if (IsME) {
+        datafile += "data_release_pzpt.root";
+        titles    = "MINERvA CC0#pi #bar{#nu}_{#mu} p_{z} p_{t};p_{z} (GeV);p_{t} (GeV);d^{2}#sigma/dp_{z}dp_{t} (cm^{2}/GeV^{2}/nucleon)";
+      } else {
+        datafile  += "cross_sections_muonpz_muonpt_lowangleqelike_minerva_2d.csv";
+        covfile   += "cross_sections_muonpz_muonpt_lowangleqelike_minerva_covariance.csv";
+        xbinning  += "cross_sections_muonpt_lowangleqelike_minerva_intmuonpz_bins_1d.csv";
+        ybinning  += "cross_sections_muonpz_lowangleqelike_minerva_intmuonpt_bins_1d.csv";
+        titles    = "MINERvA CC0#pi #bar{#nu}_{#mu} p_{t} p_{z};p_{t} (GeV);p_{z} (GeV);d^{2}#sigma/dp_{t}dp_{z} (cm^{2}/GeV^{2}/nucleon)";
+      }
       fScaleFactor  = (GetEventHistogram()->Integral("width") * 1E-38 / (fNEvents + 0.)) / this->TotalIntegratedFlux();
       break;
     case (kQ2QEEnuQE):
@@ -95,43 +103,55 @@ void MINERvA_CC0pi_XSec_2D_antinu::SetupDataSettings() {
 
   // Sample overview ---------------------------------------------------
   std::string descrip = distdescript + "\n"\
-                        "Target: CH \n" \
-                        "Flux: MINERvA Low Energy RHC anti-numu  \n" \
-                        "Signal: CC-0pi \n";
+                        "Target: CH \n";
+  
+  if (IsME) {
+    descrip += "Flux: MINERvA Medium Energy RHC anti-numu  \n" \
+               "Signal: CC-0pi \n";
+  } else {
+    descrip += "Flux: MINERvA Low Energy RHC anti-numu  \n" \
+               "Signal: CC-0pi \n";
+  }
   fSettings.SetDescription(descrip);
 
   // The input ROOT file in the fSettings
   fSettings.SetDataInput(FitPar::GetDataBase() + datafile);
-  fSettings.SetCovarInput(FitPar::GetDataBase() + covfile);
-  // Save the binning used in the sample settings
-  fSettings.SetS("xbins", FitPar::GetDataBase() + xbinning);
-  fSettings.SetS("ybins", FitPar::GetDataBase() + ybinning);
 
-  // Sets up the data from the data file, x binning and y binning
-  SetDataFromTextFile(fSettings.GetDataInput(), 
-                      fSettings.GetS("xbins"),
-                      fSettings.GetS("ybins"));
+  if (IsME) SetDataValues(fSettings.GetDataInput(), "data_xsection_with_totErr_norm");
+  else {
+    fSettings.SetCovarInput(FitPar::GetDataBase() + covfile);
+    // Save the binning used in the sample settings
+    fSettings.SetS("xbins", FitPar::GetDataBase() + xbinning);
+    fSettings.SetS("ybins", FitPar::GetDataBase() + ybinning);
 
-  // The data comes in units of 1E-41
-  fDataHist->Scale(1E-41);
+    // Sets up the data from the data file, x binning and y binning
+    SetDataFromTextFile(fSettings.GetDataInput(), 
+        fSettings.GetS("xbins"),
+        fSettings.GetS("ybins"));
 
-  // Setup the covariance matrix
-  SetCovarFromTextFile(fSettings.GetCovarInput(), fDataHist->GetNbinsX()*fDataHist->GetNbinsY());
+    // The data comes in units of 1E-41
+    fDataHist->Scale(1E-41);
 
-  // Set the error on the data from the covariance matrix
-  StatUtils::SetDataErrorFromCov(fDataHist, fFullCovar, (TH2I*)NULL, 1.E-41, true);
+    // Setup the covariance matrix
+    SetCovarFromTextFile(fSettings.GetCovarInput(), fDataHist->GetNbinsX()*fDataHist->GetNbinsY());
 
-  // In NUISANCE we assume the covar scale is 1E76 (or cross-section in 1E-38)
-  // For this measurement it's actually 1E41*1E41=1E82 so need to multiply 1E82/1E76=1E6
-  double ScalingFactor = 1E-3*1E-3;
-  (*fFullCovar) *= ScalingFactor;
-  (*covar) *= 1./ScalingFactor;
-  (*fDecomp) *= 1./ScalingFactor;
+    // Set the error on the data from the covariance matrix
+    StatUtils::SetDataErrorFromCov(fDataHist, fFullCovar, (TH2I*)NULL, 1.E-41, true);
+
+    // In NUISANCE we assume the covar scale is 1E76 (or cross-section in 1E-38)
+    // For this measurement it's actually 1E41*1E41=1E82 so need to multiply 1E82/1E76=1E6
+    double ScalingFactor = 1E-3*1E-3;
+    (*fFullCovar) *= ScalingFactor;
+    (*covar) *= 1./ScalingFactor;
+    (*fDecomp) *= 1./ScalingFactor;
+  }
 };
 
 //********************************************************************
 MINERvA_CC0pi_XSec_2D_antinu::MINERvA_CC0pi_XSec_2D_antinu(nuiskey samplekey) {
-//********************************************************************
+  //********************************************************************
+
+  IsME = false;
 
   fSettings = LoadSampleSettings(samplekey);
   fSettings.SetAllowedTypes("FIX,FREE,SHAPE/FULL,DIAG/MASK", "FIX/FULL");
@@ -160,34 +180,38 @@ void MINERvA_CC0pi_XSec_2D_antinu::FillEventVariables(FitEvent *event) {
   switch (fDist) {
     case (kPtPz):
       {
-      Double_t px = Pmu.X()/1.E3;
-      Double_t py = Pmu.Y()/1.E3;
-      Double_t pt = sqrt(px*px+py*py);
+        Double_t px = Pmu.X()/1.E3;
+        Double_t py = Pmu.Y()/1.E3;
+        Double_t pt = sqrt(px*px+py*py);
 
-      // Don't want to assume the event generators all have neutrino coming along z
-      // pz is muon momentum projected onto the neutrino direction
-      Double_t pz = Pmu.Vect().Dot(Pnu.Vect()*(1.0/Pnu.Vect().Mag()))/1.E3;
+        // Don't want to assume the event generators all have neutrino coming along z
+        // pz is muon momentum projected onto the neutrino direction
+        Double_t pz = Pmu.Vect().Dot(Pnu.Vect()*(1.0/Pnu.Vect().Mag()))/1.E3;
 
-      // Set Hist Variables
-      fYVar = pz;
-      fXVar = pt;
-      break;
+        if (IsME) {
+          fYVar = pt;
+          fXVar = pz;
+        } else {
+          fYVar = pz;
+          fXVar = pt;
+        }
+        break;
       }
     case (kQ2QEEnuQE):
       {
-      double Q2qeRec = FitUtils::Q2QErec(Pmu, Pnu, 30, false);
-      double EnuQErec = FitUtils::EnuQErec(Pmu, Pnu, 30, false);
-      fXVar = Q2qeRec;
-      fYVar = EnuQErec;
-      break;
+        double Q2qeRec = FitUtils::Q2QErec(Pmu, Pnu, 30, false);
+        double EnuQErec = FitUtils::EnuQErec(Pmu, Pnu, 30, false);
+        fXVar = Q2qeRec;
+        fYVar = EnuQErec;
+        break;
       }
     case (kQ2QEEnuTrue):
       {
-      double Q2qeRec = FitUtils::Q2QErec(Pmu, Pnu, 30, false);
-      double EnuTrue = Pnu.E()/1.E3;
-      fXVar = Q2qeRec;
-      fYVar = EnuTrue;
-      break;
+        double Q2qeRec = FitUtils::Q2QErec(Pmu, Pnu, 30, false);
+        double EnuTrue = Pnu.E()/1.E3;
+        fXVar = Q2qeRec;
+        fYVar = EnuTrue;
+        break;
       }
   }
 };
@@ -195,5 +219,8 @@ void MINERvA_CC0pi_XSec_2D_antinu::FillEventVariables(FitEvent *event) {
 //********************************************************************
 bool MINERvA_CC0pi_XSec_2D_antinu::isSignal(FitEvent *event) {
   //********************************************************************
+  if (IsME) {
+    return SignalDef::isCC0pi_anti_MINERvAPTPZ_ME(event, -14, EnuMin, EnuMax);
+  }
   return SignalDef::isCC0pi_anti_MINERvAPTPZ(event, -14, EnuMin, EnuMax);
 };
