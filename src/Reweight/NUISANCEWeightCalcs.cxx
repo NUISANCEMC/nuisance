@@ -806,7 +806,6 @@ RadCorrQ2::RadCorrQ2() {
   fInputs[kNumu] = new TFile((fileloc+"/Elspectrum_muon_neutrino_merge.root").c_str());
   fInputs[kNumuBar] = new TFile((fileloc+"/Elspectrum_muon_antineutrino_merge.root").c_str());
 
-  //EnuRange[9] = {0.2, 0.3, 0.5, 1., 2., 3., 5., 10., 20.};
   EnuRange[0] = 0.2;
   EnuRange[1] = 0.3;
   EnuRange[2] = 0.5;
@@ -1017,9 +1016,9 @@ void RadCorrQ2::SetDialValue(int rwenum, double val) {
 
   // If greater than 0.5, use
   if (curenum == kRadCorrQ2) {
-    if (val >= 0 && val < 0.5) type = 0;
-    else if (val > 0 && val < 1.5) type = 1;
-    else if (val > 0 && val < 2.5) type = 2;
+    if (val >= 0 && val < 0.5) type = 0; // Don't apply
+    else if (val > 0 && val < 1.5) type = 1; // Apply only to CCQE events
+    else if (val > 0 && val < 2.5) type = 2; // Apply to all events
     else {
       std::cerr << "wrong value given to radiative correction. Please give 0, 1, 2. I will round to nearest integer" << std::endl;
       throw;

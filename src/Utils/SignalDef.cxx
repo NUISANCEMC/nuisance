@@ -221,7 +221,7 @@ bool SignalDef::isCCCOH(FitEvent *event, int nuPDG, int piPDG, double EnuMin, do
 
   int nLepton = event->NumFSParticle(nuPDG > 0 ? nuPDG-1 : nuPDG+1);
   int nPion   = event->NumFSParticle(piPDG);
-  int nFS     = event->NumFSParticle();
+  //int nFS     = event->NumFSParticle();
 
   if (nLepton != 1 || nPion != 1) return false;
   // if (nFS != 2) return false;

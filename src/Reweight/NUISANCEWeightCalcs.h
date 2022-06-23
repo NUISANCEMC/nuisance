@@ -206,7 +206,6 @@ class RadCorrQ2 : public NUISANCEWeightCalc {
     void SetDialValue(int rwenum, double val);
     bool IsHandled(int rwenum);
 
-    int type;
 
   private:
     // Just a handy enum
@@ -219,6 +218,8 @@ class RadCorrQ2 : public NUISANCEWeightCalc {
     int nEnu;
 
     double GetQ2max(double, double);
+
+    int type;
 };
 
 
