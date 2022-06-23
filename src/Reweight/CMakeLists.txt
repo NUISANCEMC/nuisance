@@ -28,18 +28,37 @@ set(Reweight_Impl_Files
   NUISANCESyst.cxx
   NUISANCEWeightEngine.cxx
   NUISANCEWeightCalcs.cxx
+)
+
+set(Reweight_Hdr_Files
+  GlobalDialList.h
+  FitWeight.h
+  WeightEngineBase.h
+  WeightUtils.h
+  SampleNormEngine.h
+  LikelihoodWeightEngine.h
+  SplineWeightEngine.h
+  NUISANCESyst.h
+  NUISANCEWeightEngine.h
+  NUISANCEWeightCalcs.h
   weightRPA.h
 )
 
 if(GENIEReWeight_ENABLED)
   LIST(APPEND Reweight_Impl_Files 
     MINERvAWeightCalcs.cxx)
+  LIST(APPEND Reweight_Hdr_Files 
+    MINERvAWeightCalcs.h)
   if(GENIE3_API_ENABLED)
     LIST(APPEND Reweight_Impl_Files 
       GENIE3WeightEngine.cxx)
+    LIST(APPEND Reweight_Hdr_Files 
+      GENIE3WeightEngine.h)
   else()
     LIST(APPEND Reweight_Impl_Files 
       GENIE2WeightEngine.cxx)
+    LIST(APPEND Reweight_Hdr_Files 
+      GENIE2WeightEngine.h)
   endif()
 endif()
 
@@ -51,6 +70,8 @@ if(NEUTReWeight_ENABLED)
     LIST(APPEND Reweight_Impl_Files 
       NEUTWeightEngine.cxx)
   endif()
+  LIST(APPEND Reweight_Hdr_Files 
+    NEUTWeightEngine.h)
 endif()
 
 if(T2KReWeight_ENABLED)
@@ -61,25 +82,34 @@ if(T2KReWeight_ENABLED)
     LIST(APPEND Reweight_Impl_Files 
       T2KWeightEngine.cxx)
   endif()
+  LIST(APPEND Reweight_Hdr_Files 
+    T2KWeightEngine.h)
 endif()
 
 if(NIWGLegacy_ENABLED)
   LIST(APPEND Reweight_Impl_Files NIWGWeightEngine_legacy.cxx)
+  LIST(APPEND Reweight_Hdr_Files NIWGWeightEngine_legacy.h)
 endif()
 
 if(NOvARwgt_ENABLED)
   LIST(APPEND Reweight_Impl_Files NOvARwgtEngine.cxx)
+  LIST(APPEND Reweight_Hdr_Files NOvARwgtEngine.h)
 endif()
 
 if(nusystematics_ENABLED)
   LIST(APPEND Reweight_Impl_Files nusystematicsWeightEngine.cxx)
+  LIST(APPEND Reweight_Hdr_Files nusystematicsWeightEngine.h)
 endif()
 
 if(Prob3plusplus_ENABLED)
   LIST(APPEND Reweight_Impl_Files OscWeightEngine.cxx)
+  LIST(APPEND Reweight_Hdr_Files OscWeightEngine.h)
 endif()
 
 add_library(Reweight SHARED ${Reweight_Impl_Files})
 target_link_libraries(Reweight GeneratorCompileDependencies CoreIncludes ROOT::ROOT)
+set_target_properties(Reweight PROPERTIES PUBLIC_HEADER "${Reweight_Hdr_Files}")
 
-install(TARGETS Reweight DESTINATION lib)
+install(TARGETS Reweight
+  LIBRARY DESTINATION lib
+  PUBLIC_HEADER DESTINATION include)

@@ -27,7 +27,21 @@ set(Utils_Impl_Files
   ParserUtils.cxx
 )
 
+set(Utils_Hdr_Files
+  FitUtils.h
+  GeneralUtils.h
+  PlotUtils.h
+  SignalDef.h
+  BeamUtils.h
+  TargetUtils.h
+  ParserUtils.h
+  PhysConst.h
+)
+
 add_library(Utils SHARED ${Utils_Impl_Files})
 target_link_libraries(Utils CoreIncludes ROOT::ROOT)
+set_target_properties(Utils PROPERTIES PUBLIC_HEADER "${Utils_Hdr_Files}")
 
-install(TARGETS Utils DESTINATION lib)
+install(TARGETS Utils
+  LIBRARY DESTINATION lib
+  PUBLIC_HEADER DESTINATION include)

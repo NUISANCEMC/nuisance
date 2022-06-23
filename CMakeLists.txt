@@ -68,6 +68,33 @@ add_subdirectory(src)
 
 add_subdirectory(app)
 
+SET(CONFIG_COMPILE_DEFINTIONS)
+foreach(FEATURE 
+  T2KReWeight
+  NIWGLegacy
+  NOvARwgt
+  nusystematics
+  NEUT
+  NuWro
+  Prob3plusplus)
+  
+  if(${FEATURE}_ENABLED)
+    LIST(APPEND CONFIG_COMPILE_DEFINTIONS -D${FEATURE}_ENABLED)
+  endif()
+endforeach()
+
+if(GENIE_ENABLED)
+  LIST(APPEND CONFIG_COMPILE_DEFINTIONS -DGENIE_ENABLED)
+  LIST(APPEND CONFIG_INCLUDE_DIRECTORIES -I${GENIE_INC_DIR})
+  if(GENIE3_FOUND)
+      LIST(APPEND CONFIG_COMPILE_DEFINTIONS -DGENIE3_API_ENABLED)
+  endif()
+endif()
+
+STRING(REPLACE ";" " " CONFIG_COMPILE_DEFINTIONS "${CONFIG_COMPILE_DEFINTIONS}")
+STRING(REPLACE ";" " " CONFIG_INCLUDE_DIRECTORIES "${CONFIG_INCLUDE_DIRECTORIES}")
+
+
 configure_file(cmake/Templates/setup.sh.in
   "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/setup.sh" @ONLY)
 configure_file(cmake/Templates/BuildDynamicSample.in
@@ -80,7 +107,7 @@ install(FILES
   DESTINATION
     ${CMAKE_INSTALL_PREFIX})
 
-install(FILES
+install(PROGRAMS
   "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/BuildDynamicSample" 
   "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/BuildDynamicSmearcepter" 
   DESTINATION

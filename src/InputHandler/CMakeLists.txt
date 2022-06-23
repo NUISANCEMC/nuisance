@@ -31,11 +31,32 @@ set(InputHandler_Impl_Files
   NuanceEvent.cxx
   FitEventInputHandler.cxx
   SplineInputHandler.cxx
-  GeneratorInfoBase.h
   HepMCTextInputHandler.cxx
   InputFactory.cxx
   SigmaQ0HistogramInputHandler.cxx
   HistogramInputHandler.cxx
+)
+
+set(InputHandler_Hdr_Files
+  BaseFitEvt.h
+  FitParticle.h
+  FitEvent.h
+  GeneratorUtils.h
+  StdHepEvt.h
+  InputUtils.h
+  GIBUUInputHandler.h
+  GiBUUNativeInputHandler.h
+  NUANCEInputHandler.h
+  InputHandler.h
+  InputTypes.h
+  GeneratorInfoBase.h
+  NuanceEvent.h
+  FitEventInputHandler.h
+  SplineInputHandler.h
+  HepMCTextInputHandler.h
+  InputFactory.h
+  SigmaQ0HistogramInputHandler.h
+  HistogramInputHandler.h
 )
 
 if(HEPMCNuEvt_ENABLED)
@@ -56,6 +77,9 @@ endif()
 
 add_library(InputHandler SHARED ${InputHandler_Impl_Files})
 target_link_libraries(InputHandler GeneratorCompileDependencies Experiments CoreIncludes ROOT::ROOT)
+set_target_properties(InputHandler PROPERTIES PUBLIC_HEADER "${InputHandler_Hdr_Files}")
 
-install(TARGETS InputHandler DESTINATION lib)
+install(TARGETS InputHandler
+  LIBRARY DESTINATION lib
+  PUBLIC_HEADER DESTINATION include)
 
