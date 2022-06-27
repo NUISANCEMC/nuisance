@@ -642,7 +642,6 @@ MeasurementBase *CreateSample(std::string name, std::string file,
 }
 
 MeasurementBase *CreateSample(nuiskey samplekey) {
-#ifdef __USE_DYNSAMPLES__
   if (DynamicSampleFactory::Get().HasSample(samplekey)) {
     NUIS_LOG(SAM, "Instantiating dynamic sample...");
 
@@ -653,7 +652,6 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
     }
     NUIS_ABORT("Failed to instantiate dynamic sample.");
   }
-#endif
 
   FitWeight *rw = FitBase::GetRW();
   std::string name = samplekey.GetS("name");

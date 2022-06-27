@@ -32,7 +32,13 @@ if (T2KReWeight_ENABLED)
     SET(T2KReWeight_ENABLED FALSE)
   else()
     SET(T2KReWeight_ENABLED TRUE)
-    target_link_libraries(GeneratorCompileDependencies INTERFACE T2KReWeight::All)
+    
+    add_library(NUISANCET2KReWeight INTERFACE)
+    set_target_properties(NUISANCET2KReWeight PROPERTIES 
+      INTERFACE_COMPILE_OPTIONS "-DT2KReWeight_ENABLED"
+      INTERFACE_LINK_LIBRARIES T2KReWeight::All)
+
+    target_link_libraries(GeneratorCompileDependencies INTERFACE NUISANCET2KReWeight)
   endif()
 
 endif()

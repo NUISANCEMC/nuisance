@@ -103,7 +103,7 @@ if(Prob3plusplus_ENABLED)
   LIST(APPEND Reweight_Hdr_Files OscWeightEngine.h)
 endif()
 
-add_library(Reweight SHARED ${Reweight_Impl_Files})
+add_library(Reweight STATIC ${Reweight_Impl_Files})
 target_link_libraries(Reweight GeneratorCompileDependencies CoreIncludes ROOT::ROOT)
 set_target_properties(Reweight PROPERTIES PUBLIC_HEADER "${Reweight_Hdr_Files}")
 
