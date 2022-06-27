@@ -30,6 +30,9 @@ if (T2KReWeight_ENABLED)
       cmessage(FATAL_ERROR "T2KReWeight was explicitly enabled but cannot be found.")
     endif()
     SET(T2KReWeight_ENABLED FALSE)
+  else()
+    SET(T2KReWeight_ENABLED TRUE)
+    target_link_libraries(GeneratorCompileDependencies INTERFACE T2KReWeight::All)
   endif()
 
 endif()
@@ -42,6 +45,9 @@ if (NIWGLegacy_ENABLED)
       cmessage(FATAL_ERROR "NIWGLegacy was explicitly enabled but cannot be found.")
     endif()
     SET(NIWGLegacy_ENABLED FALSE)
+  else()
+    SET(NIWGLegacy_ENABLED TRUE)
+    target_link_libraries(GeneratorCompileDependencies INTERFACE NIWGLegacy::All)
   endif()
 
 endif()
@@ -54,6 +60,9 @@ if (NOvARwgt_ENABLED)
       cmessage(FATAL_ERROR "NOvARwgt was explicitly enabled but cannot be found.")
     endif()
     SET(NOvARwgt_ENABLED FALSE)
+  else()
+    SET(NOvARwgt_ENABLED TRUE)
+    target_link_libraries(GeneratorCompileDependencies INTERFACE NOvARwgt::All)
   endif()
 
 endif()
@@ -67,6 +76,7 @@ if (nusystematics_ENABLED)
     endif()
     SET(nusystematics_ENABLED FALSE)
   else()
+    SET(nusystematics_ENABLED TRUE)
     add_library(NUISANCEnusystematics INTERFACE)
     set_target_properties(NUISANCEnusystematics PROPERTIES 
       INTERFACE_COMPILE_OPTIONS "-Dnusystematics_ENABLED"
@@ -80,9 +90,6 @@ endif()
 #### Put the generators after the reweighting tools that may depend on them so that
 #### libraries are more likely to be in a useful order
 
-#Defines NEUT_ENABLED and NEUT_REQUIRED, 
-#if NEUT_ENABLED was passed explicitly 
-#then NEUT_REQUIRED is ON, otherwise it is OFF
 if (NEUT_ENABLED)
   include(NEUT)
 
@@ -91,6 +98,9 @@ if (NEUT_ENABLED)
       cmessage(FATAL_ERROR "NEUT was explicitly enabled but cannot be found.")
     endif()
     SET(NEUT_ENABLED FALSE)
+  else()
+    SET(NEUT_ENABLED TRUE)
+    target_link_libraries(GeneratorCompileDependencies INTERFACE NEUT::All)
   endif()
 
 endif()
@@ -102,6 +112,9 @@ if (GENIE_ENABLED)
       cmessage(FATAL_ERROR "GENIE was explicitly enabled but cannot be found.")
     endif()
     SET(GENIE_ENABLED FALSE)
+  else()
+    SET(GENIE_ENABLED TRUE)
+    target_link_libraries(GeneratorCompileDependencies INTERFACE GENIE::All)
   endif()
 
 endif()
@@ -114,6 +127,9 @@ if (NuWro_ENABLED)
       cmessage(FATAL_ERROR "NuWro was explicitly enabled but cannot be found.")
     endif()
     SET(NuWro_ENABLED FALSE)
+  else()
+    SET(NuWro_ENABLED TRUE)
+    target_link_libraries(GeneratorCompileDependencies INTERFACE NuWro::All)
   endif()
 
 endif()
@@ -127,6 +143,7 @@ if (Prob3plusplus_ENABLED)
     endif()
     SET(Prob3plusplus_ENABLED FALSE)
   else()
+    SET(Prob3plusplus_ENABLED TRUE)
     add_library(NUISANCEProb3plusplus INTERFACE)
     set_target_properties(NUISANCEProb3plusplus PROPERTIES 
       INTERFACE_COMPILE_OPTIONS "-DProb3plusplus_ENABLED"

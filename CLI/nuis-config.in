@@ -31,8 +31,13 @@ FEATURES=""
 GENERATORS=""
 
 T2KReWeight_ENABLED="@T2KReWeight_ENABLED@"
+T2KReWeight_LEGACY_API_ENABLED="@T2KReWeight_LEGACY_API_ENABLED@"
 if [ "${T2KReWeight_ENABLED}" = "TRUE" ]; then
-  FEATURES="${FEATURES}:T2KReWeight"
+  if [ "${T2KReWeight_LEGACY_API_ENABLED}" = "TRUE" ]; then
+    FEATURES="${FEATURES}:T2KReWeightLegacy"
+  else 
+    FEATURES="${FEATURES}:T2KReWeight"
+  fi
 fi
 
 NIWGLegacy_ENABLED="@NIWGLegacy_ENABLED@"
