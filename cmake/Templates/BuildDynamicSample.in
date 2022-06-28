@@ -41,47 +41,52 @@ fi
 
 cat $1 > compile.tmp/$1
 
-echo -e "static char const * SampleNames[] = {\"${CN}\"};\n"\
-"static int const NSamples = 1;\n"\
-"\n"\
-"extern \"C\" {\n"\
-"int DSF_NSamples() { return NSamples; }\n"\
-"char const* DSF_GetSampleName(int i) {\n"\
-"  if (i < NSamples) {\n"\
-"    return SampleNames[i];\n"\
-"  }\n"\
-"  return 0;\n"\
-"}\n"\
-"MeasurementBase* DSF_GetSample(int i, void* samplekey) {\n"\
-"  nuiskey* sk = reinterpret_cast<nuiskey *>(samplekey);\n"\
-"  if (!sk) {\n"\
-"    return 0;\n"\
-"  }\n"\
-"\n"\
-"  if (sk->GetS(\"name\") != DSF_GetSampleName(i)) {\n"\
-"    std::cout\n"\
-"        << \"[ERROR]: When instantiating dynamic sample. Samplekey named: \"\n"\
-"        << sk->GetS(\"name\") << \", but requested sample named: \"\n"\
-"        << DSF_GetSampleName(i)\n"\
-"        << \". It is possible that the nuiskey object is lost in translation. \"\n"\
-"           \"Was NUISANCE and this dynamic sample manifest built with the same \"\n"\
-"           \"environment and compiler?\"\n"\
-"        << std::endl;\n"\
-"  }\n"\
-"\n"\
-"  if (i == 0) {\n"\
-"    return new ${CN}(*sk);\n"\
-"  }\n"\
-"  return 0;\n"\
-"}\n"\
-"void DSF_DestroySample(MeasurementBase* mb) { delete mb; }\n"\
-"}" >> compile.tmp/$1
+cat << EOF >> compile.tmp/$1
+
+static char const * SampleNames[] = {"${CN}"};
+static int const NSamples = 1;
+
+extern "C" {
+int DSF_NSamples() { return NSamples; }
+char const* DSF_GetSampleName(int i) {
+  if (i < NSamples) {
+    return SampleNames[i];
+  }
+  return 0;
+}
+
+MeasurementBase* DSF_GetSample(int i, void* samplekey) {
+  nuiskey* sk = reinterpret_cast<nuiskey *>(samplekey);
+  if (!sk) {
+    return 0;
+  }
+
+  if (sk->GetS("name") != DSF_GetSampleName(i)) {
+    std::cout
+        << "[ERROR]: When instantiating dynamic sample. Samplekey named: "
+        << sk->GetS("name") << ", but requested sample named: "
+        << DSF_GetSampleName(i)
+        << ". It is possible that the nuiskey object is lost in translation. "
+           "Was NUISANCE and this dynamic sample manifest built with the same "
+           "environment and compiler?"
+        << std::endl;
+  }
+
+  if (i == 0) {
+    return new ${CN}(*sk);
+  }
+  return 0;
+}
+  void DSF_DestroySample(MeasurementBase* mb) { delete mb; }
+}
+EOF
 
 CMD="g++ ${DYNSAMPLE_EXTRA_BUILD_FLAGS} compile.tmp/$1 -shared -o $2 -fPIC -I@ROOT_INCLUDE_DIRS@ -std=c++@CMAKE_CXX_STANDARD@ -I@CMAKE_INSTALL_PREFIX@/include @CONFIG_INCLUDE_DIRECTORIES@ @CONFIG_COMPILE_DEFINTIONS@"
 
 echo ${CMD}
 if ! ${CMD}; then
   echo "[ERROR]: Failed to compile $1. Generated code can be found in ./compile.tmp/$1"
+  exit 1
 else
   rm -r compile.tmp
   echo "Successfully build: $2."
