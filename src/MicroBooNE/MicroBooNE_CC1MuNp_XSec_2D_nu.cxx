@@ -108,7 +108,7 @@ MicroBooNE_CC1MuNp_XSec_2D_nu::MicroBooNE_CC1MuNp_XSec_2D_nu(nuiskey samplekey) 
 
 
 bool MicroBooNE_CC1MuNp_XSec_2D_nu::isSignal( FitEvent* event ) {
-  return SignalDef::MicroBooNE::isCC1MuNp( event, EnuMin, EnuMax );
+  return SignalDef::MicroBooNE::isCC1MuNpFor2DAnalysis( event, EnuMin, EnuMax );
 };
 
 
