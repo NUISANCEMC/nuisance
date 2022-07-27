@@ -24,53 +24,34 @@
 class TH2D;
 
 class MicroBooNE_CC1MuNp_XSec_2D_nu : public Measurement1D {
+
 public:
+
   /// Basic Constructor.
-  MicroBooNE_CC1MuNp_XSec_2D_nu(nuiskey samplekey);
+  MicroBooNE_CC1MuNp_XSec_2D_nu( nuiskey samplekey );
 
   /// Virtual Destructor
   ~MicroBooNE_CC1MuNp_XSec_2D_nu() {};
 
   /// Apply signal definition
-  bool isSignal(FitEvent* nvect);
+  bool isSignal( FitEvent* nvect );
 
   /// Fill kinematic distributions
-  void FillEventVariables(FitEvent* customEvent);
+  void FillEventVariables( FitEvent* customEvent );
 
-  void ConvertEventRates();
-
-  void MakeSlices();
-
-  // Enables writing the slice histograms to the output file
-  void Write( std::string drawopt );
+  virtual void FillHistograms() override;
 
 private:
+
   void LoadBinDefinitions();
-  struct BinDef {
-    BinDef() {}
-    BinDef( double xmin, double xmax, double ymin, double ymax )
-      : fXMin( xmin ), fXMax( xmax ), fYMin( ymin ), fYMax( ymax ) {}
-    bool InBin( double x, double y ) const {
-      if ( x >= fXMin && x < fXMax && y >= fYMin && y < fYMax ) return true;
-      return false;
-    }
-    double fXMin;
-    double fXMax;
-    double fYMin;
-    double fYMax;
-  };
-  // Keys are bin numbers, values are definitions
-  std::map< int, BinDef > fBinToDefinitionMap;
 
-  // Slice histograms
-  std::vector< TH1D* > fMCHist_Slices;
+  // Strings containing the cuts used to define each bin
+  std::vector< std::string > fBinDefinitions;
 
-  // Edges needed to define the slice histograms
-  std::map< double, std::set<double> > fSliceEdgeMap;
+  // Temporary storage for the index of each bin that passed all cuts for any
+  // particular event
+  std::vector< size_t > fPassingBins;
 
-  // Determines which set of variables will be considered
-  enum Distribution { kPpCosp, kPmuCosmu };
-  Distribution fDist;
 };
 
 #endif

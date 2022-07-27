@@ -28,24 +28,17 @@ namespace {
   const int MASS_NUMBER_40AR = 40;
 }
 
-//********************************************************************
-MicroBooNE_CC1MuNp_XSec_2D_nu::MicroBooNE_CC1MuNp_XSec_2D_nu(nuiskey samplekey) {
-//********************************************************************
-  fSettings = LoadSampleSettings(samplekey);
-  std::string name = fSettings.GetS("name");
+MicroBooNE_CC1MuNp_XSec_2D_nu
+  ::MicroBooNE_CC1MuNp_XSec_2D_nu( nuiskey samplekey )
+{
+  fSettings = LoadSampleSettings( samplekey );
+  std::string name = fSettings.GetS( "name" );
 
   // The main histograms use the bin number on the x-axis
   fSettings.SetXTitle( "bin number" );
 
   if ( !name.compare("MicroBooNE_CC1MuNp_XSec_2D_PpCosp_nu") ) {
-    fDist = kPpCosp;
-    fSettings.SetYTitle( "d^{2}#sigma/dp_{p}dcos#theta_{p}"
-      " (cm^{2}/GeV/^{40}Ar)" );
-  }
-  else if ( !name.compare("MicroBooNE_CC1MuNp_XSec_2D_PmuCosmu_nu") ) {
-    fDist = kPmuCosmu;
-    fSettings.SetYTitle( "d^{2}#sigma/dp_{#mu}dcos#theta_{#mu}"
-      " (cm^{2}/GeV/^{40}Ar)" );
+    fSettings.SetYTitle( "#sigma (cm^{2}/^{40}Ar)" );
   }
   else {
     assert( false );
@@ -66,9 +59,8 @@ MicroBooNE_CC1MuNp_XSec_2D_nu::MicroBooNE_CC1MuNp_XSec_2D_nu(nuiskey samplekey) 
   fSettings.DefineAllowedSpecies( "numu" );
   FinaliseSampleSettings();
 
-  // ScaleFactor for the flux-averaged total cross section (cm^2 / ^{40}Ar).
-  // The bins are allowed to have non-uniform widths, so we account for
-  // that separately bin-by-bin in ConvertEventRates()
+  // Scale factor for the flux-averaged total cross section (cm^2 / ^{40}Ar) in
+  // each bin
   fScaleFactor = GetEventHistogram()->Integral( "width" )
     * 1e-38 * MASS_NUMBER_40AR / fNEvents / TotalIntegratedFlux();
 
@@ -76,7 +68,7 @@ MicroBooNE_CC1MuNp_XSec_2D_nu::MicroBooNE_CC1MuNp_XSec_2D_nu(nuiskey samplekey) 
   this->LoadBinDefinitions();
 
   // TODO: replace with real data!
-  int num_bins = fBinToDefinitionMap.size();
+  int num_bins = fBinDefinitions.size();
   fDataHist = new TH1D( "dummy", "dummy", num_bins, 0., num_bins );
   for ( int b = 1; b <= num_bins; ++b ) {
     fDataHist->SetBinContent( b, 1e-38 );
@@ -109,162 +101,144 @@ MicroBooNE_CC1MuNp_XSec_2D_nu::MicroBooNE_CC1MuNp_XSec_2D_nu(nuiskey samplekey) 
 
 bool MicroBooNE_CC1MuNp_XSec_2D_nu::isSignal( FitEvent* event ) {
   return SignalDef::MicroBooNE::isCC1MuNpFor2DAnalysis( event, EnuMin, EnuMax );
-};
-
+}
 
 void MicroBooNE_CC1MuNp_XSec_2D_nu::FillEventVariables( FitEvent* event ) {
+
+  // Clear out the vector of passing bins, which may have already been filled
+  // for the previous event
+  fPassingBins.clear();
 
   const int PROTON = 2212;
   const int MU_MINUS = 13;
 
-  int pdg;
-  double p, cos;
-  if ( fDist == kPpCosp ) pdg = PROTON;
-  else if ( fDist == kPmuCosmu ) pdg = MU_MINUS;
-  else assert( false );
+  if ( event->NumFSParticle(MU_MINUS) == 0 ) return;
+  if ( event->NumFSParticle(PROTON) == 0 ) return;
 
-  if ( event->NumFSParticle(pdg) == 0 ) return;
-  p = event->GetHMFSParticle(pdg)->fP.Vect().Mag() / 1000;
-  cos = event->GetHMFSParticle(pdg)->fP.Vect().CosTheta();
+  const TVector3& p3mu = event->GetHMFSParticle( MU_MINUS )->fP.Vect();
+  const TVector3& p3p = event->GetHMFSParticle( PROTON )->fP.Vect();
 
-  // TODO: Consider revising. Makes a critical assumption that exactly
-  // one bin will ever be filled per event.
-  for ( const auto& bin_pair : fBinToDefinitionMap ) {
-    int bin_idx = bin_pair.first;
-    const BinDef& def = bin_pair.second;
-    if ( def.InBin(p, cos) ) {
-      fXVar = bin_idx;
-      return;
-    }
-  }
-  fXVar = -1.;
-  //assert( false );
-}
+  // Loop over each of the bin definitions. Keep track of the bins that
+  // pass all cuts (and should thus be filled in this event)
+  const std::string delimiter( "&&" );
+  for ( size_t b = 0u; b < fBinDefinitions.size(); ++b ) {
 
+    const auto& bin_def = fBinDefinitions.at( b );
 
-void MicroBooNE_CC1MuNp_XSec_2D_nu::ConvertEventRates() {
-  // Do the standard conversion first
-  Measurement1D::ConvertEventRates();
+    // Start out assuming that the current bin will pass
+    bool bin_ok = true;
 
-  // Divide by the physical bin widths to get a flux-averaged differential
-  // cross section. For simplicity, do this by creating a temporary histogram
-  // first that contains entries of ( 1 / width ) in each bin.
-  // TODO: consider using a std::unique_ptr here instead for auto-deletion
-  TH1D* width_hist = dynamic_cast< TH1D* >( fDataHist->Clone("width_hist") );
-  width_hist->Reset();
-  width_hist->SetDirectory( nullptr );
-  for ( const auto& bin_pair : fBinToDefinitionMap ) {
-    // ROOT TH1D objects always include an underflow bin with index zero.
-    // This introduces an offset that we correct for here by adding one
-    // to the original zero-based bin index.
-    int root_bin_idx = bin_pair.first + 1;
-    const BinDef& def = bin_pair.second;
-    double width = ( def.fXMax - def.fXMin ) * ( def.fYMax - def.fYMin );
-    width_hist->SetBinContent( root_bin_idx, 1.0 / width );
-  }
+    // Skip the text before the first "&&" (here we assume that it is a simple
+    // bool for the signal definition)
+    std::string all_cuts = bin_def.substr(
+      bin_def.find(delimiter) + delimiter.length() );
 
-  // Divide all relevant histograms by the physical bin width. Adapted
-  // from similar code in Measurement1D::ScaleEvents()
-  fMCHist->Multiply( width_hist );
-  fMCFine->Multiply( width_hist );
+    // Loop over the rest of the cuts and check each one
+    size_t pos = 0u;
+    do {
+      // Advance to the next individual cut, removing it from the temporary
+      // copy of the list of cuts
+      pos = all_cuts.find( delimiter );
+      std::string cut = all_cuts.substr( 0, pos );
+      all_cuts.erase( 0, pos + delimiter.length() );
 
-  if (fMCHist_Modes) fMCHist_Modes->Multiply( width_hist );
-  if (fMCFine_Modes) fMCFine_Modes->Multiply( width_hist );
+      // Parse the cut
+      std::string var_name;
+      std::string comp_op;
+      double cut_val;
+      std::stringstream cut_ss( cut );
 
-  delete width_hist;
+      cut_ss >> var_name >> comp_op >> cut_val;
+
+      // Interpret the variable for this cut and load the
+      // appropriate numerical value for the event
+      double var = 0.;
+      if ( var_name == "mc_p3_lead_p.Mag()" ) {
+        var = p3p.Mag() / 1e3; // GeV
+      }
+      else if ( var_name == "mc_p3_lead_p.CosTheta()" ) {
+        var = p3p.CosTheta();
+      }
+      else if ( var_name == "mc_p3_mu.Mag()" ) {
+        var = p3mu.Mag() / 1e3; // GeV
+      }
+      else if ( var_name == "mc_p3_mu.CosTheta()" ) {
+        var = p3mu.CosTheta();
+      }
+      // Just skip the background true bin definitions
+      else if ( var_name == "ategory" ) {
+        bin_ok = false;
+        break;
+      }
+      else NUIS_ABORT( "Unrecognized cut variable " + var_name );
+
+      // Test the cut based on the appropriate comparison operator
+      if ( comp_op == ">=" ) {
+        if ( var < cut_val ) {
+          bin_ok = false;
+          break;
+        }
+      }
+      else if ( comp_op == "<" ) {
+        if ( var >= cut_val ) {
+          bin_ok = false;
+          break;
+        }
+      }
+      else NUIS_ABORT( "Unrecognized comparison operator " + comp_op );
+
+    } while ( pos != std::string::npos );
+
+    if ( bin_ok ) fPassingBins.push_back( b );
+
+  } // loop over bins
+
 }
 
 void MicroBooNE_CC1MuNp_XSec_2D_nu::LoadBinDefinitions() {
-  std::string binning_file_name = FitPar::GetDataBase();
-  if ( fDist == kPpCosp ) {
-    binning_file_name += "/MicroBooNE/mybins2Dproton.txt";
-  }
-  else if ( fDist == kPmuCosmu ) {
-    binning_file_name += "/MicroBooNE/mybins2Dmuon.txt";
-  }
+  std::string binning_file_name( FitPar::GetDataBase()
+    + "/MicroBooNE/myconfig_uB2D.txt" );
+
   std::ifstream bin_file( binning_file_name );
-  int bin_idx = 0;
-  double xmin, xmax, ymin, ymax;
+  std::string dummy_str;
+  int dummy_int;
+  size_t num_true_bins;
+
   // TODO: add I/O error handling here
-  while ( bin_file >> xmin >> xmax >> ymin >> ymax ) {
-    fBinToDefinitionMap[ bin_idx ] = BinDef( xmin, xmax, ymin, ymax );
-    ++bin_idx;
+  // Skip the output TDirectoryFile name and the input TTree name
+  bin_file >> dummy_str >> dummy_str >> num_true_bins;
+
+  for ( size_t tb = 0u; tb < num_true_bins; ++tb ) {
+
+    // Skip the true bin type and block index
+    bin_file >> dummy_int >> dummy_int;
+
+    // Use two calls to std::getline using a double quote delimiter
+    // in order to get the contents of the next double-quoted string
+    std::string temp_line;
+    std::getline( bin_file, temp_line, '\"' );
+    std::getline( bin_file, temp_line, '\"' );
+
+    fBinDefinitions.push_back( temp_line );
   }
+
 }
 
+void MicroBooNE_CC1MuNp_XSec_2D_nu::FillHistograms() {
 
-void MicroBooNE_CC1MuNp_XSec_2D_nu::MakeSlices() {
-  // Populate the "slice edge map" with the lower bounds of each
-  // momentum bin and both edges of each angular bin
-  for ( const auto& bin_pair : fBinToDefinitionMap ) {
-    const BinDef& def = bin_pair.second;
-    // This command auto-creates an empty std::set if needed
-    auto& y_edge_set = fSliceEdgeMap[ def.fXMin ];
-    y_edge_set.insert( def.fYMin );
-    y_edge_set.insert( def.fYMax );
+  if ( !Signal ) return;
+
+  // The histograms have bin number as the x-axis variable, so just fill them
+  // using the bin index of each bin that passed all cuts
+  for ( const auto& bin : fPassingBins ) {
+    NUIS_LOG(DEB, "Fill MCHist: " << bin << ", " << Weight);
+
+    fMCHist->Fill( bin, Weight );
+    fMCStat->Fill( bin, 1.0 );
+    if ( fMCHist_Modes ) fMCHist_Modes->Fill( Mode, bin, Weight );
+
+    fMCFine->Fill( bin, Weight );
+    if ( fMCFine_Modes ) fMCFine_Modes->Fill( Mode, bin, Weight );
   }
 
-  // We're ready now. Make the slices.
-  int slice_count = 0;
-  double old_xmin = DBL_MAX;
-  TH1D* current_slice_hist = nullptr;
-  for ( const auto& bin_pair : fBinToDefinitionMap ) {
-    // We add one here since ROOT TH1 bins have one-based indices
-    int root_bin_idx = bin_pair.first + 1;
-    const BinDef& def = bin_pair.second;
-
-    if ( def.fXMin != old_xmin ) {
-      old_xmin = def.fXMin;
-
-      // Build a temporary vector of bin edges that we can use to initialize
-      // the histogram for the current slice. Note that std::set will
-      // automatically sort the edges in ascending order. We need a vector,
-      // though, so that we can access the underlying C-style array.
-      std::vector< double > y_edge_vec;
-      const std::set<double>& y_edge_set = fSliceEdgeMap.at( def.fXMin );
-      for ( const auto& edge : y_edge_set ) y_edge_vec.push_back( edge );
-
-      int num_y_bins = y_edge_vec.size() - 1;
-
-      current_slice_hist = new TH1D( "slice", "slice",
-        num_y_bins, y_edge_vec.data() );
-      current_slice_hist->SetDirectory( nullptr );
-
-      std::stringstream temp_ss;
-      temp_ss << fSettings.GetS("name") << "_MC_Slice" << slice_count;
-
-      current_slice_hist->SetName( temp_ss.str().c_str() );
-
-      std::string particle_subscript;
-      if ( fDist == kPpCosp ) particle_subscript = "p";
-      else if ( fDist == kPmuCosmu ) particle_subscript = "#mu";
-      else assert( false );
-
-      temp_ss << ", p_{" << particle_subscript << "} [" << def.fXMin
-        << "," << def.fXMax << "] GeV";
-      current_slice_hist->SetTitle( temp_ss.str().c_str() );
-
-      current_slice_hist->GetXaxis()->SetTitle(
-        ("cos#theta_{" + particle_subscript + '}').c_str() );
-      current_slice_hist->GetYaxis()->SetTitle( fSettings.GetYTitle().c_str() );
-
-      fMCHist_Slices.push_back( current_slice_hist );
-      ++slice_count;
-    }
-
-    double xsec = fMCHist->GetBinContent( root_bin_idx );
-    double error = fMCHist->GetBinError( root_bin_idx );
-
-    int slice_root_bin_idx = current_slice_hist->FindBin( def.fYMin );
-    current_slice_hist->SetBinContent( slice_root_bin_idx, xsec );
-    current_slice_hist->SetBinError( slice_root_bin_idx, error );
-  }
-}
-
-void MicroBooNE_CC1MuNp_XSec_2D_nu::Write( std::string drawopt ) {
-  this->Measurement1D::Write( drawopt );
-  // Also create the slice MC histograms
-  // TODO: revisit, add data slices and possibly put this somewhere else
-  this->MakeSlices();
-  for ( auto* mc_slice_hist : fMCHist_Slices ) mc_slice_hist->Write();
 }

@@ -279,11 +279,11 @@ bool isCC1MuNpFor2DAnalysis( FitEvent* event, double EnuMin, double EnuMax ) {
   double p_mu = event->GetHMFSParticle( MUON )->fP.Vect().Mag(); // MeV
   double p_lead_p = event->GetHMFSParticle( PROTON )->fP.Vect().Mag(); // MeV
 
-  // The muon momentum must be above 100 MeV/c
-  if ( p_mu <= 100. ) return false;
+  // The muon momentum must be at least 100 MeV/c and at most 1.2 GeV/c
+  if ( p_mu < 100. || p_mu > 1200. ) return false;
 
-  // The leading proton momentum must lie on the interval [250, 1200] MeV/c
-  if ( p_lead_p < 250. || p_lead_p > 1200. ) return false;
+  // The leading proton momentum must lie on the interval [250, 1000] MeV/c
+  if ( p_lead_p < 250. || p_lead_p > 1000. ) return false;
 
   // Veto events with final-state mesons or antimesons of any kind. Do this by
   // looping over every particle in the event.
