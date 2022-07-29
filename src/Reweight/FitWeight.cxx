@@ -71,7 +71,7 @@ void FitWeight::AddRWEngine(int type) {
       fAllRW[type] = new SplineWeightEngine("splinerw");
       break;
 
-#ifdef NIWGReWeight_ENABLED
+#ifdef NIWGLegacy_ENABLED
     case kNIWG:
       fAllRW[type] = new NIWGWeightEngine("niwgrw");
       break;
@@ -126,7 +126,7 @@ bool FitWeight::HasRWEngine(int type) {
 #endif
     case kCUSTOM:
     case kSPLINEPARAMETER:
-#ifdef NIWG_ENABLED
+#ifdef NIWGLegacy_ENABLED
     case kNIWG:
 #endif
 #ifdef Prob3plusplus_ENABLED
@@ -155,6 +155,14 @@ void FitWeight::IncludeDial(std::string name, std::string type, double val) {
 }
 
 void FitWeight::IncludeDial(std::string name, int dialtype, double val) {
+  // Setup RW Engine first in case some global state is required to convert 
+  // the dial name (NEUT)
+  //TODO -- We should just ask the engine to convert the dial name
+  if (fAllRW.find(dialtype) == fAllRW.end()) {
+    AddRWEngine(dialtype);
+  }
+  WeightEngineBase *rw = fAllRW[dialtype];
+
   // Get the dial enum
   int nuisenum = Reweight::ConvDial(name, dialtype);
 
@@ -164,12 +172,6 @@ void FitWeight::IncludeDial(std::string name, int dialtype, double val) {
     NUIS_ERR(FTL, "With value: " << val);
     NUIS_ABORT("With nuisenum: " << nuisenum);
   }
-
-  // Setup RW Engine Pointer
-  if (fAllRW.find(dialtype) == fAllRW.end()) {
-    AddRWEngine(dialtype);
-  }
-  WeightEngineBase *rw = fAllRW[dialtype];
 
   // Include the dial
   rw->IncludeDial(name, val);

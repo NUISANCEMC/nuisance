@@ -47,7 +47,7 @@ LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
 include(CPM)
 CPMFindPackage(
     NAME CMakeModules
-    GIT_TAG v0.0.7
+    GIT_TAG v0.0.9
     GITHUB_REPOSITORY NuHepMC/CMakeModules
     DOWNLOAD_ONLY
 )
