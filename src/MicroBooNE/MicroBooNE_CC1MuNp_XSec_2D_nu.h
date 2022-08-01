@@ -19,9 +19,25 @@
 #ifndef MICROBOONE_CC1MUNP_2D_NU_H_SEEN
 #define MICROBOONE_CC1MUNP_2D_NU_H_SEEN
 
+#include <functional>
+#include <vector>
+
 #include "Measurement1D.h"
 
 class TH2D;
+
+struct MyCut {
+  MyCut( std::function< double(FitEvent*) > getter,
+    std::function< bool(double) > tester ) : getter_( getter ),
+    tester_( tester ) {}
+
+  std::function< double(FitEvent*) > getter_;
+  std::function< bool(double) > tester_;
+
+  inline bool evaluate( FitEvent* event ) const {
+    return tester_( getter_(event) );
+  }
+};
 
 class MicroBooNE_CC1MuNp_XSec_2D_nu : public Measurement1D {
 
@@ -45,8 +61,9 @@ private:
 
   void LoadBinDefinitions();
 
-  // Strings containing the cuts used to define each bin
-  std::vector< std::string > fBinDefinitions;
+  // Each bin is defined as a series of cuts that are applied to a FitEvent to
+  // determine whether it belongs
+  std::vector< std::vector<MyCut> > fBinDefinitions;
 
   // Temporary storage for the index of each bin that passed all cuts for any
   // particular event
