@@ -192,7 +192,7 @@ if (Prob3plusplus_ENABLED)
     add_library(NUISANCEProb3plusplus INTERFACE)
     set_target_properties(NUISANCEProb3plusplus PROPERTIES 
       INTERFACE_COMPILE_OPTIONS "-DProb3plusplus_ENABLED"
-      INTERFACE_LINK_LIBRARIES Prob3plusplus::all)
+      INTERFACE_LINK_LIBRARIES Prob3plusplus::All)
 
     target_link_libraries(GeneratorCompileDependencies INTERFACE NUISANCEProb3plusplus)
   endif()

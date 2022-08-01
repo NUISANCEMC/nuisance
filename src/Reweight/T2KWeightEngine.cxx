@@ -22,7 +22,7 @@ T2KWeightEngine::T2KWeightEngine(std::string name) {
   // Create RW Engine suppressing cout
   StopTalking();
 
-  fT2KRW = t2krew::MakeT2KReWeightInstance();
+  fT2KRW = t2krew::MakeT2KReWeightInstance(t2krew::Event::kNEUT);
 };
 
 void T2KWeightEngine::IncludeDial(std::string name, double startval) {
