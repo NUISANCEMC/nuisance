@@ -1,11 +1,11 @@
 SET(CoreDirs
+	Reweight
 	Config
 	FCN
 	FitBase
 	InputHandler
 	Logger
 	MCStudies
-	Reweight
 	Routines
 	Smearceptance
 	Splines

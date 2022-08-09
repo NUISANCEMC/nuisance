@@ -45,13 +45,17 @@ endif()
 LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
 
 include(CPM)
-CPMFindPackage(
-    NAME CMakeModules
-    GIT_TAG v0.0.9
-    GITHUB_REPOSITORY NuHepMC/CMakeModules
-    DOWNLOAD_ONLY
-)
-include(${CMakeModules_SOURCE_DIR}/NuHepMCModules.cmake)
+if(DEFINED ENV{NuHepMCModules_ROOT})
+  include($ENV{NuHepMCModules_ROOT}/NuHepMCModules.cmake)
+else()
+  CPMFindPackage(
+      NAME CMakeModules
+      GIT_TAG v0.0.9
+      GITHUB_REPOSITORY NuHepMC/CMakeModules
+      DOWNLOAD_ONLY
+  )
+  include(${CMakeModules_SOURCE_DIR}/NuHepMCModules.cmake)
+endif()
 
 ################################################################################
 #                            Check Dependencies

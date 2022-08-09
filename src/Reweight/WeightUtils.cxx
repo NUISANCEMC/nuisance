@@ -29,7 +29,7 @@ using namespace t2krew;
 #include "NSyst.h"
 #endif
 
-#ifdef GENIE_ENABLED
+#ifdef GENIEReWeight_ENABLED
 #ifdef GENIE3_API_ENABLED
 using namespace genie;
 #include "RwFramework/GReWeight.h"
