@@ -30,28 +30,6 @@
 #include "NIWGSyst.h"
 #include "NIWGSystUncertainty.h"
 
-#include "NReWeight.h"
-
-#include "NReWeightNuXSecCCQE.h"
-#include "NReWeightNuXSecRES.h"
-// Dials removed in NEUT 5.4.1
-#if NEUT_VERSION < 541
-#include "NReWeightCasc.h"
-#include "NReWeightNuclPiless.h"
-#include "NReWeightNuXSecNCRES.h"
-#include "NReWeightNuXSecCCRES.h"
-#include "NReWeightNuXSecNC.h"
-#include "NReWeightNuXSecCOH.h"
-#include "NReWeightNuXSecNCEL.h"
-#include "NReWeightNuXSecDIS.h"
-#endif
-#include "NSyst.h"
-#include "NSystUncertainty.h"
-
-#include "neutpart.h"
-#include "neutvect.h"
-#include "NEUTInputHandler.h"
-
 #include "FitLogger.h"
 
 #include "GeneratorUtils.h"
