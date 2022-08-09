@@ -21,8 +21,15 @@ set(Statistical_Impl_Files
   StatUtils.cxx
 )
 
+set(Statistical_Hdr_Files
+  StatUtils.h
+)
+
 add_library(Statistical SHARED ${Statistical_Impl_Files})
 target_link_libraries(Statistical CoreIncludes ROOT::ROOT)
+set_target_properties(Statistical PROPERTIES PUBLIC_HEADER "${Statistical_Hdr_Files}")
 
-install(TARGETS Statistical DESTINATION lib)
+install(TARGETS Statistical
+  LIBRARY DESTINATION lib
+  PUBLIC_HEADER DESTINATION include)
 

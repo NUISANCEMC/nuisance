@@ -23,7 +23,17 @@ set(Logger_Impl_Files
   Initialiser.cxx
 )
 
+set(Logger_Hdr_Files
+  FitLogger.h
+  Initialiser.h
+)
+
 add_library(Logger SHARED ${Logger_Impl_Files})
 target_link_libraries(Logger CoreIncludes ROOT::ROOT)
 
 install(TARGETS Logger DESTINATION lib)
+set_target_properties(Logger PROPERTIES PUBLIC_HEADER "${Logger_Hdr_Files}")
+
+install(TARGETS Logger
+  LIBRARY DESTINATION lib
+  PUBLIC_HEADER DESTINATION include)

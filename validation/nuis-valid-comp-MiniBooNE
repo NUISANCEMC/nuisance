@@ -1,0 +1,71 @@
+#!/bin/bash
+
+set -e
+
+source $(nuis internal valid.funcs)
+nuis_valid_parse_argments ${@}
+nuis_check_gen_enabled ${GENLIST[@]}
+
+EXP=MiniBooNE
+
+for (( i=0; i < ${#GENLIST[@]}; ++i )); do
+    GEN=${GENLIST[${i}]}
+    GENTAG=${GENTAGLIST[${i}]}
+
+    if [ ! -e ${EXP}.${GENTAG}.nu.numu.CH2.comp.root ] || [ "${NUIS_FORCE}" == "ON" ]; then
+        nuis comp ${EXP}.${GENTAG}.nu.numu.CH2.root \
+            -f -t ${GEN} \
+            -o ${EXP}.${GENTAG}.nu.numu.CH2.comp.root \
+                -s MiniBooNE_CCQE_XSec_1DQ2_nu \
+                -s MiniBooNE_CCQELike_XSec_1DQ2_nu \
+                -s MiniBooNE_CCQE_XSec_1DEnu_nu \
+                -s MiniBooNE_CCQELike_XSec_1DEnu_nu \
+                -s MiniBooNE_CCQE_XSec_2DTcos_nu \
+                -s MiniBooNE_CCQELike_XSec_2DTcos_nu \
+                -s MiniBooNE_CC1pip_XSec_1DEnu_nu \
+                -s MiniBooNE_CC1pip_XSec_1DQ2_nu \
+                -s MiniBooNE_CC1pip_XSec_1DTpi_nu \
+                -s MiniBooNE_CC1pip_XSec_1DTu_nu \
+                -s MiniBooNE_CC1pip_XSec_2DQ2Enu_nu \
+                -s MiniBooNE_CC1pip_XSec_2DTpiCospi_nu \
+                -s MiniBooNE_CC1pip_XSec_2DTpiEnu_nu \
+                -s MiniBooNE_CC1pip_XSec_2DTuCosmu_nu \
+                -s MiniBooNE_CC1pip_XSec_2DTuEnu_nu \
+                -s MiniBooNE_CC1pi0_XSec_1DEnu_nu \
+                -s MiniBooNE_CC1pi0_XSec_1DQ2_nu \
+                -s MiniBooNE_CC1pi0_XSec_1DTu_nu \
+                -s MiniBooNE_CC1pi0_XSec_1Dcosmu_nu \
+                -s MiniBooNE_CC1pi0_XSec_1Dcospi0_nu \
+                -s MiniBooNE_CC1pi0_XSec_1Dppi0_nu \
+                -s MiniBooNE_NC1pi0_XSec_1Dcospi0_nu \
+                -s MiniBooNE_NC1pi0_XSec_1Dcospi0_fhc \
+                -s MiniBooNE_NC1pi0_XSec_1Dppi0_nu \
+                -s MiniBooNE_NC1pi0_XSec_1Dppi0_fhc \
+                -s MiniBooNE_NCEL_XSec_Treco_nu \
+            --config UseSVDInverse=1
+    fi
+
+    if [ ! -e ${EXP}.${GENTAG}.nubar.numubar.CH2.comp.root ] || [ "${NUIS_FORCE}" == "ON" ]; then
+        nuis comp ${EXP}.${GENTAG}.nubar.numubar.CH2.root \
+            -f -t ${GEN} \
+            -o ${EXP}.${GENTAG}.nubar.numubar.CH2.comp.root \
+                -s MiniBooNE_CCQE_XSec_1DQ2_antinu \
+                -s MiniBooNE_CCQELike_XSec_1DQ2_antinu \
+                -s MiniBooNE_CCQE_XSec_2DTcos_antinu \
+                -s MiniBooNE_CCQELike_XSec_2DTcos_antinu \
+                -s MiniBooNE_NC1pi0_XSec_1Dcospi0_antinu \
+                -s MiniBooNE_NC1pi0_XSec_1Dcospi0_rhc \
+                -s MiniBooNE_NC1pi0_XSec_1Dppi0_antinu \
+                -s MiniBooNE_NC1pi0_XSec_1Dppi0_rhc \
+            --config UseSVDInverse=1
+    fi
+
+    if [ ! -e ${EXP}.${GENTAG}.nubar.numubar.C.comp.root ] || [ "${NUIS_FORCE}" == "ON" ]; then
+        nuis comp ${EXP}.${GENTAG}.nubar.numubar.C.root \
+            -f -t ${GEN} \
+            -o ${EXP}.${GENTAG}.nubar.numubar.C.comp.root \
+                -s MiniBooNE_CCQE_CTarg_XSec_1DQ2_antinu \
+            --config UseSVDInverse=1
+    fi
+
+done

@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# To use these functions, run 
+#     source $(nuis internal NEUT.funcs)
+
+function SetNeutParam () {
+  local CARD=${1}
+  local PNAME=${2}
+  local VAL=${3}
+
+  if [ -z "${PNAME}" ] || [ -z "${VAL}" ]; then
+    if [ ! -z ${NUIS_CLID_DEBUG} ]; then
+      echo "[CLI DEBUG](BrCr: ${NUIS_BREADCRUMBS}): ${COMMAND} SetNeutParam ${CARD} PASSED INVALID OPTIONS: PNAME=\"${PNAME}\" VAL=\"${VAL}\""
+    fi
+    return
+  fi
+
+  if [ ! -z ${NUIS_CLID_DEBUG} ]; then
+    echo "[CLI DEBUG](BrCr: ${NUIS_BREADCRUMBS}): ${COMMAND} SetNeutParam ${CARD} ${PNAME} ${VAL}"
+  fi
+
+  if cat ${CARD} | grep "^${PNAME}" &> /dev/null; then
+    cat ${CARD} | sed "s:^${PNAME}.*$:${PNAME} ${VAL}:" > ${CARD}_
+    mv ${CARD}_ ${CARD}
+  else
+    echo "${PNAME} ${VAL}" >> ${CARD}
+  fi
+}

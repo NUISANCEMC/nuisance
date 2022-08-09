@@ -1,0 +1,24 @@
+#!/bin/bash
+
+set -e
+
+source $(nuis internal valid.funcs)
+nuis_valid_parse_argments ${@}
+
+EXP=GGM
+
+for SAMP in \
+            GGM_CC1ppip_XSec_1DEnu_nu \
+            GGM_CC1ppip_Evt_1DQ2_nu \
+            ; do
+
+    nuis plot --chi2 -i $(nuis_gen_tag_list ${EXP} nu.numu.D2.comp.root) \
+        -s ${SAMP} --mc-tag ${GENTAGLIST[@]}
+
+done
+
+nuis plot collate \
+    -s GGM_CC1ppip_XSec_1DEnu_nu \
+    -s GGM_CC1ppip_Evt_1DQ2_nu \
+ -m ${GENTAGLIST[@]} -o GGM_validations.tex
+

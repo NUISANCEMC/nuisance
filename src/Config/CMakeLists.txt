@@ -22,7 +22,17 @@ set(Config_Impl_Files
   NuisKey.cxx
 )
 
+set(Config_Hdr_Files
+  NuisConfig.h
+  NuisKey.h
+)
+
 add_library(Config SHARED ${Config_Impl_Files})
 target_link_libraries(Config CoreIncludes ROOT::ROOT)
 
 install(TARGETS Config DESTINATION lib)
+set_target_properties(Config PROPERTIES PUBLIC_HEADER "${Config_Hdr_Files}")
+
+install(TARGETS Config
+  LIBRARY DESTINATION lib
+  PUBLIC_HEADER DESTINATION include)

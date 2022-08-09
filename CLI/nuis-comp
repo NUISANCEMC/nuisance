@@ -1,0 +1,201 @@
+COMMAND_FQP=${0}
+COMMAND=$(basename ${COMMAND_FQP})
+
+if [ ! -z ${NUIS_CLID_DEBUG} ]; then
+  echo "[CLI DEBUG](BrCr: ${NUIS_BREADCRUMBS}): ${COMMAND} Arguments(${#}): ${@}"
+fi
+
+function nuis_comp_help {
+  echo "Run like: ${NUIS_BREADCRUMBS} <input_file.root> [input_file2.root ...] [option]"
+  echo -e "\tOptions:"
+  echo -e "\t  -o|--output <file.root>   : Output file to write"
+  echo -e "\t  -t|--type <input type>    : Input file type, e.g. NEUT, GENIE, ..."
+  echo -e "\t  -s|--sample <sample name> : Sample to compare to, can be passed multiple times."
+  echo -e "\t  -c|--config <opt=val>     : Add NUISANCE config option"
+  echo -e "\t  -f|--force                : Continue even if output file already exists"
+}
+
+if [ "${#}" -lt 1 ]; then
+  nuis_comp_help
+  exit 1
+fi
+
+INPUT_FILES=""
+
+FORCE="no"
+NUIS_SAMPLES=""
+INPUT_TYPE=""
+CONFIG_OPTIONS=""
+OUTPUT_FILE=""
+JOINT_SAMPLE="FALSE"
+
+while [[ ${#} -gt 0 ]]; do
+
+  INPUT_FILE=${1}
+
+  if [ "${INPUT_FILE}" == "help" ]; then
+    nuis_comp_help
+    exit 0
+  fi
+
+  if [ "${INPUT_FILE::1}" == "-" ]; then
+    # break if we find an option
+    break
+  fi
+
+  if [ ! -e ${INPUT_FILE} ]; then
+    echo "[ERROR]: ${NUIS_BREADCRUMBS} -- Input file \"${INPUT_FILE}\" does not appear to exist."
+    exit 1
+  fi
+
+  if [ -z "${INPUT_FILES}" ]; then
+    INPUT_FILES="${INPUT_FILE}"
+  else
+    INPUT_FILES="${INPUT_FILES};${INPUT_FILE}"
+    JOINT_SAMPLE=TRUE
+  fi
+
+  if [ -z "${OUTPUT_FILE}"]; then
+    OUTPUT_FILE="${INPUT_FILE%%.root}.comp.root"
+  fi
+
+
+  shift
+done
+
+if [ "${JOINT_SAMPLE}" == "TRUE" ]; then
+ INPUT_FILES="(${INPUT_FILES})"
+fi
+
+while [[ ${#} -gt 0 ]]; do
+
+  key="$1"
+  case $key in
+
+    -o|--output)
+
+      if [[ ${#} -lt 2 ]]; then
+        echo "[ERROR]: ${1} expected a value."
+        exit 1
+      fi
+
+      OUTPUT_FILE="$2"
+      shift # past argument
+      echo "[OPT]: ${NUIS_BREADCRUMBS} -- Writing output to file: \"${OUTPUT_FILE}\""
+      ;;
+
+    -s|--sample)
+
+      if [[ ${#} -lt 2 ]]; then
+        echo "[ERROR]: ${1} expected a value."
+        exit 1
+      fi
+
+      SAMPLE="$2"
+      echo "[OPT]: ${NUIS_BREADCRUMBS} -- Making comparisons for: \"${SAMPLE}\""
+      shift # past argument
+      NUIS_SAMPLES="${NUIS_SAMPLES}|${SAMPLE}"
+      ;;
+
+    -t|--type)
+
+      if [[ ${#} -lt 2 ]]; then
+        echo "[ERROR]: ${1} expected a value."
+        exit 1
+      fi
+
+      INPUT_TYPE="$2"
+      echo "[OPT]: ${NUIS_BREADCRUMBS} -- Forcing input file to be parsed as: \"${INPUT_TYPE}\""
+      shift # past argument
+      ;;
+
+   -c|--config)
+
+      if [[ ${#} -lt 2 ]]; then
+        echo "[ERROR]: ${1} expected a value."
+        exit 1
+      fi
+
+      CONFIG_OPT="$2"
+      echo "[OPT]: ${NUIS_BREADCRUMBS} -- Adding NUISANCE config option: ${CONFIG_OPT}"
+      shift # past argument
+      CONFIG_OPTIONS="${CONFIG_OPTIONS}|${CONFIG_OPT}"
+      ;;
+
+    -f|--force)
+      FORCE="yes"
+      echo "[OPT]: ${NUIS_BREADCRUMBS} -- Force overwriting output file."
+      ;;
+
+    *)
+      echo "[ERROR]: Unknown argument to ${NUIS_BREADCRUMBS}: \"$1\""
+      nuis_comp_help
+      exit 1
+      ;;
+  esac
+  shift
+done
+
+
+if [ -e ${OUTPUT_FILE} ] && [ "${FORCE}" = "no" ]; then
+  echo "[ERROR]: ${NUIS_BREADCRUMBS} -- Output file \"${OUTPUT_FILE}\" exists and -f was not passed."
+  exit 1
+fi
+
+if [ -z "${INPUT_TYPE}" ]; then
+  echo "[ERROR]: ${NUIS_BREADCRUMBS} -- Input file type not supplied."
+  nuis_comp_help
+  exit 1
+fi
+
+SEED=${RANDOM}
+
+#build the nuisance card file
+echo "<nuisance>" > tmp.${SEED}.card
+
+OLDIFS=${IFS}
+IFS="|"
+for opt in ${CONFIG_OPTIONS}; do
+  {
+  LOLDIFS=${IFS}
+  IFS="="
+  set -- ${opt}
+  IFS=${LOLDIFS}
+
+  if [ -z "${1}" ]; then
+    continue
+  fi
+
+  if [ ! -z ${NUIS_CLID_DEBUG} ]; then
+    echo "[CLI DEBUG](BrCr: ${NUIS_BREADCRUMBS}): ${COMMAND} Setting NUISANCE config option: ${1} = ${2}"
+  fi
+
+  echo -e "\t<config ${1}='${2}' />" >> tmp.${SEED}.card
+
+  }
+done
+
+for SAMPLE in ${NUIS_SAMPLES}; do
+  if [ -z "${SAMPLE}" ]; then
+    continue
+  fi
+
+  if [ ! -z ${NUIS_CLID_DEBUG} ]; then
+    echo "[CLI DEBUG](BrCr: ${NUIS_BREADCRUMBS}): ${COMMAND} Adding sample: ${SAMPLE}"
+  fi
+
+  echo -e "\t<sample name='${SAMPLE}' input='${INPUT_TYPE}:${INPUT_FILES}' />" >> tmp.${SEED}.card
+done
+
+IFS=${OLDIFS}
+
+
+echo "</nuisance>" >> tmp.${SEED}.card
+
+CMD=nuiscomp
+if [ "${NUIS_DEBUG}" == "ON" ]; then
+  CMD="gdb --args nuiscomp"
+fi
+
+${CMD} -c tmp.${SEED}.card -o ${OUTPUT_FILE}
+

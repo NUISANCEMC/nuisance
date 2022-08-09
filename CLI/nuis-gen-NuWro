@@ -1,0 +1,135 @@
+#!/bin/bash
+
+COMMAND_FQP=${0}
+COMMAND=$(basename ${COMMAND_FQP})
+
+if [ ! -z ${NUIS_CLID_DEBUG} ]; then
+  echo "[CLI DEBUG](BrCr: ${NUIS_BREADCRUMBS}): ${COMMAND} Arguments(${#}): ${@}"
+fi
+
+
+function nuis_gen_nuwro_help {
+  echo -e "\tSub commands:"
+  echo -e "\t  list-targets                         : List known NuWro target files."
+  echo -e "\tNuWro options:"
+  echo -e "\t  -i <params.txt>                      : Params file to pass to nuwro."
+  echo -e "\t  -p \"param1=value1\"                   : Param value to set on the nuwro command line."
+  echo -e ""
+  echo -e "\thelp                                   : Print this message"
+  echo -e ""
+}
+
+FORWARDED_ARGS=()
+
+#Enable all of the processes by default so that NC samples can be generated
+FORWARDED_ARGS+=("-p" "dyn_qel_cc=1")
+FORWARDED_ARGS+=("-p" "dyn_qel_nc=1")
+FORWARDED_ARGS+=("-p" "dyn_res_cc=1")
+FORWARDED_ARGS+=("-p" "dyn_res_nc=1")
+FORWARDED_ARGS+=("-p" "dyn_dis_cc=1")
+FORWARDED_ARGS+=("-p" "dyn_dis_nc=1")
+FORWARDED_ARGS+=("-p" "dyn_coh_cc=1")
+FORWARDED_ARGS+=("-p" "dyn_coh_nc=1")
+FORWARDED_ARGS+=("-p" "dyn_mec_cc=1")
+FORWARDED_ARGS+=("-p" "dyn_mec_nc=1")
+FORWARDED_ARGS+=("-p" "dyn_hyp_cc=1")
+FORWARDED_ARGS+=("-p" "dyn_lep=1")
+
+while [[ ${#} -gt 0 ]]; do
+
+  key="$1"
+  case $key in
+  
+  list-targets)
+      echo "Listing target descriptors found in \${NUWRO}/data/target/:"
+      echo $(find $NUWRO/data/target/ -name "*.txt" -exec basename -s .txt \{} \; \
+              | grep -v 'doc\|params\|examples\|block' | tr "\n" " ")
+      exit 0
+      ;;
+
+  -i|-p) # Just pass these straight through
+
+      if [[ ${#} -lt 2 ]]; then
+        echo "[ERROR]: ${1} expected a value."
+        exit 1
+      fi
+
+      FORWARDED_ARGS+=("${key}" "${2}")
+      shift # past argument
+      ;;
+
+    help)
+      nuis_gen_nuwro_help
+      exit 0
+      ;;
+
+    *) # unknown option
+      echo "[ERROR]: ${NUIS_BREADCRUMBS} -- Unknown option $1"
+      nuis_gen_nuwro_help
+      exit 1
+      ;;
+  esac
+  shift
+done
+
+if [ ! -z "${TARGET_NAME}" ]; then
+
+  TARGET_NAME_FILE="${TARGET_NAME}"
+  if [ "${TARGET_NAME}" == "Pb" ]; then
+    TARGET_NAME_FILE=Pb_lfg
+  fi
+  
+  if [ "${TARGET_NAME}" == "D2" ]; then
+    # Handle D2 specially
+    FORWARDED_ARGS+=("-p" "target_type=0")
+    FORWARDED_ARGS+=("-p" "nucleus_target=5")
+  elif [ -e "${NUWRO}/data/target/${TARGET_NAME_FILE}.txt" ]; then
+    LOCALTARGETFILE=${TARGET_NAME_FILE}.${RANDOM}.txt
+    cat ${NUWRO}/data/target/${TARGET_NAME_FILE}.txt \
+                  | grep -v "^#" \
+                  | grep -v "^\s*$" \
+                  | sed "s://.*::g" \
+                  | sed "s:\s*$::g" \
+                  | sed "s:\s\+: :g" > ${LOCALTARGETFILE}
+      while read line || [[ -n $line ]]; do
+        FORWARDED_ARGS+=("-p" "${line}")
+      done < ${LOCALTARGETFILE}
+  else
+    echo "[ERROR]: ${NUIS_BREADCRUMBS} -- Invalid pre-defined material: \"${TARGET_NAME}\" for NuWro. No ${NUWRO}/data/target/${TARGET_NAME_FILE}.txt file was found, either add one, or define the target on the command line with -p options."
+    exit 1
+  fi
+fi
+
+FORWARDED_ARGS+=("-p" "random_seed=${SEED}")
+FORWARDED_ARGS+=("-p" "number_of_events=${NEVENTS}")
+FORWARDED_ARGS+=("-p" "beam_type=5")
+FORWARDED_ARGS+=("-p" "beam_particle=${PROBE_PDG}")
+FORWARDED_ARGS+=("-p" "beam_direction=0 0 1")
+FORWARDED_ARGS+=("-p" "beam_inputroot=${FLUX_FILE}")
+FORWARDED_ARGS+=("-p" "beam_inputroot_flux=${FLUX_HIST}")
+
+CMD=nuwro
+if [ "${NUIS_DEBUG}" == "ON" ]; then
+  CMD="gdb --args nuwro"
+fi
+
+if [ "${NUIS_QUIET}" == "ON" ]; then
+  set -x
+  ${CMD} -o ${OUTPUT_FILENAME} "${FORWARDED_ARGS[@]}" &> /dev/null
+  set +x
+else
+  set -x
+  ${CMD} -o ${OUTPUT_FILENAME} "${FORWARDED_ARGS[@]}"
+  set +x
+fi
+
+if [ -e ${OUTPUT_FILENAME} ]; then
+   set -x
+   NUIS_BREADCRUMBS="${NUIS_BREADCRUMBS} nuis-prep-NuWro" nuis-prep-NuWro \
+               -F ${FLUX_FILE},${FLUX_HIST},${PROBE_PDG} \
+               ${OUTPUT_FILENAME}
+   set +x
+else
+   echo "[ERROR]: Failed to produce expected output file: ${OUTPUT_FILENAME}"
+   exit 1
+fi

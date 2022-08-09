@@ -1,0 +1,184 @@
+#!/bin/bash
+
+COMMAND_FQP=${0}
+COMMAND=$(basename ${COMMAND_FQP})
+
+if [ ! -z ${NUIS_CLID_DEBUG} ]; then
+  echo "[CLI DEBUG](BrCr: ${NUIS_BREADCRUMBS}): ${COMMAND} Arguments(${#}): ${@}"
+fi
+
+ISGENIE3=FALSE
+if NUIS_CLID_DEBUG= nuis-config --has-feature GENIE3; then
+  ISGENIE3=TRUE
+fi
+
+ENERGY_RANGE=""
+
+function nuis_gen_genie_help {
+  echo -e "\tGENIE options:"
+if [ "${ISGENIE3}" == "TRUE" ]; then
+  echo -e "\t  --tune <tune>                        : GENIE Tune identifier to use, defaults to"
+  echo -e "\t                                         the value of the GENIE_XSEC_TUNE "
+  echo -e "\t                                         environment variable"
+fi
+  echo -e "\t  -e <elow,eup>                        : Energy range to throw events between."
+  echo -e "\t                                         Defaults to the energy range of the selected flux."
+  echo -e "\t  --cross-sections <xsecs.xml>         : GENIE cross-sections file to use, defaults"
+  echo -e "\t                                         to the value of the GENIE_XSEC_FILE "
+  echo -e "\t                                         environment variable"
+  echo -e ""
+  echo -e "\t  ** Any other options are forwarded to gevgen **"
+  echo -e ""
+  echo -e "\thelp                                   : Print this message"
+  echo -e ""
+  echo -e "--------------------- gevgen -h ---------------------"
+  echo -e ""
+  gevgen -h
+}
+
+XSEC_TUNE=${GENIE_XSEC_TUNE}
+XSEC_FILE=${GENIE_XSEC_FILE}
+
+FORWARDED_ARGS=()
+
+while [[ ${#} -gt 0 ]]; do
+
+  key="$1"
+  case $key in
+
+  --tune)
+      if [ "${ISGENIE3}" == "TRUE" ]; then
+        if [[ ${#} -lt 2 ]]; then
+          echo "[ERROR]: ${1} expected a value."
+          exit 1
+        fi
+
+        XSEC_TUNE="$2"
+        echo "[OPT]: Using GENIE Tune: ${XSEC_TUNE}"
+        shift # past argument
+      else
+        echo "[ERROR]: ${NUIS_BREADCRUMBS} -- Unknown option $1"
+        nuis_gen_genie_help
+        exit 1
+      fi
+
+      ;;
+
+  --cross-sections)
+
+      if [[ ${#} -lt 2 ]]; then
+        echo "[ERROR]: ${1} expected a value."
+        exit 1
+      fi
+
+      XSEC_FILE="$2"
+      echo "[OPT]: Using spline file: ${XSEC_FILE}"
+      shift # past argument
+      ;;
+
+  -e)
+
+      if [[ ${#} -lt 2 ]]; then
+        echo "[ERROR]: ${1} expected a value."
+        exit 1
+      fi
+
+      ENERGY_RANGE=${2}
+      shift # past argument
+      ;;
+
+    help)
+      nuis_gen_genie_help
+      exit 0
+      ;;
+
+    *) # unknown option
+      FORWARDED_ARGS+=("${key}")
+      ;;
+  esac
+  shift
+done
+
+#We're going to manually check these rather than just forwarding so that the error messages are clear
+if [ "${ISGENIE3}" == "TRUE" ]; then
+  if [ -z ${XSEC_TUNE} ]; then
+    echo "[ERROR]: No Tune was specified, either pass --tune or set GENIE_XSEC_TUNE environment variable."
+    exit 1
+  fi
+  FORWARDED_ARGS+=(--tune ${XSEC_TUNE})
+fi
+
+if [ -z ${XSEC_FILE} ]; then
+  echo "[ERROR]: No xsec spline file was specified, either pass --cross-sections or set GENIE_XSEC_FILE environment variable."
+  exit 1
+fi
+FORWARDED_ARGS+=(--cross-sections ${XSEC_FILE})
+
+if [ -z ${ENERGY_RANGE} ]; then
+  ENERGY_RANGE=$(NUIS_CLID_DEBUG= nuis-flux range ${FLUX_FILE},${FLUX_HIST})
+fi
+FORWARDED_ARGS+=(-e ${ENERGY_RANGE})
+
+if [ "${TARGET_NAME}" = "H" ]; then
+  GENIE_TARGET="1000010010[1]"
+elif [ "${TARGET_NAME}" = "D2" ]; then
+  GENIE_TARGET="1000010020[1]"
+elif [ "${TARGET_NAME}" = "C" ]; then
+  GENIE_TARGET="1000060120[1]"
+elif [ "${TARGET_NAME}" = "CH" ]; then
+  GENIE_TARGET="1000060120[.923076],1000010010[.076924]"
+elif [ "${TARGET_NAME}" = "CH2" ]; then
+  GENIE_TARGET="1000060120[.8571],1000010010[.14285]"
+elif [ "${TARGET_NAME}" = "O" ]; then
+  GENIE_TARGET="1000060120[1]"
+elif [ "${TARGET_NAME}" = "H2O" ]; then
+  GENIE_TARGET="1000080160[.888888],1000010010[.111112]"
+elif [ "${TARGET_NAME}" = "Cl" ]; then
+  GENIE_TARGET="1000170350[1]"
+elif [ "${TARGET_NAME}" = "Ar" ]; then
+  GENIE_TARGET="1000180400[1]"
+elif [ "${TARGET_NAME}" = "Fe" ]; then
+  GENIE_TARGET="1000260560[1]"
+elif  [ "${TARGET_NAME}" = "Pb" ]; then
+  GENIE_TARGET="1000822080[1]"
+else
+  echo "[ERROR]: ${NUIS_BREADCRUMBS} -- Invalid target material: \"${TARGET_NAME}\" for GENIE."
+  exit 1
+fi
+ 
+CMD=gevgen
+if [ "${NUIS_DEBUG}" == "ON" ]; then
+  CMD="gdb --args gevgen"
+fi
+
+if [ "${NUIS_QUIET}" == "ON" ]; then
+  set -x
+  ${CMD} \
+   -p ${PROBE_PDG} -t ${GENIE_TARGET} \
+   -r ${SEED} \
+   -f ${FLUX_FILE},${FLUX_HIST} \
+   -n ${NEVENTS} --seed ${SEED} \
+   "${FORWARDED_ARGS[@]}" &> /dev/null
+   set +x
+else
+  set -x
+  ${CMD} \
+   -p ${PROBE_PDG} -t ${GENIE_TARGET} \
+   -r ${SEED} \
+   -f ${FLUX_FILE},${FLUX_HIST} \
+   -n ${NEVENTS} --seed ${SEED} \
+   "${FORWARDED_ARGS[@]}"
+   set +x
+fi
+
+if [ -e gntp.${SEED}.ghep.root ]; then
+   mv gntp.${SEED}.ghep.root ${OUTPUT_FILENAME}
+   set -x
+   NUIS_BREADCRUMBS="${NUIS_BREADCRUMBS} nuis-prep-GENIE" nuis-prep-GENIE -i ${OUTPUT_FILENAME} \
+               -f ${FLUX_FILE},${FLUX_HIST} \
+               -t ${GENIE_TARGET}
+   set +x
+else
+   echo "[ERROR]: Failed to produce expected output file: gntp.${SEED}.ghep.root"
+   exit 1
+fi

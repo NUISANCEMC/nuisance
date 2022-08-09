@@ -13,7 +13,7 @@ int main(int argc, char const *argv[]) {
   NUIS_LOG(FIT, "***************************************************");
 
   Config::SetPar("NEUT_DIR", "/var/test/NEUT");
-  Config::SetPar("NUWRO_DIR", "/var/test/NUWRO");
+  Config::SetPar("NuWro_DIR", "/var/test/NuWro");
   Config::SetPar("GIBUU_DIR", "/var/test/NIBUU");
   Config::SetPar("GENIE_DIR", "/var/test/GENIE");
 

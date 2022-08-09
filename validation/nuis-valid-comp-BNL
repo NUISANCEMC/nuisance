@@ -1,0 +1,51 @@
+#!/bin/bash
+
+set -e
+
+source $(nuis internal valid.funcs)
+nuis_valid_parse_argments ${@}
+nuis_check_gen_enabled ${GENLIST[@]}
+
+EXP=BNL
+
+for (( i=0; i < ${#GENLIST[@]}; ++i )); do
+    GEN=${GENLIST[${i}]}
+    GENTAG=${GENTAGLIST[${i}]}
+
+    if [ ! -e ${EXP}.${GENTAG}.nu.numu.D2.comp.root ] || [ "${NUIS_FORCE}" == "ON" ]; then
+        nuis comp ${EXP}.${GENTAG}.nu.numu.D2.root \
+            -f -t ${GEN} \
+            -o ${EXP}.${GENTAG}.nu.numu.D2.comp.root \
+                -s BNL_CCQE_XSec_1DEnu_nu \
+                -s BNL_CCQE_Evt_1DQ2_nu \
+                -s BNL_CC1ppip_XSec_1DEnu_nu \
+                -s BNL_CC1ppip_XSec_1DEnu_nu_Uncorr \
+                -s BNL_CC1ppip_XSec_1DEnu_nu_W14Cut \
+                -s BNL_CC1ppip_XSec_1DEnu_nu_W14Cut_Uncorr \
+                -s BNL_CC1ppip_Evt_1DQ2_nu \
+                -s BNL_CC1ppip_Evt_1DQ2_nu_W14Cut \
+                -s BNL_CC1ppip_Evt_1DcosthAdler_nu \
+                -s BNL_CC1ppip_Evt_1Dphi_nu \
+                -s BNL_CC1ppip_Evt_1DWNpi_nu \
+                -s BNL_CC1ppip_Evt_1DWNmu_nu \
+                -s BNL_CC1ppip_Evt_1DWmupi_nu \
+                -s BNL_CC1npip_XSec_1DEnu_nu \
+                -s BNL_CC1npip_XSec_1DEnu_nu_Uncorr \
+                -s BNL_CC1npip_Evt_1DQ2_nu \
+                -s BNL_CC1npip_Evt_1DWNpi_nu \
+                -s BNL_CC1npip_Evt_1DWNmu_nu \
+                -s BNL_CC1npip_Evt_1DWmupi_nu \
+                -s BNL_CC1pi0_XSec_1DEnu_nu \
+                -s BNL_CC1pi0_Evt_1DQ2_nu \
+                -s BNL_CC1pi0_Evt_1DWNpi_nu \
+                -s BNL_CC1pi0_Evt_1DWNmu_nu \
+                -s BNL_CC1pi0_Evt_1DWmupi_nu \
+                -s BNL_CC2pi_1pim1pip_XSec_1DEnu_nu \
+                -s BNL_CC3pi_1pim2pip_XSec_1DEnu_nu \
+                -s BNL_CC4pi_2pim2pip_XSec_1DEnu_nu \
+                -s BNL_CC2pi_1pim1pip_Evt_1DWpippim_nu \
+                -s BNL_CC2pi_1pim1pip_Evt_1DWpippr_nu \
+            --config UseSVDInverse=1
+    fi
+
+done

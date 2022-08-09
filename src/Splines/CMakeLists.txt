@@ -16,7 +16,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
-set(Spline_Impl_Files
+set(Splines_Impl_Files
   SplineReader.cxx
   SplineWriter.cxx
   SplineMerger.cxx
@@ -24,7 +24,18 @@ set(Spline_Impl_Files
   Spline.cxx
 )
 
-add_library(Splines SHARED ${Spline_Impl_Files})
-target_link_libraries(Splines CoreIncludes ROOT::ROOT)
+set(Splines_Hdr_Files
+  SplineReader.h
+  SplineWriter.h
+  SplineMerger.h
+  SplineUtils.h
+  Spline.h
+)
 
-install(TARGETS Splines DESTINATION lib)
+add_library(Splines SHARED ${Splines_Impl_Files})
+target_link_libraries(Splines CoreIncludes ROOT::ROOT)
+set_target_properties(Splines PROPERTIES PUBLIC_HEADER "${Splines_Hdr_Files}")
+
+install(TARGETS Splines
+  LIBRARY DESTINATION lib
+  PUBLIC_HEADER DESTINATION include)

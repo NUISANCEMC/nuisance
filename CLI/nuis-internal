@@ -1,0 +1,16 @@
+#!/bin/bash
+
+while [[ ${#} -gt 0 ]]; do
+  key="$1"
+  case $key in
+  	valid.funcs)
+      echo -n ${NUISANCE}/var/internal/nuis-valid.funcs
+      ;;
+    NEUT.funcs)
+      echo -n ${NUISANCE}/var/internal/nuis-NEUT.funcs
+      ;;
+    *) # This script is free to ignore unknown options
+      ;;
+  esac
+  shift
+done

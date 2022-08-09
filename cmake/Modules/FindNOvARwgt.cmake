@@ -46,7 +46,3 @@ find_package_handle_standard_args(NOvARwgt
     endif()
   endif()
 endif()
-
-if(NOvARwgt_FOUND)
-  target_link_libraries(GeneratorCompileDependencies INTERFACE NOvARwgt::All)
-endif()

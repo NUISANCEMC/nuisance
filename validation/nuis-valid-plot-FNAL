@@ -1,0 +1,39 @@
+#!/bin/bash
+
+set -e
+
+source $(nuis internal valid.funcs)
+nuis_valid_parse_argments ${@}
+
+EXP=FNAL
+
+for SAMP in \
+            FNAL_CCQE_Evt_1DQ2_nu \
+            FNAL_CC1ppip_XSec_1DEnu_nu \
+            FNAL_CC1ppip_XSec_1DQ2_nu \
+            FNAL_CC1ppip_Evt_1DQ2_nu \
+            ; do
+
+    nuis plot --chi2 -i $(nuis_gen_tag_list ${EXP} nu.numu.D2.comp.root) \
+        -s ${SAMP} --mc-tag ${GENTAGLIST[@]}
+
+done
+
+
+for SAMP in \
+            FNAL_CC1ppim_XSec_1DEnu_antinu \
+            ; do
+
+    nuis plot --chi2 -i $(nuis_gen_tag_list ${EXP} nubar.numubar.D2.comp.root) \
+        -s ${SAMP} --mc-tag ${GENTAGLIST[@]}
+
+done
+
+nuis plot collate \
+    -s FNAL_CCQE_Evt_1DQ2_nu \
+    -s FNAL_CC1ppip_XSec_1DEnu_nu \
+    -s FNAL_CC1ppip_XSec_1DQ2_nu \
+    -s FNAL_CC1ppip_Evt_1DQ2_nu \
+    -s FNAL_CC1ppim_XSec_1DEnu_antinu \
+ -m ${GENTAGLIST[@]} -o FNAL_validations.tex
+

@@ -1,0 +1,361 @@
+#!/bin/bash
+
+COMMAND_FQP=${0}
+COMMAND=$(basename ${COMMAND_FQP})
+
+if [ ! -z ${NUIS_CLID_DEBUG} ]; then
+echo "[CLI DEBUG](BrCr: ${NUIS_BREADCRUMBS}): ${COMMAND} Arguments(${#}): ${@}"
+fi
+
+function nuis_flux_help {
+  echo "Run like: ${NUIS_BREADCRUMBS} <command|experiment name> [options]"
+  echo -e "\tCommands:"
+  echo -e "\t  help                                 : Display this message"
+  echo -e "\t  list-experiments                     : List all implemented experiment names"
+  echo -e "\t  range <rootfile,histname>            : Say the X axis range of the passed histogram"
+  echo -e "\tOptions:"
+  echo -e "\t  -P|--probe <numu|nue|numubar|nuebar> : Defaults to numu"
+  echo -e "\t  -M|--beam-mode <nu|nubar>            : Defaults to nu"
+  echo -e "\nExample: ${NUIS_BREADCRUMBS} MINERvA -p numubar -m nubar\n"
+}
+
+if [ "${#}" -lt 1 ]; then
+  echo -e "[ERROR]: Insufficient arguments passed to ${NUIS_BREADCRUMBS}"
+  nuis_flux_help
+  exit 1
+fi
+
+KEYARG="${1}"
+shift
+
+case $KEYARG in
+  list-experiments)
+
+    echo -e "Experimental Fluxes Available:"
+    echo -e "    ANL_77 (ANL)"
+    echo -e "    ArgoNeut"
+    echo -e "    BEBC"
+    echo -e "    BNL_81"
+    echo -e "    BNL_86"
+    echo -e "    BNL_02 (BNL)"
+    echo -e "    FNAL_82"
+    echo -e "    FNAL_93 (FNAL)"
+    echo -e "    GGM"
+    echo -e "    K2K"
+    echo -e "    MicroBooNE"
+    echo -e "    MINERvA_LE (MINERvA)"
+    echo -e "    MINERvA_ME"
+    echo -e "    MiniBooNE"
+    echo -e "    NOvA_ND"
+    echo -e "    SciBooNE"
+    echo -e "    T2K_ND"
+    exit 0
+    ;;
+
+  range)
+
+    if [[ ${#} -lt 1 ]]; then
+      echo "[ERROR]: ${KEYARG} expected a value."
+      exit 1
+    fi
+
+    RANGE_FLUX_DESCRIPTOR=${1}
+
+    OLDIFS=${IFS}
+    IFS=","
+    set -- ${RANGE_FLUX_DESCRIPTOR}
+    IFS=${OLDIFS}
+
+    RANGE_FLUX_FILE=${1}
+    RANGE_FLUX_HIST=${2}
+
+    nuishistrange ${RANGE_FLUX_FILE} ${RANGE_FLUX_HIST}
+    exit 0
+    ;;
+
+  help)
+    nuis_flux_help
+    exit 0
+    ;;
+
+
+  *)
+    EXPERIMENT=${KEYARG}
+    ;;
+esac
+
+
+PROBE="numu"
+BEAMMODE="nu"
+while [[ ${#} -gt 0 ]]; do
+
+  key="$1"
+  case $key in
+
+  -P|--probe)
+
+      if [[ ${#} -lt 2 ]]; then
+        echo "[ERROR]: ${1} expected a value."
+        exit 1
+      fi
+
+      PROBE="$2"
+      shift # past argument
+      ;;
+
+  -M|--beam-mode)
+
+      if [[ ${#} -lt 2 ]]; then
+        echo "[ERROR]: ${1} expected a value."
+        exit 1
+      fi
+
+      BEAMMODE="$2"
+      shift # past argument
+      ;;
+
+  list-experiments)
+
+      echo -e "Experimental Fluxes Available:"
+      echo -e "    ANL_77 (ANL)"
+      echo -e "    ArgoNeuT"
+      echo -e "    BEBC"
+      echo -e "    BNL_81"
+      echo -e "    BNL_86"
+      echo -e "    BNL_02 (BNL)"
+      echo -e "    FNAL_82"
+      echo -e "    FNAL_93 (FNAL)"
+      echo -e "    GGM"
+      echo -e "    K2K"
+      echo -e "    MicroBooNE"
+      echo -e "    MINERvA_LE (MINERvA)"
+      echo -e "    MINERvA_ME"
+      echo -e "    MiniBooNE"
+      echo -e "    NOvA_ND"
+      echo -e "    SciBooNE"
+      echo -e "    T2K_ND"
+      exit 0
+      ;;
+
+  help)
+    nuis_flux_help
+      exit 0
+      ;;
+
+
+      *)
+              # unknown option
+      echo "[ERROR]: Unknown argument to ${NUIS_BREADCRUMBS}: \"$1\""
+      nuis_flux_help
+      exit 1
+      ;;
+  esac
+  shift
+done
+
+if [ -z "${EXPERIMENT}" ]; then
+  echo "[ERROR]: ${NUIS_BREADCRUMBS} -- No experiment requested, please pass experiment name with -e CLI option."
+  exit 1
+fi
+
+if [ "${PROBE}" != "numu" ] && [ "${PROBE}" != "numubar" ] && [ "${PROBE}" != "nue" ] \
+  && [ "${PROBE}" != "nuebar" ]; then
+    echo "[ERROR]: ${NUIS_BREADCRUMBS} -- Invalid probe pdg requested, please use one of 14 (numu), -14, 12 (nue), or -12."
+    exit 1
+fi
+
+case $EXPERIMENT in
+  ANL|ANL_77)
+    if [ "${PROBE}" == "numu" ] && [ "${BEAMMODE}" == "nu" ]; then
+      echo "${NUISANCE}/data/flux/ANL_1977_2horn_rescan.root,numu_flux"
+      exit 0
+    fi
+    ;;
+  ArgoNeuT)
+    if [ "${PROBE}" == "numu" ] && [ "${BEAMMODE}" == "nu" ]; then
+      echo "${NUISANCE}/data/flux/ArgoNeut_numu_flux.root,numu"
+      exit 0
+    elif [ "${PROBE}" == "numubar" ] && [ "${BEAMMODE}" == "nubar" ]; then
+      echo "${NUISANCE}/data/flux/ArgoNeut_numub_flux.root,numub"
+      exit 0
+    fi
+    ;;
+  BEBC)
+    if [ "${PROBE}" == "numu" ] && [ "${BEAMMODE}" == "nu" ]; then
+      echo "${NUISANCE}/data/flux/BEBC_Wachsmuth_numu_table.root,numu_flux"
+      exit 0
+    elif [ "${PROBE}" == "numubar" ] && [ "${BEAMMODE}" == "nubar" ]; then
+      echo "${NUISANCE}/data/flux/BEBC_Wachsmuth_numubar_table.root,numu_flux"
+      exit 0
+    fi
+    ;;
+  BNL_81)
+    if [ "${PROBE}" == "numu" ] && [ "${BEAMMODE}" == "nu" ]; then
+      echo "${NUISANCE}/data/flux/BNL_CCQE_1981_rescan-ALTERNATIVE.root,numu_flux"
+      exit 0
+    fi
+    ;;
+  BNL_86)
+    if [ "${PROBE}" == "numu" ] && [ "${BEAMMODE}" == "nu" ]; then
+      echo "${NUISANCE}/data/flux/BNL_1986_flux-ALTERNATIVE.root,numu_flux"
+      exit 0
+    fi
+    ;;
+  BNL|BNL_02)
+    if [ "${PROBE}" == "numu" ] && [ "${BEAMMODE}" == "nu" ]; then
+      echo "${NUISANCE}/data/flux/BNL_NuInt02_rescan.root,numu_flux"
+      exit 0
+    fi
+    ;;
+  FNAL)
+    if [ "${PROBE}" == "numu" ] && [ "${BEAMMODE}" == "nu" ]; then
+      echo "${NUISANCE}/data/flux/FNAL_CCinc_1982_nu_MCadj.root,numu_flux"
+      exit 0
+    fi
+    if [ "${PROBE}" == "numubar" ] && [ "${BEAMMODE}" == "nubar" ]; then
+      echo "${NUISANCE}/data/flux/FNAL_coh_1993_anu.root,numu_flux"
+      exit 0
+    fi
+    ;;
+  FNAL_82)
+    if [ "${PROBE}" == "numu" ] && [ "${BEAMMODE}" == "nu" ]; then
+      echo "${NUISANCE}/data/flux/FNAL_CCinc_1982_nu_MCadj.root,numu_flux"
+      exit 0
+    fi
+    ;;
+  FNAL_93)
+    if [ "${PROBE}" == "numubar" ] && [ "${BEAMMODE}" == "nubar" ]; then
+      echo "${NUISANCE}/data/flux/FNAL_coh_1993_anu.root,numu_flux"
+      exit 0
+    fi
+    ;;
+  GGM)
+    if [ "${PROBE}" == "numu" ] && [ "${BEAMMODE}" == "nu" ]; then
+      echo "${NUISANCE}/data/flux/GGM_nu_flux_1979_rescan.root,numu_flux"
+      exit 0
+    fi
+    ;;
+  K2K)
+    if [ "${PROBE}" == "numu" ] && [ "${BEAMMODE}" == "nu" ]; then
+      echo "${NUISANCE}/data/flux/K2K_flux.root,numu_flux"
+      exit 0
+    fi
+    ;;
+  MicroBooNE)
+    if [ "${PROBE}" == "numu" ] && [ "${BEAMMODE}" == "nu" ]; then
+      echo "${NUISANCE}/data/flux/MicroBooNE_FHC_numu_flux.root,numu_hist"
+      exit 0
+    fi
+    ;;
+  MINERvA|MINERvA_LE)
+    if [ "${PROBE}" == "numu" ] && [ "${BEAMMODE}" == "nu" ]; then
+      echo "${NUISANCE}/data/flux/minerva_le_flux.root,numu_fhc"
+      exit 0
+    elif [ "${PROBE}" == "numubar" ] && [ "${BEAMMODE}" == "nu" ]; then
+      echo "${NUISANCE}/data/flux/minerva_le_flux.root,numubar_fhc"
+      exit 0
+    elif [ "${PROBE}" == "nue" ] && [ "${BEAMMODE}" == "nu" ]; then
+      echo "${NUISANCE}/data/flux/minerva_le_flux.root,nue_fhc"
+      exit 0
+    elif [ "${PROBE}" == "nuebar" ] && [ "${BEAMMODE}" == "nu" ]; then
+      echo "${NUISANCE}/data/flux/minerva_le_flux.root,nuebar_fhc"
+      exit 0
+    elif [ "${PROBE}" == "numu" ] && [ "${BEAMMODE}" == "nubar" ]; then
+      echo "${NUISANCE}/data/flux/minerva_le_flux.root,numu_rhc"
+      exit 0
+    elif [ "${PROBE}" == "numubar" ] && [ "${BEAMMODE}" == "nubar" ]; then
+      echo "${NUISANCE}/data/flux/minerva_le_flux.root,numubar_rhc"
+      exit 0
+    elif [ "${PROBE}" == "nue" ] && [ "${BEAMMODE}" == "nubar" ]; then
+      echo "${NUISANCE}/data/flux/minerva_le_flux.root,nue_rhc"
+      exit 0
+    elif [ "${PROBE}" == "nuebar" ] && [ "${BEAMMODE}" == "nubar" ]; then
+      echo "${NUISANCE}/data/flux/minerva_le_flux.root,nuebar_rhc"
+      exit 0
+    fi
+    ;;
+  MINERvA_ME)
+    if [ "${PROBE}" == "numu" ] && [ "${BEAMMODE}" == "nu" ]; then
+      echo "${NUISANCE}/data/flux/MINERvA_ME_Flux_No_Constraint.root,reweightedflux_rebinned_CV_WithStatErr"
+      exit 0
+    fi
+    ;;
+  MiniBooNE)
+    if [ "${PROBE}" == "numu" ] && [ "${BEAMMODE}" == "nu" ]; then
+      echo "${NUISANCE}/data/flux/MiniBooNE_numu_flux.root,numu_mb"
+      exit 0
+    elif [ "${PROBE}" == "numubar" ] && [ "${BEAMMODE}" == "nu" ]; then
+      echo "${NUISANCE}/data/flux/MiniBooNE_numu_flux.root,numub_mb"
+      exit 0
+    elif [ "${PROBE}" == "nue" ] && [ "${BEAMMODE}" == "nu" ]; then
+      echo "${NUISANCE}/data/flux/MiniBooNE_numu_flux.root,nue_mb"
+      exit 0
+    elif [ "${PROBE}" == "nuebar" ] && [ "${BEAMMODE}" == "nu" ]; then
+      echo "${NUISANCE}/data/flux/MiniBooNE_numu_flux.root,nueb_mb"
+      exit 0
+    elif [ "${PROBE}" == "numu" ] && [ "${BEAMMODE}" == "nubar" ]; then
+      echo "${NUISANCE}/data/flux/MiniBooNE_numubar_flux.root,numu_mb"
+      exit 0
+    elif [ "${PROBE}" == "numubar" ] && [ "${BEAMMODE}" == "nubar" ]; then
+      echo "${NUISANCE}/data/flux/MiniBooNE_numubar_flux.root,numub_mb"
+      exit 0
+    elif [ "${PROBE}" == "nue" ] && [ "${BEAMMODE}" == "nubar" ]; then
+      echo "${NUISANCE}/data/flux/MiniBooNE_numubar_flux.root,nue_mb"
+      exit 0
+    elif [ "${PROBE}" == "nuebar" ] && [ "${BEAMMODE}" == "nubar" ]; then
+      echo "${NUISANCE}/data/flux/MiniBooNE_numubar_flux.root,nueb_mb"
+      exit 0
+    fi
+    ;;
+  NOvA_ND)
+    if [ "${PROBE}" == "numu" ] && [ "${BEAMMODE}" == "nu" ]; then
+      echo "${NUISANCE}/data/flux/FHC_Flux_NOvA_ND_2017.root,flux_numu"
+      exit 0
+    elif [ "${PROBE}" == "numubar" ] && [ "${BEAMMODE}" == "nu" ]; then
+      echo "${NUISANCE}/data/flux/FHC_Flux_NOvA_ND_2017.root,flux_numubar"
+      exit 0
+    elif [ "${PROBE}" == "nue" ] && [ "${BEAMMODE}" == "nu" ]; then
+      echo "${NUISANCE}/data/flux/FHC_Flux_NOvA_ND_2017.root,flux_nue"
+      exit 0
+    elif [ "${PROBE}" == "nuebar" ] && [ "${BEAMMODE}" == "nu" ]; then
+      echo "${NUISANCE}/data/flux/FHC_Flux_NOvA_ND_2017.root,flux_nuebar"
+      exit 0
+    fi
+    ;;
+  SciBooNE)
+    if [ "${PROBE}" == "numu" ] && [ "${BEAMMODE}" == "nu" ]; then
+      echo "${NUISANCE}/data/flux/sciboone_fhc.root,flux_numu"
+      exit 0
+    fi
+    ;;
+  T2K_ND)
+    if [ "${PROBE}" == "numu" ] && [ "${BEAMMODE}" == "nu" ]; then
+      echo "${NUISANCE}/data/flux/t2kflux_2016_plus250kA.root,enu_nd280_numu"
+      exit 0
+    elif [ "${PROBE}" == "numubar" ] && [ "${BEAMMODE}" == "nu" ]; then
+      echo "${NUISANCE}/data/flux/t2kflux_2016_plus250kA.root,enu_nd280_numub"
+      exit 0
+    elif [ "${PROBE}" == "nue" ] && [ "${BEAMMODE}" == "nu" ]; then
+      echo "${NUISANCE}/data/flux/t2kflux_2016_plus250kA.root,enu_nd280_nue"
+      exit 0
+    elif [ "${PROBE}" == "nuebar" ] && [ "${BEAMMODE}" == "nu" ]; then
+      echo "${NUISANCE}/data/flux/t2kflux_2016_plus250kA.root,enu_nd280_nueb"
+      exit 0
+    elif [ "${PROBE}" == "numu" ] && [ "${BEAMMODE}" == "nubar" ]; then
+      echo "${NUISANCE}/data/flux/t2kflux_2016_minus250kA.root,enu_nd280_numu"
+      exit 0
+    elif [ "${PROBE}" == "numubar" ] && [ "${BEAMMODE}" == "nubar" ]; then
+      echo "${NUISANCE}/data/flux/t2kflux_2016_minus250kA.root,enu_nd280_numub"
+      exit 0
+    elif [ "${PROBE}" == "nue" ] && [ "${BEAMMODE}" == "nubar" ]; then
+      echo "${NUISANCE}/data/flux/t2kflux_2016_minus250kA.root,enu_nd280_nue"
+      exit 0
+    elif [ "${PROBE}" == "nuebar" ] && [ "${BEAMMODE}" == "nubar" ]; then
+      echo "${NUISANCE}/data/flux/t2kflux_2016_minus250kA.root,enu_nd280_nueb"
+      exit 0
+    fi
+    ;;
+esac
+
+echo "[ERROR]: ${NUIS_BREADCRUMBS} -- Could not find flux for Experiment: \"${EXPERIMENT}\", in Mode: \"${BEAMMODE}\" for neutrino species pdg: \"${PROBE}\"."
+exit 1

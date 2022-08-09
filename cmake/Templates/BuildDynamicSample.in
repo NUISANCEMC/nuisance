@@ -1,0 +1,93 @@
+# Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+
+################################################################################
+#    This file is part of NUISANCE.
+#
+#    NUISANCE is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    NUISANCE is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
+################################################################################
+
+#!/bin/bash
+
+if [ ! "${1}" ] || [ ! -e ${1} ] || [ ! "${2}" ]; then
+  echo "[USAGE]: ${0} input.cxx outputLibName.so [classname]"
+  exit 1
+fi
+
+if [ ! "${3}" ]; then
+  CN=$(grep "class .*" $1 | sed "s/^class \([0-9a-zA-Z]\+\).*$/\1/g")
+else
+  CN=${3}
+fi
+
+if [ ! "${CN}" ]; then
+  echo "[ERROR]: Couldn't find class name -- Expected to find a line like: \"class XXXX : public Measurement1D\" in \"$1\". You can also forcibly specify your classes name by passing a third argument to this script."
+  exit 1
+fi
+
+if [ ! -e compile.tmp ]; then
+  mkdir compile.tmp
+fi
+
+cat $1 > compile.tmp/$1
+
+cat << EOF >> compile.tmp/$1
+
+static char const * SampleNames[] = {"${CN}"};
+static int const NSamples = 1;
+
+extern "C" {
+int DSF_NSamples() { return NSamples; }
+char const* DSF_GetSampleName(int i) {
+  if (i < NSamples) {
+    return SampleNames[i];
+  }
+  return 0;
+}
+
+MeasurementBase* DSF_GetSample(int i, void* samplekey) {
+  nuiskey* sk = reinterpret_cast<nuiskey *>(samplekey);
+  if (!sk) {
+    return 0;
+  }
+
+  if (sk->GetS("name") != DSF_GetSampleName(i)) {
+    std::cout
+        << "[ERROR]: When instantiating dynamic sample. Samplekey named: "
+        << sk->GetS("name") << ", but requested sample named: "
+        << DSF_GetSampleName(i)
+        << ". It is possible that the nuiskey object is lost in translation. "
+           "Was NUISANCE and this dynamic sample manifest built with the same "
+           "environment and compiler?"
+        << std::endl;
+  }
+
+  if (i == 0) {
+    return new ${CN}(*sk);
+  }
+  return 0;
+}
+  void DSF_DestroySample(MeasurementBase* mb) { delete mb; }
+}
+EOF
+
+CMD="g++ ${DYNSAMPLE_EXTRA_BUILD_FLAGS} compile.tmp/$1 -shared -o $2 -fPIC -I@ROOT_INCLUDE_DIRS@ -std=c++@CMAKE_CXX_STANDARD@ -I@CMAKE_INSTALL_PREFIX@/include @CONFIG_INCLUDE_DIRECTORIES@ @CONFIG_COMPILE_DEFINTIONS@"
+
+echo ${CMD}
+if ! ${CMD}; then
+  echo "[ERROR]: Failed to compile $1. Generated code can be found in ./compile.tmp/$1"
+  exit 1
+else
+  rm -r compile.tmp
+  echo "Successfully build: $2."
+fi

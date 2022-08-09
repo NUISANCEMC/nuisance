@@ -1,0 +1,288 @@
+#!/bin/bash
+
+COMMAND_FQP=${0}
+COMMAND=$(basename ${COMMAND_FQP})
+
+if [ ! -z ${NUIS_CLID_DEBUG} ]; then
+echo "[CLI DEBUG](BrCr: ${NUIS_BREADCRUMBS}): ${COMMAND} Arguments(${#}): ${@}"
+fi
+
+function nuis_config_help {
+  echo "Run like: ${NUIS_BREADCRUMBS} [option]"
+  echo -e "\tOptions:"
+  echo -e "\t  --version                     : print the NUISANCE version string"
+  echo -e "\t  --features                    : print the list of optional components"
+  echo -e "\t  --generators                  : print the list of supported generators"
+  echo -e "\t  --experiments                 : print the list of included experimental samples"
+  echo -e "\t  --has-feature <feature>       : return 0 if <feature> is enabled, otherwise 1"
+  echo -e "\t  --info <feature>              : print extra information about optional <feature>"
+  echo -e "\t  --has-experiment <experiment> : return 0 if <experiment> is enabled, otherwise 1"
+}
+
+
+if [ "${#}" -lt 1 ]; then
+  nuis_config_help
+  exit 1
+fi
+
+NUISANCE_VERSION="@NUISANCE_VERSION@"
+
+FEATURES=""
+GENERATORS=""
+
+T2KReWeight_ENABLED="@T2KReWeight_ENABLED@"
+T2KReWeight_LEGACY_API_ENABLED="@T2KReWeight_LEGACY_API_ENABLED@"
+if [ "${T2KReWeight_ENABLED}" = "TRUE" ]; then
+  if [ "${T2KReWeight_LEGACY_API_ENABLED}" = "TRUE" ]; then
+    FEATURES="${FEATURES}:T2KReWeightLegacy"
+  else 
+    FEATURES="${FEATURES}:T2KReWeight"
+  fi
+fi
+
+NIWGLegacy_ENABLED="@NIWGLegacy_ENABLED@"
+if [ "${NIWGLegacy_ENABLED}" = "TRUE" ]; then
+  FEATURES="${FEATURES}:NIWGLegacy"
+fi
+
+NOvARwgt_ENABLED="@NOvARwgt_ENABLED@"
+if [ "${NOvARwgt_ENABLED}" = "TRUE" ]; then
+  FEATURES="${FEATURES}:NOvARwgt"
+fi
+
+nusystematics_ENABLED="@nusystematics_ENABLED@"
+if [ "${nusystematics_ENABLED}" = "TRUE" ]; then
+  FEATURES="${FEATURES}:nusystematics"
+fi
+
+NEUT_ENABLED="@NEUT_ENABLED@"
+if [ "${NEUT_ENABLED}" = "TRUE" ]; then
+  FEATURES="${FEATURES}:NEUT"
+  GENERATORS="${GENERATORS}:NEUT"
+
+  NEUTReWeight_ENABLED="@NEUTReWeight_ENABLED@"
+  if [ "${NEUTReWeight_ENABLED}" = "TRUE" ]; then
+    FEATURES="${FEATURES}:NEUTReWeight"
+  fi
+fi
+
+GENIE_ENABLED="@GENIE_ENABLED@"
+if [ "${GENIE_ENABLED}" = "TRUE" ]; then
+  FEATURES="${FEATURES}:GENIE"
+  GENERATORS="${GENERATORS}:GENIE"
+
+  GENIEReWeight_ENABLED="@GENIEReWeight_ENABLED@"
+  if [ "${GENIEReWeight_ENABLED}" = "TRUE" ]; then
+    FEATURES="${FEATURES}:GENIEReWeight"
+  fi
+
+  GENIE3_API_ENABLED="@GENIE3_API_ENABLED@"
+  if [ "${GENIE3_API_ENABLED}" = "TRUE" ]; then
+    FEATURES="${FEATURES}:GENIE3"
+  else
+    FEATURES="${FEATURES}:GENIE2"
+  fi
+fi
+
+NuWro_ENABLED="@NuWro_ENABLED@"
+if [ "${NuWro_ENABLED}" = "TRUE" ]; then
+  FEATURES="${FEATURES}:NuWro"
+  GENERATORS="${GENERATORS}:NuWro"
+fi
+
+Prob3plusplus_ENABLED="@Prob3plusplus_ENABLED@"
+if [ "${Prob3plusplus_ENABLED}" = "TRUE" ]; then
+  FEATURES="${FEATURES}:Prob3plusplus"
+fi
+
+FEATURES="${FEATURES}:"
+GENERATORS="${GENERATORS}:"
+
+EXPERIMENTS=""
+
+ANL_ENABLED="@ANL_ENABLED@"
+if [ "${ANL_ENABLED}" = "TRUE" ]; then
+  EXPERIMENTS="${EXPERIMENTS}:ANL"
+fi
+
+ArgoNeuT_ENABLED="@ArgoNeuT_ENABLED@"
+if [ "${ArgoNeuT_ENABLED}" = "TRUE" ]; then
+  EXPERIMENTS="${EXPERIMENTS}:ArgoNeuT"
+fi
+
+BEBC_ENABLED="@BEBC_ENABLED@"
+if [ "${BEBC_ENABLED}" = "TRUE" ]; then
+  EXPERIMENTS="${EXPERIMENTS}:BEBC"
+fi
+
+BNL_ENABLED="@BNL_ENABLED@"
+if [ "${BNL_ENABLED}" = "TRUE" ]; then
+  EXPERIMENTS="${EXPERIMENTS}:BNL"
+fi
+
+Electron_ENABLED="@Electron_ENABLED@"
+if [ "${Electron_ENABLED}" = "TRUE" ]; then
+  EXPERIMENTS="${EXPERIMENTS}:Electron"
+fi
+
+FNAL_ENABLED="@FNAL_ENABLED@"
+if [ "${FNAL_ENABLED}" = "TRUE" ]; then
+  EXPERIMENTS="${EXPERIMENTS}:FNAL"
+fi
+
+GGM_ENABLED="@GGM_ENABLED@"
+if [ "${GGM_ENABLED}" = "TRUE" ]; then
+  EXPERIMENTS="${EXPERIMENTS}:GGM"
+fi
+
+K2K_ENABLED="@K2K_ENABLED@"
+if [ "${K2K_ENABLED}" = "TRUE" ]; then
+  EXPERIMENTS="${EXPERIMENTS}:K2K"
+fi
+
+MicroBooNE_ENABLED="@MicroBooNE_ENABLED@"
+if [ "${MicroBooNE_ENABLED}" = "TRUE" ]; then
+  EXPERIMENTS="${EXPERIMENTS}:MicroBooNE"
+fi
+
+MINERvA_ENABLED="@MINERvA_ENABLED@"
+if [ "${MINERvA_ENABLED}" = "TRUE" ]; then
+  EXPERIMENTS="${EXPERIMENTS}:MINERvA"
+fi
+
+MiniBooNE_ENABLED="@MiniBooNE_ENABLED@"
+if [ "${MiniBooNE_ENABLED}" = "TRUE" ]; then
+  EXPERIMENTS="${EXPERIMENTS}:MiniBooNE"
+fi
+
+SciBooNE_ENABLED="@SciBooNE_ENABLED@"
+if [ "${SciBooNE_ENABLED}" = "TRUE" ]; then
+  EXPERIMENTS="${EXPERIMENTS}:SciBooNE"
+fi
+
+T2K_ENABLED="@T2K_ENABLED@"
+if [ "${T2K_ENABLED}" = "TRUE" ]; then
+  EXPERIMENTS="${EXPERIMENTS}:T2K"
+fi
+
+EXPERIMENTS="${EXPERIMENTS}:"
+
+if [ ! -z ${NUIS_CLID_DEBUG} ]; then
+echo "[CLI DEBUG](BrCr: ${NUIS_BREADCRUMBS}): \$FEATURES=${FEATURES}"
+echo "[CLI DEBUG](BrCr: ${NUIS_BREADCRUMBS}): \$GENERATORS=${GENERATORS}"
+echo "[CLI DEBUG](BrCr: ${NUIS_BREADCRUMBS}): \$EXPERIMENTS=${EXPERIMENTS}"
+fi
+
+while [[ ${#} -gt 0 ]]; do
+
+  key="$1"
+  case $key in
+
+  --version)
+    echo "${NUISANCE_VERSION}"
+    exit 0
+  ;;
+
+  --features)
+    echo "${FEATURES}" | sed "s/^://g" | sed "s/:$//g" | sed "s/:/ /g"
+    exit 0
+  ;;
+
+  --generators)
+    echo "${GENERATORS}" | sed "s/^://g" | sed "s/:$//g" | sed "s/:/ /g"
+    exit 0
+  ;;
+
+  --experiments)
+    echo "${EXPERIMENTS}" | sed "s/^://g" | sed "s/:$//g" | sed "s/:/ /g"
+    exit 0
+  ;;
+
+  --has-feature)
+
+    if [[ ${#} -lt 2 ]]; then
+      echo "[ERROR]: ${1} expected a value."
+      nuis_config_help
+      exit 1
+    fi
+
+    TEST_FEATURE=${2}
+    if echo "${FEATURES}" | grep -F -q ":${TEST_FEATURE}:"; then
+      exit 0
+    else 
+      exit 1
+    fi
+    ;;
+
+  --has-experiment)
+
+    if [[ ${#} -lt 2 ]]; then
+      echo "[ERROR]: ${1} expected a value."
+      nuis_config_help
+      exit 1
+    fi
+
+    TEST_EXPERIMENT=${2}
+    if echo "${EXPERIMENTS}" | grep -F -q ":${TEST_EXPERIMENT}:"; then
+      exit 0
+    else 
+      exit 1
+    fi
+    ;;
+
+  --info)
+
+    if [[ ${#} -lt 2 ]]; then
+      echo "[ERROR]: ${1} expected a value."
+      nuis_config_help
+      exit 1
+    fi
+
+    TEST_FEATURE=${2}
+    if ! echo "${FEATURES}" | grep -F -q ":${TEST_FEATURE}:"; then
+      echo "[ERROR]: Feature \"${TEST_FEATURE}\" is not enabled."
+      exit 1
+    fi
+
+    case ${TEST_FEATURE} in
+
+      NEUT)
+          echo -e "NEUT Info: "
+          echo -e "\tNEUT Location : @NEUT_ROOT@"
+          echo -e "\tNEUT Version  : @NEUT_VERSION@"
+        ;;
+
+      GENIE)
+          echo -e "GENIE Info: "
+          echo -e "\tGENIE Location : @GENIE@"
+          echo -e "\tGENIE Version  : @GENIE_VERSION@"
+        ;;
+
+      NuWro)
+          echo -e "NuWro Info: "
+          echo -e "\tNuWro Location :@NuWro@"
+        ;;
+
+      *)
+        echo "No extra information for feature \"${TEST_FEATURE}\" is available."
+        ;;
+
+    esac
+    exit 0
+
+  ;;
+
+  help)
+    nuis_config_help
+    exit 0
+    ;;
+
+
+  *)
+    echo "[ERROR]: Unknown argument to ${NUIS_BREADCRUMBS}: \"$1\""
+    nuis_config_help
+    exit 1
+    ;;
+  esac
+  shift
+done

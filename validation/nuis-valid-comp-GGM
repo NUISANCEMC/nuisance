@@ -1,0 +1,24 @@
+#!/bin/bash
+
+set -e
+
+source $(nuis internal valid.funcs)
+nuis_valid_parse_argments ${@}
+nuis_check_gen_enabled ${GENLIST[@]}
+
+EXP=GGM
+
+for (( i=0; i < ${#GENLIST[@]}; ++i )); do
+    GEN=${GENLIST[${i}]}
+    GENTAG=${GENTAGLIST[${i}]}
+
+    if [ ! -e ${EXP}.${GENTAG}.nu.numu.D2.comp.root ] || [ "${NUIS_FORCE}" == "ON" ]; then
+        nuis comp ${EXP}.${GENTAG}.nu.numu.D2.root \
+            -f -t ${GEN} \
+            -o ${EXP}.${GENTAG}.nu.numu.D2.comp.root \
+                -s GGM_CC1ppip_XSec_1DEnu_nu \
+                -s GGM_CC1ppip_Evt_1DQ2_nu \
+            --config UseSVDInverse=1
+    fi
+
+done

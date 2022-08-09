@@ -1,0 +1,41 @@
+#!/bin/bash
+
+set -e
+
+source $(nuis internal valid.funcs)
+nuis_valid_parse_argments ${@}
+nuis_check_gen_enabled ${GENLIST[@]}
+
+EXP=SciBooNE
+
+for (( i=0; i < ${#GENLIST[@]}; ++i )); do
+    GEN=${GENLIST[${i}]}
+    GENTAG=${GENTAGLIST[${i}]}
+
+    if [ ! -e ${EXP}.${GENTAG}.nu.numu.CH.comp.root ] || [ "${NUIS_FORCE}" == "ON" ]; then
+        nuis comp ${EXP}.${GENTAG}.nu.numu.CH.root \
+            -f -t ${GEN} \
+            -o ${EXP}.${GENTAG}.nu.numu.CH.comp.root \
+                -s SciBooNE_CCCOH_STOP_NTrks_nu \
+                -s SciBooNE_CCCOH_1TRK_1DQ2_nu \
+                -s SciBooNE_CCCOH_1TRK_1Dpmu_nu \
+                -s SciBooNE_CCCOH_1TRK_1Dthetamu_nu \
+                -s SciBooNE_CCCOH_MuPr_1DQ2_nu \
+                -s SciBooNE_CCCOH_MuPr_1Dpmu_nu \
+                -s SciBooNE_CCCOH_MuPr_1Dthetamu_nu \
+                -s SciBooNE_CCCOH_MuPiVA_1DQ2_nu \
+                -s SciBooNE_CCCOH_MuPiVA_1Dpmu_nu \
+                -s SciBooNE_CCCOH_MuPiVA_1Dthetamu_nu \
+                -s SciBooNE_CCCOH_MuPiNoVA_1DQ2_nu \
+                -s SciBooNE_CCCOH_MuPiNoVA_1Dthetapr_nu \
+                -s SciBooNE_CCCOH_MuPiNoVA_1Dthetapi_nu \
+                -s SciBooNE_CCCOH_MuPiNoVA_1Dthetamu_nu \
+                -s SciBooNE_CCCOH_MuPiNoVA_1Dpmu_nu \
+                -s SciBooNE_CCCOH_STOPFINAL_1DQ2_nu \
+                -s SciBooNE_CCInc_XSec_1DEnu_nu \
+                -s SciBooNE_CCInc_XSec_1DEnu_nu_NEUT \
+                -s SciBooNE_CCInc_XSec_1DEnu_nu_NUANCE \
+            --config UseSVDInverse=1
+    fi
+
+done

@@ -29,7 +29,7 @@ using namespace t2krew;
 #include "NSyst.h"
 #endif
 
-#ifdef GENIE_ENABLED
+#ifdef GENIEReWeight_ENABLED
 #ifdef GENIE3_API_ENABLED
 using namespace genie;
 #include "RwFramework/GReWeight.h"
@@ -341,7 +341,8 @@ int FitBase::GetDialEnum(int type, std::string const &name) {
     }
 
     int t2k_enum = t2krew::T2KSystToInt(
-        t2krew::MakeT2KReWeightInstance()->DialFromString(name));
+        t2krew::MakeT2KReWeightInstance(t2krew::Event::kNEUT)
+            ->DialFromString(name));
 #else
     int t2k_enum = (int)t2krew::T2KSyst::FromString(name);
 #endif
@@ -474,8 +475,9 @@ int Reweight::T2KEnumFromName(std::string const &name) {
     }
   }
 
-  int t2kenum = t2krew::T2KSystToInt(
-      t2krew::MakeT2KReWeightInstance()->DialFromString(name));
+  int t2kenum =
+      t2krew::T2KSystToInt(t2krew::MakeT2KReWeightInstance(t2krew::Event::kNEUT)
+                               ->DialFromString(name));
 #else
   int t2kenum = (int)t2krew::T2KSyst::FromString(name);
 #endif

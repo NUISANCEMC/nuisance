@@ -177,8 +177,8 @@ void ParamPull::SetupHistograms(std::string input) {
       deftype = kGENIE;
     } else if (fType.find("NORM") != std::string::npos) {
       deftype = kNORM;
-    } else if (fType.find("NUWRO") != std::string::npos) {
-      deftype = kNUWRO;
+    } else if (fType.find("NuWro") != std::string::npos) {
+      deftype = kNuWro;
     }
 
     fTypeHist = new TH1I((fName + "_type").c_str(),

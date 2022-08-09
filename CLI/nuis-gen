@@ -1,0 +1,308 @@
+#!/bin/bash
+
+COMMAND_FQP=${0}
+COMMAND=$(basename ${COMMAND_FQP})
+
+if [ ! -z ${NUIS_CLID_DEBUG} ]; then
+echo "[CLI DEBUG](BrCr: ${NUIS_BREADCRUMBS}): ${COMMAND} Arguments(${#}):" "${@}"
+fi
+
+function nuis_gen_help {
+  echo "Run like: ${NUIS_BREADCRUMBS} -t <T> [-f <FF,FH>|-E <E> [ -P <P> -M <M>]] -n <N> [options]"
+  echo -e "\tRequired:"
+  echo -e "\t  -t|--target <T>                      : Set target descriptor, e.g. <T>=\"CH\""
+  echo -e "\t  -n|--nevents <N>                     : Generate <N> events"
+  echo -e "\t  -f|--flux <file.root,histoname>      : Use neutrino energy shape from described histogram"
+  echo -e "\t  --flux-MeV                           : Interpret flux histogram as being in MeV"
+  echo -e "\tOR"
+  echo -e "\t  -E|--experiment                      : Passed to \'nuis flux\' to specify known experimental flux"
+  echo -e "\t  -M|--beam-mode <nu|nubar>            : Passed to \'nuis flux\' to specify known flux beam mode"
+  echo -e "\tOptional:"
+  echo -e "\t  -P|--probe <numu|nue|numubar|nuebar> : Set probe particle. If -e is used, this is also passed to \'nuis flux\'."
+  echo -e "\t  -o|--output-file <output.root>       : defaults to <GENERATOR>.<probe>.<flux_file>.<flux_hist>.<seed>.evts.root"
+  echo -e "\t  --seed <int>                         : Integer to use as random seed. Defaults to \${RANDOM}"
+  echo -e ""
+}
+
+if [ "${#}" -lt 1 ] || [ "${1::1}" == "-" ]; then
+  echo -e "[ERROR]: Expected to be passed a sub command verb like:"
+  echo -e "\t ${COMMAND} <verb> <verb-specific options>"
+  echo -e "Implemented verbs:"
+
+  if nuis-config --has-feature GENIE; then
+    echo -e "\tGENIE"
+  fi
+  if nuis-config --has-feature NEUT; then
+    echo -e "\tNEUT"
+  fi
+  if nuis-config --has-feature NuWro; then
+    echo -e "\tNuWro"
+  fi
+  if hash GiBUU.x &> /dev/null; then
+    echo -e "\tGiBUU"
+  fi
+
+  echo -e "Try ${COMMAND} <verb> help for further help for a specific verb."
+  exit 1
+fi
+
+VERB=${1}
+shift
+
+if ! hash ${COMMAND}-${VERB}; then
+  echo "[ERROR]: Unknown verb: ${VERB}, could not find `${COMMAND}-${VERB}`."
+  exit 1
+fi
+
+# Now we fake that we are in the VERB app to parse common gen options.
+NUIS_BREADCRUMBS="${NUIS_BREADCRUMBS} ${VERB}"
+
+# Common arguments
+PROBE="numu"
+TARGET_NAME=""
+
+NEVENTS=""
+OUTPUT_FILENAME=""
+
+EXPERIMENT=""
+BEAM_MODE="nu"
+
+FLUX_DESCRIPTOR=""
+FLUX_MeV="off"
+
+SEED=
+
+FORWARDED_ARGS=()
+
+# If the first arg after the VERB is another sub command, then just instant forward it and all other options
+if [[ ${#} -gt 0 ]] && [ "${1::1}" != "-" ]; then
+
+  if [ "${1}" == "help" ]; then
+    nuis_gen_help
+    NUIS_BREADCRUMBS=${NUIS_BREADCRUMBS} \
+      ${COMMAND}-${VERB} help
+    exit 0
+  fi
+
+  NUIS_BREADCRUMBS=${NUIS_BREADCRUMBS} \
+    ${COMMAND}-${VERB} "${@}"
+  exit $?
+fi
+
+while [[ ${#} -gt 0 ]]; do
+
+  key="$1"
+  case $key in
+
+    -P|--probe)
+
+      if [[ ${#} -lt 2 ]]; then
+        echo "[ERROR]: ${NUIS_BREADCRUMBS} -- ${1} expected a value."
+        exit 1
+      fi
+
+      PROBE="$2"
+      echo "[OPT]: ${NUIS_BREADCRUMBS} -- Using Probe particle: ${PROBE}"
+      shift # past argument
+      ;;
+
+    -t|--target)
+
+      if [[ ${#} -lt 2 ]]; then
+        echo "[ERROR]: ${NUIS_BREADCRUMBS} -- ${1} expected a value."
+        exit 1
+      fi
+
+      TARGET_NAME="$2"
+      echo "[OPT]: ${NUIS_BREADCRUMBS} -- Using target: ${TARGET_NAME}"
+      shift # past argument
+      ;;
+
+    -f|--flux)
+
+      if [[ ${#} -lt 2 ]]; then
+        echo "[ERROR]: ${NUIS_BREADCRUMBS} -- ${1} expected a value."
+        exit 1
+      fi
+
+      FLUX_DESCRIPTOR="$2"
+      echo "[OPT]: ${NUIS_BREADCRUMBS} -- Using flux descriptor: ${FLUX_DESCRIPTOR}"
+      shift # past argument
+      ;;
+
+    --flux-MeV)
+
+      echo "[OPT]: ${NUIS_BREADCRUMBS} -- Assuming flux histogram is in MeV"
+      FLUX_MeV="on"
+      ;;
+
+    -E|--experiment)
+
+      if [[ ${#} -lt 2 ]]; then
+        echo "[ERROR]: ${NUIS_BREADCRUMBS} -- ${1} expected a value."
+        exit 1
+      fi
+
+      EXPERIMENT="$2"
+      echo "[OPT]: ${NUIS_BREADCRUMBS} -- Building flux descriptor for experiment: ${EXPERIMENT}"
+      shift # past argument
+      ;;
+
+    -M|--beam-mode)
+
+      if [[ ${#} -lt 2 ]]; then
+        echo "[ERROR]: ${NUIS_BREADCRUMBS} -- ${1} expected a value."
+        exit 1
+      fi
+
+      BEAM_MODE="$2"
+      echo "[OPT]: ${NUIS_BREADCRUMBS} -- Building flux descriptor for beam mode: ${BEAM_MODE}"
+      shift # past argument
+      ;;
+
+    -n|--nevents)
+
+      if [[ ${#} -lt 2 ]]; then
+        echo "[ERROR]: ${NUIS_BREADCRUMBS} -- ${1} expected a value."
+        exit 1
+      fi
+
+      NEVENTS="$2"
+      echo "[OPT]: ${NUIS_BREADCRUMBS} -- Throwing ${NEVENTS} events."
+      shift # past argument
+      ;;
+
+    -o|--output-file)
+
+      if [[ ${#} -lt 2 ]]; then
+        echo "[ERROR]: ${NUIS_BREADCRUMBS} -- ${1} expected a value."
+        exit 1
+      fi
+
+      OUTPUT_FILENAME="$2"
+      echo "[OPT]: ${NUIS_BREADCRUMBS} -- Writing to file: ${OUTPUT_FILENAME}"
+      shift # past argument
+      ;;
+
+    --seed)
+
+      if [[ ${#} -lt 2 ]]; then
+        echo "[ERROR]: ${NUIS_BREADCRUMBS} -- ${1} expected a value."
+        exit 1
+      fi
+
+      SEED="$2"
+      echo "[OPT]: ${NUIS_BREADCRUMBS} -- Using ${SEED} as random seed."
+      shift # past argument
+      ;;
+
+    *) # unknown option
+      FORWARDED_ARGS+=("${key}")
+      ;;
+  esac
+  shift
+done
+
+case ${PROBE} in
+  numu)
+    PROBE_PDG="14"
+    ;;
+  numubar)
+    PROBE_PDG="-14"
+    ;;
+  nue)
+    PROBE_PDG="12"
+    ;;
+  nuebar)
+    PROBE_PDG="-12"
+    ;;
+  *)
+    echo "[ERROR]: ${NUIS_BREADCRUMBS} -- Invalid probe descriptor passed: ${PROBE}"
+    nuis_gen_help
+    ${COMMAND}-${VERB} help
+    exit 1
+esac
+
+#The user might want to manually set the target for NuWro with -p arguments
+if [ "${VERB}" != "NuWro" ] && [ -z "${TARGET_NAME}" ]; then
+  echo "[ERROR]: ${NUIS_BREADCRUMBS} -- Please pass target materical descriptor, e.g. CH"
+  exit 1
+fi
+
+if [ -z "${NEVENTS}" ]; then
+  echo "[ERROR]: ${NUIS_BREADCRUMBS} -- Please pass a number of events to generate with the -n flag."
+  exit 1
+fi
+
+if [ -z "${FLUX_DESCRIPTOR}" ] && [ ! -z "${EXPERIMENT}" ]; then
+  if ! nuis-flux ${EXPERIMENT} -M ${BEAM_MODE} -P ${PROBE} &> /dev/null; then
+    echo "[ERROR]: ${NUIS_BREADCRUMBS} -- nuis flux could not find a flux descriptor for: Experiment: ${EXPERIMENT}, Probe: ${PROBE}, Beam Mode: ${BEAM_MODE}"
+    exit 1
+  fi
+  FLUX_DESCRIPTOR=$(NUIS_CLID_DEBUG= nuis-flux ${EXPERIMENT} -M ${BEAM_MODE} -P ${PROBE})
+fi
+
+if [ -z "${FLUX_DESCRIPTOR}" ]; then
+  echo "[ERROR]: ${NUIS_BREADCRUMBS} -- No neutrino flux shape defined"
+  nuis_gen_neut_help
+  exit 1
+fi
+
+OLDIFS=${IFS}
+IFS=","
+set -- ${FLUX_DESCRIPTOR}
+IFS=${OLDIFS}
+
+FLUX_FILE=${1}
+FLUX_HIST=${2}
+FLUX_FILE_NAME=${FLUX_FILE##*/}
+
+if [ -z "${FLUX_FILE}" ] || [ -z "${FLUX_HIST}" ]; then
+  echo -e "[ERROR]: ${NUIS_BREADCRUMBS} -- Failed to parse flux descriptor: \"${FLUX_DESCRIPTOR}\" as \"<input_file.root>,<histogram name>\"."
+  exit 1
+fi
+
+if [ -z "${SEED}" ]; then
+  SEED=${RANDOM}
+fi
+
+if [ -z "${OUTPUT_FILENAME}" ]; then
+  OUTPUT_FILENAME=${VERB}.${PROBE}.${FLUX_HIST}.${FLUX_FILE_NAME%%.root}.${SEED}.evts.root
+fi
+
+if [ -e "${OUTPUT_FILENAME}" ]; then
+   echo "[ERROR]: ${NUIS_BREADCRUMBS} -- Already have file: ${OUTPUT_FILENAME}, not overwriting."
+   exit 1
+fi
+
+if [ ! -z ${NUIS_CLID_DEBUG} ]; then
+
+echo "[INFO]: FORWARDED_ARGS: N = ${#FORWARDED_ARGS[@]}, ARGS=(${FORWARDED_ARGS[@]})"
+echo "[CLI DEBUG](BrCr: ${NUIS_BREADCRUMBS}): " NUIS_BREADCRUMBS=${NUIS_BREADCRUMBS} \
+  PROBE=${PROBE} PROBE_PDG=${PROBE_PDG} \
+  TARGET_NAME=${TARGET_NAME} \
+  NEVENTS=${NEVENTS} \
+  OUTPUT_FILENAME=${OUTPUT_FILENAME} \
+  EXPERIMENT=${EXPERIMENT} \
+  BEAM_MODE=${BEAM_MODE} \
+  FLUX_FILE=${FLUX_FILE} \
+  FLUX_HIST=${FLUX_HIST} \
+  FLUX_FILE_NAME=${FLUX_FILE_NAME} \
+  FLUX_MeV=${FLUX_MeV} \
+  SEED=${SEED} \
+  ${COMMAND}-${VERB} "${FORWARDED_ARGS[@]}"
+fi
+
+NUIS_BREADCRUMBS=${NUIS_BREADCRUMBS} \
+  PROBE=${PROBE} PROBE_PDG=${PROBE_PDG} \
+  TARGET_NAME=${TARGET_NAME} \
+  NEVENTS=${NEVENTS} \
+  OUTPUT_FILENAME=${OUTPUT_FILENAME} \
+  EXPERIMENT=${EXPERIMENT} \
+  BEAM_MODE=${BEAM_MODE} \
+  FLUX_FILE=${FLUX_FILE} \
+  FLUX_HIST=${FLUX_HIST} \
+  FLUX_FILE_NAME=${FLUX_FILE_NAME} \
+  FLUX_MeV=${FLUX_MeV} \
+  SEED=${SEED} \
+  ${COMMAND}-${VERB} "${FORWARDED_ARGS[@]}"

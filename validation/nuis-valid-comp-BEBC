@@ -1,0 +1,46 @@
+#!/bin/bash
+
+set -e
+
+source $(nuis internal valid.funcs)
+nuis_valid_parse_argments ${@}
+nuis_check_gen_enabled ${GENLIST[@]}
+
+EXP=BEBC
+
+for (( i=0; i < ${#GENLIST[@]}; ++i )); do
+    GEN=${GENLIST[${i}]}
+    GENTAG=${GENTAGLIST[${i}]}
+
+    if [ ! -e ${EXP}.${GENTAG}.nu.numu.D2.comp.root ] || [ "${NUIS_FORCE}" == "ON" ]; then
+        nuis comp ${EXP}.${GENTAG}.nu.numu.D2.root \
+            -f -t ${GEN} \
+            -o ${EXP}.${GENTAG}.nu.numu.D2.comp.root \
+                -s BEBC_CCQE_XSec_1DQ2_nu \
+                -s BEBC_CC1ppip_XSec_1DEnu_nu \
+                -s BEBC_CC1ppip_XSec_1DQ2_nu \
+                -s BEBC_CC1npip_XSec_1DEnu_nu \
+                -s BEBC_CC1npip_XSec_1DQ2_nu \
+                -s BEBC_CC1pi0_XSec_1DEnu_nu \
+                -s BEBC_CC1pi0_XSec_1DQ2_nu \
+            --config UseSVDInverse=1
+    fi
+
+done
+
+for (( i=0; i < ${#GENLIST[@]}; ++i )); do
+    GEN=${GENLIST[${i}]}
+    GENTAG=${GENTAGLIST[${i}]}
+
+    if [ ! -e ${EXP}.${GENTAG}.nubar.numubar.D2.comp.root ] || [ "${NUIS_FORCE}" == "ON" ]; then
+        nuis comp ${EXP}.${GENTAG}.nubar.numubar.D2.root \
+            -f -t ${GEN} \
+            -o ${EXP}.${GENTAG}.nubar.numubar.D2.comp.root \
+                -s BEBC_CC1npim_XSec_1DEnu_antinu \
+                -s BEBC_CC1npim_XSec_1DQ2_antinu \
+                -s BEBC_CC1ppim_XSec_1DEnu_antinu \
+                -s BEBC_CC1ppim_XSec_1DQ2_antinu \
+            --config UseSVDInverse=1
+    fi
+
+done

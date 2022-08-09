@@ -1,0 +1,41 @@
+#!/bin/bash
+set -e
+
+source $(nuis internal valid.funcs)
+nuis_valid_parse_argments "${@}"
+nuis_check_gen_enabled "${GENLIST[@]}"
+
+EXP=T2K_ND
+NEVENTS=250000
+
+#numu
+for TARGET in CH C O H2O; do
+    for (( i=0; i < ${#GENLIST[@]}; ++i )); do
+        GEN=${GENLIST[${i}]}
+        GENTAG=${GENTAGLIST[${i}]}
+        if [ ! -e "${EXP}.${GENTAG}.nu.numu.${TARGET}.root" ] || [ "${NUIS_FORCE}" == "ON" ]; then
+            nuis gen ${GEN} -o ${EXP}.${GENTAG}.nu.numu.${TARGET}.root \
+                            -t ${TARGET} \
+                            -M nu \
+                            -P numu \
+                            -n ${NEVENTS} \
+                            -E ${EXP} "${GENARGS[@]}"
+        fi
+    done
+done
+
+#numubar
+for TARGET in CH H2O; do
+    for (( i=0; i < ${#GENLIST[@]}; ++i )); do
+        GEN=${GENLIST[${i}]}
+        GENTAG=${GENTAGLIST[${i}]}
+        if [ ! -e "${EXP}.${GENTAG}.nubar.numubar.${TARGET}.root" ] || [ "${NUIS_FORCE}" == "ON" ]; then
+            nuis gen ${GEN} -o ${EXP}.${GENTAG}.nubar.numubar.${TARGET}.root \
+                            -t ${TARGET} \
+                            -M nubar \
+                            -P numubar \
+                            -n ${NEVENTS} \
+                            -E ${EXP} "${GENARGS[@]}"
+        fi
+    done
+done

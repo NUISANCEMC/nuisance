@@ -1,0 +1,64 @@
+#!/bin/bash
+
+# To use these functions, run 
+#     source $(nuis internal valid.funcs)
+
+#### Define some helper functions to be used in writing nuis-valid-[comp|gen|plot]-<EXPERIMENT> scripts
+function nuis_valid_parse_argments {
+    INARGS=( ${@} )
+    GENLIST=()
+    GENTAGLIST=()
+
+    READTAGS="FALSE"
+    GENARGS=()
+
+    for (( i=0; i < ${#INARGS[@]}; ++i )); do
+        local CARG=${INARGS[${i}]}
+
+        if [ "${CARG::1}" == "-" ]; then
+            READTAGS="TRUE"
+        fi
+
+        if [ "${READTAGS}" == "FALSE" ]; then
+
+            OLD_IFS=${IFS}
+            IFS=":"
+            set -- ${CARG}
+            IFS=${OLD_IFS}
+            
+            GENNAME=${1}
+            GENTAG=${2}
+            if [ -z "${GENTAG}" ]; then
+                GENTAG=${GENNAME}
+            fi
+
+            GENLIST+=("${GENNAME}")
+            GENTAGLIST+=("${GENTAG}")
+        else
+            GENARGS+=("${CARG}")
+        fi
+        
+    done
+
+    echo "Parsed: (${INARGS[@]}) to "
+    echo -e "\tGENLIST=(${GENLIST[@]})"
+    echo -e "\tGENTAGLIST=(${GENTAGLIST[@]})"
+    echo -e "\tGENARGS=(${GENARGS[@]})"
+}
+
+function nuis_check_gen_enabled {
+    for GENNAME in ${@}; do
+        if ! NUIS_CLID_DEBUG= nuis-config --has-feature ${GENNAME}; then
+            echo "[ERROR]: Trying to validate with generator: \"${GENNAME}\", but NUISANCE has no support for that generator."
+            echo "Supported generators: "
+            nuis-config --generators
+            exit 1
+        fi
+    done
+}
+
+function nuis_gen_tag_list {
+    for GENTAG in ${GENTAGLIST[@]}; do
+        echo ${1}.${GENTAG}.${2}
+    done
+}

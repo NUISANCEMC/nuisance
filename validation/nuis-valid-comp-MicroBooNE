@@ -1,0 +1,28 @@
+#!/bin/bash
+
+set -e
+
+source $(nuis internal valid.funcs)
+nuis_valid_parse_argments ${@}
+nuis_check_gen_enabled ${GENLIST[@]}
+
+EXP=MicroBooNE
+
+for (( i=0; i < ${#GENLIST[@]}; ++i )); do
+    GEN=${GENLIST[${i}]}
+    GENTAG=${GENTAGLIST[${i}]}
+
+    if [ ! -e ${EXP}.${GENTAG}.nu.numu.Ar.comp.root ] || [ "${NUIS_FORCE}" == "ON" ]; then
+        nuis comp ${EXP}.${GENTAG}.nu.numu.Ar.root \
+            -f -t ${GEN} \
+            -o ${EXP}.${GENTAG}.nu.numu.Ar.comp.root \
+                -s MicroBooNE_CCInc_XSec_2DPcos_nu \
+                -s MicroBooNE_CC1MuNp_XSec_1DPmu_nu \
+                -s MicroBooNE_CC1MuNp_XSec_1Dcosmu_nu \
+                -s MicroBooNE_CC1MuNp_XSec_1DPp_nu \
+                -s MicroBooNE_CC1MuNp_XSec_1Dcosp_nu \
+                -s MicroBooNE_CC1MuNp_XSec_1Dthetamup_nu \
+            --config UseSVDInverse=1
+    fi
+
+done

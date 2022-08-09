@@ -23,7 +23,7 @@
  *  @{
  */
 
-#ifdef NIWG_ENABLED
+#ifdef NIWGLegacy_ENABLED
 #ifdef NEUT_ENABLED
 #include "NIWGEvent.h"
 #include "NIWGSyst.h"

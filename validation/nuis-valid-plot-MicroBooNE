@@ -1,0 +1,37 @@
+#!/bin/bash
+
+set -e
+
+source $(nuis internal valid.funcs)
+nuis_valid_parse_argments ${@}
+
+EXP=MicroBooNE
+
+for SAMP in \
+            MicroBooNE_CC1MuNp_XSec_1DPmu_nu \
+            MicroBooNE_CC1MuNp_XSec_1Dcosmu_nu \
+            MicroBooNE_CC1MuNp_XSec_1DPp_nu \
+            MicroBooNE_CC1MuNp_XSec_1Dcosp_nu \
+            MicroBooNE_CC1MuNp_XSec_1Dthetamup_nu \
+            ; do
+
+    nuis plot --chi2 -i $(nuis_gen_tag_list ${EXP} nu.numu.Ar.comp.root) \
+        -s ${SAMP} --mc-tag ${GENTAGLIST[@]}
+
+done
+
+nuis plot --chi2 -i $(nuis_gen_tag_list ${EXP} nu.numu.Ar.comp.root) \
+    -s MicroBooNE_CCInc_XSec_2DPcos_nu \
+    --slice-list $(awk 'BEGIN{ for (i=0;i<8;i++) printf "MicroBooNE_CCInc_XSec_2DPcos_nu_MC_Slice%d:MicroBooNE_CCInc_XSec_2DPcos_nu_data_Slice%d ", i, i }') \
+    --mc-tag ${GENTAGLIST[@]}
+
+
+nuis plot collate \
+    -s MicroBooNE_CCInc_XSec_2DPcos_nu \
+    -s MicroBooNE_CC1MuNp_XSec_1DPmu_nu \
+    -s MicroBooNE_CC1MuNp_XSec_1Dcosmu_nu \
+    -s MicroBooNE_CC1MuNp_XSec_1DPp_nu \
+    -s MicroBooNE_CC1MuNp_XSec_1Dcosp_nu \
+    -s MicroBooNE_CC1MuNp_XSec_1Dthetamup_nu \
+ -m ${GENTAGLIST[@]} -o MicroBooNE_validations.tex
+

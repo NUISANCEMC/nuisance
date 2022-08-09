@@ -38,7 +38,7 @@ std::vector<std::string> ParseInputFileList(std::string const &inpFile) {
 InputType ParseInputType(std::string const &inp) {
   // The hard-coded list of supported input generators
   const static std::string filetypes[] = {
-      "NEUT",  "NUWRO",  "GENIE", "GiBUU",       "NUANCE", "EVSPLN",
+      "NEUT",  "NuWro",  "GENIE", "GiBUU",       "NUANCE", "EVSPLN",
       "EMPTY", "FEVENT", "JOINT", "SIGMAQ0HIST", "HISTO",  "HEPMCNUEVT"};
 
   size_t nInputTypes = GeneralUtils::GetArraySize(filetypes);
@@ -69,7 +69,7 @@ bool IsJointInput(std::string const &inputs) {
 std::string ExpandInputDirectories(std::string const &inputs) {
   // Parse the "environement" flags in the fitter config
   // Can specify NEUT_DIR = "" and others in parameters/config.xml
-  const static std::string filedir[] = {"NEUT_DIR",   "NUWRO_DIR",
+  const static std::string filedir[] = {"NEUT_DIR",   "NuWro_DIR",
                                         "GENIE_DIR",  "NUANCE_DIR",
                                         "EVSPLN_DIR", "GIBUU_DIR"};
   size_t nfiledir = GeneralUtils::GetArraySize(filedir);
@@ -116,9 +116,9 @@ InputType GuessInputTypeFromFile(TFile *inpF) {
   if (NEUT_Input) {
     return kNEUT_Input;
   }
-  TTree *NUWRO_Input = dynamic_cast<TTree *>(inpF->Get(NuWro_TreeName.c_str()));
-  if (NUWRO_Input) {
-    return kNUWRO_Input;
+  TTree *NuWro_Input = dynamic_cast<TTree *>(inpF->Get(NuWro_TreeName.c_str()));
+  if (NuWro_Input) {
+    return kNuWro_Input;
   }
   TTree *GENIE_Input = dynamic_cast<TTree *>(inpF->Get(GENIE_TreeName.c_str()));
   if (GENIE_Input) {
@@ -154,8 +154,8 @@ std::string PrependGuessedInputTypeToName(std::string const &inpFName) {
   case kNEUT_Input: {
     return "NEUT:" + inpFName;
   }
-  case kNUWRO_Input: {
-    return "NUWRO:" + inpFName;
+  case kNuWro_Input: {
+    return "NuWro:" + inpFName;
   }
   case kGENIE_Input: {
     return "GENIE:" + inpFName;

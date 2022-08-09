@@ -33,7 +33,26 @@ set(FitBase_Impl_Files
   StackBase.cxx
 )
 
+set(FitBase_Hdr_Files
+  ParamPull.h
+  EventManager.h
+  Measurement1D.h
+  Measurement2D.h
+  JointMeas1D.h
+  MeasurementBase.h
+  TemplateMeas1D.h
+  SampleSettings.h
+  MeasurementVariableBox.h
+  MeasurementVariableBox2D.h
+  MeasurementVariableBox1D.h
+  StandardStacks.h
+  StackBase.h
+)
+
 add_library(FitBase SHARED ${FitBase_Impl_Files})
 target_link_libraries(FitBase CoreIncludes ROOT::ROOT)
+set_target_properties(FitBase PROPERTIES PUBLIC_HEADER "${FitBase_Hdr_Files}")
 
-install(TARGETS FitBase DESTINATION lib)
+install(TARGETS FitBase
+  LIBRARY DESTINATION lib
+  PUBLIC_HEADER DESTINATION include)

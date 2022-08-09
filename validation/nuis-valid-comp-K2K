@@ -1,0 +1,23 @@
+#!/bin/bash
+
+set -e
+
+source $(nuis internal valid.funcs)
+nuis_valid_parse_argments ${@}
+nuis_check_gen_enabled ${GENLIST[@]}
+
+EXP=K2K
+
+for (( i=0; i < ${#GENLIST[@]}; ++i )); do
+    GEN=${GENLIST[${i}]}
+    GENTAG=${GENTAGLIST[${i}]}
+
+    if [ ! -e ${EXP}.${GENTAG}.nu.numu.H2O.comp.root ] || [ "${NUIS_FORCE}" == "ON" ]; then
+        nuis comp ${EXP}.${GENTAG}.nu.numu.H2O.root \
+            -f -t ${GEN} \
+            -o ${EXP}.${GENTAG}.nu.numu.H2O.comp.root \
+                -s K2K_NC1pi0_Evt_1Dppi0_nu \
+            --config UseSVDInverse=1
+    fi
+
+done

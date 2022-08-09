@@ -1,0 +1,106 @@
+#!/bin/bash
+
+set -e
+
+source $(nuis internal valid.funcs)
+nuis_valid_parse_argments ${@}
+nuis_check_gen_enabled ${GENLIST[@]}
+
+EXP=T2K_ND
+
+for (( i=0; i < ${#GENLIST[@]}; ++i )); do
+    GEN=${GENLIST[${i}]}
+    GENTAG=${GENTAGLIST[${i}]}
+
+    if [ ! -e ${EXP}.${GENTAG}.nu.numu.CH.comp.root ] || [ "${NUIS_FORCE}" == "ON" ]; then
+        nuis comp ${EXP}.${GENTAG}.nu.numu.CH.root \
+            -f -t ${GEN} \
+            -o ${EXP}.${GENTAG}.nu.numu.CH.comp.root \
+                -s T2K_CC0pi_XSec_2DPcos_nu_I \
+                -s T2K_CC0pi_XSec_2DPcos_nu_II \
+                -s T2K_CCinc_XSec_2DPcos_nu_nonuniform \
+                -s T2K_NuMu_CC0pi_CH_XSec_2DPcos \
+                -s T2K_CC1pip_CH_XSec_1Dppi_nu \
+                -s T2K_CC1pip_CH_XSec_1Dthpi_nu \
+                -s T2K_CC1pip_CH_XSec_1Dthmupi_nu \
+                -s T2K_CC1pip_CH_XSec_1DQ2_nu \
+                -s T2K_CC1pip_CH_XSec_1DAdlerPhi_nu \
+                -s T2K_CC1pip_CH_XSec_1DCosThAdler_nu \
+                -s T2K_CC0pinp_STV_XSec_1Ddpt_nu \
+                -s T2K_CC0pinp_STV_XSec_1Ddphit_nu \
+                -s T2K_CC0pinp_STV_XSec_1Ddat_nu \
+                -s T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np \
+                -s T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p \
+                -s T2K_CC0piWithProtons_XSec_2018_multidif_0p \
+                -s T2K_CC0piWithProtons_XSec_2018_multidif_1p \
+                -s T2K_CC0pinp_ifk_XSec_3Dinfp_nu \
+                -s T2K_CC0pinp_ifk_XSec_3Dinfa_nu \
+                -s T2K_CC0pinp_ifk_XSec_3Dinfip_nu \
+            --config UseSVDInverse=1
+    fi
+
+    if [ ! -e ${EXP}.${GENTAG}.nu.numu.C.comp.root ] || [ "${NUIS_FORCE}" == "ON" ]; then
+        nuis comp ${EXP}.${GENTAG}.nu.numu.C.root \
+            -f -t ${GEN} \
+            -o ${EXP}.${GENTAG}.nu.numu.C.comp.root \
+                -s T2K_NuMu_CC0pi_C_XSec_2DPcos \
+                -s T2K_CCCOH_C12_XSec_1DEnu_nu \
+            --config UseSVDInverse=1
+    fi
+
+    if [ ! -e ${EXP}.${GENTAG}.nu.numu.H2O.comp.root ] || [ "${NUIS_FORCE}" == "ON" ]; then
+        nuis comp ${EXP}.${GENTAG}.nu.numu.H2O.root \
+            -f -t ${GEN} \
+            -o ${EXP}.${GENTAG}.nu.numu.H2O.comp.root \
+                -s T2K_CC0pi_XSec_H2O_2DPcos_anu \
+                -s T2K_CC1pip_H2O_XSec_1DEnuDelta_nu \
+                -s T2K_CC1pip_H2O_XSec_1DEnuMB_nu \
+                -s T2K_CC1pip_H2O_XSec_1Dcosmu_nu \
+                -s T2K_CC1pip_H2O_XSec_1Dcosmupi_nu \
+                -s T2K_CC1pip_H2O_XSec_1Dcospi_nu \
+                -s T2K_CC1pip_H2O_XSec_1Dpmu_nu \
+                -s T2K_CC1pip_H2O_XSec_1Dppi_nu \
+            --config UseSVDInverse=1
+    fi
+
+    if [ ! -e ${EXP}.${GENTAG}.nu.numu.O.comp.root ] || [ "${NUIS_FORCE}" == "ON" ]; then
+        nuis comp ${EXP}.${GENTAG}.nu.numu.O.root \
+            -f -t ${GEN} \
+            -o ${EXP}.${GENTAG}.nu.numu.O.comp.root \
+                -s T2K_NuMu_CC0pi_O_XSec_2DPcos \
+            --config UseSVDInverse=1
+    fi
+
+    if [ ! -e ${EXP}.${GENTAG}.nu.numu.OC.comp.root ] || [ "${NUIS_FORCE}" == "ON" ]; then
+        nuis comp ${EXP}.${GENTAG}.nu.numu.O.root ${EXP}.${GENTAG}.nu.numu.C.root \
+            -f -t ${GEN} \
+            -o ${EXP}.${GENTAG}.nu.numu.OC.comp.root \
+                -s T2K_NuMu_CC0pi_OC_XSec_2DPcos_joint \
+            --config UseSVDInverse=1
+    fi
+
+    if [ ! -e ${EXP}.${GENTAG}.nubar.numubar.H2O.comp.root ] || [ "${NUIS_FORCE}" == "ON" ]; then
+        nuis comp ${EXP}.${GENTAG}.nubar.numubar.H2O.root \
+            -f -t ${GEN} \
+            -o ${EXP}.${GENTAG}.nubar.numubar.H2O.comp.root \
+                -s T2K_CC0pi_XSec_H2O_2DPcos_anu \
+            --config UseSVDInverse=1
+    fi
+
+    if [ ! -e ${EXP}.${GENTAG}.nubar.numubar.CH.comp.root ] || [ "${NUIS_FORCE}" == "ON" ]; then
+        nuis comp ${EXP}.${GENTAG}.nubar.numubar.CH.root \
+            -f -t ${GEN} \
+            -o ${EXP}.${GENTAG}.nubar.numubar.CH.comp.root \
+                -s T2K_AntiNuMu_CC0pi_CH_XSec_2DPcos \
+            --config UseSVDInverse=1
+    fi
+
+    if [ ! -e ${EXP}.${GENTAG}.numunumubar.CH.comp.root ] || [ "${NUIS_FORCE}" == "ON" ]; then
+        nuis comp ${EXP}.${GENTAG}.nu.numu.CH.root ${EXP}.${GENTAG}.nubar.numubar.CH.root \
+            -f -t ${GEN} \
+            -o ${EXP}.${GENTAG}.numunumubar.CH.comp.root \
+                -s T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos_joint \
+            --config UseSVDInverse=1
+    fi
+
+done

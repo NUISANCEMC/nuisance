@@ -1,0 +1,51 @@
+#!/bin/bash
+
+set -e
+
+source $(nuis internal valid.funcs)
+nuis_valid_parse_argments ${@}
+
+EXP=BEBC
+
+for SAMP in \
+            BEBC_CCQE_XSec_1DQ2_nu \
+            BEBC_CC1ppip_XSec_1DEnu_nu \
+            BEBC_CC1ppip_XSec_1DQ2_nu \
+            BEBC_CC1npip_XSec_1DEnu_nu \
+            BEBC_CC1npip_XSec_1DQ2_nu \
+            BEBC_CC1pi0_XSec_1DEnu_nu \
+            BEBC_CC1pi0_XSec_1DQ2_nu \
+            ; do
+
+    nuis plot --chi2 -i $(nuis_gen_tag_list ${EXP} nu.numu.D2.comp.root) \
+        -s ${SAMP} --mc-tag ${GENTAGLIST[@]}
+
+done
+
+
+for SAMP in \
+            BEBC_CC1npim_XSec_1DEnu_antinu \
+            BEBC_CC1npim_XSec_1DQ2_antinu \
+            BEBC_CC1ppim_XSec_1DEnu_antinu \
+            BEBC_CC1ppim_XSec_1DQ2_antinu \
+            ; do
+
+    nuis plot --chi2 -i $(nuis_gen_tag_list ${EXP} nubar.numubar.D2.comp.root) \
+        -s ${SAMP} --mc-tag ${GENTAGLIST[@]}
+
+done
+
+nuis plot collate \
+    -s BEBC_CCQE_XSec_1DQ2_nu \
+    -s BEBC_CC1ppip_XSec_1DEnu_nu \
+    -s BEBC_CC1ppip_XSec_1DQ2_nu \
+    -s BEBC_CC1npip_XSec_1DEnu_nu \
+    -s BEBC_CC1npip_XSec_1DQ2_nu \
+    -s BEBC_CC1pi0_XSec_1DEnu_nu \
+    -s BEBC_CC1pi0_XSec_1DQ2_nu \
+    -s BEBC_CC1npim_XSec_1DEnu_antinu \
+    -s BEBC_CC1npim_XSec_1DQ2_antinu \
+    -s BEBC_CC1ppim_XSec_1DEnu_antinu \
+    -s BEBC_CC1ppim_XSec_1DQ2_antinu \
+ -m ${GENTAGLIST[@]} -o BEBC_validations.tex
+

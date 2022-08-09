@@ -1,0 +1,41 @@
+#!/bin/bash
+
+set -e
+
+source $(nuis internal valid.funcs)
+nuis_valid_parse_argments ${@}
+nuis_check_gen_enabled ${GENLIST[@]}
+
+EXP=ArgoNeuT
+
+for (( i=0; i < ${#GENLIST[@]}; ++i )); do
+    GEN=${GENLIST[${i}]}
+    GENTAG=${GENTAGLIST[${i}]}
+
+    if [ ! -e ${EXP}.${GENTAG}.nu.numu.Ar.comp.root ] || [ "${NUIS_FORCE}" == "ON" ]; then
+        nuis comp ${EXP}.${GENTAG}.nu.numu.Ar.root \
+            -f -t ${GEN} \
+            -o ${EXP}.${GENTAG}.nu.numu.Ar.comp.root \
+                -s ArgoNeuT_CCInc_XSec_1Dpmu_nu \
+                -s ArgoNeuT_CCInc_XSec_1Dthetamu_nu \
+                -s ArgoNeuT_CC1Pi_XSec_1Dpmu_nu \
+                -s ArgoNeuT_CC1Pi_XSec_1Dthetamu_nu \
+                -s ArgoNeuT_CC1Pi_XSec_1Dthetapi_nu \
+                -s ArgoNeuT_CC1Pi_XSec_1Dthetamupi_nu \
+            --config UseSVDInverse=1
+    fi
+
+    if [ ! -e ${EXP}.${GENTAG}.nubar.numubar.Ar.comp.root ] || [ "${NUIS_FORCE}" == "ON" ]; then
+        nuis comp ${EXP}.${GENTAG}.nubar.numubar.Ar.root \
+            -f -t ${GEN} \
+            -o ${EXP}.${GENTAG}.nubar.numubar.Ar.comp.root \
+                -s ArgoNeuT_CCInc_XSec_1Dpmu_antinu \
+                -s ArgoNeuT_CCInc_XSec_1Dthetamu_antinu \
+                -s ArgoNeuT_CC1Pi_XSec_1Dpmu_antinu \
+                -s ArgoNeuT_CC1Pi_XSec_1Dthetamu_antinu \
+                -s ArgoNeuT_CC1Pi_XSec_1Dthetapi_antinu \
+                -s ArgoNeuT_CC1Pi_XSec_1Dthetamupi_antinu \
+            --config UseSVDInverse=1
+    fi
+
+done

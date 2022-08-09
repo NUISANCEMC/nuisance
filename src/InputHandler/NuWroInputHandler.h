@@ -36,11 +36,6 @@ class NuWroGeneratorInfo : public GeneratorInfoBase {
 /// Main NuWro Input Reader. Requires events have flux and xsec TH1Ds saved into
 /// them.
 class NuWroInputHandler : public InputHandlerBase {
-#ifdef __USE_NUWRO_SRW_EVENTS__
-  params fNuwroParams;
-  std::vector<BaseFitEvt> rwEvs;
-#endif
-
  public:
   /// Constructor. Can handle single and joint inputs.
   NuWroInputHandler(std::string const& handle, std::string const& rawinputs);
@@ -55,18 +50,6 @@ class NuWroInputHandler : public InputHandlerBase {
   /// Returns filled NUISANCEEvent for given entry.
   FitEvent* GetNuisanceEvent(const UInt_t entry,
                              const bool lightweight = false);
-
-#ifdef __USE_NUWRO_SRW_EVENTS__
-  // Returns filled BaseFitEvent for a given entry;
-  BaseFitEvt* GetBaseEvent(const UInt_t entry) {
-    if (rwEvs.size() <= entry) {
-      NUIS_ABORT("Tried to get cached BaseFitEv[" << entry << "], but only have "
-                                             << rwEvs.size()
-                                             << " in the cache.");
-    }
-    return &rwEvs[entry];
-  }
-#endif
 
   /// Fills fNUISANCEEvent from fNuWroEvent
   void CalcNUISANCEKinematics();

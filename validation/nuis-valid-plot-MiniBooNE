@@ -1,0 +1,120 @@
+#!/bin/bash
+
+set -e
+
+source $(nuis internal valid.funcs)
+nuis_valid_parse_argments ${@}
+
+EXP=MiniBooNE
+
+for SAMP in \
+            MiniBooNE_CCQE_XSec_1DQ2_nu \
+            MiniBooNE_CCQELike_XSec_1DQ2_nu:MiniBooNE_CCQELike_XSec_1DQ2_nu_MC:MiniBooNE_CCQELike_XSec_1DQ2_nu \
+            MiniBooNE_CCQE_XSec_1DEnu_nu \
+            MiniBooNE_CCQELike_XSec_1DEnu_nu \
+            MiniBooNE_CC1pip_XSec_1DEnu_nu \
+            MiniBooNE_CC1pip_XSec_1DQ2_nu \
+            MiniBooNE_CC1pip_XSec_1DTpi_nu \
+            MiniBooNE_CC1pip_XSec_1DTu_nu \
+            MiniBooNE_CC1pi0_XSec_1DEnu_nu \
+            MiniBooNE_CC1pi0_XSec_1DQ2_nu \
+            MiniBooNE_CC1pi0_XSec_1DTu_nu \
+            MiniBooNE_CC1pi0_XSec_1Dcosmu_nu \
+            MiniBooNE_CC1pi0_XSec_1Dcospi0_nu \
+            MiniBooNE_CC1pi0_XSec_1Dppi0_nu \
+            MiniBooNE_NC1pi0_XSec_1Dcospi0_nu \
+            MiniBooNE_NC1pi0_XSec_1Dcospi0_fhc \
+            MiniBooNE_NC1pi0_XSec_1Dppi0_nu \
+            MiniBooNE_NC1pi0_XSec_1Dppi0_fhc \
+            MiniBooNE_NCEL_XSec_Treco_nu \
+            ; do
+
+    nuis plot --chi2 -i $(nuis_gen_tag_list ${EXP} nu.numu.CH2.comp.root) \
+        -s ${SAMP} --mc-tag ${GENTAGLIST[@]}
+done
+
+for SAMP in \
+    MiniBooNE_CC1pip_XSec_2DQ2Enu_nu \
+    MiniBooNE_CC1pip_XSec_2DTuEnu_nu \
+    MiniBooNE_CC1pip_XSec_2DTpiEnu_nu \
+    ; do
+
+    nuis plot --chi2 -i $(nuis_gen_tag_list ${EXP} nu.numu.CH2.comp.root) \
+        -s ${SAMP} --split2D X --mc-tag ${GENTAGLIST[@]}
+done
+
+for SAMP in \
+    MiniBooNE_CC1pip_XSec_2DTpiCospi_nu \
+    MiniBooNE_CC1pip_XSec_2DTuCosmu_nu \
+    ; do
+
+    nuis plot --chi2 -i $(nuis_gen_tag_list ${EXP} nu.numu.CH2.comp.root) \
+        -s ${SAMP} --split2D X --mc-tag ${GENTAGLIST[@]}
+done
+
+nuis plot --chi2 -i $(nuis_gen_tag_list ${EXP} nu.numu.CH2.comp.root) \
+    -s MiniBooNE_CCQELike_XSec_2DTcos_nu --split2D X --bins-nodisplay X 9 --mc-tag ${GENTAGLIST[@]}
+
+nuis plot --chi2 -i $(nuis_gen_tag_list ${EXP} nu.numu.CH2.comp.root) \
+    -s MiniBooNE_CCQE_XSec_2DTcos_nu --split2D X --bins-nodisplay X 9 --mc-tag ${GENTAGLIST[@]}
+
+for SAMP in \
+            MiniBooNE_CCQE_XSec_1DQ2_antinu \
+            MiniBooNE_CCQELike_XSec_1DQ2_antinu \
+            MiniBooNE_NC1pi0_XSec_1Dcospi0_antinu \
+            MiniBooNE_NC1pi0_XSec_1Dcospi0_rhc \
+            MiniBooNE_NC1pi0_XSec_1Dppi0_antinu \
+            MiniBooNE_NC1pi0_XSec_1Dppi0_rhc \
+            ; do
+
+    nuis plot --chi2 -i $(nuis_gen_tag_list ${EXP} nubar.numubar.CH2.comp.root) \
+        -s ${SAMP} --mc-tag ${GENTAGLIST[@]}
+done
+
+nuis plot --chi2 -i $(nuis_gen_tag_list ${EXP} nubar.numubar.CH2.comp.root) \
+    -s MiniBooNE_CCQE_XSec_2DTcos_antinu --split2D Y --mc-tag ${GENTAGLIST[@]}
+
+nuis plot --chi2 -i $(nuis_gen_tag_list ${EXP} nubar.numubar.CH2.comp.root) \
+    -s MiniBooNE_CCQELike_XSec_2DTcos_antinu --split2D Y --mc-tag ${GENTAGLIST[@]}
+
+nuis plot --chi2 -i $(nuis_gen_tag_list ${EXP} nubar.numubar.C.comp.root) \
+    -s MiniBooNE_CCQE_CTarg_XSec_1DQ2_antinu --mc-tag ${GENTAGLIST[@]}
+
+nuis plot collate \
+    -s MiniBooNE_CCQE_XSec_1DQ2_nu \
+    -s MiniBooNE_CCQELike_XSec_1DQ2_nu \
+    -s MiniBooNE_CCQE_XSec_1DEnu_nu \
+    -s MiniBooNE_CCQELike_XSec_1DEnu_nu \
+    -s MiniBooNE_CCQE_XSec_2DTcos_nu \
+    -s MiniBooNE_CCQELike_XSec_2DTcos_nu \
+    -s MiniBooNE_CC1pip_XSec_1DEnu_nu \
+    -s MiniBooNE_CC1pip_XSec_1DQ2_nu \
+    -s MiniBooNE_CC1pip_XSec_1DTpi_nu \
+    -s MiniBooNE_CC1pip_XSec_1DTu_nu \
+    -s MiniBooNE_CC1pip_XSec_2DQ2Enu_nu \
+    -s MiniBooNE_CC1pip_XSec_2DTpiCospi_nu \
+    -s MiniBooNE_CC1pip_XSec_2DTpiEnu_nu \
+    -s MiniBooNE_CC1pip_XSec_2DTuCosmu_nu \
+    -s MiniBooNE_CC1pip_XSec_2DTuEnu_nu \
+    -s MiniBooNE_CC1pi0_XSec_1DEnu_nu \
+    -s MiniBooNE_CC1pi0_XSec_1DQ2_nu \
+    -s MiniBooNE_CC1pi0_XSec_1DTu_nu \
+    -s MiniBooNE_CC1pi0_XSec_1Dcosmu_nu \
+    -s MiniBooNE_CC1pi0_XSec_1Dcospi0_nu \
+    -s MiniBooNE_CC1pi0_XSec_1Dppi0_nu \
+    -s MiniBooNE_NC1pi0_XSec_1Dcospi0_nu \
+    -s MiniBooNE_NC1pi0_XSec_1Dcospi0_fhc \
+    -s MiniBooNE_NC1pi0_XSec_1Dppi0_nu \
+    -s MiniBooNE_NC1pi0_XSec_1Dppi0_fhc \
+    -s MiniBooNE_NCEL_XSec_Treco_nu \
+    -s MiniBooNE_CCQE_XSec_1DQ2_antinu \
+    -s MiniBooNE_CCQELike_XSec_1DQ2_antinu \
+    -s MiniBooNE_CCQE_XSec_2DTcos_antinu \
+    -s MiniBooNE_CCQELike_XSec_2DTcos_antinu \
+    -s MiniBooNE_NC1pi0_XSec_1Dcospi0_antinu \
+    -s MiniBooNE_NC1pi0_XSec_1Dcospi0_rhc \
+    -s MiniBooNE_NC1pi0_XSec_1Dppi0_antinu \
+    -s MiniBooNE_NC1pi0_XSec_1Dppi0_rhc \
+    -s MiniBooNE_CCQE_CTarg_XSec_1DQ2_antinu \
+ -m ${GENTAGLIST[@]} -o MiniBooNE_validations.tex
+

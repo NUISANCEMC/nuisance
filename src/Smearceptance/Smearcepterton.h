@@ -27,8 +27,6 @@
 #include <map>
 #include <string>
 
-
-#ifdef __USE_DYNSAMPLES__
 /// Expect each .so containing smearceptors to supply 4 c-style methods.
 /// int DSF_NSmearceptors();
 /// char const * DSF_GetSmearceptorName(int);
@@ -79,8 +77,6 @@ class DynamicSmearceptorFactory {
 
   ~DynamicSmearceptorFactory();
 };
-
-#endif
 
 /// Singleton handling the loading and configuring of known smearcepters.
 class Smearcepterton {

@@ -1,0 +1,22 @@
+#!/bin/bash
+
+set -e
+
+source $(nuis internal valid.funcs)
+nuis_valid_parse_argments ${@}
+
+EXP=K2K
+
+for SAMP in \
+            K2K_NC1pi0_Evt_1Dppi0_nu \
+            ; do
+
+    nuis plot --chi2 -i $(nuis_gen_tag_list ${EXP} nu.numu.H2O.comp.root) \
+        -s ${SAMP} --mc-tag ${GENTAGLIST[@]}
+
+done
+
+nuis plot collate \
+    -s K2K_NC1pi0_Evt_1Dppi0_nu \
+ -m ${GENTAGLIST[@]} -o K2K_validations.tex
+

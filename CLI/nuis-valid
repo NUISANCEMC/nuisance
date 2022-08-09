@@ -1,0 +1,108 @@
+#!/bin/bash
+COMMAND_FQP=${0}
+COMMAND=$(basename ${COMMAND_FQP})
+
+if [ ! -z ${NUIS_CLID_DEBUG} ]; then
+  echo "[CLI DEBUG](BrCr: ${NUIS_BREADCRUMBS}): ${COMMAND} Arguments(${#}):" "${@}"
+fi
+
+function nuis_valid_help {
+  echo "Run like: ${NUIS_BREADCRUMBS} [list-experiments|help|gen|comp|plot] <experiment> <GENERATOR1[:TAG]> [<GENERATOR2:TAG> ...] [GENERATOR ARGS]"
+  echo -e "\tSub commands:"
+  echo -e "\t  list-experiments      : Print the list of validatable experiments."
+  echo -e "\t  gen                   : Only generate the events for the relevant generators."
+  echo -e "\t  comp                  : Only make sample comparisons. Assumes events have been generated."
+  echo -e "\t  plot                  : Only make figures for the relevant samples. Assumes sample comparisons have been made."
+  echo -e "\t  help                  : Print this message."
+  echo -e ""
+  echo -e "\tIf no sub command is given, then gen, comp, and plot will be run sequentially."
+  echo -e ""
+  echo -e "\tTrailing arguments are passed on to the generation stage to facilitate "
+  echo -e "\t model customisation where allowed on the command line. It is not"
+  echo -e "\t recommended to use this feature in conjunction with multiple generator tags."
+}
+
+SUBCOMMAND=${1}
+shift
+
+DO_GEN=TRUE
+DO_COMP=TRUE
+DO_PLOT=TRUE
+
+case ${SUBCOMMAND} in
+  gen)
+    EXPERIMENT=${1}
+    shift
+    DO_COMP=FALSE
+    DO_PLOT=FALSE
+    ;;
+
+  comp)
+    EXPERIMENT=${1}
+    shift
+    DO_GEN=FALSE
+    DO_PLOT=FALSE
+    ;;
+
+  plot)
+    EXPERIMENT=${1}
+    shift
+    DO_GEN=FALSE
+    DO_COMP=FALSE
+    ;;
+
+  list-experiments)
+    echo -e "Experiments Available:"
+    echo -e "    ANL"
+    echo -e "    ArgoNeuT"
+    echo -e "    BNL"
+    echo -e "    T2K"
+    exit 0
+    ;;
+
+  help)
+    nuis_valid_help
+    exit 0
+    ;;
+
+  *)
+    EXPERIMENT=${SUBCOMMAND}
+    ;;
+esac
+
+if [ -z "${EXPERIMENT}" ]; then
+    echo "[ERROR]: No experiment passed."
+    nuis_valid_help
+    exit 1
+fi
+
+if [ "${#}" -lt 1 ] || [ "${1::1}" == "-" ] ; then
+    echo "[ERROR]: No generators passed."
+    nuis_valid_help
+    exit 1
+fi
+
+
+if [ "${DO_GEN}" == "TRUE" ]; then
+  if ! [ -e ${NUISANCE}/var/validation/nuis-valid-gen-${EXPERIMENT} ]; then
+    echo "[ERROR]: Experiment: \"${EXPERIMENT}\" does not have a nuis valid gen script."
+    exit 1
+  fi
+  ${NUISANCE}/var/validation/nuis-valid-gen-${EXPERIMENT} "${@}"
+fi
+
+if [ "${DO_COMP}" == "TRUE" ]; then
+  if ! [ -e ${NUISANCE}/var/validation/nuis-valid-comp-${EXPERIMENT} ]; then
+    echo "[ERROR]: Experiment: \"${EXPERIMENT}\" does not have a nuis valid comp script."
+    exit 1
+  fi
+  ${NUISANCE}/var/validation/nuis-valid-comp-${EXPERIMENT} "${@}"
+fi
+
+if [ "${DO_PLOT}" == "TRUE" ]; then
+  if ! [ -e ${NUISANCE}/var/validation/nuis-valid-plot-${EXPERIMENT} ]; then
+    echo "[ERROR]: Experiment: \"${EXPERIMENT}\" does not have a nuis valid plot script."
+    exit 1
+  fi
+  ${NUISANCE}/var/validation/nuis-valid-plot-${EXPERIMENT} "${@}"
+fi

@@ -1,0 +1,166 @@
+#!/bin/bash
+
+set -e
+
+source $(nuis internal valid.funcs)
+nuis_valid_parse_argments ${@}
+
+nuis plot --chi2 -i $(nuis_gen_tag_list T2K_ND nu.numu.CH.comp.root) \
+    -s T2K_CC0pi_XSec_2DPcos_nu_I:T2K_CC0pi_XSec_2DPcos_nu_I_MC:T2K_CC0pi_XSec_2DPcos_nu_I_data_1D \
+    --slice-list $(awk 'BEGIN{ for (i=0;i<8;i++) printf "T2K_CC0pi_XSec_2DPcos_nu_I_MC_Slice%d:T2K_CC0pi_XSec_2DPcos_nu_I_data_Slice%d ", i, i }') \
+    --bins-nodisplay X 1 --variable-yscale --mc-tag ${GENTAGLIST[@]}
+
+nuis plot --chi2 -i $(nuis_gen_tag_list T2K_ND nu.numu.CH.comp.root)\
+    -s T2K_CC0pi_XSec_2DPcos_nu_II \
+    --split2D Y --bins-nodisplay X 2  \
+    --zaxis-title 'd#sigma/dp_{#mu}cos(#theta_{#mu}) cm^{2} c/GeV' \
+    --mc-tag ${GENTAGLIST[@]}
+
+nuis plot --chi2 -i $(nuis_gen_tag_list T2K_ND nu.numu.CH.comp.root) \
+    -s T2K_CCinc_XSec_2DPcos_nu_nonuniform \
+    --slice-list $(awk 'BEGIN{ for (i=0;i<10;i++) printf "T2K_CCinc_XSec_2DPcos_nu_nonuniform_Slice%d_MC:T2K_CCinc_XSec_2DPcos_nu_nonuniform_Slice%d_data ", i, i }') \
+    --bins-nodisplay X 0:1 --variable-yscale --mc-tag ${GENTAGLIST[@]}
+
+nuis plot --chi2 -i $(nuis_gen_tag_list T2K_ND nu.numu.CH.comp.root) \
+    -s T2K_NuMu_CC0pi_CH_XSec_2DPcos \
+    --slice-list $(awk 'BEGIN{ for (i=0;i<8;i++) printf "T2K_NuMu_CC0pi_CH_XSec_2DPcos_MC_Slice%d:T2K_NuMu_CC0pi_CH_XSec_2DPcos_data_Slice%d ", i, i }') \
+    --bins-nodisplay X 0:1 --variable-yscale --mc-tag ${GENTAGLIST[@]}
+
+nuis plot --chi2 -i $(nuis_gen_tag_list T2K_ND nu.numu.CH.comp.root) \
+    -s T2K_CC1pip_CH_XSec_1Dppi_nu \
+    --bins-nodisplay X 1 --variable-yscale --mc-tag ${GENTAGLIST[@]}
+
+nuis plot --chi2 -i $(nuis_gen_tag_list T2K_ND nu.numu.CH.comp.root) \
+    -s T2K_CC1pip_CH_XSec_1Dthpi_nu --mc-tag ${GENTAGLIST[@]}
+
+nuis plot --chi2 -i $(nuis_gen_tag_list T2K_ND nu.numu.CH.comp.root) \
+    -s T2K_CC1pip_CH_XSec_1Dthmupi_nu --mc-tag ${GENTAGLIST[@]}
+
+nuis plot --chi2 -i $(nuis_gen_tag_list T2K_ND nu.numu.CH.comp.root) \
+    -s T2K_CC1pip_CH_XSec_1DQ2_nu --mc-tag ${GENTAGLIST[@]}
+
+nuis plot --chi2 -i $(nuis_gen_tag_list T2K_ND nu.numu.CH.comp.root) \
+    -s T2K_CC1pip_CH_XSec_1DAdlerPhi_nu --mc-tag ${GENTAGLIST[@]}
+
+nuis plot --chi2 -i $(nuis_gen_tag_list T2K_ND nu.numu.CH.comp.root) \
+    -s T2K_CC1pip_CH_XSec_1DCosThAdler_nu --mc-tag ${GENTAGLIST[@]}
+
+nuis plot --chi2 -i $(nuis_gen_tag_list T2K_ND nu.numu.CH.comp.root) \
+    -s T2K_CC0pinp_STV_XSec_1Ddpt_nu --mc-tag ${GENTAGLIST[@]}
+
+nuis plot --chi2 -i $(nuis_gen_tag_list T2K_ND nu.numu.CH.comp.root) \
+    -s T2K_CC0pinp_STV_XSec_1Ddphit_nu --mc-tag ${GENTAGLIST[@]}
+
+nuis plot --chi2 -i $(nuis_gen_tag_list T2K_ND nu.numu.CH.comp.root) \
+    -s T2K_CC0pinp_STV_XSec_1Ddat_nu --mc-tag ${GENTAGLIST[@]}
+
+#####
+
+nuis plot --chi2 -i $(nuis_gen_tag_list T2K_ND nu.numu.C.comp.root) \
+    -s T2K_NuMu_CC0pi_C_XSec_2DPcos \
+    --slice-list $(awk 'BEGIN{ for (i=0;i<5;i++) printf "T2K_NuMu_CC0pi_C_XSec_2DPcos_MC_Slice%d:T2K_NuMu_CC0pi_C_XSec_2DPcos_data_Slice%d ", i, i }') \
+    --bins-nodisplay X 0:1 --variable-yscale --mc-tag ${GENTAGLIST[@]}
+
+nuis plot --chi2 -i $(nuis_gen_tag_list T2K_ND nu.numu.C.comp.root) \
+    -s T2K_CCCOH_C12_XSec_1DEnu_nu --mc-tag ${GENTAGLIST[@]}
+#####
+
+nuis plot --chi2 -i $(nuis_gen_tag_list T2K_ND nu.numu.H2O.comp.root) \
+     -s T2K_CC1pip_H2O_XSec_1DEnuDelta_nu --mc-tag ${GENTAGLIST[@]}
+
+nuis plot --chi2 -i $(nuis_gen_tag_list T2K_ND nu.numu.H2O.comp.root) \
+     -s T2K_CC1pip_H2O_XSec_1DEnuMB_nu --mc-tag ${GENTAGLIST[@]}
+
+nuis plot --chi2 -i $(nuis_gen_tag_list T2K_ND nu.numu.H2O.comp.root) \
+     -s T2K_CC1pip_H2O_XSec_1Dcosmu_nu --mc-tag ${GENTAGLIST[@]}
+
+nuis plot --chi2 -i $(nuis_gen_tag_list T2K_ND nu.numu.H2O.comp.root) \
+     -s T2K_CC1pip_H2O_XSec_1Dcosmupi_nu --mc-tag ${GENTAGLIST[@]}
+
+nuis plot --chi2 -i $(nuis_gen_tag_list T2K_ND nu.numu.H2O.comp.root) \
+     -s T2K_CC1pip_H2O_XSec_1Dcospi_nu --mc-tag ${GENTAGLIST[@]}
+
+nuis plot --chi2 -i $(nuis_gen_tag_list T2K_ND nu.numu.H2O.comp.root) \
+     -s T2K_CC1pip_H2O_XSec_1Dpmu_nu --bins-nodisplay X 1 --variable-yscale\
+     --mc-tag ${GENTAGLIST[@]}
+
+nuis plot --chi2 -i $(nuis_gen_tag_list T2K_ND nu.numu.H2O.comp.root) \
+     -s T2K_CC1pip_H2O_XSec_1Dppi_nu --bins-nodisplay X 1 --variable-yscale --mc-tag ${GENTAGLIST[@]}
+#####
+
+nuis plot --chi2 -i $(nuis_gen_tag_list T2K_ND nu.numu.O.comp.root) \
+    -s T2K_NuMu_CC0pi_O_XSec_2DPcos \
+    --slice-list $(awk 'BEGIN{ for (i=0;i<5;i++) printf "T2K_NuMu_CC0pi_O_XSec_2DPcos_MC_Slice%d:T2K_NuMu_CC0pi_O_XSec_2DPcos_data_Slice%d ", i, i }') \
+    --bins-nodisplay X 0:1 --variable-yscale --mc-tag ${GENTAGLIST[@]}
+#####
+
+nuis plot --chi2 -i $(nuis_gen_tag_list T2K_ND nu.numu.OC.comp.root) \
+    -s T2K_NuMu_CC0pi_OC_XSec_2DPcos_joint \
+    --slice-list $(awk 'BEGIN{ for (i=0;i<5;i++) printf "T2K_NuMu_CC0pi_O_XSec_2DPcos_MC_Slice%d:T2K_NuMu_CC0pi_O_XSec_2DPcos_data_Slice%d ", i, i }') \
+        $(awk 'BEGIN{ for (i=0;i<5;i++) printf "T2K_NuMu_CC0pi_C_XSec_2DPcos_MC_Slice%d:T2K_NuMu_CC0pi_C_XSec_2DPcos_data_Slice%d ", i, i }') \
+    --bins-nodisplay X 0:1 --variable-yscale --mc-tag ${GENTAGLIST[@]}
+#####
+
+nuis plot --chi2 -i $(nuis_gen_tag_list T2K_ND nubar.numubar.H2O.comp.root) \
+    -s T2K_CC0pi_XSec_H2O_2DPcos_anu \
+    --slice-list $(awk 'BEGIN{ for (i=0;i<6;i++) printf "T2K_CC0pi_XSec_H2O_2DPcos_anu_MC_Slice%d:T2K_CC0pi_XSec_H2O_2DPcos_anu_data_Slice%d ", i, i }') \
+    --bins-nodisplay X 0:1 --variable-yscale --mc-tag ${GENTAGLIST[@]}
+#####
+
+nuis plot --chi2 -i $(nuis_gen_tag_list T2K_ND nubar.numubar.CH.comp.root) \
+    -s T2K_AntiNuMu_CC0pi_CH_XSec_2DPcos \
+    --slice-list $(awk 'BEGIN{ for (i=0;i<7;i++) printf "T2K_AntiNuMu_CC0pi_CH_XSec_2DPcos_MC_Slice%d:T2K_AntiNuMu_CC0pi_CH_XSec_2DPcos_data_Slice%d ", i, i }') \
+    --bins-nodisplay X 0:1 --variable-yscale --mc-tag ${GENTAGLIST[@]}
+#####
+
+nuis plot --chi2 -i $(nuis_gen_tag_list T2K_ND numunumubar.CH.comp.root) \
+    -s T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos_joint \
+    --slice-list $(awk 'BEGIN{ for (i=0;i<8;i++) printf "T2K_NuMu_CC0pi_CH_XSec_2DPcos_MC_Slice%d:T2K_NuMu_CC0pi_CH_XSec_2DPcos_data_Slice%d ", i, i }') \
+        $(awk 'BEGIN{ for (i=0;i<7;i++) printf "T2K_AntiNuMu_CC0pi_CH_XSec_2DPcos_MC_Slice%d:T2K_AntiNuMu_CC0pi_CH_XSec_2DPcos_data_Slice%d ", i, i }') \
+    --bins-nodisplay X 0:1 --variable-yscale --mc-tag ${GENTAGLIST[@]}
+
+# T2K_nueCCinc_XSec_1Dpe_FHC
+# T2K_nueCCinc_XSec_1Dpe_RHC
+# T2K_nuebarCCinc_XSec_1Dpe_RHC
+# T2K_nueCCinc_XSec_1Dthe_FHC
+# T2K_nueCCinc_XSec_1Dthe_RHC
+# T2K_nuebarCCinc_XSec_1Dthe_RHC
+# T2K_nueCCinc_XSec_1Dpe_joint
+# T2K_nueCCinc_XSec_1Dthe_joint
+# T2K_nueCCinc_XSec_joint
+
+nuis plot collate \
+            -s T2K_CC0pi_XSec_2DPcos_nu_I \
+            -s T2K_CC0pi_XSec_2DPcos_nu_II \
+            -s T2K_CCinc_XSec_2DPcos_nu_nonuniform \
+            -s T2K_NuMu_CC0pi_CH_XSec_2DPcos \
+            -s T2K_CC1pip_CH_XSec_1Dppi_nu \
+            -s T2K_CC1pip_CH_XSec_1Dthpi_nu \
+            -s T2K_CC1pip_CH_XSec_1Dthmupi_nu \
+            -s T2K_CC1pip_CH_XSec_1DQ2_nu \
+            -s T2K_CC1pip_CH_XSec_1DAdlerPhi_nu \
+            -s T2K_CC1pip_CH_XSec_1DCosThAdler_nu \
+            -s T2K_CC0pinp_STV_XSec_1Ddpt_nu \
+            -s T2K_CC0pinp_STV_XSec_1Ddphit_nu \
+            -s T2K_CC0pinp_STV_XSec_1Ddat_nu \
+            -s T2K_NuMu_CC0pi_C_XSec_2DPcos \
+            -s T2K_CCCOH_C12_XSec_1DEnu_nu \
+            -s T2K_CC0pi_XSec_H2O_2DPcos_anu \
+            -s T2K_CC1pip_H2O_XSec_1DEnuDelta_nu \
+            -s T2K_CC1pip_H2O_XSec_1DEnuMB_nu \
+            -s T2K_CC1pip_H2O_XSec_1Dcosmu_nu \
+            -s T2K_CC1pip_H2O_XSec_1Dcosmupi_nu \
+            -s T2K_CC1pip_H2O_XSec_1Dcospi_nu \
+            -s T2K_CC1pip_H2O_XSec_1Dpmu_nu \
+            -s T2K_CC1pip_H2O_XSec_1Dppi_nu \
+            -s T2K_NuMu_CC0pi_O_XSec_2DPcos \
+            -s T2K_NuMu_CC0pi_OC_XSec_2DPcos_joint \
+            -s T2K_CC0pi_XSec_H2O_2DPcos_anu \
+            -s T2K_AntiNuMu_CC0pi_CH_XSec_2DPcos \
+            -s T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos_joint \
+ -m ${GENTAGLIST[@]} -o T2K_validations.tex
+
+if hash pdflatex &> /dev/null; then 
+    pdflatex T2K_validations.tex
+    pdflatex T2K_validations.tex
+fi

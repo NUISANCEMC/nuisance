@@ -1,11 +1,11 @@
 SET(CoreDirs
+	Reweight
 	Config
 	FCN
 	FitBase
 	InputHandler
 	Logger
 	MCStudies
-	Reweight
 	Routines
 	Smearceptance
 	Splines
@@ -45,6 +45,7 @@ SET(Experiment_Defines)
 foreach(EXP ${ExperimentDirs})
 	if(NOT DEFINED ${EXP}_ENABLED)
 		set(${EXP}_ENABLED ${EXPERIMENTS_ENABLED})
+		set(${EXP}_ENABLED ${EXPERIMENTS_ENABLED} PARENT_SCOPE)
 	endif()
 
 	if(${EXP}_ENABLED OR EXPERIMENTS_ENABLED)

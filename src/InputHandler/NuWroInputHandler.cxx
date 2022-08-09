@@ -97,7 +97,7 @@ NuWroInputHandler::NuWroInputHandler(std::string const &handle,
   fNuWroTree->GetEntry(0);
 
   fNUISANCEEvent = new FitEvent();
-  fNUISANCEEvent->fType = kNUWRO;
+  fNUISANCEEvent->fType = kNuWro;
   fNUISANCEEvent->fNuwroEvent = fNuWroEvent;
 
   fNUISANCEEvent->HardReset();
@@ -153,29 +153,7 @@ FitEvent *NuWroInputHandler::GetNuisanceEvent(const UInt_t ent,
 #endif
   // Setup Input scaling for joint inputs
   fNUISANCEEvent->InputWeight = GetInputWeight(entry);
-
-#ifdef __USE_NUWRO_SRW_EVENTS__
-  if (!rwEvs.size()) {
-    fNuwroParams = fNuWroEvent->par;
-  }
-
-  if (entry >= rwEvs.size()) {
-    rwEvs.push_back(BaseFitEvt());
-    rwEvs.back().fType = kNUWRO;
-    rwEvs.back().Mode = fNUISANCEEvent->Mode;
-    rwEvs.back().fNuwroSRWEvent = SRW::SRWEvent(*fNuWroEvent);
-    rwEvs.back().fNuwroEvent = NULL;
-    rwEvs.back().fNuwroParams = &fNuwroParams;
-    rwEvs.back().probe_E = rwEvs.back().fNuwroSRWEvent.NeutrinoEnergy;
-    rwEvs.back().probe_pdg = rwEvs.back().fNuwroSRWEvent.NeutrinoPDG;
-  }
-
-  fNUISANCEEvent->fNuwroSRWEvent = SRW::SRWEvent(*fNuWroEvent);
-  fNUISANCEEvent->fNuwroParams = &fNuwroParams;
-  fNUISANCEEvent->probe_E = fNUISANCEEvent->fNuwroSRWEvent.NeutrinoEnergy;
-  fNUISANCEEvent->probe_pdg = fNUISANCEEvent->fNuwroSRWEvent.NeutrinoPDG;
-#endif
-
+  
   return fNUISANCEEvent;
 }
 
@@ -306,7 +284,7 @@ int NuWroInputHandler::ConvertNuwroMode(event *e) {
   } 
 
   // If we got here, something is wrong, see what happened...
-  NUIS_ERR(WRN, "Unable to interpret NUWRO event, dumping info...");
+  NUIS_ERR(WRN, "Unable to interpret NuWro event, dumping info...");
   Print();
 
   return 9999;
@@ -342,7 +320,7 @@ void NuWroInputHandler::CalcNUISANCEKinematics() {
   UInt_t kmax = evt->kMaxParticles;
 
   if (npart > kmax) {
-    NUIS_ERR(WRN, "NUWRO has too many particles. Expanding stack.");
+    NUIS_ERR(WRN, "NuWro has too many particles. Expanding stack.");
     fNUISANCEEvent->ExpandParticleStack(npart);
   }
 

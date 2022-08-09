@@ -1,0 +1,92 @@
+#!/bin/bash
+
+COMMAND_FQP=${0}
+COMMAND=$(basename ${COMMAND_FQP})
+NUIS_BREADCRUMBS=${COMMAND}
+
+if [ ! -z ${NUIS_CLID_DEBUG} ]; then
+echo "[CLI DEBUG](BrCr: ${NUIS_BREADCRUMBS}): ${COMMAND} Arguments(${#}):" "${@}"
+fi
+
+if [ -z ${NUISANCE} ]; then
+  echo "[ERROR]: We need to be in a NUISANCE environment (\$NUISANCE should be set)."
+  exit 1
+fi
+
+function nuis_help {
+  echo -e "\t ${NUIS_BREADCRUMBS} [global options] <verb> <verb-specific options>"
+  echo -e "\tImplemented verbs:"
+  echo -e "\t  gen         : Event generation helper"
+  echo -e "\t  prep        : Ensure input files contain neccessary information"
+  echo -e "\t  flux        : Experimental flux descriptor"
+  echo -e "\t  comp        : Make generator--data comparisons"
+  echo -e "\t  config      : Check NUISANCE build options"
+  echo -e "\t  plot        : Plot the output of nuis comp"
+  echo -e "\tGlobal options:"
+  echo -e "\t  --debug     : Enable debugging options where implemented"  
+  echo -e "\t  --force     : Force process where implemented, usually ignores errors related to extant output files."  
+  echo -e "\t  --quiet     : Tries to produce less output to the terminal"  
+  echo -e "Try ${NUIS_BREADCRUMBS} <verb> help for further help for a specific verb."
+}
+
+if [ "${1}" == "help" ]; then
+  nuis_help
+  exit 0
+fi
+
+NUIS_DEBUG=OFF
+NUIS_QUIET=OFF
+NUIS_FORCE=OFF
+
+# ## Take global options
+# while [[ ${#} -gt 0 ]]; do
+
+#   KEYARG=${1}
+#   echo "KEYARG: ${KEYARG}"
+
+#   if [ "${KEYARG::1}" != "-" ]; then
+#     echo "break"
+#     break;
+#   fi
+
+#   case $key in
+
+#     --debug)
+#       NUIS_DEBUG=ON
+#     ;;
+
+#     --quiet)
+#       NUIS_QUIET=ON
+#     ;;
+
+#     --force)
+#       NUIS_FORCE=ON
+#     ;;
+
+#   esac
+
+#   shift
+# done
+
+# export NUIS_DEBUG
+# export NUIS_QUIET
+# export NUIS_FORCE
+
+# # echo "NUIS_QUIET: ${NUIS_QUIET}"
+# # exit 0
+
+if [ "${#}" -lt 1 ]; then
+  echo -e "[ERROR]: Expected to be passed a sub-command verb like:"
+  nuis_help
+  exit 1
+fi
+
+VERB=${1}
+shift
+
+if ! hash ${COMMAND}-${VERB}; then
+  echo "[ERROR]: Unknown verb: ${VERB}, could not find `${COMMAND}-${VERB}`."
+  exit 1
+fi
+
+NUIS_BREADCRUMBS="${NUIS_BREADCRUMBS} ${VERB}" ${COMMAND}-${VERB} "${@}"

@@ -24,7 +24,7 @@ K2K_NC1pi0_Evt_1Dppi0_nu::K2K_NC1pi0_Evt_1Dppi0_nu(nuiskey samplekey){
   
 // Sample overview ---------------------------------------------------
   std::string descrip = "K2K_NC1pi0_Evt_1Dppi0_nu sample. \n" \
-                        "Target: D2 \n" \
+                        "Target: H20 \n" \
                         "Flux:  \n" \
                         "Signal:  \n";
 

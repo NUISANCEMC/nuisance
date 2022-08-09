@@ -56,7 +56,7 @@
 #include "ANL_CC2pi_1pip1pi0_XSec_1DEnu_nu.h"
 #endif
 
-#ifdef ArgoNeut_ENABLED
+#ifdef ArgoNeuT_ENABLED
 // ArgoNeuT CC1Pi
 #include "ArgoNeuT_CC1Pi_XSec_1Dpmu_antinu.h"
 #include "ArgoNeuT_CC1Pi_XSec_1Dpmu_nu.h"
@@ -385,8 +385,6 @@
 #include "NuisConfig.h"
 #include "NuisKey.h"
 
-#ifdef __USE_DYNSAMPLES__
-
 #include "TRegexp.h"
 
 #include <dirent.h>
@@ -627,8 +625,6 @@ MeasurementBase *DynamicSampleFactory::CreateSample(nuiskey &samplekey) {
 
 DynamicSampleFactory::~DynamicSampleFactory() { Manifests.clear(); }
 
-#endif
-
 //! Functions to make it easier for samples to be created and handled.
 namespace SampleUtils {
 
@@ -646,7 +642,6 @@ MeasurementBase *CreateSample(std::string name, std::string file,
 }
 
 MeasurementBase *CreateSample(nuiskey samplekey) {
-#ifdef __USE_DYNSAMPLES__
   if (DynamicSampleFactory::Get().HasSample(samplekey)) {
     NUIS_LOG(SAM, "Instantiating dynamic sample...");
 
@@ -657,7 +652,6 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
     }
     NUIS_ABORT("Failed to instantiate dynamic sample.");
   }
-#endif
 
   FitWeight *rw = FitBase::GetRW();
   std::string name = samplekey.GetS("name");
@@ -805,7 +799,7 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
     */
   } else
 #endif
-#ifdef ArgoNeut_ENABLED
+#ifdef ArgoNeuT_ENABLED
     if (!name.compare("ArgoNeuT_CCInc_XSec_1Dpmu_antinu")) {
       return (new ArgoNeuT_CCInc_XSec_1Dpmu_antinu(samplekey));
     } else if (!name.compare("ArgoNeuT_CCInc_XSec_1Dpmu_nu")) {

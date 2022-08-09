@@ -1,0 +1,151 @@
+#!/bin/bash
+
+set -e
+
+source $(nuis internal valid.funcs)
+nuis_valid_parse_argments ${@}
+
+EXP=ANL
+
+for SAMP in ANL_CCQE_XSec_1DEnu_nu \
+            ANL_CCQE_XSec_1DEnu_nu_PRD26 \
+            ANL_CCQE_XSec_1DEnu_nu_PRL31 \
+            ANL_CCQE_XSec_1DEnu_nu_PRD16 \
+            ANL_CCQE_Evt_1DQ2_nu \
+            ANL_CCQE_Evt_1DQ2_nu_PRL31 \
+            ANL_CCQE_Evt_1DQ2_nu_PRD26 \
+            ANL_CCQE_Evt_1DQ2_nu_PRD16 \
+            ANL_CC1ppip_XSec_1DEnu_nu \
+            ANL_CC1ppip_XSec_1DEnu_nu_W14Cut \
+            ANL_CC1ppip_XSec_1DEnu_nu_Uncorr \
+            ANL_CC1ppip_XSec_1DEnu_nu_W14Cut_Uncorr \
+            ANL_CC1ppip_XSec_1DEnu_nu_W16Cut_Uncorr \
+            ANL_CC1ppip_XSec_1DQ2_nu \
+            ANL_CC1ppip_Evt_1DQ2_nu \
+            ANL_CC1ppip_Evt_1DQ2_nu_W14Cut \
+            ANL_CC1ppip_Evt_1Dppi_nu \
+            ANL_CC1ppip_Evt_1Dthpr_nu \
+            ANL_CC1ppip_Evt_1DcosmuStar_nu \
+            ANL_CC1ppip_Evt_1DcosthAdler_nu \
+            ANL_CC1ppip_Evt_1Dphi_nu \
+            ANL_CC1ppip_Evt_1DWNpi_nu \
+            ANL_CC1ppip_Evt_1DWNmu_nu \
+            ANL_CC1ppip_Evt_1DWmupi_nu \
+            ANL_CC1npip_XSec_1DEnu_nu \
+            ANL_CC1npip_XSec_1DEnu_nu_W14Cut \
+            ANL_CC1npip_XSec_1DEnu_nu_Uncorr \
+            ANL_CC1npip_XSec_1DEnu_nu_W14Cut_Uncorr \
+            ANL_CC1npip_XSec_1DEnu_nu_W16Cut_Uncorr \
+            ANL_CC1npip_Evt_1DQ2_nu \
+            ANL_CC1npip_Evt_1DQ2_nu_W14Cut \
+            ANL_CC1npip_Evt_1Dppi_nu \
+            ANL_CC1npip_Evt_1DcosmuStar_nu \
+            ANL_CC1npip_Evt_1DWNpi_nu \
+            ANL_CC1npip_Evt_1DWNmu_nu \
+            ANL_CC1npip_Evt_1DWmupi_nu \
+            ANL_CC1pi0_XSec_1DEnu_nu \
+            ANL_CC1pi0_XSec_1DEnu_nu_W14Cut \
+            ANL_CC1pi0_XSec_1DEnu_nu_Uncorr \
+            ANL_CC1pi0_XSec_1DEnu_nu_W14Cut_Uncorr \
+            ANL_CC1pi0_XSec_1DEnu_nu_W16Cut_Uncorr \
+            ANL_CC1pi0_Evt_1DQ2_nu \
+            ANL_CC1pi0_Evt_1DQ2_nu_W14Cut \
+            ANL_CC1pi0_Evt_1DcosmuStar_nu \
+            ANL_CC1pi0_Evt_1DWNpi_nu \
+            ANL_CC1pi0_Evt_1DWNmu_nu \
+            ANL_CC1pi0_Evt_1DWmupi_nu \
+            ANL_NC1npip_Evt_1Dppi_nu \
+            ANL_NC1ppim_XSec_1DEnu_nu \
+            ANL_NC1ppim_Evt_1DcosmuStar_nu \
+            ANL_CC2pi_1pim1pip_XSec_1DEnu_nu \
+            ANL_CC2pi_1pim1pip_Evt_1Dpmu_nu \
+            ANL_CC2pi_1pim1pip_Evt_1Dppip_nu \
+            ANL_CC2pi_1pim1pip_Evt_1Dppim_nu \
+            ANL_CC2pi_1pim1pip_Evt_1Dpprot_nu \
+            ANL_CC2pi_1pip1pip_XSec_1DEnu_nu \
+            ANL_CC2pi_1pip1pip_Evt_1Dpmu_nu \
+            ANL_CC2pi_1pip1pip_Evt_1Dpneut_nu \
+            ANL_CC2pi_1pip1pip_Evt_1DppipHigh_nu \
+            ANL_CC2pi_1pip1pip_Evt_1DppipLow_nu \
+            ANL_CC2pi_1pip1pi0_XSec_1DEnu_nu \
+            ANL_CC2pi_1pip1pi0_Evt_1Dpmu_nu \
+            ANL_CC2pi_1pip1pi0_Evt_1Dppip_nu \
+            ANL_CC2pi_1pip1pi0_Evt_1Dppi0_nu \
+            ANL_CC2pi_1pip1pi0_Evt_1Dpprot_nu \
+            ; do
+
+    nuis plot --chi2 -i $(nuis_gen_tag_list ${EXP} nu.numu.D2.comp.root) \
+        -s ${SAMP} --mc-tag ${GENTAGLIST[@]}
+
+done
+
+nuis plot collate \
+    -s ANL_CCQE_XSec_1DEnu_nu \
+    -s ANL_CCQE_XSec_1DEnu_nu_PRD26 \
+    -s ANL_CCQE_XSec_1DEnu_nu_PRL31 \
+    -s ANL_CCQE_XSec_1DEnu_nu_PRD16 \
+    -s ANL_CCQE_Evt_1DQ2_nu \
+    -s ANL_CCQE_Evt_1DQ2_nu_PRL31 \
+    -s ANL_CCQE_Evt_1DQ2_nu_PRD26 \
+    -s ANL_CCQE_Evt_1DQ2_nu_PRD16 \
+    -s ANL_CC2pi_1pim1pip_XSec_1DEnu_nu \
+    -s ANL_CC2pi_1pim1pip_Evt_1Dpmu_nu \
+    -s ANL_CC2pi_1pim1pip_Evt_1Dppip_nu \
+    -s ANL_CC2pi_1pim1pip_Evt_1Dppim_nu \
+    -s ANL_CC2pi_1pim1pip_Evt_1Dpprot_nu \
+    -s ANL_CC2pi_1pip1pip_XSec_1DEnu_nu \
+    -s ANL_CC2pi_1pip1pip_Evt_1Dpmu_nu \
+    -s ANL_CC2pi_1pip1pip_Evt_1Dpneut_nu \
+    -s ANL_CC2pi_1pip1pip_Evt_1DppipHigh_nu \
+    -s ANL_CC2pi_1pip1pip_Evt_1DppipLow_nu \
+    -s ANL_CC2pi_1pip1pi0_XSec_1DEnu_nu \
+    -s ANL_CC2pi_1pip1pi0_Evt_1Dpmu_nu \
+    -s ANL_CC2pi_1pip1pi0_Evt_1Dppip_nu \
+    -s ANL_CC2pi_1pip1pi0_Evt_1Dppi0_nu \
+    -s ANL_CC2pi_1pip1pi0_Evt_1Dpprot_nu \
+ -m ${GENTAGLIST[@]} -o ANL_other_validations.tex
+
+ nuis plot collate \
+    -s ANL_CC1ppip_XSec_1DEnu_nu \
+    -s ANL_CC1ppip_XSec_1DEnu_nu_W14Cut \
+    -s ANL_CC1ppip_XSec_1DEnu_nu_Uncorr \
+    -s ANL_CC1ppip_XSec_1DEnu_nu_W14Cut_Uncorr \
+    -s ANL_CC1ppip_XSec_1DEnu_nu_W16Cut_Uncorr \
+    -s ANL_CC1ppip_XSec_1DQ2_nu \
+    -s ANL_CC1ppip_Evt_1DQ2_nu \
+    -s ANL_CC1ppip_Evt_1DQ2_nu_W14Cut \
+    -s ANL_CC1ppip_Evt_1Dppi_nu \
+    -s ANL_CC1ppip_Evt_1Dthpr_nu \
+    -s ANL_CC1ppip_Evt_1DcosmuStar_nu \
+    -s ANL_CC1ppip_Evt_1DcosthAdler_nu \
+    -s ANL_CC1ppip_Evt_1Dphi_nu \
+    -s ANL_CC1ppip_Evt_1DWNpi_nu \
+    -s ANL_CC1ppip_Evt_1DWNmu_nu \
+    -s ANL_CC1ppip_Evt_1DWmupi_nu \
+    -s ANL_CC1npip_XSec_1DEnu_nu \
+    -s ANL_CC1npip_XSec_1DEnu_nu_W14Cut \
+    -s ANL_CC1npip_XSec_1DEnu_nu_Uncorr \
+    -s ANL_CC1npip_XSec_1DEnu_nu_W14Cut_Uncorr \
+    -s ANL_CC1npip_XSec_1DEnu_nu_W16Cut_Uncorr \
+    -s ANL_CC1npip_Evt_1DQ2_nu \
+    -s ANL_CC1npip_Evt_1DQ2_nu_W14Cut \
+    -s ANL_CC1npip_Evt_1Dppi_nu \
+    -s ANL_CC1npip_Evt_1DcosmuStar_nu \
+    -s ANL_CC1npip_Evt_1DWNpi_nu \
+    -s ANL_CC1npip_Evt_1DWNmu_nu \
+    -s ANL_CC1npip_Evt_1DWmupi_nu \
+    -s ANL_CC1pi0_XSec_1DEnu_nu \
+    -s ANL_CC1pi0_XSec_1DEnu_nu_W14Cut \
+    -s ANL_CC1pi0_XSec_1DEnu_nu_Uncorr \
+    -s ANL_CC1pi0_XSec_1DEnu_nu_W14Cut_Uncorr \
+    -s ANL_CC1pi0_XSec_1DEnu_nu_W16Cut_Uncorr \
+    -s ANL_CC1pi0_Evt_1DQ2_nu \
+    -s ANL_CC1pi0_Evt_1DQ2_nu_W14Cut \
+    -s ANL_CC1pi0_Evt_1DcosmuStar_nu \
+    -s ANL_CC1pi0_Evt_1DWNpi_nu \
+    -s ANL_CC1pi0_Evt_1DWNmu_nu \
+    -s ANL_CC1pi0_Evt_1DWmupi_nu \
+    -s ANL_NC1npip_Evt_1Dppi_nu \
+    -s ANL_NC1ppim_XSec_1DEnu_nu \
+    -s ANL_NC1ppim_Evt_1DcosmuStar_nu \
+ -m ${GENTAGLIST[@]} -o ANL_1pi_validations.tex

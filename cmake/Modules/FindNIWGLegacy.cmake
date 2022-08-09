@@ -1,32 +1,32 @@
-SET(NIWGLegacy_FOUND FALSE)
-
 if(NOT TARGET NIWGLegacy::All)
 
-EnsureVarOrEnvSet(NIWG NIWG)
-
-if("${NIWG}" STREQUAL "NIWG-NOTFOUND")
-  cmessage(STATUS "Environment variable: NIWG not set, assuming no NIWG (Legacy) support required.")
   SET(NIWGLegacy_FOUND FALSE)
-  SET(NIWGLegacy_ENABLED FALSE)
-  return()
-endif()
 
-find_path(NIWGLegacy_INCLUDE_DIR
-  NAMES NIWGSyst.h
-  PATHS ${NIWG}
-)
+  EnsureVarOrEnvSet(NIWG NIWG)
 
-find_path(NIWGLegacy_LIB_DIR
-  NAMES libNIWGReWeight.so
-  PATHS ${NIWG}
-)
+  if("${NIWG}" STREQUAL "NIWG-NOTFOUND")
+    cmessage(STATUS "Environment variable: NIWG not set, assuming no NIWG (Legacy) support required.")
+    SET(NIWGLegacy_FOUND FALSE)
+    SET(NIWGLegacy_ENABLED FALSE)
+    return()
+  endif()
 
-include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(NIWGLegacy
-    REQUIRED_VARS 
-      NIWGLegacy_INCLUDE_DIR
-      NIWGLegacy_LIB_DIR
-)
+  find_path(NIWGLegacy_INCLUDE_DIR
+    NAMES NIWGSyst.h
+    PATHS ${NIWG}
+  )
+
+  find_path(NIWGLegacy_LIB_DIR
+    NAMES libNIWGReWeight.so
+    PATHS ${NIWG}
+  )
+
+  include(FindPackageHandleStandardArgs)
+  find_package_handle_standard_args(NIWGLegacy
+      REQUIRED_VARS 
+        NIWGLegacy_INCLUDE_DIR
+        NIWGLegacy_LIB_DIR
+  )
 
   if(NIWGLegacy_FOUND)
 
@@ -45,8 +45,4 @@ find_package_handle_standard_args(NIWGLegacy
         )
     endif()
   endif()
-endif()
-
-if(NIWGLegacy_FOUND)
-  target_link_libraries(GeneratorCompileDependencies INTERFACE NIWGLegacy::All)
 endif()

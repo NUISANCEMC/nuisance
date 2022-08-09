@@ -1,0 +1,34 @@
+#!/bin/bash
+
+COMMAND_FQP=${0}
+COMMAND=$(basename ${COMMAND_FQP})
+
+if [ ! -z ${NUIS_CLID_DEBUG} ]; then
+echo "[CLI DEBUG](BrCr: ${NUIS_BREADCRUMBS}): ${COMMAND} Arguments(${#}):" "${@}"
+fi
+
+if [ "${#}" -lt 1 ]; then
+  echo -e "[ERROR]: Expected to be passed a sub command verb like:"
+  echo -e "\t ${COMMAND} <verb> <verb-specific options>"
+  echo -e "Implemented verbs:"
+
+  if nuis-config --has-feature GENIE; then
+    echo -e "\t  GENIE"
+  fi
+  if nuis-config --has-feature NEUT; then
+    echo -e "\t  NEUT"
+  fi
+
+  echo -e "Try ${COMMAND} <verb> help for further help for a specific verb."
+  exit 1
+fi
+
+VERB=${1}
+shift
+
+if ! hash ${COMMAND}-${VERB}; then
+  echo "[ERROR]: Unknown verb: ${VERB}, could not find `${COMMAND}-${VERB}`."
+  exit 1
+fi
+
+NUIS_BREADCRUMBS="${NUIS_BREADCRUMBS} ${VERB}" ${COMMAND}-${VERB} "${@}"

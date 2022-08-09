@@ -9,7 +9,7 @@ using namespace t2krew;
 T2KWeightEngine::T2KWeightEngine(std::string name) {
 #if NEUT_VERSION >= 541
   // No need to vomit the contents of the card file all over my screen
-  StopTalking();
+  // StopTalking();
 
   std::string neut_card = FitPar::Config().GetParS("NEUT_CARD");
   if (neut_card.length() > 0) {
@@ -25,7 +25,7 @@ T2KWeightEngine::T2KWeightEngine(std::string name) {
                                              "/data/neut/neut_minimal_6t.card");
   }
 
-  StartTalking();
+  // StartTalking();
 #endif
 
   // Setup the NEUT Reweight engien
