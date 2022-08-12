@@ -50,7 +50,7 @@ if(DEFINED ENV{NuHepMCModules_ROOT})
 else()
   CPMFindPackage(
       NAME CMakeModules
-      GIT_TAG v0.0.10
+      GIT_TAG v0.0.11
       GITHUB_REPOSITORY NuHepMC/CMakeModules
       DOWNLOAD_ONLY
   )
