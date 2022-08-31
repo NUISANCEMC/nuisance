@@ -426,7 +426,8 @@ int FitEvent::GetSHMParticleIndex(int const pdg, int const state) const {
       continue;
     if (pdg == 0 or fParticlePDG[i] == pdg) {
       double newmom2 = GetParticleMom2(i);
-      if (newmom2 > maxmom2) {
+
+      if (newmom2 >= maxmom2) {
 
         secind = maxind;
         secmom2 = maxmom2;
@@ -435,9 +436,19 @@ int FitEvent::GetSHMParticleIndex(int const pdg, int const state) const {
         maxmom2 = newmom2;
 
       }
+
+      if (newmom2 < maxmom2 && newmom2 > secmom2) {
+
+        secind = i;
+        secmom2 = newmom2;
+
+      }
+
+
     }
   }
 
+  if (secind == -1) { secind = maxind; }
   return secind;
 }
 

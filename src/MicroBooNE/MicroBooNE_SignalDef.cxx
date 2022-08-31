@@ -70,6 +70,21 @@ bool isCC1Mu2p(FitEvent* event, double EnuMin, double EnuMax) {
   double precoil = event->GetSHMFSParticle(2212)->fP.Vect().Mag();
   if (precoil < 300 || precoil > 1000) return false;
 
+  // Reject events with neutral pions of any momenta
+  if (event->NumFSParticle(111) != 0) return false;
+
+  // Reject events with positively charged pions above 65 MeV/c
+  if (event->NumFSParticle(211) != 0) {
+    double ppiplus = event->GetHMFSParticle(211)->fP.Vect().Mag();
+    if (ppiplus > 65) { return false; }
+  }
+
+  // Reject events with negatively charged pions above 65 MeV/c
+  /*if (event->NumFSParticle(-211) != 0) {
+    double ppiminus = event->GetHMFSParticle(-211)->fP.Vect().Mag();
+    if (ppiminus > 65) { return false; }
+    }*/
+
   return true;
 }
 

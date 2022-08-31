@@ -30,7 +30,7 @@ MicroBooNE_CC1Mu2p_XSec_1D_nu::MicroBooNE_CC1Mu2p_XSec_1D_nu(nuiskey samplekey) 
 
   if (!name.compare("MicroBooNE_CC1Mu2p_XSec_1DDeltaPT_nu")) {
     fDist = kDeltaPT;
-    objSuffix = "DeltaPT";
+    objSuffix = "delta_PT";
     fSettings.SetXTitle("#deltaP_{T}^{true} (GeV)");
     fSettings.SetYTitle("d#sigma/d#deltaP_{T}^{true} (cm^{2}/(GeV/c)/^{40}Ar)");
   }
@@ -67,7 +67,7 @@ MicroBooNE_CC1Mu2p_XSec_1D_nu::MicroBooNE_CC1Mu2p_XSec_1D_nu(nuiskey samplekey) 
   // Load data ---------------------------------------------------------
   std::string inputFile = FitPar::GetDataBase() + "/MicroBooNE/CC1Mu2p/CC2p_data_MC_cov_dataRelease.root";
   SetDataFromRootFile(inputFile, "h_data_xsec_" + objSuffix);
-  //ScaleData(1E-38);
+  ScaleData(1E-38);
 
   // ScaleFactor for DiffXSec/cm2/Nucleus
   fScaleFactor = GetEventHistogram()->Integral("width") / fNEvents * 1E-38 / TotalIntegratedFlux();
@@ -87,7 +87,7 @@ bool MicroBooNE_CC1Mu2p_XSec_1D_nu::isSignal(FitEvent* event) {
 void MicroBooNE_CC1Mu2p_XSec_1D_nu::FillEventVariables(FitEvent* event) {
 
   if (event->NumFSParticle(13) == 0) return;
-  if (event->NumFSParticle(2212) == 0) return;
+  if (event->NumFSParticle(2212) < 2) return;
 
   TVector3 vpmu = event->GetHMFSParticle(13)->fP.Vect();
   TVector3 vplead = event->GetHMFSParticle(2212)->fP.Vect();

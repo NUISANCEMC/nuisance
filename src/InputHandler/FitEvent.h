@@ -262,8 +262,19 @@ public:
 	  leadmom = leadmomnew;
 
 	}
+
+	if (leadmomnew < leadmom && leadmomnew > recoilmom) {
+
+	  recoilrtnindex = i;
+	  recoilmom = leadmomnew;
+
+	}
+
+
       }
     }
+
+    if (recoilrtnindex == -1) { recoilrtnindex = leadrtnindex; }
     return recoilrtnindex;
   };
 
