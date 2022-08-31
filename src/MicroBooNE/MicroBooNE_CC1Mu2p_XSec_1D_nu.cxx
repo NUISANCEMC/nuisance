@@ -110,21 +110,3 @@ void MicroBooNE_CC1Mu2p_XSec_1D_nu::FillEventVariables(FitEvent* event) {
     fXVar = CosThetaMu_Both;
   }
 }
-
-
-void MicroBooNE_CC1Mu2p_XSec_1D_nu::ConvertEventRates() {
-  // Do standard conversion
-  Measurement1D::ConvertEventRates();
-
-  // Apply MC truth -> reco smearing
-  TH1D* truth = (TH1D*) fMCHist->Clone(TString(fMCHist->GetName()) + "_truth");
-  assert(fSmearingMatrix->GetNbinsX() == fSmearingMatrix->GetNbinsY());
-  for (int ireco=1; ireco<fSmearingMatrix->GetNbinsY()+1; ireco++) {
-    double total = 0;
-    for (int itrue=1; itrue<fSmearingMatrix->GetNbinsX()+1; itrue++) {
-      total += truth->GetBinContent(itrue) * truth->GetBinWidth(itrue) * fSmearingMatrix->GetBinContent(itrue, ireco);
-    }
-    fMCHist->SetBinContent(ireco, total / truth->GetBinWidth(ireco));
-  }
-}
-

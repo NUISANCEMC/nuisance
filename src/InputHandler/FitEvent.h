@@ -237,7 +237,7 @@ public:
   /// Returns the Index of the second highest momentum particle given a pdg and state.
   /// If no state is given all states are considered, but that will just return the
   /// momentum of the beam in most cases so is not advised.
-  int  GetHMParticleIndex (int const pdg = 0, int const state = -1) const;
+  int  GetSHMParticleIndex (int const pdg = 0, int const state = -1) const;
 
   template <size_t N>
   inline int GetSHMParticleIndex (int const (&pdgs)[N], int const state = -1) const {
@@ -253,7 +253,7 @@ public:
       int pindex = GetSHMParticleIndex(pdgs[i], state);
       if (pindex != -1){
 	double leadmomnew = GetParticleMom2(pindex);
-	if (leadomnew > leadmom) {
+	if (leadmomnew > leadmom) {
 
 	  recoilrtnindex = leadrtnindex;
 	  recoilmom = leadmomnew;
@@ -280,8 +280,6 @@ public:
   };
 
   /// Returns the second highest momentum particle given a pdg and state.
-  /// If no state is given all states are considered, but that will just return the
-  /// momentum of the beam in most cases so is not advised.
   inline FitParticle* GetSHMParticle(int const pdg = 0, int const state = -1) {
     return GetParticle( GetSHMParticleIndex(pdg, state) );
   }
@@ -492,6 +490,7 @@ public:
     return GetHMParticle(pdgs, kFinalState);
   };
 
+  template <size_t N>
   inline FitParticle* GetSHMFSParticle(int const (&pdgs)[N]) {
     return GetSHMParticle(pdgs, kFinalState);
   };

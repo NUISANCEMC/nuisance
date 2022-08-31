@@ -64,13 +64,13 @@ bool isCC1Mu2p(FitEvent* event, double EnuMin, double EnuMax) {
   // Leading proton within momentum range
   if (event->NumFSParticle(2212) == 0) return false;
   double plead = event->GetHMFSParticle(2212)->fP.Vect().Mag();
-  if (plead > 300 && plead < 1000) return true;
+  if (plead < 300 || plead > 1000) return false;
 
   // Recoil proton within momentum range
   double precoil = event->GetSHMFSParticle(2212)->fP.Vect().Mag();
-  if (precoil > 300 && precoil < 1000) return true;
+  if (precoil < 300 || precoil > 1000) return false;
 
-  return false;
+  return true;
 }
 
   }  // namespace MicroBooNE

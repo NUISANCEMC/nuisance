@@ -37,9 +37,6 @@ public:
   /// Fill kinematic distributions
   void FillEventVariables(FitEvent* customEvent);
 
-  /// Smear and build 1D MC histogram from slices
-  void ConvertEventRates();
-
 private:
   enum Distribution { kDeltaPT, kOpening_Angle_Protons_Lab, kOpening_Angle_Mu_Both };
   Distribution fDist;
