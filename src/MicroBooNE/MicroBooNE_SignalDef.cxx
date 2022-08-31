@@ -50,6 +50,29 @@ bool isCC1MuNp(FitEvent* event, double EnuMin, double EnuMax) {
   return false;
 }
 
+bool isCC1Mu2p(FitEvent* event, double EnuMin, double EnuMax) {
+  // Check CC inclusive
+  if (!SignalDef::isCCINC(event, 14, EnuMin, EnuMax)) return false;
+
+  // Veto events which don't have exactly 1 FS muon
+  if (event->NumFSMuon() != 1) return false;
+
+  // Muon momentum range
+  if (event->GetHMFSParticle(13)->fP.Vect().Mag() < 100) return false;
+  if (event->GetHMFSParticle(13)->fP.Vect().Mag() > 1000) return false;
+
+  // Leading proton within momentum range
+  if (event->NumFSParticle(2212) == 0) return false;
+  double plead = event->GetHMFSParticle(2212)->fP.Vect().Mag();
+  if (plead > 300 && plead < 1000) return true;
+
+  // Recoil proton within momentum range
+  double precoil = event->GetSHMFSParticle(2212)->fP.Vect().Mag();
+  if (precoil > 300 && precoil < 1000) return true;
+
+  return false;
+}
+
   }  // namespace MicroBooNE
 }  // namespace SignalDef
 
