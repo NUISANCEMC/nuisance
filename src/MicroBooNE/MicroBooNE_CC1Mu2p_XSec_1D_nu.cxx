@@ -36,13 +36,13 @@ MicroBooNE_CC1Mu2p_XSec_1D_nu::MicroBooNE_CC1Mu2p_XSec_1D_nu(nuiskey samplekey) 
   }
   else if (!name.compare("MicroBooNE_CC1Mu2p_XSec_1DOpening_Angle_Protons_Lab_nu")) {
     fDist = kOpening_Angle_Protons_Lab;
-    objSuffix = "Opening_Angle_Protons_Lab";
+    objSuffix = "opening_angle_protons_lab";
     fSettings.SetXTitle("cos#gamma_{#vec{p}_{L},#vec{p}_{R}}^{true}");
     fSettings.SetYTitle("d#sigma/dcos#gamma_{#vec{p}_{L},#vec{p}_{R}}^{true} (cm^{2}/^{40}Ar)");
   }
   else if (!name.compare("MicroBooNE_CC1Mu2p_XSec_1DOpening_Angle_Mu_Both_nu")) {
     fDist = kOpening_Angle_Mu_Both;
-    objSuffix = "Opening_Angle_Mu_Both";
+    objSuffix = "opening_angle_mu_both";
     fSettings.SetXTitle("cos#gamma_{#vec{p}_{#mu},#vec{p}_{sum}}^{true} (GeV)");
     fSettings.SetYTitle("d#sigma/dcos#gamma_{#vec{p}_{#mu},#vec{p}_{sum}}^{true} (cm^{2}/^{40}Ar)");
   }
@@ -69,8 +69,8 @@ MicroBooNE_CC1Mu2p_XSec_1D_nu::MicroBooNE_CC1Mu2p_XSec_1D_nu(nuiskey samplekey) 
   SetDataFromRootFile(inputFile, "h_total_systematic_uncertainty_" + objSuffix);
   ScaleData(1E-38);
 
-  // ScaleFactor for DiffXSec/cm2/Nucleus
-  fScaleFactor = GetEventHistogram()->Integral("width") / fNEvents * 1E-38 / TotalIntegratedFlux();
+  // ScaleFactor for DiffXSec/cm2/Nucleus // Already multiplied by the Ar mass number
+  fScaleFactor = GetEventHistogram()->Integral("width") / fNEvents * 1E-38 / TotalIntegratedFlux() * 40;
 
   SetCovarFromRootFile(inputFile, "h_2D_total_covariance_matrix_" + objSuffix);
 
@@ -96,9 +96,9 @@ void MicroBooNE_CC1Mu2p_XSec_1D_nu::FillEventVariables(FitEvent* event) {
   TVector3 vSumP = vplead + vprecoil;
   TVector3 vSumAll = vpmu + vplead + vprecoil;
 
-  double DeltaPT = vSumAll.Pt() * 1000.; // MeV
-  double CosThetaP_Lab = vplead.Angle(vprecoil) * 180./TMath::Pi(); // deg
-  double CosThetaMu_Both = vpmu.Angle(vSumP) * 180./TMath::Pi(); // deg
+  double DeltaPT = vSumAll.Pt() / 1000.; // GeV/c
+  double CosThetaP_Lab = cos( vplead.Angle(vprecoil) );
+  double CosThetaMu_Both = cos( vpmu.Angle(vSumP) );
 
   if (fDist == kDeltaPT) {
     fXVar = DeltaPT;

@@ -59,13 +59,13 @@ bool isCC1Mu2p(FitEvent* event, double EnuMin, double EnuMax) {
 
   // Muon momentum range
   if (event->GetHMFSParticle(13)->fP.Vect().Mag() < 100) return false;
-  if (event->GetHMFSParticle(13)->fP.Vect().Mag() > 1000) return false;
-
+  if (event->GetHMFSParticle(13)->fP.Vect().Mag() > 1200) return false;
+  
   // Leading proton within momentum range
   if (event->NumFSParticle(2212) < 2) return false;
   double plead = event->GetHMFSParticle(2212)->fP.Vect().Mag();
   if (plead < 300 || plead > 1000) return false;
-
+  
   // Recoil proton within momentum range
   double precoil = event->GetSHMFSParticle(2212)->fP.Vect().Mag();
   if (precoil < 300 || precoil > 1000) return false;
@@ -84,7 +84,7 @@ bool isCC1Mu2p(FitEvent* event, double EnuMin, double EnuMax) {
     double ppiminus = event->GetHMFSParticle(-211)->fP.Vect().Mag();
     if (ppiminus > 65) { return false; }
   }
-
+  
   return true;
 }
 
