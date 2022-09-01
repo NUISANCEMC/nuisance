@@ -62,14 +62,14 @@ bool isCC1Mu2p(FitEvent* event, double EnuMin, double EnuMax) {
   if (event->GetHMFSParticle(13)->fP.Vect().Mag() > 1000) return false;
 
   // Leading proton within momentum range
-  if (event->NumFSParticle(2212) == 0) return false;
+  if (event->NumFSParticle(2212) < 2) return false;
   double plead = event->GetHMFSParticle(2212)->fP.Vect().Mag();
   if (plead < 300 || plead > 1000) return false;
 
   // Recoil proton within momentum range
   double precoil = event->GetSHMFSParticle(2212)->fP.Vect().Mag();
   if (precoil < 300 || precoil > 1000) return false;
-
+  
   // Reject events with neutral pions of any momenta
   if (event->NumFSParticle(111) != 0) return false;
 
@@ -78,12 +78,12 @@ bool isCC1Mu2p(FitEvent* event, double EnuMin, double EnuMax) {
     double ppiplus = event->GetHMFSParticle(211)->fP.Vect().Mag();
     if (ppiplus > 65) { return false; }
   }
-
+  
   // Reject events with negatively charged pions above 65 MeV/c
-  /*if (event->NumFSParticle(-211) != 0) {
+  if (event->NumFSParticle(-211) != 0) {
     double ppiminus = event->GetHMFSParticle(-211)->fP.Vect().Mag();
     if (ppiminus > 65) { return false; }
-    }*/
+  }
 
   return true;
 }

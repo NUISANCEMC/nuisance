@@ -66,7 +66,7 @@ MicroBooNE_CC1Mu2p_XSec_1D_nu::MicroBooNE_CC1Mu2p_XSec_1D_nu(nuiskey samplekey) 
 
   // Load data ---------------------------------------------------------
   std::string inputFile = FitPar::GetDataBase() + "/MicroBooNE/CC1Mu2p/CC2p_data_MC_cov_dataRelease.root";
-  SetDataFromRootFile(inputFile, "h_data_xsec_" + objSuffix);
+  SetDataFromRootFile(inputFile, "h_total_systematic_uncertainty_" + objSuffix);
   ScaleData(1E-38);
 
   // ScaleFactor for DiffXSec/cm2/Nucleus
