@@ -77,6 +77,8 @@ MINERvA_CC0pi_XSec_2D_nu.cxx
 # MINERvA_CC0pi_XSec_3DptpzTp_nu.cxx
 MINERvA_CC0pi_XSec_1D_2018_nu.cxx
 
+MINERvA_CC0pi_XSec_1DQ2_antinu_H.cxx
+
 MINERvA_CCCOHPI_XSec_1DEnu_nu.cxx
 MINERvA_CCCOHPI_XSec_1DEpi_nu.cxx
 MINERvA_CCCOHPI_XSec_1Dth_nu.cxx
@@ -150,6 +152,8 @@ MINERvA_CC0pi_XSec_2D_antinu.h
 MINERvA_CC0pi_XSec_2D_nu.h
 # MINERvA_CC0pi_XSec_3DptpzTp_nu.h
 MINERvA_CC0pi_XSec_1D_2018_nu.h
+MINERvA_CC0pi_XSec_1DQ2_antinu_H.h
+
 
 MINERvA_CC1pip_XSec_1D_2017Update.h
 
