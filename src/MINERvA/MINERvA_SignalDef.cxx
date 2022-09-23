@@ -497,6 +497,38 @@ bool isCC0pi_anti_MINERvAPTPZ(FitEvent *event, int nuPDG, double emin,
 
   return false;
 }
+bool isCC0pi_anti_MINERvAPTPZ_ME_H(FitEvent *event, int nuPDG, double emin, double emax) {
+  // First check the target
+
+  // Check it's CCINC
+  if (!SignalDef::isCCINC(event, nuPDG, emin, emax)) return false;
+
+  // Then check there is only a neutron and mu+ in final state
+  if (event->NParticles() != 4) return false;
+  int nMuons = 0;
+  int nNeutrons = 0;
+  for (unsigned int i = 0; i < event->NParticles(); ++i) {
+    FitParticle *p = event->GetParticle(i);
+    if (p->Status() != kFinalState) continue;
+
+    int pdg = p->fPID;
+    double energy = p->fP.E();
+
+    if (pdg == -13) nMuons++;
+    else if (pdg == 2112) nNeutrons++;
+    else  return false; // Exit if we find anything else
+  }
+
+  if (nMuons != 1 || nNeutrons != 1) return false; // Check for one muon and one neutron
+  TLorentzVector pnu = event->GetNeutrinoIn()->fP;
+  TLorentzVector pmu = event->GetHMFSParticle(-13)->fP;
+  // Make Angle Cut > 20.0
+  double th_nu_mu = FitUtils::th(pmu, pnu) * 180. / M_PI;
+  if (th_nu_mu >= 20.0) return false;
+  if (pmu.Vect().Mag() < 1.5 || pmu.Vect().Mag() > 10) return false;
+
+  return true;
+}
 
 // **************************************************
 // Upcoming MINERvA ME CC0pi numubar RHC has slighly different signal definition to previous LE result
@@ -509,6 +541,7 @@ bool isCC0pi_anti_MINERvAPTPZ_ME(FitEvent *event, int nuPDG, double emin,
 
   TLorentzVector pnu = event->GetNeutrinoIn()->fP;
   TLorentzVector pmu = event->GetHMFSParticle(-13)->fP;
+
   // Make Angle Cut > 20.0
   double th_nu_mu = FitUtils::th(pmu, pnu) * 180. / M_PI;
   if (th_nu_mu >= 20.0) return false;
