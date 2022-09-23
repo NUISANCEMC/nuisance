@@ -499,33 +499,41 @@ bool isCC0pi_anti_MINERvAPTPZ(FitEvent *event, int nuPDG, double emin,
 }
 bool isCC0pi_anti_MINERvAPTPZ_ME_H(FitEvent *event, int nuPDG, double emin, double emax) {
   // First check the target
+  if (event->fBound != 0 && event->fTargetPDG != 1000010010) return false;
+  // This doesn't quite work
+  /*
+  std::cout << "****" << std::endl;
+  std::cout << "target A: " << event->GetTargetA() << std::endl;
+  std::cout << "target Z: " << event->GetTargetZ() << std::endl;
+  std::cout << "target H: " << event->fTargetH << std::endl;
+  std::cout << "fBound: " << event->fBound << std::endl;
+  std::cout << "fTargetPDG: " << event->fTargetPDG << std::endl;
+  */
 
   // Check it's CCINC
   if (!SignalDef::isCCINC(event, nuPDG, emin, emax)) return false;
 
   // Then check there is only a neutron and mu+ in final state
   if (event->NParticles() != 4) return false;
+
   int nMuons = 0;
   int nNeutrons = 0;
   for (unsigned int i = 0; i < event->NParticles(); ++i) {
     FitParticle *p = event->GetParticle(i);
-    if (p->Status() != kFinalState) continue;
-
     int pdg = p->fPID;
-    double energy = p->fP.E();
-
+    if (p->Status() != kFinalState) continue;
     if (pdg == -13) nMuons++;
     else if (pdg == 2112) nNeutrons++;
-    else  return false; // Exit if we find anything else
+    else return false; // Exit if we find anything else
   }
 
   if (nMuons != 1 || nNeutrons != 1) return false; // Check for one muon and one neutron
   TLorentzVector pnu = event->GetNeutrinoIn()->fP;
   TLorentzVector pmu = event->GetHMFSParticle(-13)->fP;
-  // Make Angle Cut > 20.0
+  // Make Angle Cut > 20.0 and muon momentum
   double th_nu_mu = FitUtils::th(pmu, pnu) * 180. / M_PI;
   if (th_nu_mu >= 20.0) return false;
-  if (pmu.Vect().Mag() < 1.5 || pmu.Vect().Mag() > 10) return false;
+  if (pmu.Vect().Mag()/1.E3 < 1.5 || pmu.Vect().Mag()/1.E3 > 20) return false;
 
   return true;
 }

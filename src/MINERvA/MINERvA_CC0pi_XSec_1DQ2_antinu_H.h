@@ -21,7 +21,7 @@
 #define MINERVA_CC0PI_XSEC_1DQ2_ANTINU_H_SEEN
 
 #include "Measurement1D.h"
-
+#include "MINERvA_SignalDef.h"
 
 //********************************************************************  
 class MINERvA_CC0pi_XSec_1DQ2_antinu_H : public Measurement1D {

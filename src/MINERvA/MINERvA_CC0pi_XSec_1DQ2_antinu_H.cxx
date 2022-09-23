@@ -23,9 +23,7 @@
             See Tejin Cai (Rochester) PhD thesis for full information
 */
 
-#include "MINERvA_SignalDef.h"
 #include "MINERvA_CC0pi_XSec_1DQ2_antinu_H.h"
-
 
 //********************************************************************  
 void MINERvA_CC0pi_XSec_1DQ2_antinu_H::SetupDataSettings() {
@@ -36,22 +34,21 @@ void MINERvA_CC0pi_XSec_1DQ2_antinu_H::SetupDataSettings() {
   std::string name = fSettings.GetS("name");
 
   // Define what files to use from the dist
-  std::string basedir = "MINERvA/CC0pi_1D/Hydrogen";
+  std::string basedir = "MINERvA/CC0pi_1D/Hydrogen/";
   std::string histname = "";
   std::string xbinning = basedir;
   std::string ybinning = basedir;
 
-  std::string distdescript = "MINERvA_CC0pi_XSec_2Dptpz_antinu sample";
+  std::string distdescript = "MINERvA_CC0pi_XSec_1DQ2_antinu_H sample";
   std::string datafile = basedir+"xsec_mod.csv";
-  std::string covfile = basedir+"cross_sections_muonpz_muonpt_lowangleqelike_minerva_covariance.csv";
-  std::string titles    = "MINERvA CC0#pi #bar{#nu}_{#mu} p_{t} p_{z};p_{t} (GeV);p_{z} (GeV);d^{2}#sigma/dp_{t}dp_{z} (cm^{2}/GeV^{2}/nucleon)";
+  std::string titles    = "MINERvA CC0#pi #bar{#nu}_{#mu} Q^{2} H;Q^{2} (GeV^{2}); d#sigma/dQ^{2} (cm^{2}/(GeV^{2})/nucleon)";
 
   fScaleFactor  = (GetEventHistogram()->Integral("width") * 1E-38 / (fNEvents + 0.)) / this->TotalIntegratedFlux();
+  fScaleFactor *= 12; // Result is cm2/GeV2/Hydrogen in a CH target, so need to scale the /nucleon cross-section appropriately
 
   fSettings.SetTitle(  GeneralUtils::ParseToStr(titles,";")[0] );
   fSettings.SetXTitle( GeneralUtils::ParseToStr(titles,";")[1] );
   fSettings.SetYTitle( GeneralUtils::ParseToStr(titles,";")[2] );
-  fSettings.SetZTitle( GeneralUtils::ParseToStr(titles,";")[3] );
 
   // Sample overview ---------------------------------------------------
   std::string descrip = distdescript + "\n"\
@@ -66,6 +63,7 @@ void MINERvA_CC0pi_XSec_1DQ2_antinu_H::SetupDataSettings() {
 
   // Set the data 
   SetDataFromTextFile(fSettings.GetDataInput());
+  fDataHist->Scale(1E-38); // release comes in units of 1E-38
 };
 
 //********************************************************************
@@ -95,8 +93,9 @@ void MINERvA_CC0pi_XSec_1DQ2_antinu_H::FillEventVariables(FitEvent *event) {
 
   TLorentzVector Pnu = event->GetNeutrinoIn()->fP;
   TLorentzVector Pmu  = event->GetHMFSParticle(-13)->fP;
+  double Q2 = -1*(Pnu-Pmu).Mag2()/1.E6;
 
-  fXVar = -1*(Pnu-Pmu).Mag2();
+  fXVar = Q2;
 };
 
 //********************************************************************
