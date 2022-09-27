@@ -106,6 +106,7 @@ void MINERvA_CC0pi_XSec_3DptpzTp_1DVersion_nu::FillEventVariables( FitEvent* eve
     sum += it->KE()/1000.;
   }
 
+  //==== Note) fXVar is the bin index for a given (Sum Tp, Pt, Pz)
   fXVar = GetBinIndexFromKinamatics(sum, pt, pz);
   //std::cout << "sum = " << sum << ", pt = " << pt << ", pz = " << pz << " -> fXVar = " << fXVar << std::endl;
 
