@@ -129,6 +129,12 @@ double Get_pn_reco_Ar_HMProton(FitEvent *event, int ISPDG, bool Is0pi);
 double ProtonQ2QErec(double pE, double binding);
 
 /*
+Emiss and pmiss
+*/
+double GetEmiss(FitEvent *event);
+TVector3 GetPmiss(FitEvent *event);
+
+/*
   E Recoil MINERvA
 */
 double GetErecoil_MINERvA_LowRecoil(FitEvent *event);
