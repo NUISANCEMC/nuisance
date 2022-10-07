@@ -670,16 +670,16 @@ double FitUtils::GetEmiss(FitEvent *event) {
 
   std::map<int, double> bindingEnergies;
 
-  bindingEnergies.insert(pair(1000030060, 17.0)); //Li6   
-  bindingEnergies.insert(pair(1000060120, 25.0)); //C12   
-  bindingEnergies.insert(pair(1000080160, 27.0)); //O16   
-  bindingEnergies.insert(pair(1000120240, 32.0)); //Mg24  
-  bindingEnergies.insert(pair(1000180400, 29.5)); //Ar40  
-  bindingEnergies.insert(pair(1000200400, 28.0)); //Ca40  
-  bindingEnergies.insert(pair(1000220480, 30.0)); //Ti48    
-  bindingEnergies.insert(pair(1000260560, 36.0)); //Fe56  
-  bindingEnergies.insert(pair(1000280580, 36.0)); //Ni58  
-  bindingEnergies.insert(pair(1000822080, 44.0)); //Pb208 
+  bindingEnergies.insert(std::pair(1000030060, 17.0)); //Li6   
+  bindingEnergies.insert(std::pair(1000060120, 25.0)); //C12   
+  bindingEnergies.insert(std::pair(1000080160, 27.0)); //O16   
+  bindingEnergies.insert(std::pair(1000120240, 32.0)); //Mg24  
+  bindingEnergies.insert(std::pair(1000180400, 29.5)); //Ar40  
+  bindingEnergies.insert(std::pair(1000200400, 28.0)); //Ca40  
+  bindingEnergies.insert(std::pair(1000220480, 30.0)); //Ti48    
+  bindingEnergies.insert(std::pair(1000260560, 36.0)); //Fe56  
+  bindingEnergies.insert(std::pair(1000280580, 36.0)); //Ni58  
+  bindingEnergies.insert(std::pair(1000822080, 44.0)); //Pb208 
 
   
   int n_tgt_nucleons = event->fTargetA;
