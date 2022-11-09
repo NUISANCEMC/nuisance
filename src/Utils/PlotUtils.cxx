@@ -579,6 +579,7 @@ TH1D *PlotUtils::GetTH1DFromFile(std::string dataFile, std::string title,
     delete temp_infile;
 
     // Else its a space separated txt file
+    // Expecting format: lower bin edge, data, uncertainty
   } else {
     // Make a TGraph Errors
     TGraphErrors *gr = new TGraphErrors(dataFile.c_str(), "%lg %lg %lg");
