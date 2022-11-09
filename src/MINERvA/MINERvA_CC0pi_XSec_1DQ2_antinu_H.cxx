@@ -40,7 +40,8 @@ void MINERvA_CC0pi_XSec_1DQ2_antinu_H::SetupDataSettings() {
   std::string ybinning = basedir;
 
   std::string distdescript = "MINERvA_CC0pi_XSec_1DQ2_antinu_H sample";
-  std::string datafile = basedir+"xsec_mod.csv";
+  std::string datafile = basedir+"xsec_mod_acc.csv";
+  std::string covfile = basedir+"cov_tot.csv";
   std::string titles    = "MINERvA CC0#pi #bar{#nu}_{#mu} Q^{2} H;Q^{2} (GeV^{2}); d#sigma/dQ^{2} (cm^{2}/(GeV^{2})/nucleon)";
 
   fScaleFactor  = (GetEventHistogram()->Integral("width") * 1E-38 / (fNEvents + 0.)) / this->TotalIntegratedFlux();
@@ -60,10 +61,14 @@ void MINERvA_CC0pi_XSec_1DQ2_antinu_H::SetupDataSettings() {
 
   // The input ROOT file in the fSettings
   fSettings.SetDataInput(FitPar::GetDataBase() + datafile);
+  fSettings.SetCovarInput(FitPar::GetDataBase() + covfile);
 
   // Set the data 
   SetDataFromTextFile(fSettings.GetDataInput());
   fDataHist->Scale(1E-38); // release comes in units of 1E-38
+  
+  // Covariance comes in 1E-40, so need to scale by 1E-2 (NUISANCE assumes 1E-38 for uncert.)
+  SetCovarMatrixFromText(fSettings.GetCovarInput(), fDataHist->GetXaxis()->GetNbins(), 1E-4);
 };
 
 //********************************************************************
@@ -94,6 +99,22 @@ void MINERvA_CC0pi_XSec_1DQ2_antinu_H::FillEventVariables(FitEvent *event) {
   TLorentzVector Pnu = event->GetNeutrinoIn()->fP;
   TLorentzVector Pmu  = event->GetHMFSParticle(-13)->fP;
   double Q2 = -1*(Pnu-Pmu).Mag2()/1.E6;
+
+  // Just a check to make sure Q2QE on hydrogen and Q2 true is the same, and it is (to 1E-3 GeV2)
+  /*
+  const double Mn = 0.9396*1E3;// GeV/c2
+  const double Mp = 0.9382*1E3;// GeV/c2
+  double costhetamu = cos(Pmu.Vect().Angle(Pnu.Vect()));
+  double EnuQE = (Mn*Mn-Mp*Mp-Pmu.Mag2()+2*Mp*Pmu.E())/(2*(Mp-Pmu.E()+Pmu.Vect().Mag()*costhetamu));
+  double Q2QE = 2*EnuQE*(Pmu.E()-Pmu.Vect().Mag()*costhetamu)-Pmu.Mag2();
+  Q2QE *= 1E-6;
+
+  if (isSignal(event) && fabs(Q2QE-Q2)>1E-3) {
+    std::cout << "***" << std::endl;
+    std::cout << Q2 << std::endl;
+    std::cout << Q2QE << std::endl;
+  }
+  */
 
   fXVar = Q2;
 };

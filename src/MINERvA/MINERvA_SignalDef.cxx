@@ -499,16 +499,9 @@ bool isCC0pi_anti_MINERvAPTPZ(FitEvent *event, int nuPDG, double emin,
 }
 bool isCC0pi_anti_MINERvAPTPZ_ME_H(FitEvent *event, int nuPDG, double emin, double emax) {
   // First check the target
-  if (event->fBound != 0 && event->fTargetPDG != 1000010010) return false;
-  // This doesn't quite work
-  /*
-  std::cout << "****" << std::endl;
-  std::cout << "target A: " << event->GetTargetA() << std::endl;
-  std::cout << "target Z: " << event->GetTargetZ() << std::endl;
-  std::cout << "target H: " << event->fTargetH << std::endl;
-  std::cout << "fBound: " << event->fBound << std::endl;
-  std::cout << "fTargetPDG: " << event->fTargetPDG << std::endl;
-  */
+  // Coherent events on carbon will not be bound, so check the target PDG and the fBound
+  if (event->fBound != 0) return false;
+  if (event->fTargetPDG != 1000010010) return false;
 
   // Check it's CCINC
   if (!SignalDef::isCCINC(event, nuPDG, emin, emax)) return false;
@@ -527,7 +520,8 @@ bool isCC0pi_anti_MINERvAPTPZ_ME_H(FitEvent *event, int nuPDG, double emin, doub
     else return false; // Exit if we find anything else
   }
 
-  if (nMuons != 1 || nNeutrons != 1) return false; // Check for one muon and one neutron
+  if (nMuons != 1 || nNeutrons < 1) return false; // Check for one muon and one neutron
+
   TLorentzVector pnu = event->GetNeutrinoIn()->fP;
   TLorentzVector pmu = event->GetHMFSParticle(-13)->fP;
   // Make Angle Cut > 20.0 and muon momentum
