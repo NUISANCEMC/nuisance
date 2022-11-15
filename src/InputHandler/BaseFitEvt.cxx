@@ -252,4 +252,4 @@ void BaseFitEvt::SetInputFitEvent() { fType = kINPUTFITEVENT; }
 
 void BaseFitEvt::SetInputFitSpline() { fType = kNEWSPLINE; }
 
-void BaseFitEvt::SetInputHepMC() { fType = kHEPMC; }
+void BaseFitEvt::SetInputHepMC() { fType = kNuHepMC; }

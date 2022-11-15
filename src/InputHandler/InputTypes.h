@@ -38,7 +38,7 @@ enum generator_event_type {
   kNEWSPLINE = 12,
   kLIKEWEIGHT = 13,
   kSPLINEPARAMETER = 14,
-  kHEPMC = 15,
+  kNuHepMC = 15,
   kHISTO = 16,
   kSIGMAQ0HIST = 17,
   kLast_generator_event_type
@@ -52,6 +52,7 @@ enum InputType {
   kGENIE_Input = 2,
   kGiBUU_Input,
   kNUANCE_Input,
+  kNuHepMC_Input,
   kEVSPLN_Input,
   kEMPTY_Input,
   kFEVENT_Input,
@@ -100,8 +101,8 @@ inline std::ostream& operator<<(std::ostream& os,
   case kNORM: {
     return os << "kNORM";
   }
-  case kHEPMC: {
-    return os << "kHEPMC";
+  case kNuHepMC: {
+    return os << "kNuHepMC";
   }
   case kSIGMAQ0HIST: {
     return os << "kSIGMAQ0HIST";
@@ -130,6 +131,9 @@ inline std::ostream &operator<<(std::ostream &os, InputUtils::InputType it) {
   }
   case InputUtils::kNUANCE_Input: {
     return os << "kNUANCE_Input";
+  }
+  case InputUtils::kNuHepMC_Input: {
+    return os << "kNuHepMC_Input";
   }
   case InputUtils::kEVSPLN_Input: {
     return os << "kEVSPLN_Input";

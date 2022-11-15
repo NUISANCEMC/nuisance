@@ -24,6 +24,7 @@
 #include "NUANCEInputHandler.h"
 #include "SigmaQ0HistogramInputHandler.h"
 #include "SplineInputHandler.h"
+#include "NuHepMCInputHandler.h"
 
 #ifdef GENIE_ENABLED
 #include "GENIEInputHandler.h"
@@ -98,6 +99,9 @@ InputHandlerBase *CreateInputHandler(std::string const &handle,
                    << handle << " " << inpType << " " << inputs);
     NUIS_ABORT("NUANCE is not enabled!");
 #endif
+    break;
+  case (kNuHepMC_Input):
+    input = new NuHepMCInputHandler(handle, newinputs);
     break;
 
   case (kFEVENT_Input):

@@ -31,7 +31,7 @@ set(InputHandler_Impl_Files
   NuanceEvent.cxx
   FitEventInputHandler.cxx
   SplineInputHandler.cxx
-  HepMCTextInputHandler.cxx
+  NuHepMCInputHandler.cxx
   InputFactory.cxx
   SigmaQ0HistogramInputHandler.cxx
   HistogramInputHandler.cxx
@@ -53,15 +53,11 @@ set(InputHandler_Hdr_Files
   NuanceEvent.h
   FitEventInputHandler.h
   SplineInputHandler.h
-  HepMCTextInputHandler.h
+  NuHepMCInputHandler.cxx
   InputFactory.h
   SigmaQ0HistogramInputHandler.h
   HistogramInputHandler.h
 )
-
-if(HEPMCNuEvt_ENABLED)
-  LIST(APPEND InputHandler_Impl_Files HepMCNuEvtInputHandler.cxx)
-endif()
 
 if(GENIE_ENABLED)
   LIST(APPEND InputHandler_Impl_Files GENIEInputHandler.cxx)
@@ -76,7 +72,7 @@ if(NuWro_ENABLED)
 endif()
 
 add_library(InputHandler SHARED ${InputHandler_Impl_Files})
-target_link_libraries(InputHandler GeneratorCompileDependencies Experiments CoreIncludes ROOT::ROOT)
+target_link_libraries(InputHandler GeneratorCompileDependencies Experiments CoreIncludes HepMC3 ROOT::ROOT)
 set_target_properties(InputHandler PROPERTIES PUBLIC_HEADER "${InputHandler_Hdr_Files}")
 
 install(TARGETS InputHandler
