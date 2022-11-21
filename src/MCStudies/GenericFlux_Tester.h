@@ -95,6 +95,8 @@ public:
   float bjorken_y;
   float q0_true;
   float q3_true;
+  float Emiss;
+  TVector3 pmiss;
   float Erecoil_true;
   float Erecoil_charged;
   float Erecoil_minerva;

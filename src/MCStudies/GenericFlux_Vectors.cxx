@@ -137,6 +137,10 @@ void GenericFlux_Vectors::AddEventVariablesToTree() {
   eventVariables->Branch("y", &y, "y/F");
   eventVariables->Branch("Eav", &Eav, "Eav/F");
   eventVariables->Branch("EavAlt", &EavAlt, "EavAlt/F");
+  
+  // Add in EMiss and PMiss
+  eventVariables->Branch("Emiss", &Emiss, "Emiss/F");
+  eventVariables->Branch("pmiss", &pmiss);
 
   eventVariables->Branch("CosThetaAdler", &CosThetaAdler, "CosThetaAdler/F");
   eventVariables->Branch("PhiAdler", &PhiAdler, "PhiAdler/F");
@@ -219,6 +223,9 @@ void GenericFlux_Vectors::FillEventVariables(FitEvent *event) {
     Q2 = -1 * (nu->fP - lep->fP).Mag2() / 1E6;
     q0 = (nu->fP - lep->fP).E() / 1E3;
     q3 = (nu->fP - lep->fP).Vect().Mag() / 1E3;
+
+	Emiss = FitUtils::GetEmiss(event);
+	pmiss = FitUtils::GetPmiss(event);
 
     // These assume C12 binding from MINERvA... not ideal
     Enu_QE = FitUtils::EnuQErec(lep->fP, CosLep, 34., true);
@@ -355,7 +362,7 @@ void GenericFlux_Vectors::ResetVariables() {
   Mode = PDGnu = tgt = tgta = tgtz = PDGLep = 0;
 
   Enu_true = ELep = CosLep = Q2 = q0 = q3 = Enu_QE = Q2_QE = W_nuc_rest = W =
-      x = y = Eav = EavAlt = CosThetaAdler = PhiAdler = -999.9;
+      x = y = Eav = EavAlt = CosThetaAdler = PhiAdler = Emiss = -999.9;
 
   W_genie = -999;
   // Other fun variables
@@ -373,6 +380,9 @@ void GenericFlux_Vectors::ResetVariables() {
     px_vert[i] = py_vert[i] = pz_vert[i] = E_vert[i] = -999;
     pdg_vert[i] = 0;
   }
+
+  // Reset pmiss
+  pmiss.SetXYZ(-999.,-999.,-999.);
 
   Weight = InputWeight = RWWeight = 0.0;
 

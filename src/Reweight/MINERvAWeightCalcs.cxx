@@ -666,11 +666,7 @@ double COHBrandon::CalcWeight(BaseFitEvt* evt) {
   //const Target& tgt = init_state.Tgt();
 
   // If the event is not QE this Calc doesn't handle it
-  #if GENIE_VERSION >= 301
   if (!proc_info.IsCoherentProduction()) return 1.0;
-  #else
-  if (!proc_info.IsCoherent()) return 1.0;
-  #endif
 
   // WEIGHT CALCULATIONS -------------
   double w = 1.0;
