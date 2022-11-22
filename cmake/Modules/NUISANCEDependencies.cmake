@@ -13,6 +13,7 @@ endif()
 add_library(GeneratorCompileDependencies INTERFACE)
 add_library(GeneratorLinkDependencies INTERFACE)
 
+set(GiBUU_ENABLED TRUE)
 target_compile_definitions(GeneratorCompileDependencies INTERFACE GiBUU_ENABLED)
 
 DefineEnabledRequiredSwitch(T2KReWeight)
