@@ -386,8 +386,8 @@ int GENIEInputHandler::ConvertGENIEReactionCode(GHepRecord *gheprec) {
 
   // And the same story for 54
   if (gheprec->Summary()->ProcInfo().IsIMDAnnihilation() || gheprec->Summary()->ProcInfo().IsInverseMuDecay()){
-    if (pdg::IsNeutrino(gheprec->Summary()->InitState().ProbePdg())) return InputHandler::kMuonCapture;
-    else return -InputHandler::kMuonCapture;
+    if (pdg::IsNeutrino(gheprec->Summary()->InitState().ProbePdg())) return InputHandler::kInvMuonDecay;
+    else return -InputHandler::kInvMuonDecay;
   }
 
   // Electron Scattering

@@ -54,7 +54,7 @@ enum InteractionModes {
   kNCELonn = 52,
   kNC2p2h = 53,
   kNuElectronElastic = 54,
-  kMuonCapture = 55
+  kInvMuonDecay = 55
 };
 }
 
