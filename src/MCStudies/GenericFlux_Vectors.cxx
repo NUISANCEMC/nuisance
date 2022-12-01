@@ -136,6 +136,7 @@ void GenericFlux_Vectors::AddEventVariablesToTree() {
   eventVariables->Branch("x", &x, "x/F");
   eventVariables->Branch("y", &y, "y/F");
   eventVariables->Branch("Erecoil_minerva", &Erecoil_minerva, "Erecoil_minerva/F");
+  eventVariables->Branch("Erecoil_charged", &Erecoil_charged, "Erecoil_charged/F");
   eventVariables->Branch("EavAlt", &EavAlt, "EavAlt/F");
   
   // Add in EMiss and PMiss
@@ -232,7 +233,8 @@ void GenericFlux_Vectors::FillEventVariables(FitEvent *event) {
     Q2_QE = FitUtils::Q2QErec(lep->fP, CosLep, 34., true);
 
     Erecoil_minerva = FitUtils::GetErecoil_MINERvA_LowRecoil(event) / 1.E3;
-    EavAlt = FitUtils::Eavailable(event) / 1.E3;
+    Erecoil_charged = FitUtils::GetErecoil_CHARGED(event) / 1.E3;
+	EavAlt = FitUtils::Eavailable(event) / 1.E3;
 
     // Check if this is a 1pi+ or 1pi0 event
     if ((SignalDef::isCC1pi(event, PDGnu, 211) ||
@@ -362,7 +364,7 @@ void GenericFlux_Vectors::ResetVariables() {
   Mode = PDGnu = tgt = tgta = tgtz = PDGLep = 0;
 
   Enu_true = ELep = CosLep = Q2 = q0 = q3 = Enu_QE = Q2_QE = W_nuc_rest = W =
-      x = y = Erecoil_minerva = EavAlt = CosThetaAdler = PhiAdler = Emiss = -999.9;
+      x = y = Erecoil_minerva = Erecoil_charged = EavAlt = CosThetaAdler = PhiAdler = Emiss = -999.9;
 
   W_genie = -999;
   // Other fun variables

@@ -95,6 +95,7 @@ public:
   float x;
   float y;
   float Erecoil_minerva;
+  float Erecoil_charged;
   float EavAlt;
   float dalphat;
   float W_genie;

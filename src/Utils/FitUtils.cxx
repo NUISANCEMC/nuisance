@@ -912,7 +912,7 @@ double FitUtils::Get_STV_dpt_HMProton(FitEvent *event, int ISPDG, bool Is0pi) {
     TLorentzVector ppi = event->GetHMFSParticle(PhysConst::pdg_pions)->fP;
     HadronP += ppi.Vect();
   }
-  return GetDeltaPT(LeptonP, HadronP, NuP).Mag();
+  return 1E-3 * GetDeltaPT(LeptonP, HadronP, NuP).Mag();
 }
 
 double FitUtils::Get_STV_dphit_HMProton(FitEvent *event, int ISPDG,
