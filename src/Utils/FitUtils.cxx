@@ -650,8 +650,9 @@ TVector3 FitUtils::GetPmiss(FitEvent *event) {
 
   pmiss_vect -= Sum_of_momenta;
   std::cout << "Sum_of_momenta is " << Sum_of_momenta.Mag() << std::endl;
-
-  return pmiss_vect;
+  
+  // Return in GeV
+  return pmiss_vect * 0.001;
 }
 
 double FitUtils::GetEmiss(FitEvent *event) {
@@ -738,8 +739,9 @@ double FitUtils::GetEmiss(FitEvent *event) {
   } else if (event->GetHMFSParticle(event->GetBeamPartPDG())) {
     q0_true -= event->GetHMFSParticle(event->GetBeamPartPDG())->fP.E();
   }
-
-  Emiss = q0_true - Ehad - Trem;
+  
+  // Convert in GeV
+  Emiss = 0.001 * (q0_true - Ehad - Trem);
 
   ///debugging
   std::cout << "Mode is " << evt_mode << std::endl;
