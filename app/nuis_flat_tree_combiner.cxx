@@ -16,7 +16,7 @@ void SayUsage(char const *argv[]) {
   std::cout
       << "[USAGE]: " << argv[0] << "\n"
       << "\t-i <file1.root [file2.root [file3.root [...]]]> : Input file list\n"
-      << "\t-o <outfilename.root>                           : Input file list\n"
+      << "\t-o <outfilename.root>                           : Output file name\n"
       << "\t-t <treename>                                   : flat tree name\n"
       << "\t-b <branchname>                                 : xsec weighting "
          "branch name\n"

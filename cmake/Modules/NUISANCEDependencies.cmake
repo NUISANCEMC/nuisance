@@ -13,6 +13,7 @@ endif()
 add_library(GeneratorCompileDependencies INTERFACE)
 add_library(GeneratorLinkDependencies INTERFACE)
 
+set(GiBUU_ENABLED TRUE)
 target_compile_definitions(GeneratorCompileDependencies INTERFACE GiBUU_ENABLED)
 
 DefineEnabledRequiredSwitch(T2KReWeight)
@@ -23,6 +24,7 @@ DefineEnabledRequiredSwitch(NEUT)
 DefineEnabledRequiredSwitch(GENIE)
 DefineEnabledRequiredSwitch(NuWro)
 DefineEnabledRequiredSwitch(Prob3plusplus)
+DefineEnabledRequiredSwitch(HepMC3)
 
 if (T2KReWeight_ENABLED)
   include(T2KReWeight)
@@ -207,21 +209,23 @@ if(NOUNDEF_INDEX GREATER -1)
   cmessage(STATUS "Removed -Wl,--no-undefined flag from CMAKE_SHARED_LINKER_FLAGS at the end of NUISANCEDependencies")
 endif()
 
-CPMAddPackage(
-    NAME HepMC3
-    VERSION 3.2.5
-    GIT_REPOSITORY "https://gitlab.cern.ch/hepmc/HepMC3.git"
-    GIT_TAG 3.2.5
-    OPTIONS
-      "HEPMC3_CXX_STANDARD ${CMAKE_CXX_STANDARD}"
-      "HEPMC3_ENABLE_SEARCH OFF"
-      "HEPMC3_ENABLE_ROOTIO ON"
-      "HEPMC3_ENABLE_PROTOBUFIO OFF"
-      "HEPMC3_ENABLE_PYTHON OFF"
-      "HEPMC3_BUILD_DOCS OFF"
-      "HEPMC3_BUILD_EXAMPLES OFF"
-      "HEPMC3_INSTALL_EXAMPLES OFF"
-      "HEPMC3_ENABLE_TEST OFF"
-      "HEPMC3_INSTALL_INTERFACES OFF"
-      "HEPMC3_BUILD_STATIC_LIBS OFF"
-)
+if (HepMC3_ENABLED)
+  CPMAddPackage(
+      NAME HepMC3
+      VERSION 3.2.5
+      GIT_REPOSITORY "https://gitlab.cern.ch/hepmc/HepMC3.git"
+      GIT_TAG 3.2.5
+      OPTIONS
+        "HEPMC3_CXX_STANDARD ${CMAKE_CXX_STANDARD}"
+        "HEPMC3_ENABLE_SEARCH OFF"
+        "HEPMC3_ENABLE_ROOTIO ON"
+        "HEPMC3_ENABLE_PROTOBUFIO OFF"
+        "HEPMC3_ENABLE_PYTHON OFF"
+        "HEPMC3_BUILD_DOCS OFF"
+        "HEPMC3_BUILD_EXAMPLES OFF"
+        "HEPMC3_INSTALL_EXAMPLES OFF"
+        "HEPMC3_ENABLE_TEST OFF"
+        "HEPMC3_INSTALL_INTERFACES OFF"
+        "HEPMC3_BUILD_STATIC_LIBS OFF"
+  )
+endif()
