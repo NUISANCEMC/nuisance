@@ -59,6 +59,13 @@ set(InputHandler_Hdr_Files
   HistogramInputHandler.h
 )
 
+add_library(InputHandler SHARED ${InputHandler_Impl_Files})
+
+if(HepMC3_ENABLED)
+  LIST(APPEND InputHandler_Impl_Files NuHepMCInputHandler.cxx)
+  target_compile_definitions(InputHandler PRIVATE HepMC3_ENABLED)
+endif()
+
 if(GENIE_ENABLED)
   LIST(APPEND InputHandler_Impl_Files GENIEInputHandler.cxx)
 endif()
@@ -71,7 +78,6 @@ if(NuWro_ENABLED)
   LIST(APPEND InputHandler_Impl_Files NuWroInputHandler.cxx)
 endif()
 
-add_library(InputHandler SHARED ${InputHandler_Impl_Files})
 target_link_libraries(InputHandler GeneratorCompileDependencies Experiments CoreIncludes HepMC3 ROOT::ROOT)
 set_target_properties(InputHandler PROPERTIES PUBLIC_HEADER "${InputHandler_Hdr_Files}")
 
