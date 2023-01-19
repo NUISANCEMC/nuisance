@@ -87,6 +87,8 @@ public:
   float q3;
   float Emiss;
   TVector3 pmiss;
+  float Emiss_preFSI;
+  TVector3 pmiss_preFSI;
   float Enu_QE;
   float Enu_true;
   float Q2_QE;

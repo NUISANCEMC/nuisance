@@ -627,35 +627,41 @@ double FitUtils::GetErecoil_CHARGED(FitEvent *event) {
 }
 
 //DIRTy variables - Emiss and pmiss
-TVector3 FitUtils::GetPmiss(FitEvent *event) {
+TVector3 FitUtils::GetPmiss(FitEvent *event, bool preFSI) {
   //pmiss_vect is the vector difference between the neutrino momentum and the sum of final state particles momenta
   //initialize to neutrino momentum
   TVector3 pmiss_vect = event->GetNeutrinoIn()->P3();
-  std::cout << "in pmiss - neutirno momentum " << pmiss_vect.Mag()<< std::endl;
+  //std::cout << "in pmiss - neutirno momentum " << pmiss_vect.Mag()<< std::endl;
   // Get sum of momenta for all final state particles
   TVector3 Sum_of_momenta(0, 0, 0);
-  for (unsigned int i = 0; i < event->Npart(); i++) {
-    // Only final state
-    if (!event->PartInfo(i)->fIsAlive)
-      continue;
-    if (event->PartInfo(i)->fNEUTStatusCode != 0)
-      continue;
+  for (unsigned int i = 3; i < event->Npart(); i++) {
+    // //if calculated with pre-fsi info, skip is particle is not at primary vertex, esle only final state
+    if (preFSI){
+      if (!event->fPrimaryVertex[i])
+        continue;
+    }
+    else {
+      if (!event->PartInfo(i)->fIsAlive)
+        continue;
+      if (event->PartInfo(i)->fNEUTStatusCode != 0)
+        continue;
+    }
     //skip nuclear remnant
     if (abs(event->PartInfo(i)->fPID)>10000)
       continue;
-    std::cout << "Found a " << event->PartInfo(i)->fPID << std::endl;
+    //std::cout << "Found a " << event->PartInfo(i)->fPID << std::endl;
     Sum_of_momenta+=event->PartInfo(i)->P3();
-    std::cout << "in pmiss - other part mom " << event->PartInfo(i)->P3().Mag() << std::endl;
+    //std::cout << "in pmiss - other part mom " << event->PartInfo(i)->P3().Mag() << std::endl;
   }
 
   pmiss_vect -= Sum_of_momenta;
-  std::cout << "Sum_of_momenta is " << Sum_of_momenta.Mag() << std::endl;
+  //std::cout << "Sum_of_momenta is " << Sum_of_momenta.Mag() << std::endl;
   
   // Return in GeV
   return pmiss_vect * 0.001;
 }
 
-double FitUtils::GetEmiss(FitEvent *event) {
+double FitUtils::GetEmiss(FitEvent *event, bool preFSI) {
 
   /*==================!!!!!!!!!!!!!!!!!!!!!!!!!!!!=======================//
   Beware, this is not an exact calculation. The following approximations are made 
@@ -667,7 +673,9 @@ double FitUtils::GetEmiss(FitEvent *event) {
   This is fine at first order for DIRT2 ground state validations. If you care about MeV level effects, you might want to change this function or not use it
   ==================!!!!!!!!!!!!!!!!!!!!!!!!!!!!=======================*/
   double Emiss = -999;
-  double pmiss = GetPmiss(event).Mag();
+  double pmiss;
+  if (preFSI) pmiss = GetPmiss(event, 1).Mag();
+  else pmiss = GetPmiss(event).Mag();
 
   std::map<int, double> bindingEnergies;
 
@@ -708,12 +716,18 @@ double FitUtils::GetEmiss(FitEvent *event) {
 
   double Ehad = 0;
 
-  for (unsigned int i = 0; i < event->Npart(); i++) {
-    // Only final state
-    if (!event->PartInfo(i)->fIsAlive)
-      continue;
-    if (event->PartInfo(i)->fNEUTStatusCode != 0)
-      continue;
+  for (unsigned int i = 3; i < event->Npart(); i++) {
+    //if calculated with pre-fsi info, skip is particle is not at primary vertex, esle only final state
+    if (preFSI){
+      if (!event->fPrimaryVertex[i])
+        continue;
+    }
+    else {
+      if (!event->PartInfo(i)->fIsAlive)
+        continue;
+      if (event->PartInfo(i)->fNEUTStatusCode != 0)
+        continue;
+    }
     //skip nuclear remnant
     if (abs(event->PartInfo(i)->fPID)>10000)
       continue;
@@ -724,12 +738,12 @@ double FitUtils::GetEmiss(FitEvent *event) {
     //add kinetic energy of proton or neutron
     if (event->PartInfo(i)->fPID == 2112 || event->PartInfo(i)->fPID == 2212){
       Ehad+=FitUtils::T(event->PartInfo(i)->fP)*1000;
-      std::cout << "proto/neutronKE  " << FitUtils::T(event->PartInfo(i)->fP)*1000 << std::endl;
+      //std::cout << "proto/neutronKE  " << FitUtils::T(event->PartInfo(i)->fP)*1000 << std::endl;
     }
     //add total energy of other particles 
     else {
       Ehad+=event->PartInfo(i)->fP.E();
-      std::cout << "other particles E " << event->PartInfo(i)->fP.E() << std::endl;
+      //std::cout << "other particles E " << event->PartInfo(i)->fP.E() << std::endl;
     }
   }
 
@@ -744,7 +758,7 @@ double FitUtils::GetEmiss(FitEvent *event) {
   Emiss = 0.001 * (q0_true - Ehad - Trem);
 
   ///debugging
-  std::cout << "Mode is " << evt_mode << std::endl;
+  /*std::cout << "Mode is " << evt_mode << std::endl;
   std::cout << "Target mass is " << M_tgt << std::endl;
   std::cout << "Target nucleons is " << n_tgt_nucleons << std::endl;
   std::cout << "Interacting nucleons is " << n_int_nucleons << std::endl;
@@ -754,7 +768,7 @@ double FitUtils::GetEmiss(FitEvent *event) {
   std::cout << "Ehad is " << Ehad << std::endl;
   std::cout << "Trem is " << Trem << std::endl;
   std::cout << "Emiss is " << Emiss << std::endl;
-  std::cout << "==========================" << std::endl;
+  std::cout << "==========================" << std::endl;*/
 
   return Emiss;
 

@@ -122,7 +122,7 @@ bool GENIEInputHandler::IsPrimary(GHepParticle *p) {
 
   // Then do a simple check of mother is associated with the primary
   int MotherID = mother->FirstMother();
-  if (MotherID > 2) return false;
+  //if (MotherID > 2) return false;
 
   // Finally, this should mean that our partcile is marked for transport through the nucleus
   // Could also be interactions of free proton

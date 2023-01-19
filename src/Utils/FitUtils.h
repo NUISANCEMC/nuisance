@@ -131,8 +131,8 @@ double ProtonQ2QErec(double pE, double binding);
 /*
 Emiss and pmiss
 */
-double GetEmiss(FitEvent *event);
-TVector3 GetPmiss(FitEvent *event);
+double GetEmiss(FitEvent *event, bool preFSI=0);
+TVector3 GetPmiss(FitEvent *event, bool preFSI=0);
 
 /*
   E Recoil MINERvA
