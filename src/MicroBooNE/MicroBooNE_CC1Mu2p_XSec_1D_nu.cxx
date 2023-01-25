@@ -80,6 +80,66 @@ MicroBooNE_CC1Mu2p_XSec_1D_nu::MicroBooNE_CC1Mu2p_XSec_1D_nu(nuiskey samplekey) 
 
 
 bool MicroBooNE_CC1Mu2p_XSec_1D_nu::isSignal(FitEvent* event) {
+  
+  // apapadop
+  /*static int counter  = 0;
+  static double old_mom = 0.;
+  double new_mom = event->GetHMFSParticle(13)->fP.Vect().Mag();
+  if (new_mom < 100 || new_mom > 1200) { return false; }
+  bool signal = SignalDef::MicroBooNE::isCC1Mu2p(event, EnuMin, EnuMax);
+  
+    if (old_mom != new_mom) {  
+
+      old_mom = new_mom; 
+
+      if (signal) {
+
+	int ProtonCounter = 0;
+	std::vector<int> ProtonIndices = event->GetAllFSProtonIndices();
+	std::vector<int> SignalProtonIndices;
+
+	for (int i = 0; i < (int)(ProtonIndices.size()); i++) {
+
+	  double mom = event->GetParticleMom( ProtonIndices.at(i) );
+	  if (mom > 300 && mom < 1000) {
+
+	    ProtonCounter++;
+	    SignalProtonIndices.push_back( ProtonIndices.at(i) );
+
+	  }
+
+	}
+
+	if (ProtonCounter != 2) { return false; }
+
+	TVector3 vpmu = event->GetHMFSParticle(13)->fP.Vect();
+	TVector3 vplead = event->GetParticleP3(SignalProtonIndices.at(0) );
+	TVector3 vprecoil = event->GetParticleP3( SignalProtonIndices.at(1) );
+
+	if ( vplead.Mag() < vprecoil.Mag() ) {
+
+	  TVector3 temp = vplead;
+	  vplead = vprecoil;
+	  vprecoil = temp;
+
+	}
+
+	TVector3 vSumP = vplead + vprecoil;
+	TVector3 vSumAll = vpmu + vplead + vprecoil;
+
+	double DeltaPT = vSumAll.Pt() / 1000.; // GeV/c                                                                                                                                                         
+	double CosThetaP_Lab = cos( vplead.Angle(vprecoil) );
+	double CosThetaMu_Both = cos( vpmu.Angle(vSumP) );
+
+	cout << "event = " << counter << ", mu mom = " << new_mom/1000. << ", p lead mom = " << vplead.Mag()/1000. << ", p recoil mom = " << vprecoil.Mag()/1000. << std::endl;
+	cout << "      DeltaPT = " << DeltaPT  << ", opening_angle_protons_lab = " << CosThetaP_Lab << ", opening_angle_mu_both = " << CosThetaMu_Both << endl;
+      }
+
+      ++counter;
+
+    }
+    // end of apapadop
+    */
   return SignalDef::MicroBooNE::isCC1Mu2p(event, EnuMin, EnuMax);
 };
 
@@ -89,9 +149,39 @@ void MicroBooNE_CC1Mu2p_XSec_1D_nu::FillEventVariables(FitEvent* event) {
   if (event->NumFSParticle(13) == 0) return;
   if (event->NumFSParticle(2212) < 2) return;
 
+  if ( !(SignalDef::MicroBooNE::isCC1Mu2p(event, EnuMin, EnuMax) ) ) { return; }
+
   TVector3 vpmu = event->GetHMFSParticle(13)->fP.Vect();
-  TVector3 vplead = event->GetHMFSParticle(2212)->fP.Vect();
-  TVector3 vprecoil = event->GetSHMFSParticle(2212)->fP.Vect();
+  if (vpmu.Mag() < 100 || vpmu.Mag() > 1200) { return; }
+
+  int ProtonCounter = 0;
+  std::vector<int> ProtonIndices = event->GetAllFSProtonIndices();
+  std::vector<int> SignalProtonIndices;
+
+  for (int i = 0; i < (int)(ProtonIndices.size()); i++) {
+
+    double mom = event->GetParticleMom( ProtonIndices.at(i) );
+    if (mom > 300 && mom < 1000) { 
+      
+      ProtonCounter++; 
+      SignalProtonIndices.push_back( ProtonIndices.at(i) );
+
+    }
+
+  }
+
+  if (ProtonCounter != 2) { return; }
+
+  TVector3 vplead = event->GetParticleP3(SignalProtonIndices.at(0) );
+  TVector3 vprecoil = event->GetParticleP3( SignalProtonIndices.at(1) );
+  
+  if ( vplead.Mag() < vprecoil.Mag() ) {  
+
+    TVector3 temp = vplead;
+    vplead = vprecoil;
+    vprecoil = temp;
+
+  }
 
   TVector3 vSumP = vplead + vprecoil;
   TVector3 vSumAll = vpmu + vplead + vprecoil;

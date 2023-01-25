@@ -21,6 +21,10 @@
 
 #include "Measurement1D.h"
 
+#include <iostream>
+#include <fstream>
+using namespace std;
+
 class TH2D;
 
 class MicroBooNE_CC1Mu2p_XSec_1D_nu : public Measurement1D {
@@ -40,6 +44,7 @@ public:
 private:
   enum Distribution { kDeltaPT, kOpening_Angle_Protons_Lab, kOpening_Angle_Mu_Both };
   Distribution fDist;
+
 };
 
 #endif

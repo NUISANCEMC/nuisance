@@ -182,6 +182,7 @@
 #include "MicroBooNE_CCInc_XSec_2DPcos_nu.h"
 #include "MicroBooNE_CC1MuNp_XSec_1D_nu.h"
 #include "MicroBooNE_CC1Mu2p_XSec_1D_nu.h"
+#include "MicroBooNE_CC1Mu1p_XSec_1D_nu.h"
 #endif
 
 #ifndef __NO_MINERvA__
@@ -1098,6 +1099,19 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
 	     !name.compare("MicroBooNE_CC1Mu2p_XSec_1DOpening_Angle_Mu_Both_nu") ||
 	     !name.compare("MicroBooNE_CC1Mu2p_XSec_1DDeltaPT_nu")) {
 	return (new MicroBooNE_CC1Mu2p_XSec_1D_nu(samplekey));
+  } else if (!name.compare("MicroBooNE_CC1Mu1p_XSec_1DDeltaPT_nu") ||
+	     !name.compare("MicroBooNE_CC1Mu1p_XSec_1DDeltaAlphaT_nu") ||
+	     !name.compare("MicroBooNE_CC1Mu1p_XSec_1DDeltaPhiT_nu") ||
+	     !name.compare("MicroBooNE_CC1Mu1p_XSec_1DMuonCosTheta_nu") ||
+	     !name.compare("MicroBooNE_CC1Mu1p_XSec_1DProtonCosTheta_nu") ||
+	     !name.compare("MicroBooNE_CC1Mu1p_XSec_1DMuonMomentum_nu") ||
+	     !name.compare("MicroBooNE_CC1Mu1p_XSec_1DProtonMomentum_nu") ||
+	     !name.compare("MicroBooNE_CC1Mu1p_XSec_1DDeltaPn_nu") ||
+	     !name.compare("MicroBooNE_CC1Mu1p_XSec_1DDeltaPtx_nu") ||
+	     !name.compare("MicroBooNE_CC1Mu1p_XSec_1DDeltaPty_nu") ||
+	     !name.compare("MicroBooNE_CC1Mu1p_XSec_1DECal_nu") ||
+	     !name.compare("MicroBooNE_CC1Mu1p_XSec_1DEQE_nu")) {
+	return (new MicroBooNE_CC1Mu1p_XSec_1D_nu(samplekey));
   } else
 #endif
 

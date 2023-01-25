@@ -39,6 +39,15 @@ bool isCC1MuNp(FitEvent* event, double EnuMin, double EnuMax);
  */
 bool isCC1Mu2p(FitEvent* event, double EnuMin, double EnuMax);
 
+/**
+ * numu CC with 1 muon (0.1 < Pmu < 1.2 GeV/c), 1 proton (0.3 < Pp < 1 GeV/c), no neutral pions (any momenta), and no charged pions above 70 MeV/c [any number of neutrons is allowed].
+ *
+ * publication reference to be updated
+ */
+bool isCC1Mu1p(FitEvent* event, double EnuMin, double EnuMax);
+
+
+
   }  // namespace MicroBooNE
 }  // namespace SignalDef
 
