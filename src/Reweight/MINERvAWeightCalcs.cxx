@@ -2,7 +2,6 @@
 #ifdef __GENIE_ENABLED__
 
 #include "MINERvAWeightCalcs.h"
-#include "BaseFitEvt.h"
 
 namespace nuisance {
 namespace reweight {

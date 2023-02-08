@@ -27,9 +27,12 @@ using namespace genie;
 #include "NUISANCEWeightCalcs.h"
 #include "GeneralUtils.h"
 #include "NUISANCESyst.h"
+#include "BaseFitEvt.h"
 #include "FitEvent.h"
 #include "WeightUtils.h"
 #include "weightRPA.h"
+#include "WeightEngineBase.h"
+
 class BaseFitEvt;
 
 
