@@ -13,6 +13,10 @@ endif()
 add_library(GeneratorCompileDependencies INTERFACE)
 add_library(GeneratorLinkDependencies INTERFACE)
 
+if(DEFINED ROOT_VERSION_MAJOR)
+  target_compile_definitions(GeneratorCompileDependencies INTERFACE ROOT_VERSION_MAJOR=${ROOT_VERSION_MAJOR})
+endif()
+
 set(GiBUU_ENABLED TRUE)
 target_compile_definitions(GeneratorCompileDependencies INTERFACE GiBUU_ENABLED)
 

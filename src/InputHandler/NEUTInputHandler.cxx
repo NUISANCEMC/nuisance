@@ -137,10 +137,11 @@ NEUTInputHandler::NEUTInputHandler(std::string const &handle,
   fEventType = kNEUT;
   fNeutVect = NULL;
   fNEUTTree->SetBranchAddress("vectorbranch", &fNeutVect);
-  #if defined(ROOT6) && defined(NEUT_VERSION) && (NEUT_VERSION >= 541)
+#if defined(ROOT_VERSION_MAJOR) && (ROOT_VERSION_MAJOR >= 6) &&                \
+    defined(NEUT_VERSION) && (NEUT_VERSION >= 541)
   fNEUTTree->SetAutoDelete(true);
-  #endif
-  fNEUTTree->GetEntry(0);
+#endif
+      fNEUTTree->GetEntry(0);
 
   // Create Fit Event
   fNUISANCEEvent = new FitEvent();
@@ -291,10 +292,11 @@ int NEUTInputHandler::GetNeutParticleStatus(NeutPart *part) {
     NUIS_ABORT("Undefined NEUT state "
                << " Alive: " << part->fIsAlive << " Status: " << part->fStatus
                << " PDG: " << part->fPID << " Mode: " << fNeutVect->Mode);
-  } else if (abs(fNeutVect->Mode) == 35){
+  } else if (abs(fNeutVect->Mode) == 35) {
     NUIS_ERR(WRN, "Marking nonsensical CC difractive event as undefined "
-	     << " Alive: " << part->fIsAlive << " Status: " << part->fStatus
-	     << " PDG: " << part->fPID << " Mode: " << fNeutVect->Mode);
+                      << " Alive: " << part->fIsAlive
+                      << " Status: " << part->fStatus << " PDG: " << part->fPID
+                      << " Mode: " << fNeutVect->Mode);
     state = kUndefinedState;
     // Warn if we find dead particles that we haven't classified
   } else {
@@ -318,8 +320,10 @@ void NEUTInputHandler::CalcNUISANCEKinematics() {
   fNUISANCEEvent->fTargetH = fNeutVect->TargetH;
   fNUISANCEEvent->fBound = bool(fNeutVect->Ibound);
 
-  if (fNUISANCEEvent->fBound || 
-      (!fNUISANCEEvent->fBound && abs(fNUISANCEEvent->Mode) == 16))  { // Make special exception for coherent events (mode 16)
+  if (fNUISANCEEvent->fBound ||
+      (!fNUISANCEEvent->fBound &&
+       abs(fNUISANCEEvent->Mode) ==
+           16)) { // Make special exception for coherent events (mode 16)
     fNUISANCEEvent->fTargetPDG = TargetUtils::GetTargetPDGFromZA(
         fNUISANCEEvent->fTargetZ, fNUISANCEEvent->fTargetA);
   } else {
