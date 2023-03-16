@@ -95,7 +95,12 @@ GENIEInputHandler::GENIEInputHandler(std::string const &handle,
   fName = handle;
 
   // Setup the TChain
-  fGENIETree = new TChain("gtree");
+  if (FitPar::Config().HasConfig("GENIE_tree_loc")){
+    fGENIETree = new TChain(FitPar::Config().GetPar("GENIE_tree_loc").c_str());
+  }
+  else {
+    fGENIETree = new TChain("gtree");
+  }
   fSaveExtra = FitPar::Config().GetParB("SaveExtraGenie");
   fCacheSize = FitPar::Config().GetParI("CacheSize");
   fMaxEvents = FitPar::Config().GetParI("MAXEVENTS");

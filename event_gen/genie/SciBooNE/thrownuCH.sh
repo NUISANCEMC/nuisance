@@ -5,8 +5,8 @@ if [ -z $1 ]; then
   exit 1
 fi
 
-if [ -z $GENIE_XSEC_FILE ] || [ ! -e $GENIE_XSEC_FILE ]; then
-  echo "Cannot find GENIE xsec file @ \$ENV{GENIE_XSEC_FILE}."
+if [ -z $GENIEXSECFILE ] || [ ! -e $GENIEXSECFILE ]; then
+  echo "Cannot find GENIE xsec file @ \$ENV{GENIEXSECFILE}."
   exit 1
 fi
 
@@ -40,9 +40,10 @@ gevgen \
    -r ${RUNNUM} -e 0.1,10 \
    -f ${FLUX_FILE},${FLUX_HIST} \
    -n ${NEVS} --seed ${RUNNUM} \
-   --cross-sections ${GENIE_XSEC_FILE} \
-   --event-generator-list Default+MEC \
-   --message-thresholds Messenger_whisper.xml
+   --cross-sections ${GENIEXSECFILE} \
+   --tune ${GENIE_XSEC_TUNE} 
+#   --message-thresholds Messenger_whisper.xml
+#   --event-generator-list Default+MEC \
 
 if [ -e gntp.${RUNNUM}.ghep.root ]; then
    rm -f input-flux.root

@@ -23,6 +23,7 @@ std::string gInputFiles = "";
 std::string gOutputFile = "";
 std::string gFluxFile = "";
 std::string gTarget = "";
+std::string gTree = "gtree";
 double MonoEnergy;
 int gNEvents = -999;
 bool IsMonoE = false;
@@ -86,7 +87,7 @@ void RunGENIEPrepareMono(std::string input, std::string target,
       << " GeV");
 
   // Setup TTree
-  TChain *tn = new TChain("gtree");
+  TChain *tn = new TChain(gTree.c_str());
   std::string first_file = "";
 
   if (input.find_first_of(',') != std::string::npos) {
@@ -223,6 +224,7 @@ void RunGENIEPrepareMono(std::string input, std::string target,
 
     NUIS_LOG(FIT, "Cloning input vector to output file: " << gOutputFile);
     TTree *cloneTree = tn->CloneTree(-1, "fast");
+    cloneTree->SetName("gtree");
     cloneTree->SetDirectory(outputfile);
     cloneTree->Write();
 
@@ -498,7 +500,7 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
   }
 
   // Setup TTree
-  TChain *tn = new TChain("gtree");
+  TChain *tn = new TChain(gTree.c_str());
   std::string first_file = "";
 
   if (input.find_first_of(',') != std::string::npos) {
@@ -948,6 +950,9 @@ void ParseOptions(int argc, char *argv[]) {
         MonoEnergy = GeneralUtils::StrToDbl(argv[i + 1]);
         IsMonoE = true;
         ++i;
+      } else if (!std::strcmp(argv[i], "-l")) {
+	gTree = argv[i+1];
+	++i;
       } else {
         NUIS_ERR(FTL, "ERROR: unknown command line option given! - '"
             << argv[i] << " " << argv[i + 1] << "'");
