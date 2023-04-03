@@ -50,8 +50,8 @@ if(DEFINED ENV{NuHepMCModules_ROOT})
 else()
   CPMFindPackage(
       NAME CMakeModules
-      GIT_TAG stable
-      GITHUB_REPOSITORY NuHepMC/CMakeModules
+      GIT_TAG feature/jskim_fixFindLHAPDF
+      GITHUB_REPOSITORY jedori0228/CMakeModules
       DOWNLOAD_ONLY
   )
   include(${CMakeModules_SOURCE_DIR}/NuHepMCModules.cmake)

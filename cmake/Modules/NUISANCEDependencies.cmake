@@ -78,7 +78,7 @@ if (NOvARwgt_ENABLED)
 endif()
 
 if (nusystematics_ENABLED)
-  find_package(nusystematics 1.00.3)
+  include(FindNusystematics)
 
   if(NOT nusystematics_FOUND)
     if(nusystematics_REQUIRED)
@@ -86,11 +86,12 @@ if (nusystematics_ENABLED)
     endif()
     SET(nusystematics_ENABLED FALSE)
   else()
+    message(STATUS "[JSKIMDEBUG] nusystematics found")
     SET(nusystematics_ENABLED TRUE)
     add_library(NUISANCEnusystematics INTERFACE)
     set_target_properties(NUISANCEnusystematics PROPERTIES 
       INTERFACE_COMPILE_OPTIONS "-Dnusystematics_ENABLED"
-      INTERFACE_LINK_LIBRARIES nusystematics::all)
+      INTERFACE_LINK_LIBRARIES nusystematics::All)
 
     target_link_libraries(GeneratorCompileDependencies INTERFACE NUISANCEnusystematics)
   endif()
