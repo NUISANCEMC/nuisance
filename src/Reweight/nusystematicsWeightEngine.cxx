@@ -166,7 +166,8 @@ double nusystematicsWeightEngine::CalcWeight(BaseFitEvt *evt) {
              // spline every time.
 
       //this is a completely backwards way of doing this loop, but the whole thing is broken anyway.
-      size_t index = GetParamContainerIndex(EnabledParams, resp.pid);
+      auto pid = resp.pid;
+      size_t index = GetParamContainerIndex(EnabledParams, pid);
       if(index != systtools::kParamUnhandled<size_t>){
       weight *= (resp.CV_response *
                  DUNErwt.GetParameterResponse(resp.pid, EnabledParams[index].val,
