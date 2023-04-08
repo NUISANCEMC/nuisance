@@ -45,6 +45,9 @@ int main(int argc, char *argv[]) {
 
 // CWret October 2019
 // We have to scale the 2p2h cross-section when the 2p2h generator in GENIE is Nieves
+//****
+// SD: OR SuSA!
+//****
 // When the 2p2h generator is Empirical no such scaling is needed
 // This is needed to match the output of PrepareGENIE to GENIE splines from gspl2root
 // Allow the user to override this for debugging
@@ -65,6 +68,10 @@ bool CheckConfig(std::string filename) {
     // Look for MEC (specifies it's a MEC setting)
     // Look for Nieves 2p2h from 2016
     if (name.find("XSecModel") != std::string::npos && name.find("MEC-CC") != std::string::npos && name.find("NievesSimoVacasMECPXSec2016") != std::string::npos) {
+      ShouldScale = true;
+    }
+    // The same thing applies to the SuSAv2 model
+    if (name.find("XSecModel") != std::string::npos && name.find("MEC-CC") != std::string::npos && name.find("SuSAv2MECPXSec") != std::string::npos) {
       ShouldScale = true;
     }
   }
