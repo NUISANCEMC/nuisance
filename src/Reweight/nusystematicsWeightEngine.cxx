@@ -50,6 +50,9 @@ void nusystematicsWeightEngine::Config() {
 systtools::paramId_t const kNuSystCVResponse = 999;
 
 int nusystematicsWeightEngine::ConvDial(std::string name) {
+
+  std::cout << "[JSKIMDEBUG][nusystematicsWeightEngine::ConvDial(std::string name)] called, name = " << name << std::endl;
+
   if (name == "NuSystCVResponse") {
     return kNuSystCVResponse;
   }
@@ -63,6 +66,8 @@ int nusystematicsWeightEngine::ConvDial(std::string name) {
 
 void nusystematicsWeightEngine::IncludeDial(std::string name, double startval) {
 
+  std::cout << "[JSKIMDEBUG][nusystematicsWeightEngine::IncludeDial(std::string name, double startval)] called, name = " << name << ", startval = " << startval << std::endl;
+
   systtools::paramId_t DuneRwtEnum(ConvDial(name));
 
   if (DuneRwtEnum == kNuSystCVResponse) {
@@ -73,6 +78,8 @@ void nusystematicsWeightEngine::IncludeDial(std::string name, double startval) {
 }
 
 void nusystematicsWeightEngine::SetDialValue(int nuisenum, double val) {
+
+  std::cout << "[JSKIMDEBUG][nusystematicsWeightEngine::SetDialValue(int nuisenum, double val)] called, nuisenum = " << nuisenum << ", val = " << val << std::endl;
 
   systtools::paramId_t DuneRwtEnum = (nuisenum % NUIS_DIAL_OFFSET);
 
@@ -86,6 +93,9 @@ void nusystematicsWeightEngine::SetDialValue(int nuisenum, double val) {
   pval.val = val;
 }
 void nusystematicsWeightEngine::SetDialValue(std::string name, double val) {
+
+  std::cout << "[JSKIMDEBUG][nusystematicsWeightEngine::SetDialValue(std::string name, double val)] called, name = " << name << ", val = " << val << std::endl;
+
   if (!IsDialIncluded(name)) {
     NUIS_ABORT("nusystematicsWeightEngine passed dial: "
                << name << " that is not enabled.");
@@ -104,6 +114,9 @@ void nusystematicsWeightEngine::SetDialValue(std::string name, double val) {
 }
 
 bool nusystematicsWeightEngine::IsDialIncluded(std::string name) {
+
+  std::cout << "[JSKIMDEBUG][nusystematicsWeightEngine::IsDialIncluded(std::string name)] called, name = " << name << std::endl;
+
   return IsDialIncluded(ConvDial(name));
 }
 bool nusystematicsWeightEngine::IsDialIncluded(int nuisenum) {
@@ -152,29 +165,105 @@ bool nusystematicsWeightEngine::NeedsEventReWeight() {
 }
 
 double nusystematicsWeightEngine::CalcWeight(BaseFitEvt *evt) {
+
+  std::cout << "[JSKIMDEBUG][nusystematicsWeightEngine.cxx][CalcWeight] Called" << std::endl;
+
+  // note 1) typedef std::vector<VarAndCVResponse> event_unit_response_w_cv_t
+  // note 2) struct VarAndCVResponse {
+  // systtools::paramId_t pid;
+  // double CV_response;
+  // std::vector<double> responses;
+  // };
+  
   systtools::event_unit_response_w_cv_t responses =
       DUNErwt.GetEventVariationAndCVResponse(*evt->genie_event->event);
 
+  std::cout << "[JSKIMDEBUG][nusystematicsWeightEngine.cxx][CalcWeight] GetEventVariationAndCVResponse finished" << std::endl;
+
   double weight = 1;
+  std::cout << "[JSKIMDEBUG][nusystematicsWeightEngine.cxx][CalcWeight] responses.size() = " << responses.size() << std::endl;
   for (auto const &resp : responses) {
+
+    std::cout << "[JSKIMDEBUG][nusystematicsWeightEngine.cxx][CalcWeight] - reps looped" << std::endl;
+    std::cout << "[JSKIMDEBUG][nusystematicsWeightEngine.cxx][CalcWeight]   - pid = " << resp.pid << std::endl;
+
+    auto const& sph = DUNErwt.GetHeader(resp.pid);
+    std::cout << "[JSKIMDEBUG][nusystematicsWeightEngine.cxx][CalcWeight]   - prettyName = " << sph.prettyName << std::endl;
+    std::cout << "[JSKIMDEBUG][nusystematicsWeightEngine.cxx][CalcWeight]   - isSplineable = " << sph.isSplineable << std::endl;
+    std::cout << "[JSKIMDEBUG][nusystematicsWeightEngine.cxx][CalcWeight]   - paramVariations.size() = " << sph.paramVariations.size() << ":" << std::endl;
+    for(auto const &v: sph.paramVariations) std::cout << v << ", ";
+    std::cout << std::endl;
+
+    std::cout << "[JSKIMDEBUG][nusystematicsWeightEngine.cxx][CalcWeight]   - CV_response = " << resp.CV_response << std::endl;
+    std::cout << "[JSKIMDEBUG][nusystematicsWeightEngine.cxx][CalcWeight]   - responses.size() = " << resp.responses.size() << ":" << std::endl;
+    for(auto const &v: resp.responses) std::cout << v << ", ";
+    std::cout << std::endl;
+
+
     if (!DUNErwt.IsWeightResponse(resp.pid)) {
+      std::cout << "[JSKIMDEBUG][nusystematicsWeightEngine.cxx][CalcWeight]   -> NOT IsWeightResponse, continue" << std::endl;
       continue;
     }
     if (fUseCV) {
+      std::cout << "[JSKIMDEBUG][nusystematicsWeightEngine.cxx][CalcWeight]   - UseCV: true" << std::endl;
       weight *= resp.CV_response;
     } else { // This is very inefficient for fitting, as it recalculates the
              // spline every time.
 
+      std::cout << "[JSKIMDEBUG][nusystematicsWeightEngine.cxx][CalcWeight]   - UseCV: false" << std::endl;
       //this is a completely backwards way of doing this loop, but the whole thing is broken anyway.
-      size_t index = GetParamContainerIndex(EnabledParams, resp.pid);
-      if(index != systtools::kParamUnhandled<size_t>){
-      weight *= (resp.CV_response *
-                 DUNErwt.GetParameterResponse(resp.pid, EnabledParams[index].val,
-                                              systtools::event_unit_response_t{
-                                                  {resp.pid, resp.responses}}));
+      auto pid = resp.pid;
+      size_t index = GetParamContainerIndex(EnabledParams, pid);
+      if(index == systtools::kParamUnhandled<size_t>){
+        std::cout << "[JSKIMDEBUG][nusystematicsWeightEngine.cxx][CalcWeight]   -> Not in EnabledParams, skipping.." << std::endl;
+      }
+      else{
+        std::cout << "[JSKIMDEBUG][nusystematicsWeightEngine.cxx][CalcWeight]   - index = " << index << std::endl;
+        std::cout << "[JSKIMDEBUG][nusystematicsWeightEngine.cxx][CalcWeight]   - EnabledParams[index].val = " << EnabledParams[index].val << std::endl;
+        std::cout << "[JSKIMDEBUG][nusystematicsWeightEngine.cxx][CalcWeight]   - Running GetParameterResponse" << std::endl;
+
+        bool DialAlreadyFound = false;
+        unsigned int counter = -1;
+        for(auto const &v: sph.paramVariations){
+          counter++;
+          if( std::abs( v - EnabledParams[index].val ) < std::numeric_limits<double>::epsilon() ){
+            DialAlreadyFound = true;
+            break;
+          }
+        }
+
+        if(DialAlreadyFound){
+          std::cout << "[JSKIMDEBUG][nusystematicsWeightEngine.cxx][CalcWeight]   - Dial found from paramVariations" << std::endl;
+          std::cout << "[JSKIMDEBUG][nusystematicsWeightEngine.cxx][CalcWeight]   - sph.paramVariations[counter] = " << sph.paramVariations[counter] << std::endl;
+          const double this_rw = (resp.CV_response * resp.responses[counter]);
+          std::cout << "[JSKIMDEBUG][nusystematicsWeightEngine.cxx][CalcWeight]   -> Found weight = " << this_rw << std::endl;
+          weight *= this_rw;
+        }
+        else{
+
+          std::cout << "[JSKIMDEBUG][nusystematicsWeightEngine.cxx][CalcWeight]   - Dial NOT found from paramVariations, constructing a spline" << std::endl;
+
+          const double this_rw = (resp.CV_response *
+                     DUNErwt.GetParameterResponse(resp.pid, EnabledParams[index].val,
+                                                  systtools::event_unit_response_t{
+                                                      {resp.pid, resp.responses}}));
+          std::cout << "[JSKIMDEBUG][nusystematicsWeightEngine.cxx][CalcWeight]   -> this_rw = " << this_rw << std::endl;
+/*
+          weight *= (resp.CV_response *
+                     DUNErwt.GetParameterResponse(resp.pid, EnabledParams[index].val,
+                                                  systtools::event_unit_response_t{
+                                                      {resp.pid, resp.responses}}));
+*/
+          weight *= this_rw;
+        }
       }
     }
+
+    std::cout << "[JSKIMDEBUG][nusystematicsWeightEngine.cxx][CalcWeight]   -> Going to next resp" << std::endl;
+
   }
+
+  std::cout << "[JSKIMDEBUG][nusystematicsWeightEngine.cxx][CalcWeight] ---> Final weight = " << weight << std::endl;
 
   return weight;
 }
