@@ -41,7 +41,6 @@ public:
   void ConvertEventRates();
 
 private:
-  TH2D* fSmearingMatrix;
   enum Distribution { kElecEnergy };
   Distribution fDist;
 };

@@ -62,25 +62,6 @@ MicroBooNE_CC1ENp_XSec_1D_nu::MicroBooNE_CC1ENp_XSec_1D_nu(nuiskey samplekey) {
 
   SetCovarFromRootFile(inputFile, "CovarianceMatrix_" + objSuffix);
 
-  TFile* inputRootFile = TFile::Open(inputFile.c_str());
-  assert(inputRootFile && inputRootFile->IsOpen());
-  TH2D* hsmear = (TH2D*) inputRootFile->Get(("SmearingMatrix_" + objSuffix).c_str());
-  assert(hsmear);
-  fSmearingMatrix = (TH2D*) hsmear->Clone((name + "_smearingMatrix").c_str());
-  fSmearingMatrix->SetDirectory(0);
-  inputRootFile->Close();
-  assert(fSmearingMatrix);
-
-  // Normalize columns
-  TH1D* hpx = fSmearingMatrix->ProjectionX("_smearing_py");
-  for (int i=1; i<fSmearingMatrix->GetNbinsX()+1; i++) {
-    for (int j=1; j<fSmearingMatrix->GetNbinsY()+1; j++) {
-      double v = fSmearingMatrix->GetBinContent(i, j) / hpx->GetBinContent(i);
-      fSmearingMatrix->SetBinContent(i, j, v);
-    }
-  }
-  delete hpx;
-
   // Final setup ------------------------------------------------------
   FinaliseMeasurement();
 };
@@ -102,16 +83,5 @@ void MicroBooNE_CC1ENp_XSec_1D_nu::FillEventVariables(FitEvent* event) {
 void MicroBooNE_CC1ENp_XSec_1D_nu::ConvertEventRates() {
   // Do standard conversion
   Measurement1D::ConvertEventRates();
-
-  // Apply MC truth -> reco smearing
-  TH1D* truth = (TH1D*) fMCHist->Clone(TString(fMCHist->GetName()) + "_truth");
-  assert(fSmearingMatrix->GetNbinsX() == fSmearingMatrix->GetNbinsY());
-  for (int ireco=1; ireco<fSmearingMatrix->GetNbinsY()+1; ireco++) {
-    double total = 0;
-    for (int itrue=1; itrue<fSmearingMatrix->GetNbinsX()+1; itrue++) {
-      total += truth->GetBinContent(itrue) * truth->GetBinWidth(itrue) * fSmearingMatrix->GetBinContent(itrue, ireco);
-    }
-    fMCHist->SetBinContent(ireco, total / truth->GetBinWidth(ireco));
-  }
 }
 
