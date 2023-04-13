@@ -54,8 +54,32 @@ bool isCC1ENp(FitEvent* event, double EnuMin, double EnuMax) {
   // Check CC inclusive
   if (!SignalDef::isCCINC(event, 12, EnuMin, EnuMax)) return false;
 
-  // Veto events which have fewer than 1 proton
+  // Veto events which don't have 1 or more FS protons
   if (event->NumFSProton() == 0) return false;
+
+  // Veto events which don't have exactly 1 FS electron
+  if (event->NumFSElectron() != 1) return false;
+
+  // Veto events with any charged or neutral pions with kinetic energy > 40MeV
+  std::vector<FitParticle*> PiPlusParticles = event->GetAllPiPlus();
+  std::vector<FitParticle*> PiMinusParticles = event->GetAllPiMinus();
+  std::vector<FitParticle*> PiZeroParticles = event->GetAllPiZero();
+
+  std::vector<FitParticle*> PiParticles;
+  for (uint i=0;i<PiPlusParticles.size();i++) {PiParticles.push_back(PiPlusParticles[i]);}
+  for (uint i=0;i<PiMinusParticles.size();i++) {PiParticles.push_back(PiMinusParticles[i]);}
+  for (uint i=0;i<PiZeroParticles.size();i++) {PiParticles.push_back(PiZeroParticles[i]);}
+
+  double KEThreshold = 40.0/1000; //Units in MeV
+
+  uint nPionsWithKEAboveThreshold = 0;
+  for (uint i=0;i<PiParticles.size();i++) {
+    if (PiParticles[i]->KE()>=KEThreshold) {
+      nPionsWithKEAboveThreshold += 1;
+    }
+  }
+
+  if (nPionsWithKEAboveThreshold != 0) return false;
 
   return true;
 }
