@@ -94,7 +94,7 @@ bool MicroBooNE_CC1ENp_XSec_1D_nu::isSignal(FitEvent* event) {
 void MicroBooNE_CC1ENp_XSec_1D_nu::FillEventVariables(FitEvent* event) {
   if (fDist == kElecEnergy) {
     if (event->NumFSParticle(11) == 0) return;
-    fXVar = event->GetHMFSParticle(11)->fP.Vect().Mag() / 1000;
+    fXVar = event->GetHMFSParticle(11)->fP.E() / 1000;
   }
 }
 
