@@ -79,7 +79,8 @@ foreach(FEATURE
   NOvARwgt
   nusystematics
   NuWro
-  Prob3plusplus)
+  Prob3plusplus
+  GiBUU)
   
   if(${FEATURE}_ENABLED)
     LIST(APPEND CONFIG_COMPILE_DEFINTIONS -D${FEATURE}_ENABLED)

@@ -25,6 +25,10 @@
 #include "SigmaQ0HistogramInputHandler.h"
 #include "SplineInputHandler.h"
 
+#ifdef HepMC3_ENABLED
+#include "NuHepMCInputHandler.h"
+#endif
+
 #ifdef GENIE_ENABLED
 #include "GENIEInputHandler.h"
 #endif
@@ -97,6 +101,15 @@ InputHandlerBase *CreateInputHandler(std::string const &handle,
     NUIS_ERR(FTL, "Tried to create NUANCEInputHandler : "
                    << handle << " " << inpType << " " << inputs);
     NUIS_ABORT("NUANCE is not enabled!");
+#endif
+    break;
+  case (kNuHepMC_Input):
+#ifdef HepMC3_ENABLED
+    input = new NuHepMCInputHandler(handle, newinputs);
+#else
+    NUIS_ERR(FTL, "Tried to create NuHepMCInputHandler : "
+                   << handle << " " << inpType << " " << inputs);
+    NUIS_ABORT("NuHepMCInputHandler is not enabled!");
 #endif
     break;
 
