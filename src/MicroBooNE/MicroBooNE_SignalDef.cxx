@@ -50,6 +50,16 @@ bool isCC1MuNp(FitEvent* event, double EnuMin, double EnuMax) {
   return false;
 }
 
+bool isCC1ENp(FitEvent* event, double EnuMin, double EnuMax) {
+  // Check CC inclusive
+  if (!SignalDef::isCCINC(event, 12, EnuMin, EnuMax)) return false;
+
+  // Veto events which have fewer than 1 proton
+  if (event->NumFSProton() == 0) return false;
+
+  return true;
+}
+
   }  // namespace MicroBooNE
 }  // namespace SignalDef
 
