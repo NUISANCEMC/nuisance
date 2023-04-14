@@ -27,19 +27,11 @@ MicroBooNE_CC1ENp_XSec_1D_nu::MicroBooNE_CC1ENp_XSec_1D_nu(nuiskey samplekey) {
   fSettings = LoadSampleSettings(samplekey);
   std::string name = fSettings.GetS("name");
 
-  std::string DataFileName;
-  std::string DataHistName;
-  std::string CovMatName;
-  std::string SmearMatName;
+  std::string ObjSuffix;
 
   if (!name.compare("MicroBooNE_CC1ENp_XSec_1DElecEnergy_nu")) {
     fDist = kElecEnergy;
-    
-    DataFileName = "output_shr_energy_cali_Combined_121622_dev1.root";
-    DataHistName = "unf";
-    CovMatName = "unfcov";
-    SmearMatName = "smear";
-
+    ObjSuffix = "ElecEnergy";
     fSettings.SetXTitle("Electron Energy (GeV)");
     fSettings.SetYTitle("d#sigma/dE_{e} (cm^{2}/^{40}Ar)");
   }
@@ -62,19 +54,22 @@ MicroBooNE_CC1ENp_XSec_1D_nu::MicroBooNE_CC1ENp_XSec_1D_nu(nuiskey samplekey) {
   FinaliseSampleSettings();
 
   // Load data --------------------------------------------------------- 
-  std::string inputFile = FitPar::GetDataBase() + "/MicroBooNE/CC1ENp/" + DataFileName;
-  SetDataFromRootFile(inputFile, DataHistName);
+  std::string inputFile = FitPar::GetDataBase() + "/MicroBooNE/CC1ENp/CC1ENp_data_MC_cov_data_smear_Release.root";
+  SetDataFromRootFile(inputFile, "DataXsec_"+ObjSuffix);
   ScaleData(1E-38);
 
   // ScaleFactor for DiffXSec/cm2/Nucleus
   fScaleFactor = GetEventHistogram()->Integral("width") / fNEvents * 1E-38 / TotalIntegratedFlux();
 
-  SetCovarFromRootFile(inputFile, CovMatName);
+  SetCovarFromRootFile(inputFile, "CovarianceMatrix_"+ObjSuffix);
 
   // Load smearing matrix ---------------------------------------------------------
+  // Set up the additional smearing matrix Ac
+  // All the MC predictions need to be multiplied by Ac to move to the regularized phase space
+
   TFile* inputRootFile = TFile::Open(inputFile.c_str());
   assert(inputRootFile && inputRootFile->IsOpen());
-  TH2D* hsmear = (TH2D*) inputRootFile->Get(SmearMatName.c_str());
+  TH2D* hsmear = (TH2D*)inputRootFile->Get(("SmearingMatrix_"+ObjSuffix).c_str());
   assert(hsmear);
 
   int nrows = hsmear->GetNbinsX();
@@ -87,7 +82,6 @@ MicroBooNE_CC1ENp_XSec_1D_nu::MicroBooNE_CC1ENp_XSec_1D_nu(nuiskey samplekey) {
   }
 
   inputRootFile->Close();
-  assert(fSmearingMatrix);
 
   // Final setup ------------------------------------------------------
   FinaliseMeasurement();
@@ -114,13 +108,13 @@ void MicroBooNE_CC1ENp_XSec_1D_nu::ConvertEventRates() {
   // Apply Weiner-SVD additional smearing Ac
   int nBins = fMCHist->GetNbinsX();
   TVectorD OriginalMC(nBins);
-  for (int i=0; i<nBins; i++) {
-    OriginalMC(i) = fMCHist->GetBinContent(i+1);
+  for (int iBin=0;iBin<nBins;iBin++) {
+    OriginalMC(iBin) = fMCHist->GetBinContent(iBin+1);
   }
   TVectorD SmearedMC = (*fSmearingMatrix) * OriginalMC;
 
-  for (int i=0; i<nBins; i++) {
-    fMCHist->SetBinContent(i+1, SmearedMC(i));
+  for (int iBin=0;iBin<nBins;iBin++) {
+    fMCHist->SetBinContent(iBin+1, SmearedMC(iBin));
   }
 }
 
