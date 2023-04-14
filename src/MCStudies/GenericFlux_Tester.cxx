@@ -295,7 +295,7 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
 
   // Function used to extract any variables of interest to the event
   Mode = event->Mode;
-  ResCodes = event->fResCode;
+  ResCode = event->fResCode;
 
   // Reset the highest momentum variables
   float proton_highmom = __BAD_FLOAT__;

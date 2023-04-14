@@ -483,7 +483,7 @@ void GENIEInputHandler::CalcNUISANCEKinematics() {
   fNUISANCEEvent->Mode = ConvertGENIEReactionCode(fGenieGHep);
 
   // Get the resonance ID Code
-  fNUISANCEEvent->fResCode = fGenieGHep->Summary()->ExclTagPtr()->fResonance;
+  fNUISANCEEvent->fResCode = fGenieGHep->Summary()->ExclTagPtr()->Resonance();
 
 
   if (!fNUISANCEEvent->Mode) {
