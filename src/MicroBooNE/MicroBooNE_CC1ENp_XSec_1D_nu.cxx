@@ -26,11 +26,18 @@ MicroBooNE_CC1ENp_XSec_1D_nu::MicroBooNE_CC1ENp_XSec_1D_nu(nuiskey samplekey) {
 //********************************************************************
   fSettings = LoadSampleSettings(samplekey);
   std::string name = fSettings.GetS("name");
-  std::string objSuffix;
+
+  std::string DataFileName;
+  std::string DataHistName;
+  std::string CovMatName;
 
   if (!name.compare("MicroBooNE_CC1ENp_XSec_1DElecEnergy_nu")) {
     fDist = kElecEnergy;
-    objSuffix = "mumom";
+    
+    DataFileName = "output_shr_energy_cali_Combined_121622_dev1.root";
+    DataHistName = "unf";
+    CovMatName = "unfcov";
+
     fSettings.SetXTitle("Electron Energy (GeV)");
     fSettings.SetYTitle("d#sigma/dE_{e} (cm^{2}/^{40}Ar)");
   }
@@ -41,7 +48,7 @@ MicroBooNE_CC1ENp_XSec_1D_nu::MicroBooNE_CC1ENp_XSec_1D_nu(nuiskey samplekey) {
   // Sample overview ---------------------------------------------------
   std::string descrip = name + " sample.\n" \
                         "Target: Ar\n" \
-                        "Flux: BNB FHC numu\n" \
+                        "Flux: NUMI nue\n" \
                         "Signal: CC1ENp\n";
 
   fSettings.SetDescription(descrip);
@@ -52,15 +59,15 @@ MicroBooNE_CC1ENp_XSec_1D_nu::MicroBooNE_CC1ENp_XSec_1D_nu(nuiskey samplekey) {
   fSettings.DefineAllowedSpecies("nue");
   FinaliseSampleSettings();
 
-  // Load data ---------------------------------------------------------
-  std::string inputFile = FitPar::GetDataBase() + "/MicroBooNE/CC1MuNp/CCNp_data_MC_cov_dataRelease.root";
-  SetDataFromRootFile(inputFile, "DataXsec_" + objSuffix);
+  // Load data --------------------------------------------------------- 
+  std::string inputFile = FitPar::GetDataBase() + "/MicroBooNE/CC1ENp/" + DataFileName;
+  SetDataFromRootFile(inputFile, DataHistName);
   ScaleData(1E-38);
 
   // ScaleFactor for DiffXSec/cm2/Nucleus
   fScaleFactor = GetEventHistogram()->Integral("width") / fNEvents * 1E-38 / TotalIntegratedFlux();
 
-  SetCovarFromRootFile(inputFile, "CovarianceMatrix_" + objSuffix);
+  SetCovarFromRootFile(inputFile, CovMatName);
 
   // Final setup ------------------------------------------------------
   FinaliseMeasurement();
