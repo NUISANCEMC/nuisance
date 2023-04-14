@@ -30,6 +30,7 @@ MicroBooNE_CC1ENp_XSec_1D_nu::MicroBooNE_CC1ENp_XSec_1D_nu(nuiskey samplekey) {
   std::string DataFileName;
   std::string DataHistName;
   std::string CovMatName;
+  std::string SmearMatName;
 
   if (!name.compare("MicroBooNE_CC1ENp_XSec_1DElecEnergy_nu")) {
     fDist = kElecEnergy;
@@ -37,6 +38,7 @@ MicroBooNE_CC1ENp_XSec_1D_nu::MicroBooNE_CC1ENp_XSec_1D_nu(nuiskey samplekey) {
     DataFileName = "output_shr_energy_cali_Combined_121622_dev1.root";
     DataHistName = "unf";
     CovMatName = "unfcov";
+    SmearMatName = "smear";
 
     fSettings.SetXTitle("Electron Energy (GeV)");
     fSettings.SetYTitle("d#sigma/dE_{e} (cm^{2}/^{40}Ar)");
@@ -69,6 +71,24 @@ MicroBooNE_CC1ENp_XSec_1D_nu::MicroBooNE_CC1ENp_XSec_1D_nu(nuiskey samplekey) {
 
   SetCovarFromRootFile(inputFile, CovMatName);
 
+  // Load smearing matrix ---------------------------------------------------------
+  TFile* inputRootFile = TFile::Open(inputFile.c_str());
+  assert(inputRootFile && inputRootFile->IsOpen());
+  TH2D* hsmear = (TH2D*) inputRootFile->Get(SmearMatName.c_str());
+  assert(hsmear);
+
+  int nrows = hsmear->GetNbinsX();
+  int ncols = hsmear->GetNbinsY();
+  fSmearingMatrix = new TMatrixD(nrows, ncols);
+  for (int i=0; i<nrows; i++) {
+    for (int j=0; j<ncols; j++) {
+      (*fSmearingMatrix)(i,j) = hsmear->GetBinContent(i+1, j+1);
+    }
+  }
+
+  inputRootFile->Close();
+  assert(fSmearingMatrix);
+
   // Final setup ------------------------------------------------------
   FinaliseMeasurement();
 };
@@ -90,5 +110,17 @@ void MicroBooNE_CC1ENp_XSec_1D_nu::FillEventVariables(FitEvent* event) {
 void MicroBooNE_CC1ENp_XSec_1D_nu::ConvertEventRates() {
   // Do standard conversion
   Measurement1D::ConvertEventRates();
+
+  // Apply Weiner-SVD additional smearing Ac
+  int nBins = fMCHist->GetNbinsX();
+  TVectorD OriginalMC(nBins);
+  for (int i=0; i<nBins; i++) {
+    OriginalMC(i) = fMCHist->GetBinContent(i+1);
+  }
+  TVectorD SmearedMC = (*fSmearingMatrix) * OriginalMC;
+
+  for (int i=0; i<nBins; i++) {
+    fMCHist->SetBinContent(i+1, SmearedMC(i));
+  }
 }
 
