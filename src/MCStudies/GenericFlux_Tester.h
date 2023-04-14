@@ -106,6 +106,9 @@ public:
   // Interaction mode
   int Mode;
 
+  // Res ID (for GENIE only)
+  int ResCode;
+
   // Particle counters
   int Nparticles;
   int Nleptons;

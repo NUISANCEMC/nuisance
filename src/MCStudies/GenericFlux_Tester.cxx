@@ -108,6 +108,7 @@ void GenericFlux_Tester::AddEventVariablesToTree() {
 
   NUIS_LOG(SAM, "Adding Event Variables");
   eventVariables->Branch("Mode", &Mode, "Mode/I");
+  eventVariables->Branch("ResCode", &ResCode, "ResCode/I");
 
   eventVariables->Branch("PDGnu", &PDGnu, "PDGnu/I");
   eventVariables->Branch("Enu_true", &Enu_true, "Enu_true/F");
@@ -294,6 +295,7 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
 
   // Function used to extract any variables of interest to the event
   Mode = event->Mode;
+  ResCodes = event->fResCode;
 
   // Reset the highest momentum variables
   float proton_highmom = __BAD_FLOAT__;

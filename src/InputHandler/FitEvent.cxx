@@ -122,6 +122,7 @@ void FitEvent::HardReset() {
 
 void FitEvent::ResetEvent() {
   Mode = 9999;
+  fResCode = 9999;
   fEventNo = -1;
   fTotCrs = -1.0;
   fTargetA = -1;
