@@ -1,19 +1,28 @@
 #include "T2KWeightEngine.h"
 
+#ifdef NEUT_ENABLED
 #include "T2KReWeight/WeightEngines/NEUT/T2KNEUTUtils.h"
+#endif
 
 T2KWeightEngine::T2KWeightEngine(std::string name) {
   // No need to vomit the contents of the card file all over my screen
+
+#ifdef NEUT_ENABLED
   StopTalking();
 
   if (!t2krew::T2KNEUTUtils::CardIsSet()) {
     std::string neut_card = FitPar::Config().GetParS("NEUT_CARD");
     if (neut_card.size()) {
       t2krew::T2KNEUTUtils::SetCardFile(neut_card);
+    } else {
+      StartTalking();
+      NUIS_ABORT("NEUT is enabled but not <config NEUT_CARD=\"neut.card\" /> "
+                 "tag was found in config file.");
     }
   }
 
   StartTalking();
+#endif
 
   // Setup the NEUT Reweight engien
   fCalcName = name;
@@ -30,8 +39,8 @@ void T2KWeightEngine::IncludeDial(std::string name, double startval) {
   int nuisenum = Reweight::ConvDial(name, kT2K);
 
   // Setup Maps
-  fEnumIndex[nuisenum];  // = std::vector<size_t>(0);
-  fNameIndex[name];      // = std::vector<size_t>(0);
+  fEnumIndex[nuisenum]; // = std::vector<size_t>(0);
+  fNameIndex[name];     // = std::vector<size_t>(0);
 
   // Split by commas
   std::vector<std::string> allnames = GeneralUtils::ParseToStr(name, ",");
@@ -78,7 +87,8 @@ void T2KWeightEngine::SetDialValue(std::string name, double val) {
 
 void T2KWeightEngine::Reconfigure(bool silent) {
   // Hush now...
-  if (silent) StopTalking();
+  if (silent)
+    StopTalking();
 
   // Reconf
   StopTalking();
@@ -86,7 +96,8 @@ void T2KWeightEngine::Reconfigure(bool silent) {
   StartTalking();
 
   // Shout again
-  if (silent) StartTalking();
+  if (silent)
+    StartTalking();
 }
 
 double T2KWeightEngine::CalcWeight(BaseFitEvt *evt) {
