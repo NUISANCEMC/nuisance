@@ -75,6 +75,7 @@ set(MINERvA_Impl_Files
 
   MINERvA_CC0pi_XSec_2D_antinu.cxx
   MINERvA_CC0pi_XSec_2D_nu.cxx
+  MINERvA_NukeCC0pi_XSec_2D_nu.cxx
   # MINERvA_CC0pi_XSec_3DptpzTp_nu.cxx
   MINERvA_CC0pi_XSec_1D_2018_nu.cxx
 
