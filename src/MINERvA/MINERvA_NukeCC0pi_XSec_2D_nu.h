@@ -62,47 +62,56 @@ class MINERvA_NukeCC0pi_XSec_2D_nu : public Measurement2D {
   std::string covar_name;
 };
 
-class MINERVA_NukeCC0Pi_CH_XSec_2D_nu : public MINERvA_NukeCC0pi_XSec_2D_nu {
+class MINERvA_NukeCC0pi_CH_XSec_2D_nu : public MINERvA_NukeCC0pi_XSec_2D_nu {
+  public: using MINERvA_NukeCC0pi_XSec_2D_nu::MINERvA_NukeCC0pi_XSec_2D_nu;
   protected:
     virtual void SetupDataSettings() { _SetupDataSettings(ch); }
 };
 
-class MINERVA_NukeCC0Pi_C_XSec_2D_nu : public MINERvA_NukeCC0pi_XSec_2D_nu {
+class MINERvA_NukeCC0pi_C_XSec_2D_nu : public MINERvA_NukeCC0pi_XSec_2D_nu {
+  public: using MINERvA_NukeCC0pi_XSec_2D_nu::MINERvA_NukeCC0pi_XSec_2D_nu;
   protected:
     virtual void SetupDataSettings() { _SetupDataSettings(c); }
 };
 
-class MINERVA_NukeCC0Pi_H2O_XSec_2D_nu : public MINERvA_NukeCC0pi_XSec_2D_nu {
+class MINERvA_NukeCC0pi_H2O_XSec_2D_nu : public MINERvA_NukeCC0pi_XSec_2D_nu {
+  public: using MINERvA_NukeCC0pi_XSec_2D_nu::MINERvA_NukeCC0pi_XSec_2D_nu;
   protected:
     virtual void SetupDataSettings() { _SetupDataSettings(h2o); }
 };
 
-class MINERVA_NukeCC0Pi_Fe_XSec_2D_nu : public MINERvA_NukeCC0pi_XSec_2D_nu {
+class MINERvA_NukeCC0pi_Fe_XSec_2D_nu : public MINERvA_NukeCC0pi_XSec_2D_nu {
+  public: using MINERvA_NukeCC0pi_XSec_2D_nu::MINERvA_NukeCC0pi_XSec_2D_nu;
   protected:
     virtual void SetupDataSettings() { _SetupDataSettings(fe); }
 };
 
-class MINERVA_NukeCC0Pi_Pb_XSec_2D_nu : public MINERvA_NukeCC0pi_XSec_2D_nu {
+class MINERvA_NukeCC0pi_Pb_XSec_2D_nu : public MINERvA_NukeCC0pi_XSec_2D_nu {
+  public: using MINERvA_NukeCC0pi_XSec_2D_nu::MINERvA_NukeCC0pi_XSec_2D_nu;
   protected:
     virtual void SetupDataSettings() { _SetupDataSettings(pb); }
 };
 
-class MINERVA_NukeCC0Pi_CH_C_Flux_XSec_2D_nu : public MINERvA_NukeCC0pi_XSec_2D_nu {
+class MINERvA_NukeCC0pi_CH_C_Flux_XSec_2D_nu : public MINERvA_NukeCC0pi_XSec_2D_nu {
+  public: using MINERvA_NukeCC0pi_XSec_2D_nu::MINERvA_NukeCC0pi_XSec_2D_nu;
   protected:
     virtual void SetupDataSettings() { _SetupDataSettings(ch_c_flux); }
 };
 
-class MINERVA_NukeCC0Pi_CH_H2O_Flux_XSec_2D_nu : public MINERvA_NukeCC0pi_XSec_2D_nu {
+class MINERvA_NukeCC0pi_CH_H2O_Flux_XSec_2D_nu : public MINERvA_NukeCC0pi_XSec_2D_nu {
+  public: using MINERvA_NukeCC0pi_XSec_2D_nu::MINERvA_NukeCC0pi_XSec_2D_nu;
   protected:
     virtual void SetupDataSettings() { _SetupDataSettings(ch_h2o_flux); }
 };
 
-class MINERVA_NukeCC0Pi_CH_Fe_Flux_XSec_2D_nu : public MINERvA_NukeCC0pi_XSec_2D_nu {
+class MINERvA_NukeCC0pi_CH_Fe_Flux_XSec_2D_nu : public MINERvA_NukeCC0pi_XSec_2D_nu {
+  public: using MINERvA_NukeCC0pi_XSec_2D_nu::MINERvA_NukeCC0pi_XSec_2D_nu;
   protected:
     virtual void SetupDataSettings() { _SetupDataSettings(ch_fe_flux); }
 };
 
-class MINERVA_NukeCC0Pi_CH_Pb_Flux_XSec_2D_nu : public MINERvA_NukeCC0pi_XSec_2D_nu {
+class MINERvA_NukeCC0pi_CH_Pb_Flux_XSec_2D_nu : public MINERvA_NukeCC0pi_XSec_2D_nu {
+  public: using MINERvA_NukeCC0pi_XSec_2D_nu::MINERvA_NukeCC0pi_XSec_2D_nu;
   protected:
     virtual void SetupDataSettings() { _SetupDataSettings(ch_pb_flux); }
 };
