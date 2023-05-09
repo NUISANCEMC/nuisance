@@ -5,6 +5,21 @@
 
 #include <stdexcept>
 
+namespace NuHepMC {
+namespace VertexStatus {
+const int kPrimaryVertex = 1;
+const int kNuclearVertex = 2;
+} // namespace VertexStatus
+
+namespace ParticleStatus {
+const int kUndecayedPhysicalParticle = 1;
+const int kIncomingBeamParticle = 4;
+const int kTargetParticle = 11;
+const int kStruckNucleon = 21;
+} // namespace ParticleStatus
+
+} // namespace NuHepMC
+
 NuHepMCInputHandler::~NuHepMCInputHandler(){
 
 };
@@ -58,6 +73,21 @@ auto CheckedAttributeValue(T const &obj, std::string const &name,
 
   return obj->template attribute<AT>(name)->value();
 }
+
+bool SignalsConvention(std::shared_ptr<HepMC3::GenRunInfo> const &run_info,
+                       std::string const &Convention) {
+  auto conventions =
+      NuHepMC::CheckedAttributeValue<HepMC3::VectorStringAttribute>(
+          run_info, "NuHepMC.Conventions");
+
+  for (auto const &c : conventions) {
+    if (c == Convention) {
+      return true;
+    }
+  }
+  return false;
+}
+
 } // namespace NuHepMC
 
 NuHepMCInputHandler::NuHepMCInputHandler(std::string const &handle,
@@ -95,15 +125,47 @@ NuHepMCInputHandler::NuHepMCInputHandler(std::string const &handle,
 
   fReader = HepMC3::deduce_reader(fFilename);
 
+  bool has_running_xsec_estimate = false;
+  double best_xs_estimate = 0;
+  bool has_FATX = false;
+  size_t NWeights = 0;
   // Loop through events and get N
   fNEvents = 0;
   while (!fReader->failed()) {
     fReader->read_event(fHepMC3Evt);
     if (!fReader->failed()) {
+      // std::cout << "read event: " << fNEvents << std::endl;
       fNEvents++;
+    } else {
+      // std::cout << "reader failed after " << fNEvents << " events."
+      //           << std::endl;
+      break;
     }
+
     if (!frun_info) {
       frun_info = fReader->run_info();
+
+      has_FATX = NuHepMC::SignalsConvention(frun_info, "G.C.4");
+      has_running_xsec_estimate =
+          NuHepMC::SignalsConvention(frun_info, "E.C.4");
+
+      std::cout << "Input file contains weights:" << std::endl;
+      for (auto const &wn : frun_info->weight_names()) {
+        std::cout << "\t" << wn << std::endl;
+        NWeights++;
+      }
+    }
+
+    if (has_running_xsec_estimate) {
+      auto xs = fHepMC3Evt.cross_section();
+      if (xs) {
+        if (NWeights > 0) {
+          best_xs_estimate = xs->xsecs()[0];
+        }
+      } else {
+        std::cout << "[WARN]: Failed to read xs info for " << (fNEvents - 1)
+                  << std::endl;
+      }
     }
   }
 
@@ -116,9 +178,15 @@ NuHepMCInputHandler::NuHepMCInputHandler(std::string const &handle,
         "Could not read run_info from input NuHepMC file: " << fFilename);
   }
 
-  double fatx_cm2 = NuHepMC::CheckedAttributeValue<HepMC3::DoubleAttribute>(
-                        frun_info, "NuHepMC.FluxAveragedTotalCrossSection") *
-                    1E36; // back into cm2
+  double fatx_cm2 = 1;
+
+  if (has_FATX) {
+    double FATX = NuHepMC::CheckedAttributeValue<HepMC3::DoubleAttribute>(
+        frun_info, "NuHepMC.FluxAveragedTotalCrossSection");
+    fatx_cm2 = FATX; // back into cm2
+  } else if (has_running_xsec_estimate) {
+    fatx_cm2 = best_xs_estimate; // back into cm2
+  }
 
   // Dupe the FATX
   fEventHist = new TH1D("eventhist", "eventhist", 10, 0.0, 10.0);
@@ -171,21 +239,6 @@ FitEvent *NuHepMCInputHandler::GetNuisanceEvent(const UInt_t entry, bool) {
   // Return event pointer
   return fNUISANCEEvent;
 }
-
-namespace NuHepMC {
-namespace VertexStatus {
-const int kPrimaryVertex = 1;
-const int kNuclearVertex = 2;
-} // namespace VertexStatus
-
-namespace ParticleStatus {
-const int kUndecayedPhysicalParticle = 1;
-const int kIncomingBeamParticle = 4;
-const int kTargetParticle = 11;
-const int kStruckNucleon = 21;
-} // namespace ParticleStatus
-
-} // namespace NuHepMC
 
 void NuHepMCInputHandler::CalcNUISANCEKinematics() {
 

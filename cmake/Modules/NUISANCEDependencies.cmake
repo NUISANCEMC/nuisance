@@ -214,6 +214,7 @@ if(NOUNDEF_INDEX GREATER -1)
 endif()
 
 if (HepMC3_ENABLED)
+  set(HepMC3_ENABLED TRUE)
   CPMAddPackage(
       NAME HepMC3
       VERSION 3.2.6
