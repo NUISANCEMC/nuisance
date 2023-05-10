@@ -103,7 +103,7 @@ struct convert<HepDataVariables> {
 
     }
     int il = xvalues.size()-1;
-    rhs.edges[il] = xvalues[il]["high"] ? xvalues[il]["high"].as<double>() : NULL_ENTRY;
+    rhs.edges[il+1] = xvalues[il]["high"] ? xvalues[il]["high"].as<double>() : NULL_ENTRY;
 
     rhs.valid = 1;
     return 1;
@@ -203,10 +203,10 @@ ANL_CCQE_HEPDATA::ANL_CCQE_HEPDATA(nuiskey samplekey) {
 
   std::string title = dataname + ";" + dimension1.title + ";" + entries.title;
 
-  for (int i = 0; i < dimension1.n; i++){
-std::cout << "BIN1 " << i << dimension1.edges[i] << std::endl;
+  for (int i = 0; i < dimension1.n+1; i++){
+std::cout << "BIN1 " << i << " " << dimension1.edges[i] << " " << dimension1.edges.size() << std::endl;
   }
-  if (dimension1.valid) fDataHist = new TH1D( dataname.c_str(), title.c_str(), dimension1.n-1, &dimension1.edges[0] );
+  if (dimension1.valid) fDataHist = new TH1D( dataname.c_str(), title.c_str(), dimension1.n, &dimension1.edges[0] );
 
 
   // Non dynamic NUISANCE CRAP
