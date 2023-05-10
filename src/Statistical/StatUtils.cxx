@@ -1307,6 +1307,7 @@ TMatrixDSym *StatUtils::ExtractShapeOnlyCovar(TMatrixDSym *full_covar,
   if (data_hist->GetNbinsX() != nbins) {
     NUIS_ERR(WRN, "Inconsistent matrix and data histogram passed to "
         "StatUtils::ExtractShapeOnlyCovar!");
+        std::cout << data_hist->GetNbinsX() << " " << nbins << std::endl;
     NUIS_ABORT("data_hist has " << data_hist->GetNbinsX() << " matrix has "
         << nbins << "bins");
     int err_bins = data_hist->GetNbinsX();
@@ -1331,6 +1332,7 @@ TMatrixDSym *StatUtils::ExtractShapeOnlyCovar(TMatrixDSym *full_covar,
   }
 
   if (total_data == 0 || total_covar == 0) {
+    std::cout << total_data << " " << total_covar << std::endl;
     NUIS_ERR(WRN, "Stupid matrix or data histogram passed to "
         "StatUtils::ExtractShapeOnlyCovar! Ignoring...");
     return NULL;
