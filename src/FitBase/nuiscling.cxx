@@ -4,6 +4,16 @@
 
 using namespace nuiscling_ftypes;
 
+//Borrowed from Cling::utils
+template <class T> T VoidToFunctionPtr(void *ptr) {
+  union {
+    T f;
+    void *v;
+  } tmp;
+  tmp.v = ptr;
+  return tmp.f;
+}
+
 nuiscling *nuiscling::instance_ = nullptr;
 
 nuiscling &nuiscling::Get() {
@@ -57,7 +67,7 @@ nuiscling::GetFilterFunction(std::string const &fnname) {
               << std::endl;
     return nullptr;
   }
-  return reinterpret_cast<nuiscling_ftypes::filter>(sym);
+  return VoidToFunctionPtr<nuiscling_ftypes::filter>(sym);
 }
 
 nuiscling_ftypes::project
@@ -68,7 +78,7 @@ nuiscling::GetProjectionFunction(std::string const &fnname) {
               << std::endl;
     return nullptr;
   }
-  return reinterpret_cast<nuiscling_ftypes::project>(sym);
+  return VoidToFunctionPtr<nuiscling_ftypes::project>(sym);
 }
 nuiscling_ftypes::weight
 nuiscling::GetWeightFunction(std::string const &fnname) {
@@ -78,7 +88,7 @@ nuiscling::GetWeightFunction(std::string const &fnname) {
               << std::endl;
     return nullptr;
   }
-  return reinterpret_cast<nuiscling_ftypes::weight>(sym);
+  return VoidToFunctionPtr<nuiscling_ftypes::weight>(sym);
 }
 
 bool nuiscling::Filter(FitEvent const *event, nuiscling_ftypes::filter fn) {
