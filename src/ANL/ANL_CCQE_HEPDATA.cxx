@@ -17,9 +17,9 @@
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 #include "yaml-cpp/yaml.h"
-#include "boost/histogram.hpp"
+// #include "boost/histogram.hpp"
 // using YAML;
-using namespace boost::histogram;
+// using namespace boost::histogram;
 
 
 #include "ANL_CCQE_HEPDATA.h"
