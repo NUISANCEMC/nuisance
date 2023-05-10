@@ -1,0 +1,4 @@
+
+<nuisance>
+  <sample name="HEPDATATEST" input="NuWro:./NuWro.numu.numu_flux.ANL_1977_2horn_rescan.30945.evts.root" release="/mnt/c/Users/Patrick/Downloads/CentOS7/NUISANCEMC/HEPData-1683648535-v1/" table="EventRate-Q2"/>
+</nuisance>

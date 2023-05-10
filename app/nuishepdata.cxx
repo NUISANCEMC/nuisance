@@ -103,6 +103,17 @@ void PrintTotalMatrix(FuckOffMatrix&m){
       std::cout << std::endl;
    }
 }
+
+// #include <iosteam>
+// #include <Eigen/Dense>
+
+// using Eigen::MatrixXd;
+// using Eigen::VectorXd;
+
+void SelectSignal(FuckOffMatrix&m){
+   
+}
+
 //*******************************
 int main(int argc, char *argv[]) {
   //*******************************
@@ -175,6 +186,22 @@ int main(int argc, char *argv[]) {
 
       PrintTotalMatrix(matrices[i]);
    }
+
+   // Histogram Entries
+   // Weighting = C X F X W X S
+   // C is a correction factor fScaleFactor from the event.
+   // F is a flux correction factor.
+   // W is the event weight requested before.
+   // S is the signal flag.
+   // Then X Variable is the main X definition.
+
+
+
+
+
+
+
+
 
    // NUIS_LOG(REC, " Reconfiguring sample " << fName);
 

@@ -45,6 +45,76 @@ using namespace YAML;
 
 // void GetHistogramFromYAMLFile(fSettings.GetDataInput());
 
+struct HepDataSubmission {
+  std::string test;
+};
+
+
+struct HepDataVariables {
+  std::vector<double> values;
+  std::vector<double> low;
+  std::vector<double> high;
+  std::vector<double> center;
+  std::vector<double> edges;
+  bool valid = 0;
+  std::string name;
+  std::string units;
+  std::string title;
+  int n = 0;
+};
+
+namespace YAML {
+template<>
+struct convert<HepDataVariables> {
+  
+  static bool decode(const Node& node, HepDataVariables& rhs) {
+    
+    rhs.values.clear();
+    rhs.low.clear();
+    rhs.high.clear();
+    rhs.center.clear();
+    rhs.edges.clear();
+    rhs.valid = 0;
+
+    // Return empty if no node
+    if (!node) return 1;
+
+    rhs.name = node["header"]["name"].as<std::string>();
+    rhs.units = node["header"]["units"].as<std::string>();
+    rhs.title = rhs.name + "[" + rhs.units + "]";
+    
+    YAML::Node xvalues = node["values"];
+
+    rhs.n = xvalues.size();
+    rhs.values.resize(xvalues.size());
+    rhs.low.resize(xvalues.size());
+    rhs.high.resize(xvalues.size());
+    rhs.center.resize(xvalues.size());
+    rhs.edges.resize(xvalues.size()+1);
+
+    double NULL_ENTRY =-999;
+    for (int i = 0; i < xvalues.size(); i++){
+
+      rhs.values[i] = xvalues[i]["value"] ? xvalues[i]["value"].as<double>() : NULL_ENTRY;
+      rhs.low[i] = xvalues[i]["low"] ? xvalues[i]["low"].as<double>() : NULL_ENTRY;
+      rhs.high[i] = xvalues[i]["high"] ? xvalues[i]["high"].as<double>() : NULL_ENTRY;
+      rhs.center[i] = xvalues[i]["center"] ? xvalues[i]["center"].as<double>() : NULL_ENTRY;
+      rhs.edges[i] = xvalues[i]["low"] ? xvalues[i]["low"].as<double>() : NULL_ENTRY;
+
+    }
+    int il = xvalues.size()-1;
+    rhs.edges[il] = xvalues[il]["high"] ? xvalues[il]["high"].as<double>() : NULL_ENTRY;
+
+    rhs.valid = 1;
+    return 1;
+  };
+};
+};
+
+
+
+
+
 
 std::string PrintNodeType(YAML::Node mynode){
   
@@ -59,22 +129,22 @@ std::string PrintNodeType(YAML::Node mynode){
 
 };
 
+double QueryErrorFromPoint(YAML::Node val){
+
+  // if ( val["errors"] )
+  // yerrors.push_back( yvalues[i]["errors"] );
+  return 0.0;
+}
+
 //********************************************************************
 ANL_CCQE_HEPDATA::ANL_CCQE_HEPDATA(nuiskey samplekey) {
 //********************************************************************
-
-  // Sample overview ---------------------------------------------------
-  // // Descrip should go into 1DQ2
-  // std::string descrip = "ANL CCQ2 Event Rate 1DQ2 nu sample. \n" \
-  //                       "Target: D2 \n" \
-  //                       "Flux:  \n" \
-  //                       "Signal:  \n";
 
   // Setup common settings
   fSettings = LoadSampleSettings(samplekey);
 
   std::string filename = samplekey.GetS("release") + "/submission.yaml";
-  std::string table = samplekey.GetS("table");
+  std::string table    = samplekey.GetS("table");
   YAML::Node doc = YAML::LoadFile(filename); 
 
   std::cout << "Loading from file " << filename << std::endl;
@@ -110,20 +180,6 @@ ANL_CCQE_HEPDATA::ANL_CCQE_HEPDATA(nuiskey samplekey) {
   doc = YAML::LoadFile(samplekey.GetS("release") + "/" + datafile); 
 
   // Grab dependent independent variables
-  YAML::Node ind = doc["independent_variables"][0];
-  YAML::Node dep = doc["dependent_variables"][0];
-
-  std::cout << "Getting independent " << doc["independent_variables"].size() << " " <<  doc["independent_variables"][0]["header"]["name"].as<std::string>() << std::endl;
-  std::cout << doc["dependent_variables"]["values"][0] << std::endl;
-
-  fSettings.SetDescription(dataname);
-
-  std::cout << "XTITLE " << doc["independent_variables"][0]["header"]["name"].as<std::string>() << std::endl;
-  std::cout << "YTITLE " << doc["dependent_variables"][0]["header"]["name"].as<std::string>() << std::endl;
-  fSettings.SetXTitle(doc["independent_variables"][0]["header"]["name"].as<std::string>());
-  fSettings.SetYTitle(doc["dependent_variables"][0]["header"]["name"].as<std::string>());
-  fSettings.SetTitle(dataname);
-
   fSettings.SetAllowedTypes("EVT/SHAPE/DIAG", "EVT/SHAPE/DIAG/Q2CORR/MASK");
 
   double enumin;
@@ -134,35 +190,31 @@ ANL_CCQE_HEPDATA::ANL_CCQE_HEPDATA(nuiskey samplekey) {
   for (int i = 0; i < qualifiers.size(); i++){
     std::string name = qualifiers[i]["name"].as<std::string>();
     std::string value = qualifiers[i]["value"].as<std::string>();
-    std::cout << "QUALIFIER SETTING : " << name << " " << value << std::endl;
     fSettings.SetDefault(name, value);
   }
 
-  fSettings.SetEnuRange( enumin, enumax);
-  fSettings.DefineAllowedTargets(targets);
-  fSettings.DefineAllowedSpecies(species);
+  YAML::Node indep_var = doc["independent_variables"];
+  HepDataVariables dimension1 = indep_var[0].as<HepDataVariables>();
+  HepDataVariables dimension2 = indep_var[1].as<HepDataVariables>();
+  HepDataVariables dimension3 = indep_var[2].as<HepDataVariables>();
 
-  YAML::Node xvalues = doc["independent_variables"][0]["values"];
-  YAML::Node yvalues = doc["dependent_variables"][0]["values"];
+  YAML::Node dep_var = doc["dependent_variables"];
+  HepDataVariables entries = dep_var[0].as<HepDataVariables>();
 
-  std::vector<double> edges;
-  std::vector<double> yentries;
-  std::vector<double> xcentres;
-  for (int i = 0; i < xvalues.size(); i++){
-    edges.push_back( xvalues[i]["low"].as<double>());
-    yentries.push_back( yvalues[i]["value"].as<double>());
-    xcentres.push_back( (xvalues[i]["low"].as<double>() + xvalues[i]["high"].as<double>())/2);
+  std::string title = dataname + ";" + dimension1.title + ";" + entries.title;
+
+  for (int i = 0; i < dimension1.n; i++){
+std::cout << "BIN1 " << i << dimension1.edges[i] << std::endl;
   }
-  edges.push_back( xvalues[xvalues.size()-1]["high"].as<double>() );
+  if (dimension1.valid) fDataHist = new TH1D( dataname.c_str(), title.c_str(), dimension1.n-1, &dimension1.edges[0] );
 
-  for (int i = 0; i < edges.size()-1; i++){
-    std::cout << "XVALUES " << edges[i] << " " << yentries[i] <<  std::endl;
-  }
 
-  std::string xtitle = doc["independent_variables"][0]["header"]["name"].as<std::string>() + "[" + doc["dependent_variables"][0]["header"]["units"].as<std::string>() + "]";
-  std::string ytitle = doc["dependent_variables"][0]["header"]["name"].as<std::string>() + "[" + doc["dependent_variables"][0]["header"]["units"].as<std::string>() + "]";
-  std::string title = dataname + ";" + xtitle + ";" + ytitle;
-  fDataHist = new TH1D( dataname.c_str(), title.c_str(), edges.size()-1, &edges[0] );
+  // Non dynamic NUISANCE CRAP
+  fSettings.SetDescription(dataname);
+  fSettings.SetXTitle( dimension1.title );
+  fSettings.SetYTitle( entries.title );
+  fSettings.SetTitle(title);
+
 
   FinaliseSampleSettings();
 
