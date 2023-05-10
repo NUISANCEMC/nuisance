@@ -88,6 +88,10 @@ template <> struct convert<HepDataVariables> {
     YAML::Node xvalues = node["values"];
 
     rhs.n = xvalues.size();
+
+    if (rhs.n == 0)
+      return 1;
+
     rhs.values.resize(xvalues.size());
     rhs.low.resize(xvalues.size());
     rhs.high.resize(xvalues.size());
@@ -151,9 +155,7 @@ ANL_CCQE_HEPDATA::ANL_CCQE_HEPDATA(nuiskey samplekey) {
 
   std::string filename = samplekey.GetS("release") + "/submission.yaml";
   std::string table = samplekey.GetS("table");
-  std::string NUIS_SNIPPET_DIR =
-      std::string(getenv("NUISANCE")) + "/data/HEPDataSnippets/";
-  std::string snippet_file = NUIS_SNIPPET_DIR + samplekey.GetS("snippet_file");
+  std::string snippet_file = samplekey.GetS("snippet_file");
   YAML::Node doc = YAML::LoadFile(filename);
 
   std::cout << "Loading from file " << filename << std::endl;
@@ -190,6 +192,7 @@ ANL_CCQE_HEPDATA::ANL_CCQE_HEPDATA(nuiskey samplekey) {
 
   // Grab dependent independent variables
   fSettings.SetAllowedTypes("EVT/SHAPE/DIAG", "EVT/SHAPE/DIAG/Q2CORR/MASK");
+  fSettings.SetAllowedTypes("EVT/SHAPE/DIAG", "EVT/SHAPE/DIAG/Q2CORR/MASK");
 
   double enumin;
   double enumax;
@@ -216,9 +219,29 @@ ANL_CCQE_HEPDATA::ANL_CCQE_HEPDATA(nuiskey samplekey) {
     std::cout << "BIN1 " << i << " " << dimension1.edges[i] << " "
               << dimension1.edges.size() << std::endl;
   }
-  if (dimension1.valid)
+  if (dimension1.valid) {
+
+    std::cout << "CREATED TH1D" << std::endl;
     fDataHist = new TH1D(dataname.c_str(), title.c_str(), dimension1.n,
                          &dimension1.edges[0]);
+
+    for (int i = 0; i < entries.values.size(); i++) {
+      fDataHist->SetBinContent(i + 1, entries.values[i]);
+    }
+    std::cout << "MAPPING SIZE : " << entries.n << " " << dimension1.n
+              << std::endl;
+
+    for (int i = 0; i < fDataHist->GetNbinsX(); i++) {
+      std::cout << "VALUE " << i << " " << fDataHist->GetBinContent(i + 1)
+                << " " << entries.values[i] << std::endl;
+    }
+
+    // Non dynamic NUISANCE CRAP
+    fSettings.SetDescription(dataname);
+    fSettings.SetXTitle(dimension1.title);
+    fSettings.SetYTitle(entries.title);
+    fSettings.SetTitle(title);
+  }
 
   std::cout << "[INFO]: Parsing snippet file: " << snippet_file << std::endl;
   if (!nuiscling::Get().LoadFile(snippet_file)) {
@@ -263,28 +286,28 @@ ANL_CCQE_HEPDATA::ANL_CCQE_HEPDATA(nuiskey samplekey) {
                << " after interpreting snippet_file: " << snippet_file)
   }
 
-  // Non dynamic NUISANCE CRAP
-  fSettings.SetDescription(dataname);
-  fSettings.SetXTitle(dimension1.title);
-  fSettings.SetYTitle(entries.title);
-  fSettings.SetTitle(title);
-
-  FinaliseSampleSettings();
-
   // Scaling Setup ---------------------------------------------------
   // ScaleFactor for shape
   fScaleFactor = 1.0;
 
   // Plot Setup -------------------------------------------------------
-  // SetDataFromRootFile( fSettings.GetDataInput() );
-
   // Hard Coded YAML File Histogram Setting
   // fDataHist = GetHistogramFromYAMLFile(fSettings.GetDataInput());
+  fSettings.Set("error_flag", "Possion");
+  SetPoissonErrors();
+  SetCovarFromDiagonal();
+  if (!fSettings.GetS("error_flag").compare("Possion")) {
+    SetPoissonErrors();
+    SetCovarFromDiagonal();
+  }
 
-  // SetPoissonErrors();   - Should not be needed
-  // SetCovarFromDiagonal(); - Should not be needed
+  if (!fSettings.GetS("error_flag").compare("Uncorrelated")) {
+    SetCovarFromDiagonal();
+  }
+  fSettings.SetAllowedTypes("EVT/SHAPE/DIAG", "EVT/SHAPE/DIAG/Q2CORR/MASK");
 
   // Final setup  ---------------------------------------------------
+  FinaliseSampleSettings();
   FinaliseMeasurement();
 }
 

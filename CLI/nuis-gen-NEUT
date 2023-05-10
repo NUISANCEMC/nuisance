@@ -240,7 +240,8 @@ elif  [ "${TARGET_NAME}" = "Pb" ]; then
   NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-NUMFREP=0"
   NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-NUMATOM=208"
 else
-  echo "ERROR]: ${NUIS_BREADCRUMBS} -- Invalid target material: \"${TARGET_NAME}\" for NEUT." 
+  echo "[ERROR]: ${NUIS_BREADCRUMBS} -- Invalid target material: \"${TARGET_NAME}\" for NEUT."
+  exit 1
 fi
 
 NEUT_OPTIONS="${NEUT_OPTIONS}|EVCT-NEVT=${NEVENTS}"

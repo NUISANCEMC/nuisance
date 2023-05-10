@@ -73,6 +73,27 @@ CPMFindPackage(
       "YAML_BUILD_SHARED_LIBS ON"
 )
 
+#we have to dupe this as yaml-cpp refuses to be installed if it isn't the root project
+SET(YAML_CPP_INSTALL ON)
+if (YAML_CPP_INSTALL)
+  install(TARGETS yaml-cpp
+    EXPORT yaml-cpp-targets
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+  install(DIRECTORY ${yaml-cpp_SOURCE_DIR}/include/
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+    FILES_MATCHING PATTERN "*.h")
+  install(EXPORT yaml-cpp-targets
+    DESTINATION "${CMAKE_INSTALL_DATADIR}/cmake/yaml-cpp")
+  install(FILES
+    "${yaml-cpp_BINARY_DIR}/yaml-cpp-config.cmake"
+    "${yaml-cpp_BINARY_DIR}/yaml-cpp-config-version.cmake"
+    DESTINATION "${CMAKE_INSTALL_DATADIR}/cmake/yaml-cpp")
+  install(FILES "${yaml-cpp_BINARY_DIR}/yaml-cpp.pc"
+    DESTINATION ${CMAKE_INSTALL_DATADIR}/pkgconfig)
+endif()
+
 #CPMFindPackage(
 #    NAME eigen3
 #    VERSION 3.4.0

@@ -68,6 +68,9 @@ int main(int argc, char const *argv[]) {
   }
 
   auto filter_func = nuiscling::Get().GetFilterFunction(filter_symname);
+  if(!filter_func){
+    return 1;
+  }
   std::vector<nuiscling_ftypes::project> proj_funcs;
   std::vector<std::string> proj_funcnames;
   for (auto &proj_sym_name : projection_symnames) {
@@ -86,9 +89,10 @@ int main(int argc, char const *argv[]) {
   FitEvent *ev = inp->FirstNuisanceEvent();
   size_t e_it = 0;
   while (ev) {
+    std::cout << "Event: " << e_it << std::endl;
     bool filtered = filter_func(ev);
     if (filtered) {
-      std::cout << "Event: " << e_it << " passes filter: " << std::endl;
+      std::cout << "--Passes filter." << std::endl;
       for (size_t i = 0; i < proj_funcs.size(); ++i) {
         std::cout << "\t" << proj_funcnames[i] << ": " << proj_funcs[i](ev)
                   << std::endl;
