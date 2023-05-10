@@ -34,6 +34,11 @@ LIST(APPEND TARGETS_TO_BUILD
   nuishepdata
   PrepareGiBUU)
 
+if(ROOT_VERSION VERSION_GREATER 6)
+  add_executable(nuiscling nuiscling.cxx)
+  target_link_libraries(nuiscling CoreTargets GeneratorLinkDependencies)
+endif()
+
 if(GENIE_ENABLED)
   LIST(APPEND TARGETS_TO_BUILD PrepareGENIE)
 endif()
@@ -51,7 +56,7 @@ foreach(targ ${TARGETS_TO_BUILD})
   target_link_libraries(${targ} CoreTargets GeneratorLinkDependencies  yaml-cpp )
 endforeach()
 
-install(TARGETS ${TARGETS_TO_BUILD} DESTINATION bin)
+install(TARGETS ${TARGETS_TO_BUILD};nuiscling DESTINATION bin)
 
 add_executable(nuishistrange nuishistrange.cxx)
 target_link_libraries(nuishistrange ROOT::ROOT)
