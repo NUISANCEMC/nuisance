@@ -49,9 +49,28 @@ set(FitBase_Hdr_Files
   StackBase.h
 )
 
+if(ROOT_VERSION VERSION_GREATER 6)
+  LIST(APPEND FitBase_Impl_Files nuiscling.cxx)
+  LIST(APPEND FitBase_Hdr_Files nuiscling.h)
+endif()
+
 add_library(FitBase SHARED ${FitBase_Impl_Files})
 target_link_libraries(FitBase CoreIncludes ROOT::ROOT)
 set_target_properties(FitBase PROPERTIES PUBLIC_HEADER "${FitBase_Hdr_Files}")
+
+if(ROOT_VERSION VERSION_GREATER 6)
+  if(GENIE_ENABLED)
+    target_compile_definitions(FitBase PRIVATE GENIE_INC_DIR=\"${GENIE_INC_DIR}\")
+  endif()
+
+  if(NEUT_ENABLED)
+    target_compile_definitions(FitBase PRIVATE NEUT_INC_DIR=\"${NEUT_INCLUDE_DIR}\")
+  endif()
+
+  if(NuWro_ENABLED)
+    target_compile_definitions(FitBase PRIVATE NuWro_INC_DIR=\"${NuWro_INC_DIR}\")
+  endif()
+endif()
 
 install(TARGETS FitBase
   LIBRARY DESTINATION lib
