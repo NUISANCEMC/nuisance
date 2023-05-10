@@ -31,6 +31,7 @@ LIST(APPEND TARGETS_TO_BUILD
   nuisbayes
   nuisbac
   nuisplot
+  nuishepdata
   PrepareGiBUU)
 
 if(GENIE_ENABLED)

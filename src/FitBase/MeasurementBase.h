@@ -297,7 +297,7 @@ public:
   // - Return MeasurementList (returns )
 
 
-protected:
+public: // Hack for now for debugging.
   // Minimum and maximum energies
   double Enu;     //!< Neutrino Energy
   double EnuMin;  //!< Minimum incoming particle energy of events to include

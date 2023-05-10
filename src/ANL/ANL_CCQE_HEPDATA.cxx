@@ -195,18 +195,17 @@ void ANL_CCQE_HEPDATA::FillEventVariables(FitEvent * event) {
   std::string projector = fSettings.GetS("project");
   fXVar = 0;
 
+  // Eventual Selection of fXVar, fYVar....
+  if (event->NumFSParticle(13) == 0)
+    return;
 
-  // // Eventual Selection of fXVar, fYVar....
-  // if (event->NumFSParticle(13) == 0)
-  //   return;
+  // Fill histogram with reconstructed Q2 Distribution
+  fXVar = -999.9;
+  TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
+  TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
 
-  // // Fill histogram with reconstructed Q2 Distribution
-  // fXVar = -999.9;
-  // TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
-  // TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
-
-  // ThetaMu = Pnu.Vect().Angle(Pmu.Vect());
-  // fXVar = FitUtils::Q2QErec(Pmu, cos(ThetaMu), 0., true);
+  ThetaMu = Pnu.Vect().Angle(Pmu.Vect());
+  fXVar = FitUtils::Q2QErec(Pmu, cos(ThetaMu), 0., true);
 
 
   std::string weightcalculator = fSettings.GetS("weighting");
