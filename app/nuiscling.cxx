@@ -68,7 +68,7 @@ int main(int argc, char const *argv[]) {
   }
 
   auto filter_func = nuiscling::Get().GetFilterFunction(filter_symname);
-  std::vector<nuiscling::project_ftype> proj_funcs;
+  std::vector<nuiscling_ftypes::project> proj_funcs;
   std::vector<std::string> proj_funcnames;
   for (auto &proj_sym_name : projection_symnames) {
     auto proj_func = nuiscling::Get().GetProjectionFunction(proj_sym_name);

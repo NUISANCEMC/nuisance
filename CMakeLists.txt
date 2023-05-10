@@ -69,6 +69,8 @@ CPMFindPackage(
     VERSION 0.7.0
     GITHUB_REPOSITORY "jbeder/yaml-cpp"
     GIT_TAG "yaml-cpp-0.7.0"
+    OPTIONS
+      "YAML_BUILD_SHARED_LIBS ON"
 )
 
 #CPMFindPackage(

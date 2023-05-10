@@ -52,6 +52,7 @@ set(FitBase_Hdr_Files
 if(ROOT_VERSION VERSION_GREATER 6)
   LIST(APPEND FitBase_Impl_Files nuiscling.cxx)
   LIST(APPEND FitBase_Hdr_Files nuiscling.h)
+  LIST(APPEND FitBase_Hdr_Files nuiscling_ftypes.h)
 endif()
 
 add_library(FitBase SHARED ${FitBase_Impl_Files})

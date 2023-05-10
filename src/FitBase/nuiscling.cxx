@@ -2,6 +2,8 @@
 
 #include "FitEvent.h"
 
+using namespace nuiscling_ftypes;
+
 nuiscling *nuiscling::instance_ = nullptr;
 
 nuiscling &nuiscling::Get() {
@@ -47,7 +49,7 @@ bool nuiscling::LoadFile(std::string const &file_to_read) {
   return !bool(gInterpreter->LoadFile(file_to_read.c_str()));
 }
 
-nuiscling::filter_ftype
+nuiscling_ftypes::filter
 nuiscling::GetFilterFunction(std::string const &fnname) {
   void *sym = gInterpreter->FindSym(fnname.c_str());
   if (!sym) {
@@ -55,10 +57,10 @@ nuiscling::GetFilterFunction(std::string const &fnname) {
               << std::endl;
     return nullptr;
   }
-  return reinterpret_cast<nuiscling::filter_ftype>(sym);
+  return reinterpret_cast<nuiscling_ftypes::filter>(sym);
 }
 
-nuiscling::project_ftype
+nuiscling_ftypes::project
 nuiscling::GetProjectionFunction(std::string const &fnname) {
   void *sym = gInterpreter->FindSym(fnname.c_str());
   if (!sym) {
@@ -66,9 +68,9 @@ nuiscling::GetProjectionFunction(std::string const &fnname) {
               << std::endl;
     return nullptr;
   }
-  return reinterpret_cast<nuiscling::project_ftype>(sym);
+  return reinterpret_cast<nuiscling_ftypes::project>(sym);
 }
-nuiscling::weight_ftype
+nuiscling_ftypes::weight
 nuiscling::GetWeightFunction(std::string const &fnname) {
   void *sym = gInterpreter->FindSym(fnname.c_str());
   if (!sym) {
@@ -76,15 +78,15 @@ nuiscling::GetWeightFunction(std::string const &fnname) {
               << std::endl;
     return nullptr;
   }
-  return reinterpret_cast<nuiscling::weight_ftype>(sym);
+  return reinterpret_cast<nuiscling_ftypes::weight>(sym);
 }
 
-bool nuiscling::Filter(FitEvent const *event, nuiscling::filter_ftype fn) {
+bool nuiscling::Filter(FitEvent const *event, nuiscling_ftypes::filter fn) {
   return fn(event);
 }
 std::vector<double>
 nuiscling::Project(FitEvent const *event,
-                   std::vector<nuiscling::project_ftype> fns) {
+                   std::vector<nuiscling_ftypes::project> fns) {
   std::vector<double> projections;
   for (auto &fn : fns) {
     projections.push_back(fn(event));
@@ -93,7 +95,7 @@ nuiscling::Project(FitEvent const *event,
 }
 std::vector<double>
 nuiscling::Weight(FitEvent const *event,
-                  std::vector<nuiscling::weight_ftype> fns) {
+                  std::vector<nuiscling_ftypes::weight> fns) {
   std::vector<double> weights;
   for (auto &fn : fns) {
     weights.push_back(fn(event));

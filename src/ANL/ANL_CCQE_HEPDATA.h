@@ -22,6 +22,7 @@
 
 #include "Measurement1D.h"
 #include "CustomVariableBoxes.h"
+#include "nuiscling_ftypes.h"
 
 /// \brief ANL Charged Current Quasi-elastic Measurement.
 ///  1D Event Rate in Q2QE 
@@ -60,6 +61,8 @@ public:
   TH1D* CorrectionHist; ///< Correction factor
   TH1D* fMCHist_NoCorr; ///< Uncorrected fMCHist
 
+  nuiscling_ftypes::filter filter_func;
+  std::vector<nuiscling_ftypes::project> projection_funcs;
 
 };
   
