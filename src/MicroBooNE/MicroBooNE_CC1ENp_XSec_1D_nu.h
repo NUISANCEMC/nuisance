@@ -43,7 +43,7 @@ public:
 private:
   TMatrixD* fSmearingMatrix;
 
-  enum Distribution { kElecEnergy };
+  enum Distribution { kElecEnergy, kOpeningAngle, kTrueVisibleEnergy };
   Distribution fDist;
 };
 

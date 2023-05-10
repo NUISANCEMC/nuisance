@@ -27,17 +27,35 @@ MicroBooNE_CC1ENp_XSec_1D_nu::MicroBooNE_CC1ENp_XSec_1D_nu(nuiskey samplekey) {
   fSettings = LoadSampleSettings(samplekey);
   std::string name = fSettings.GetS("name");
 
+  std::string DataFileName = "/MicroBooNE/CC1ENp/CCNp_nue_data_covmat_smearmat_Release.root";
+
   std::string ObjSuffix;
 
   if (!name.compare("MicroBooNE_CC1ENp_XSec_1DElecEnergy_nu")) {
+    ObjSuffix = "elec_e";
     fDist = kElecEnergy;
-    ObjSuffix = "ElecEnergy";
     fSettings.SetXTitle("Electron Energy (GeV)");
-    fSettings.SetYTitle("d#sigma/dE_{e} (cm^{2}/^{40}Ar)");
+    fSettings.SetYTitle("d#sigma/dE (cm^{2}/GeV/Nucleon)");
+  }
+  else if (!name.compare("MicroBooNE_CC1ENp_XSec_1DOpeningAngle_nu")) {
+    ObjSuffix = "opening_angle";
+    fDist = kOpeningAngle;
+    fSettings.SetXTitle("Opening Angle cos #theta_{ep}");
+    fSettings.SetYTitle("d#sigma/d(cos #theta_{ep}) (cm^{2}/GeV/Nucleon)");
+  }
+  else if (!name.compare("MicroBooNE_CC1ENp_XSec_1DTrueVisibleEnergy_nu")) {
+    ObjSuffix = "true_e_visible";
+    fDist = kTrueVisibleEnergy;
+    fSettings.SetXTitle("True Visible Energy [GeV]");
+    fSettings.SetYTitle("d#sigma/dE (cm^{2}/GeV/Nucleon)");
   }
   else {
     assert(false);
   }
+
+  std::string DataHistName = "unf_xsec_"+ObjSuffix;
+  std::string CovMatName = "unfcov_xsec_"+ObjSuffix;
+  std::string ACMatName = "Ac_"+ObjSuffix;
 
   // Sample overview ---------------------------------------------------
   std::string descrip = name + " sample.\n" \
@@ -54,14 +72,14 @@ MicroBooNE_CC1ENp_XSec_1D_nu::MicroBooNE_CC1ENp_XSec_1D_nu(nuiskey samplekey) {
   FinaliseSampleSettings();
 
   // Load data --------------------------------------------------------- 
-  std::string inputFile = FitPar::GetDataBase() + "/MicroBooNE/CC1ENp/CC1ENp_data_MC_cov_data_smear_Release.root";
-  SetDataFromRootFile(inputFile, "DataXsec_"+ObjSuffix);
+  std::string inputFile = FitPar::GetDataBase()+DataFileName;
+  SetDataFromRootFile(inputFile, DataHistName);
   ScaleData(1E-38);
 
-  // ScaleFactor for DiffXSec/cm2/Nucleus
-  fScaleFactor = GetEventHistogram()->Integral("width") / fNEvents * 1E-38 / TotalIntegratedFlux();
+  // ScaleFactor for DiffXSec/cm2/Nucleon
+  fScaleFactor = (GetEventHistogram()->Integral("width") * 1E-38) / (double(fNEvents) * TotalIntegratedFlux() * 40.);
 
-  SetCovarFromRootFile(inputFile, "CovarianceMatrix_"+ObjSuffix);
+  SetCovarFromRootFile(inputFile, CovMatName);
 
   // Load smearing matrix ---------------------------------------------------------
   // Set up the additional smearing matrix Ac
@@ -69,7 +87,7 @@ MicroBooNE_CC1ENp_XSec_1D_nu::MicroBooNE_CC1ENp_XSec_1D_nu(nuiskey samplekey) {
 
   TFile* inputRootFile = TFile::Open(inputFile.c_str());
   assert(inputRootFile && inputRootFile->IsOpen());
-  TH2D* hsmear = (TH2D*)inputRootFile->Get(("SmearingMatrix_"+ObjSuffix).c_str());
+  TH2D* hsmear = (TH2D*)inputRootFile->Get(ACMatName.c_str());
   assert(hsmear);
 
   int nrows = hsmear->GetNbinsX();
@@ -94,9 +112,38 @@ bool MicroBooNE_CC1ENp_XSec_1D_nu::isSignal(FitEvent* event) {
 
 
 void MicroBooNE_CC1ENp_XSec_1D_nu::FillEventVariables(FitEvent* event) {
+  fXVar = -999.;
+  if (event->NumFSParticle(11) == 0) return;
+  if (event->NumFSParticle(2212) == 0) return;
+
   if (fDist == kElecEnergy) {
-    if (event->NumFSParticle(11) == 0) return;
-    fXVar = event->GetHMFSParticle(11)->fP.E() / 1000;
+    fXVar = event->GetHMFSParticle(11)->fP.E()/1000.0;
+  }
+  else if (fDist == kOpeningAngle) {
+    TVector3 HMProtonVec = event->GetHMFSParticle(2212)->P3();
+    TVector3 HMElectronVec = event->GetHMFSParticle(11)->P3();
+
+    fXVar = HMProtonVec.Angle(HMElectronVec);
+  }
+  else if (fDist == kTrueVisibleEnergy) {
+    int nParticles = event->NParticles();
+
+    double TrueVisibleEnergy = 0.;
+    for (int iParticle=0;iParticle<nParticles;iParticle++) {
+      FitParticle* Particle = event->GetParticle(iParticle);
+      if (!Particle->IsFinalState()) {
+	continue;
+      }
+
+      if (Particle->PDG() == 11) { //Electron
+	TrueVisibleEnergy += Particle->E();
+      }
+      else if (Particle->PDG() == 2212) { //Proton
+	TrueVisibleEnergy += Particle->KE();
+      }
+    }
+    
+    fXVar = TrueVisibleEnergy/1000.0;
   }
 }
 
