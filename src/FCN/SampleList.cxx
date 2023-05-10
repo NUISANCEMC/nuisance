@@ -4,6 +4,8 @@
 #include "ANL_CCQE_Evt_1DQ2_nu.h"
 #include "ANL_CCQE_XSec_1DEnu_nu.h"
 
+#include "ANL_CCQE_HEPDATA.h"
+
 // ANL CC1ppip
 #include "ANL_CC1ppip_Evt_1DQ2_nu.h"
 #include "ANL_CC1ppip_Evt_1DcosmuStar_nu.h"
@@ -662,8 +664,9 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
   /*
      ANL CCQE Samples
   */
-
+std::cout << "CHECKING SAMPLE" << name << std::endl;
 #ifdef ANL_ENABLED
+std::cout << "CHECKING ANL TEST " << name << std::endl;
   if (!name.compare("ANL_CCQE_XSec_1DEnu_nu") ||
       !name.compare("ANL_CCQE_XSec_1DEnu_nu_PRD26") ||
       !name.compare("ANL_CCQE_XSec_1DEnu_nu_PRL31") ||
@@ -674,6 +677,10 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
              !name.compare("ANL_CCQE_Evt_1DQ2_nu_PRD26") ||
              !name.compare("ANL_CCQE_Evt_1DQ2_nu_PRD16")) {
     return (new ANL_CCQE_Evt_1DQ2_nu(samplekey));
+
+
+  } else if (!name.compare("HEPDATATEST")) {
+    return (new ANL_CCQE_HEPDATA(samplekey));
     /*
       ANL CC1ppip samples
     */

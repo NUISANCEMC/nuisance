@@ -16,7 +16,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
-cmake_minimum_required (VERSION 3.14 FATAL_ERROR)
+cmake_minimum_required (VERSION 3.12 FATAL_ERROR)
 
 #Use the compilers found in the path
 find_program(CMAKE_C_COMPILER NAMES $ENV{CC} gcc PATHS ENV PATH NO_DEFAULT_PATH)
@@ -56,6 +56,27 @@ else()
   )
   include(${CMakeModules_SOURCE_DIR}/NuHepMCModules.cmake)
 endif()
+
+CPMFindPackage(
+    NAME Boost
+    #VERSION 1.78.0
+    GITHUB_REPOSITORY "boostorg/boost"
+    GIT_TAG "boost-1.78.0"
+)
+
+CPMFindPackage(
+    NAME yaml-cpp
+    VERSION 0.7.0
+    GITHUB_REPOSITORY "jbeder/yaml-cpp"
+    GIT_TAG "yaml-cpp-0.7.0"
+)
+
+#CPMFindPackage(
+#    NAME eigen3
+#    VERSION 3.4.0
+#    GITLAB_REPOSITORY "libeigen/eigen"
+#    GIT_TAG "3.4.0"
+#)
 
 ################################################################################
 #                            Check Dependencies

@@ -133,10 +133,13 @@ ANL_CCQE_HEPDATA::ANL_CCQE_HEPDATA(nuiskey samplekey) {
   YAML::Node qualifiers = doc["dependent_variables"][0]["qualifiers"];
   for (int i = 0; i < qualifiers.size(); i++){
     std::string name = qualifiers[i]["name"].as<std::string>();
-    if (!name.compare("Enu_min")) enumin = qualifiers[i]["value"].as<double>();
-    if (!name.compare("Enu_max")) enumax = qualifiers[i]["value"].as<double>();
-    if (!name.compare("AllowedSpecies")) species = qualifiers[i]["value"].as<std::string>();
-    if (!name.compare("AllowedTargets")) targets = qualifiers[i]["value"].as<std::string>();
+    std::string value = qualifiers[i]["value"].as<std::string>();
+    std::cout << "QUALIFIER SETTING : " << name << " " << value << std::endl;
+    fSettings.SetDefault(name, value);
+    // if (!name.compare("Enu_min")) enumin = qualifiers[i]["value"].as<double>();
+    // if (!name.compare("Enu_max")) enumax = qualifiers[i]["value"].as<double>();
+    // if (!name.compare("AllowedSpecies")) species = qualifiers[i]["value"].as<std::string>();
+    // if (!name.compare("AllowedTargets")) targets = qualifiers[i]["value"].as<std::string>();
   }
 
   fSettings.SetEnuRange( enumin, enumax);

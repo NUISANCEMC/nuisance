@@ -21,6 +21,8 @@ set(ANL_Impl_Files
   ANL_CCQE_Evt_1DQ2_nu.cxx
   ANL_CCQE_XSec_1DEnu_nu.cxx
 
+  ANL_CCQE_HEPDATA.cxx
+
   ANL_CC1npip_Evt_1DcosmuStar_nu.cxx
   ANL_CC1npip_Evt_1Dppi_nu.cxx
   ANL_CC1npip_Evt_1DQ2_nu.cxx
@@ -74,6 +76,6 @@ set(ANL_Impl_Files
 
 
 add_library(ANL SHARED ${ANL_Impl_Files})
-target_link_libraries(ANL CoreIncludes)
+target_link_libraries(ANL CoreIncludes yaml-cpp)
 
 install(TARGETS ANL DESTINATION lib)

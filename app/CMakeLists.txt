@@ -47,7 +47,7 @@ endif()
 
 foreach(targ ${TARGETS_TO_BUILD})
   add_executable(${targ} ${targ}.cxx)
-  target_link_libraries(${targ} CoreTargets GeneratorLinkDependencies)
+  target_link_libraries(${targ} CoreTargets GeneratorLinkDependencies  yaml-cpp )
 endforeach()
 
 install(TARGETS ${TARGETS_TO_BUILD} DESTINATION bin)
