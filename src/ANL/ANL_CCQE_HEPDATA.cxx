@@ -136,16 +136,11 @@ ANL_CCQE_HEPDATA::ANL_CCQE_HEPDATA(nuiskey samplekey) {
     std::string value = qualifiers[i]["value"].as<std::string>();
     std::cout << "QUALIFIER SETTING : " << name << " " << value << std::endl;
     fSettings.SetDefault(name, value);
-    // if (!name.compare("Enu_min")) enumin = qualifiers[i]["value"].as<double>();
-    // if (!name.compare("Enu_max")) enumax = qualifiers[i]["value"].as<double>();
-    // if (!name.compare("AllowedSpecies")) species = qualifiers[i]["value"].as<std::string>();
-    // if (!name.compare("AllowedTargets")) targets = qualifiers[i]["value"].as<std::string>();
   }
 
   fSettings.SetEnuRange( enumin, enumax);
   fSettings.DefineAllowedTargets(targets);
   fSettings.DefineAllowedSpecies(species);
-
 
   YAML::Node xvalues = doc["independent_variables"][0]["values"];
   YAML::Node yvalues = doc["dependent_variables"][0]["values"];
@@ -196,25 +191,35 @@ ANL_CCQE_HEPDATA::ANL_CCQE_HEPDATA(nuiskey samplekey) {
 void ANL_CCQE_HEPDATA::FillEventVariables(FitEvent * event) {
 //********************************************************************
 
-  // Eventual Selection of fXVar, fYVar....
-  if (event->NumFSParticle(13) == 0)
-    return;
+  // Hacked slow string comparison for now. Eventually move into init, that these are setup.
+  std::string projector = fSettings.GetS("project");
+  fXVar = 0;
 
-  // Fill histogram with reconstructed Q2 Distribution
-  fXVar = -999.9;
-  TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
-  TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
 
-  ThetaMu = Pnu.Vect().Angle(Pmu.Vect());
-  fXVar = FitUtils::Q2QErec(Pmu, cos(ThetaMu), 0., true);
+  // // Eventual Selection of fXVar, fYVar....
+  // if (event->NumFSParticle(13) == 0)
+  //   return;
 
-  GetQ2Box()->fQ2 = fXVar;
+  // // Fill histogram with reconstructed Q2 Distribution
+  // fXVar = -999.9;
+  // TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
+  // TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
+
+  // ThetaMu = Pnu.Vect().Angle(Pmu.Vect());
+  // fXVar = FitUtils::Q2QErec(Pmu, cos(ThetaMu), 0., true);
+
+
+  std::string weightcalculator = fSettings.GetS("weighting");
+  Weight = 1.0;
   return;
 };
 
 //********************************************************************
 bool ANL_CCQE_HEPDATA::isSignal(FitEvent * event) {
 //********************************************************************
+
+  // Hacked string comparison right now. Change to
+  std::string signalfilter = fSettings.GetS("filter");
 
   if (!SignalDef::isCCQE(event, 14, EnuMin, EnuMax)) return false;
 
@@ -225,14 +230,17 @@ bool ANL_CCQE_HEPDATA::isSignal(FitEvent * event) {
 void ANL_CCQE_HEPDATA::FillHistograms() {
 //********************************************************************
 
+  // Should not be needed in the future.
   Measurement1D::FillHistograms();
 
 }
+
 
 //********************************************************************
 void ANL_CCQE_HEPDATA::ScaleEvents() {
 //********************************************************************
 
+  // Should not be needed in the future.
   Measurement1D::ScaleEvents();
 
 }
