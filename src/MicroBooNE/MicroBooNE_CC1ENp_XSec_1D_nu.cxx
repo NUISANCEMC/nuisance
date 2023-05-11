@@ -76,8 +76,8 @@ MicroBooNE_CC1ENp_XSec_1D_nu::MicroBooNE_CC1ENp_XSec_1D_nu(nuiskey samplekey) {
   SetDataFromRootFile(inputFile, DataHistName);
   ScaleData(1E-38);
 
-  // ScaleFactor for DiffXSec/cm2/Nucleon
-  fScaleFactor = (GetEventHistogram()->Integral("width") * 1E-38) / (double(fNEvents) * TotalIntegratedFlux() * 40.);
+  // ScaleFactor for DiffXSec/cm2/Nucleus (According to L.P. 11/05/23)
+  fScaleFactor = (GetEventHistogram()->Integral("width") * 1E-38) / (double(fNEvents) * TotalIntegratedFlux());
 
   SetCovarFromRootFile(inputFile, CovMatName);
 
