@@ -747,10 +747,25 @@ TH2D *PlotUtils::GetDecompCovarPlot(TMatrixDSym *cov, std::string name) {
 }
 
 TH1D *PlotUtils::GetTH1DFromRootFile(std::string file, std::string name) {
+
   if (name.empty()) {
     std::vector<std::string> tempfile = GeneralUtils::ParseToStr(file, ";");
+    if (tempfile.size() != 2) {
+      NUIS_ERR(FTL, "File/histogram specifier is malformed: " << file);
+      NUIS_ERR(FTL, "Needs to be separated by FILE_NAME:HISTOGRAM_NAME");
+      NUIS_ERR(FTL, "Or the HISTOGRAM_NAME can be given as an argument");
+      throw;
+    }
     file = tempfile[0];
     name = tempfile[1];
+  }
+
+  // Check that the file is actually a ".root" file
+  if (file.find(".root") == std::string::npos) {
+    NUIS_ERR(FTL, "Input file " << file << " does not appear to be a ROOT file");
+    NUIS_ERR(FTL, "You've probably used the wrong function for the data setter");
+    NUIS_ERR(FTL, "Or, you have a ROOT file which does not end in .root, please address");
+    throw;
   }
 
   TFile *rootHistFile = new TFile(file.c_str(), "READ");
