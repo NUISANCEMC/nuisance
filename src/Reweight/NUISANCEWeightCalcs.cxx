@@ -227,7 +227,6 @@ double LagrangeRPA::CalcWeight(BaseFitEvt* evt) {
 //
 //
 double LagrangeRPA::GetRPAWeight(double Q2) {
-  //std::cout << "Getting RPA Weight : " << Q2 << std::endl;
   if (Q2 > 0.7) return 1.0;
 
   // Keep original Lagrange RPA for documentation
@@ -578,7 +577,7 @@ double GaussianModeCorr::GetGausWeight(double q0, double q3, double vals[]) {
   // Use tilt-shift method by Patrick
   if (fMethod) {
     if (fDebugStatements) {
-      std::cout << "Using Patrick gaussian" << std::endl;
+      NUIS_LOG(DEB, "Using Patrick gaussian");
     }
     // // CCQE Without Suppression
     // double Norm = 4.82788679036;
@@ -621,11 +620,9 @@ double GaussianModeCorr::GetGausWeight(double q0, double q3, double vals[]) {
     w *= exp(-c * (q3 - Pq3) * (q3 - Pq3));
 
     if (fDebugStatements) {
-      std::cout << "Applied Tilt " << Tilt << " " << cos(Tilt) << " "
-        << sin(Tilt) << std::endl;
-      std::cout << "abc = " << a << " " << b << " " << c << std::endl;
-      std::cout << "Returning " << Norm << " " << Pq0 << " " << Wq0 << " "
-        << Pq3 << " " << Wq3 << " " << w << std::endl;
+      NUIS_LOG(DEB, "Applied Tilt " << Tilt << " " << cos(Tilt) << " " << sin(Tilt));
+      NUIS_LOG(DEB, "abc = " << a << " " << b << " " << c);
+      NUIS_LOG(DEB, "Returning " << Norm << " " << Pq0 << " " << Wq0 << " " << Pq3 << " " << Wq3 << " " << w);
     }
 
     if (w != w || std::isnan(w) || w < 0.0) {
@@ -655,7 +652,7 @@ double GaussianModeCorr::GetGausWeight(double q0, double q3, double vals[]) {
      * 0.875287
      */
     if (fDebugStatements) {
-      std::cout << "Using MINERvA Gaussian" << std::endl;
+      NUIS_LOG(DEB, "Using MINERvA Gaussian");
     }
 
     double norm = vals[kPosNorm];
@@ -803,9 +800,25 @@ RadCorrQ2::RadCorrQ2() {
   std::string fileloc = std::string(std::getenv("NUISANCE"));
   fileloc += "/data/radcorr";
   // Two files for numu and numubar
-  fInputs[kNumu] = new TFile((fileloc+"/Elspectrum_muon_neutrino_merge.root").c_str());
-  fInputs[kNumuBar] = new TFile((fileloc+"/Elspectrum_muon_antineutrino_merge.root").c_str());
+  // 7 March 2023 use extended tables
+  fInputs[kNumu] = new TFile((fileloc+"/Elspectrum_muon_neutrino_merge_extend2.root").c_str());
+  fInputs[kNumuBar] = new TFile((fileloc+"/Elspectrum_muon_antineutrino_merge_extend2.root").c_str());
 
+  if (!fInputs[kNumu]->IsOpen() || fInputs[kNumu]->IsZombie()) {
+    NUIS_ERR(FTL, "Radiative corrections");
+    NUIS_ERR(FTL, "Input file for muon neutrinos does not exist");
+    NUIS_ERR(FTL, "Provided location: " << fInputs[kNumu]->GetName());
+    throw;
+  }
+
+  if (!fInputs[kNumuBar]->IsOpen() || fInputs[kNumuBar]->IsZombie()) {
+    NUIS_ERR(FTL, "Radiative corrections");
+    NUIS_ERR(FTL, "Input file for muon anti-neutrinos does not exist");
+    NUIS_ERR(FTL, "Provided location: " << fInputs[kNumuBar]->GetName());
+    throw;
+  }
+
+  // The neutrino energy ranges
   EnuRange[0] = 0.2;
   EnuRange[1] = 0.3;
   EnuRange[2] = 0.5;
@@ -817,11 +830,41 @@ RadCorrQ2::RadCorrQ2() {
   EnuRange[8] = 3.0;
   EnuRange[9] = 5.0;
   EnuRange[10] = 10.;
-  EnuRange[11] = 20.;
+  EnuRange[11] = 15.;
+  EnuRange[12] = 20.;
+  EnuRange[13] = 25.;
+  EnuRange[14] = 30.;
+  EnuRange[15] = 35.;
+  EnuRange[16] = 40.;
+  EnuRange[17] = 45.;
+  EnuRange[18] = 50.;
+  EnuRange[19] = 70.;
 
-  nEnu = 12;
+  // Hard-code the expected number of fixed Enu calculations to check against the size
+  nEnu = 20;
   if (nEnu != sizeof(EnuRange)/sizeof(double)) {
-    std::cerr << "Something wrong with Enu range" << std::endl;
+    NUIS_ERR(FTL, "Radiative corrections");
+    NUIS_ERR(FTL, "The number of neutrino energies expected (" << nEnu << ") does not match the hard-coded range!");
+    NUIS_ERR(FTL, "Hard-coded range: " << sizeof(EnuRange)/sizeof(double));
+    for (unsigned int i = 0; i < sizeof(EnuRange)/sizeof(double); ++i) {
+      NUIS_ERR(FTL, "EnuRange[" <<  i << "]=" << EnuRange[i]);
+    }
+    throw;
+  }
+
+  // Check the number of keys in the file to make sure it matches the number of neutrino energies
+  // Might as well be paranoid
+  if (nEnu != fInputs[kNumu]->GetListOfKeys()->GetSize()) {
+    NUIS_ERR(FTL, "Radiative corrections");
+    NUIS_ERR(FTL, "The number of neutrino energies expected (" << nEnu << ") does not match the entries in the TFile for muon neutrinos (" << fInputs[kNumu]->GetName() << ")");
+    NUIS_ERR(FTL, "Number of entries in file: " << fInputs[kNumu]->GetListOfKeys()->GetSize());
+    throw;
+  }
+  
+  if (nEnu != fInputs[kNumuBar]->GetListOfKeys()->GetSize()) {
+    NUIS_ERR(FTL, "Radiative corrections");
+    NUIS_ERR(FTL, "The number of neutrino energies expected (" << nEnu << ") does not match the entries in the TFile for muon anti-neutrinos (" << fInputs[kNumuBar]->GetName() << ")");
+    NUIS_ERR(FTL, "Number of entries in file: " << fInputs[kNumuBar]->GetListOfKeys()->GetSize());
     throw;
   }
 
@@ -830,11 +873,13 @@ RadCorrQ2::RadCorrQ2() {
   std::string basename_numub = "Elspectrum_muon_antineutrino_proton";
 
   Graphs = new TGraph**[kNumuBar+1];
+  // Loop over neutrino and anti-neutrino
   for (int i = 0; i < kNumuBar+1; ++i) {
     Graphs[i] = new TGraph*[nEnu];
     std::string basename;
     if (i == kNumu) basename = basename_numu;
     else basename = basename_numub;
+    /*
     Graphs[i][0] = (TGraph*)fInputs[i]->Get((basename+"_02GeV").c_str())->Clone();
     Graphs[i][1] = (TGraph*)fInputs[i]->Get((basename+"_03GeV").c_str())->Clone();
     Graphs[i][2] = (TGraph*)fInputs[i]->Get((basename+"_05GeV").c_str())->Clone();
@@ -847,6 +892,27 @@ RadCorrQ2::RadCorrQ2() {
     Graphs[i][9] = (TGraph*)fInputs[i]->Get((basename+"_5GeV").c_str())->Clone();
     Graphs[i][10] = (TGraph*)fInputs[i]->Get((basename+"_10GeV").c_str())->Clone();
     Graphs[i][11] = (TGraph*)fInputs[i]->Get((basename+"_20GeV").c_str())->Clone();
+    */
+    Graphs[i][0] = (TGraph*)fInputs[i]->Get((basename+"_02GeV").c_str())->Clone();
+    Graphs[i][1] = (TGraph*)fInputs[i]->Get((basename+"_03GeV").c_str())->Clone();
+    Graphs[i][2] = (TGraph*)fInputs[i]->Get((basename+"_05GeV").c_str())->Clone();
+    Graphs[i][3] = (TGraph*)fInputs[i]->Get((basename+"_06GeV").c_str())->Clone();
+    Graphs[i][4] = (TGraph*)fInputs[i]->Get((basename+"_075GeV").c_str())->Clone();
+    Graphs[i][5] = (TGraph*)fInputs[i]->Get((basename+"_09GeV").c_str())->Clone();
+    Graphs[i][6] = (TGraph*)fInputs[i]->Get((basename+"_1GeV").c_str())->Clone();
+    Graphs[i][7] = (TGraph*)fInputs[i]->Get((basename+"_2GeV").c_str())->Clone();
+    Graphs[i][8] = (TGraph*)fInputs[i]->Get((basename+"_3GeV").c_str())->Clone();
+    Graphs[i][9] = (TGraph*)fInputs[i]->Get((basename+"_5GeV").c_str())->Clone();
+    Graphs[i][10] = (TGraph*)fInputs[i]->Get((basename+"_10GeV").c_str())->Clone();
+    Graphs[i][11] = (TGraph*)fInputs[i]->Get((basename+"_15GeV").c_str())->Clone();
+    Graphs[i][12] = (TGraph*)fInputs[i]->Get((basename+"_20GeV").c_str())->Clone();
+    Graphs[i][13] = (TGraph*)fInputs[i]->Get((basename+"_25GeV").c_str())->Clone();
+    Graphs[i][14] = (TGraph*)fInputs[i]->Get((basename+"_30GeV").c_str())->Clone();
+    Graphs[i][15] = (TGraph*)fInputs[i]->Get((basename+"_35GeV").c_str())->Clone();
+    Graphs[i][16] = (TGraph*)fInputs[i]->Get((basename+"_40GeV").c_str())->Clone();
+    Graphs[i][17] = (TGraph*)fInputs[i]->Get((basename+"_45GeV").c_str())->Clone();
+    Graphs[i][18] = (TGraph*)fInputs[i]->Get((basename+"_50GeV").c_str())->Clone();
+    Graphs[i][19] = (TGraph*)fInputs[i]->Get((basename+"_70GeV").c_str())->Clone();
   }
 
   fInputs[0]->Close();
@@ -894,12 +960,7 @@ double RadCorrQ2::CalcWeight(BaseFitEvt *evt) {
 
   // Boost the neutrino
   initnu.Boost(-1*initnuc.BoostVector());
-  //std::cout << Enu << " " << initnu.E()/1E3 << std::endl;
   Enu = initnu.E()/1E3; // update to be enu in nucleon frame
-
-  // Pick some random Q2 and Enu
-  //double Q2 = 1;
-  //double Enu = 2;
 
   // Find the nearest point in Enu
   // Get the true neutrino energy and interpolate between nearest points
@@ -974,7 +1035,6 @@ double RadCorrQ2::CalcWeight(BaseFitEvt *evt) {
 
   // linear intepolation
   double weight = (high-low)*(Enu-EnuRange[nearest])/(EnuRange[nearest+1]-EnuRange[nearest])+low;
-  //std::cout << Q2 << " " << Enu << " " << weight << std::endl;
 
   // Put in a weight cap
   if (weight > 10) weight = 10;
@@ -1020,7 +1080,10 @@ void RadCorrQ2::SetDialValue(int rwenum, double val) {
     else if (val > 0 && val < 1.5) type = 1; // Apply only to CCQE events
     else if (val > 0 && val < 2.5) type = 2; // Apply to all events
     else {
-      std::cerr << "wrong value given to radiative correction. Please give 0, 1, 2. I will round to nearest integer" << std::endl;
+      std::cerr << "Wrong value given to radiative correction. Please give 0, 1, 2. I will round to nearest integer" << std::endl;
+      std::cerr << "0: off" << std::endl;
+      std::cerr << "1: Affects only CCQE events" << std::endl;
+      std::cerr << "2: Affects all events" << std::endl;
       throw;
     }
   }

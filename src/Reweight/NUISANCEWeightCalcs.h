@@ -214,7 +214,7 @@ class RadCorrQ2 : public NUISANCEWeightCalc {
     TGraph ***Graphs;
 
     // Enu Range that the inputs come in
-    double EnuRange[12];
+    double EnuRange[20];
     int nEnu;
 
     double GetQ2max(double, double);
