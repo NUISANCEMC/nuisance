@@ -56,8 +56,6 @@ int timelastlog = 0;
 // -------- Logging Functions --------- //
 
 bool LOGGING(int level) {
-  // std::cout << "LOGGING : " << __FILENAME__ << " " << __FUNCTION__ <<
-  // std::endl;
   return (Logger::log_verb >=
           (int)__GETLOG_LEVEL(level, __FILENAME__, __FUNCTION__));
 };
@@ -127,13 +125,13 @@ std::ostream& __OUTLOG(int level, const char* filename, const char* funct,
         std::cout << "[LOG Signal]";
         break;
       case EVT:
-        std::cout << "[LOG Event ]";
+        std::cout << "[LOG Event]";
         break;
       case DEB:
-        std::cout << "[LOG DEBUG ]";
+        std::cout << "[LOG DEBUG]";
         break;
       default:
-        std::cout << "[LOG INFO  ]";
+        std::cout << "[LOG INFO]";
         break;
     }
 
@@ -225,14 +223,15 @@ void SETTRACE(bool val) { Logger::showtrace = val; }
 // ------ ERROR FUNCTIONS ---------- //
 std::ostream& __OUTERR(int level, const char* filename, const char* funct,
                        int line) {
-  if (Logger::use_colors) std::cerr << RED;
 
   switch (level) {
     case FTL:
-      std::cerr << "[ERR FATAL ]: ";
+      if (Logger::use_colors) std::cerr << REDBKG WHITE BOLD;
+      std::cerr << "[ERR FATAL]: ";
       break;
     case WRN:
-      std::cerr << "[ERR WARN  ]: ";
+      if (Logger::use_colors) std::cerr << YELLOWBKG BOLD;
+      std::cerr << "[ERR WARN]: ";
       break;
   }
 
