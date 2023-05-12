@@ -43,7 +43,7 @@ FNAL_CCQE_Evt_1DQ2_nu::FNAL_CCQE_Evt_1DQ2_nu(nuiskey samplekey) {
   // plot information
   fSettings.SetTitle("FNAL #nu_{#mu} CCQE");
   fSettings.DefineAllowedSpecies("numu");
-  fSettings.SetDataInput(  FitPar::GetDataBase() + "FNAL/FNAL_CCQE_Data_PRD29_436.root;FNAL_CCQE_Data_1DQ2");
+  fSettings.SetDataInput(  FitPar::GetDataBase() + "FNAL/CCQE/FNAL_CCQE_Data_PRD29_436.root;FNAL_CCQE_Data_1DQ2");
 
   // is Q2 Correction applied
   applyQ2correction = fSettings.Found("type", "Q2CORR");
