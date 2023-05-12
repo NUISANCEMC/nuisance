@@ -1583,7 +1583,9 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
   } else if (!name.compare("Smear_SVDUnfold_Propagation_Osc")) {
     return (new Smear_SVDUnfold_Propagation_Osc(samplekey));
   } else {
-    NUIS_ABORT("Error: No such sample: " << name << std::endl);
+    NUIS_ERR(FTL, "Error: No such sample: " << name << std::endl);
+    NUIS_ERR(FTL, "Check which samples are available by running the script in $NUISANCE/scripts/nuissamples");
+    throw;
   }
 
   // Return NULL if no sample loaded.
