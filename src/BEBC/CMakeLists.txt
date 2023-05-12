@@ -28,6 +28,7 @@ BEBC_CC1ppim_XSec_1DQ2_antinu.cxx
 BEBC_CC1ppip_XSec_1DEnu_nu.cxx
 BEBC_CC1ppip_XSec_1DQ2_nu.cxx
 BEBC_CCQE_XSec_1DQ2_nu.cxx
+BEBC_CCQE_XSec_1DEnu_nu.cxx
 )
 
 set(HEADERFILES
@@ -42,6 +43,7 @@ BEBC_CC1ppim_XSec_1DQ2_antinu.h
 BEBC_CC1ppip_XSec_1DEnu_nu.h
 BEBC_CC1ppip_XSec_1DQ2_nu.h
 BEBC_CCQE_XSec_1DQ2_nu.h
+BEBC_CCQE_XSec_1DEnu_nu.h
 )
 
 set(LIBNAME expBEBC)
