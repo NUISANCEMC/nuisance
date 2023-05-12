@@ -20,8 +20,9 @@ set(IMPLFILES
 FNAL_CC1ppip_Evt_1DQ2_nu.cxx
 FNAL_CC1ppip_XSec_1DEnu_nu.cxx
 FNAL_CC1ppip_XSec_1DQ2_nu.cxx
-FNAL_CCQE_Evt_1DQ2_nu.cxx
 FNAL_CC1ppim_XSec_1DEnu_antinu.cxx
+FNAL_CCQE_Evt_1DQ2_nu.cxx
+FNAL_CCQE_XSec_1DEnu_nu.cxx
 )
 
 set(HEADERFILES
@@ -30,6 +31,7 @@ FNAL_CC1ppip_Evt_1DQ2_nu.h
 FNAL_CC1ppip_XSec_1DEnu_nu.h
 FNAL_CC1ppip_XSec_1DQ2_nu.h
 FNAL_CCQE_Evt_1DQ2_nu.h
+FNAL_CCQE_XSec_1DEnu_nu.h
 )
 
 set(LIBNAME expFNAL)

@@ -108,6 +108,7 @@
 #ifndef __NO_FNAL__
 // FNAL CCQE
 #include "FNAL_CCQE_Evt_1DQ2_nu.h"
+#include "FNAL_CCQE_XSec_1DEnu_nu.h"
 // FNAL CC1ppip
 #include "FNAL_CC1ppip_Evt_1DQ2_nu.h"
 #include "FNAL_CC1ppip_XSec_1DEnu_nu.h"
@@ -119,6 +120,7 @@
 #ifndef __NO_BEBC__
 // BEBC CCQE
 #include "BEBC_CCQE_XSec_1DQ2_nu.h"
+#include "BEBC_CCQE_XSec_1DEnu_nu.h"
 // BEBC CC1ppip
 #include "BEBC_CC1ppip_XSec_1DEnu_nu.h"
 #include "BEBC_CC1ppip_XSec_1DQ2_nu.h"
@@ -907,6 +909,8 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
 #ifndef __NO_FNAL__
       if (!name.compare("FNAL_CCQE_Evt_1DQ2_nu")) {
     return (new FNAL_CCQE_Evt_1DQ2_nu(samplekey));
+      } else if (!name.compare("FNAL_CCQE_XSec_1DEnu_nu")) {
+    return (new FNAL_CCQE_XSec_1DEnu_nu(samplekey));
     /*
       FNAL CC1ppip
     */
@@ -929,7 +933,9 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
 #endif
 #ifndef __NO_BEBC__
       if (!name.compare("BEBC_CCQE_XSec_1DQ2_nu")) {
-    return (new BEBC_CCQE_XSec_1DQ2_nu(samplekey));
+        return (new BEBC_CCQE_XSec_1DQ2_nu(samplekey));
+      } else if (!name.compare("BEBC_CCQE_XSec_1DEnu_nu")) {
+        return (new BEBC_CCQE_XSec_1DEnu_nu(samplekey));
     /*
       BEBC CC1ppip samples
     */
