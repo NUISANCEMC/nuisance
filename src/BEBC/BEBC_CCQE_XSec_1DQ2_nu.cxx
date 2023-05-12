@@ -34,7 +34,7 @@ BEBC_CCQE_XSec_1DQ2_nu::BEBC_CCQE_XSec_1DQ2_nu(nuiskey samplekey) {
   fSettings = LoadSampleSettings(samplekey);
   fSettings.SetDescription(descrip);
   fSettings.SetXTitle("Q^{2} (GeV^{2})");
-  fSettings.SetYTitle("Number of events");
+  fSettings.SetYTitle("d#sigma/dQ^{2} (cm^{2}/GeV^{2}/nucleon)");
   fSettings.SetAllowedTypes("EVT/SHAPE/DIAG", "EVT/SHAPE/DIAG/Q2CORR/MASK");
   fSettings.SetEnuRange(0.0, 200.0);
   fSettings.DefineAllowedTargets("D,H");
@@ -42,7 +42,7 @@ BEBC_CCQE_XSec_1DQ2_nu::BEBC_CCQE_XSec_1DQ2_nu(nuiskey samplekey) {
   // plot information
   fSettings.SetTitle("BEBC_CCQE_XSec_1DQ2_nu");
   fSettings.DefineAllowedSpecies("numu");
-  fSettings.SetDataInput(  FitPar::GetDataBase() + "BEBC/BEBC_CCQE_Data_NPB343_285.root;BEBC_1DQ2_Data");
+  fSettings.SetDataInput(  FitPar::GetDataBase() + "BEBC/CCQE/BEBC_CCQE_Data_NPB343_285.root;BEBC_1DQ2_Data");
    
   // is Q2 Correction applied
   applyQ2correction = fSettings.Found("type", "Q2CORR");
