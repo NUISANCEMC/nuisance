@@ -63,18 +63,21 @@ bool isCC1ENp(FitEvent* event, double EnuMin, double EnuMax) {
   // Veto events which don't have 1 or more FS protons that have kinetic energy > 40MeV
   double ProtonKEThreshold = 40.0/1000; //Units in GeV
   uint nProtonsWithKEAboveThreshold = 0;
-  std::vector<FitParticle*> ProtonParticles = event->GetAllProton();
+  std::vector<FitParticle*> ProtonParticles = event->GetAllFSProton();
   for (uint i=0;i<ProtonParticles.size();i++) {
     if (ProtonParticles[i]->KE()>=ProtonKEThreshold) {
       nProtonsWithKEAboveThreshold += 1;
     }
   }
+  if (nProtonsWithKEAboveThreshold != event->NumFSProton()) {
+    std::cout << nProtonsWithKEAboveThreshold << " " << event->NumFSProton() << std::endl;
+  }
   if (nProtonsWithKEAboveThreshold == 0) return false;
 
   // ==============================================================================================================================
   // Veto events with any charged pions that have kinetic energy > 40MeV
-  std::vector<FitParticle*> PiPlusParticles = event->GetAllPiPlus();
-  std::vector<FitParticle*> PiMinusParticles = event->GetAllPiMinus();
+  std::vector<FitParticle*> PiPlusParticles = event->GetAllFSPiPlus();
+  std::vector<FitParticle*> PiMinusParticles = event->GetAllFSPiMinus();
 
   std::vector<FitParticle*> ChargedPionParticles;
   for (uint i=0;i<PiPlusParticles.size();i++) {ChargedPionParticles.push_back(PiPlusParticles[i]);}
@@ -91,7 +94,7 @@ bool isCC1ENp(FitEvent* event, double EnuMin, double EnuMax) {
 
   // ==============================================================================================================================
   // Veto events with any neutral pions
-  std::vector<FitParticle*> PiZeroParticles = event->GetAllPiZero();
+  std::vector<FitParticle*> PiZeroParticles = event->GetAllFSPiZero();
   uint nNeutralPions = PiZeroParticles.size();
   if (nNeutralPions != 0) return false;
 
