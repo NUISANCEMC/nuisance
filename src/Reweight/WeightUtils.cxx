@@ -221,7 +221,7 @@ int FitBase::ConvDialType(std::string const &type) {
   else if (!type.compare("nusyst_parameter"))
     return kNuSystematics;
   else
-    return kUNKNOWN;
+    return 0; //kUNKNOWN;
 }
 
 std::string FitBase::ConvDialType(int type) {

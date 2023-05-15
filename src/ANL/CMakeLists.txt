@@ -22,6 +22,7 @@ set(ANL_Impl_Files
   ANL_CCQE_XSec_1DEnu_nu.cxx
 
   ANL_CCQE_HEPDATA.cxx
+  ANL_CCQE_HEPDATA_2D.cxx
 
   ANL_CC1npip_Evt_1DcosmuStar_nu.cxx
   ANL_CC1npip_Evt_1Dppi_nu.cxx

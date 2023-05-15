@@ -5,6 +5,7 @@
 #include "ANL_CCQE_XSec_1DEnu_nu.h"
 
 #include "ANL_CCQE_HEPDATA.h"
+#include "ANL_CCQE_HEPDATA_2D.h"
 
 // ANL CC1ppip
 #include "ANL_CC1ppip_Evt_1DQ2_nu.h"
@@ -678,9 +679,11 @@ std::cout << "CHECKING ANL TEST " << name << std::endl;
              !name.compare("ANL_CCQE_Evt_1DQ2_nu_PRD16")) {
     return (new ANL_CCQE_Evt_1DQ2_nu(samplekey));
 
-
+   } else if (!name.compare("MENTALANALYSIS")) {
+    return (new ANL_CCQE_HEPDATA_2D(samplekey));
   } else if (!name.compare("HEPDATATEST")) {
     return (new ANL_CCQE_HEPDATA(samplekey));
+ 
     /*
       ANL CC1ppip samples
     */

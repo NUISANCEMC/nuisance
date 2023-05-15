@@ -8,6 +8,7 @@
 #include <string>
 
 extern "C" {
+
 double ANL_CCQE_Project_Q2(FitEvent *event) {
   // std::cout << "ANL_CCQE_project_Q2: event(" << event
   //           << ")->GetNeutrinoIn(): " << event->GetNeutrinoIn() << std::endl;

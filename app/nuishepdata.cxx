@@ -58,6 +58,132 @@ struct FuckOffMatrix{
    std::vector<std::vector<double>> column_values;
 };
 
+#define NULL_ENTRY -999.99
+
+bool inRangeComp(double p, double v1, double v2) {
+    return v1 <= v2                                // <- v1 and v2 are compared only once
+         ? v1 <= p && p <= v2 
+         : v2 <= p && p <= v1;
+}
+
+
+class Histogram {
+   
+   struct {
+      double low,
+      double high
+   } extent;
+
+   std::vector<std::vector<extent>> bins;
+   std::vector<double> weights;
+   std::vector<double> error_high;
+   std::vector<double> error_low;
+   std::vector<int> entries;
+
+   std::vector< std::vector<double>> correlation;
+
+   int ndim;
+   int overflow_entries;
+   double overflow_weights;
+
+   double default_extent_low;
+   double default_extent_high;
+
+   Histogram(){
+      n = 0;
+   };
+
+   Histogram(int n){
+      ndim = n;
+   }
+
+   ~Histogram(){};
+
+   void AddBin(double* low, double* high){
+
+      // Estimate dimensions of high vs low
+      int newdim = sizeof(low);
+      
+      if (sizeof(high) != newdim) {
+         std::cerr << "Histogram::AddBin - Issue with newdim." << std::endl;
+         throw std::length_error("Extent high is not the same as extent low!");
+      }
+
+      // if ndim is 0, then set the dimensions now.
+
+
+   }
+
+   void RemoveBin(int i){
+      // Remove bin from entry.
+   }
+
+   void FillBin(double w, unsigned int i){
+      if (i >= weights.size()) {
+         overflow_weights += w;
+         overflow_entries += 1;
+      } else {
+         weights[i] += w;
+         entries[i] += 1;
+      }
+   }
+
+   void GetBinContent(unsigned int i){
+      return weights[i];
+   }
+
+   void GetBinError(unsigned int i){
+
+   }
+
+   int GetSize(){
+
+   }
+
+   double * GetValues() {
+
+   }
+
+   double * GetErrors() {
+
+   }
+
+   double ** GetCovariance() {
+
+   }
+
+   double ** GetCorrelation() {
+
+   }
+
+   int FindBin(double* x){
+      for (int i = 0; i < weights.size(); i++){
+         bool found = true;
+         for (int j = 0; j < sizeof(x); i++){
+            if ( x[j] < bins[i].low || x[j] >= bins[i].high ){
+               found = false;
+               break;
+            }
+         }
+         if (found) break;
+      }
+   }
+
+   void operator () (double w, double* x)
+   {
+      FillBin( FindBin(x), w ); 
+   }   
+}
+
+#define ROOT 1
+#ifdef ROOT
+   TH1D* Histogram_to_TH1D(Histogram* h);
+   TH2D* Histogram_to_TH2D(Histogram* h);
+   TH2Poly* Histogram_to_TH2Poly(Histogram* h);
+   TGraph* Histogram_to_TGraph(Histogram* h);
+#endif
+
+
 std::vector<double>& GetColumn(FuckOffMatrix& m, std::string column_name){
    for (int i = 0; i < m.column_headers.size(); i++){
       if (!m.column_headers[i].compare(column_name)) return m.column_values[i];

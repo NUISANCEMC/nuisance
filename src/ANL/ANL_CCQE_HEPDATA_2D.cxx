@@ -21,7 +21,7 @@
 // using YAML;
 // using namespace boost::histogram;
 
-#include "ANL_CCQE_HEPDATA.h"
+#include "ANL_CCQE_HEPDATA_2D.h"
 
 #include "nuiscling.h"
 
@@ -65,6 +65,8 @@ struct HepDataVariables {
   int n = 0;
 };
 
+
+
 namespace YAML {
 template <> struct convert<HepDataVariables> {
 
@@ -82,8 +84,13 @@ template <> struct convert<HepDataVariables> {
       return 1;
 
     rhs.name = node["header"]["name"].as<std::string>();
-    // rhs.units = node["header"]["units"].as<std::string>();
-    rhs.title = rhs.name + "[" + rhs.units + "]";
+    rhs.units = "";
+    rhs.title = rhs.name;
+
+    
+    // if (node["header"]["units"])
+    //   rhs.units = node["header"]["units"].as<std::string>();
+    //   rhs.title = rhs.name + "[" + rhs.units + "]";
 
     YAML::Node xvalues = node["values"];
 
@@ -147,7 +154,7 @@ double QueryErrorFromPoint(YAML::Node val) {
 }
 
 //********************************************************************
-ANL_CCQE_HEPDATA::ANL_CCQE_HEPDATA(nuiskey samplekey) {
+ANL_CCQE_HEPDATA_2D::ANL_CCQE_HEPDATA_2D(nuiskey samplekey) {
   //********************************************************************
 
   // Setup common settings
@@ -213,34 +220,52 @@ ANL_CCQE_HEPDATA::ANL_CCQE_HEPDATA(nuiskey samplekey) {
   YAML::Node dep_var = doc["dependent_variables"];
   HepDataVariables entries = dep_var[0].as<HepDataVariables>();
 
-  std::string title = dataname + ";" + dimension1.title + ";" + entries.title;
+  std::string title = dataname + ";" + dimension1.title + ";" + dimension2.title + ";" + entries.title;
 
-  for (int i = 0; i < dimension1.n + 1; i++) {
-    std::cout << "BIN1 " << i << " " << dimension1.edges[i] << " "
-              << dimension1.edges.size() << std::endl;
-  }
-  if (dimension1.valid) {
+  if (dimension1.valid && dimension2.valid) {
 
-    std::cout << "CREATED TH1D" << std::endl;
-    fDataHist = new TH1D(dataname.c_str(), title.c_str(), dimension1.n,
-                         &dimension1.edges[0]);
+    TH2Poly* tempdata = new TH2Poly();
+
+
+    // std::cout << "CREATED TH2D" << std::endl;
+    // fDataHist = new TH1D(dataname.c_str(), title.c_str(), 
+    //                     dimension1.n,
+    //                     &dimension1.edges[0],
+    //                     dimension2.n,
+    //                     &dimension2.edges[0]);
 
     for (int i = 0; i < entries.values.size(); i++) {
-      fDataHist->SetBinContent(i + 1, entries.values[i]);
+
+      
+      double xlow  = dimension1.low[i];
+      double xhigh = dimension1.high[i];
+      double ylow  = dimension2.low[i];
+      double yhigh = dimension2.high[i];
+      double vals  = entries.values[i];
+      // double xedges[4] = {xlow,xlow,xhigh,xhigh};
+      // double yedges[4] = {ylow,yhigh,yhigh,ylow};
+
+      tempdata->AddBin(xlow,ylow,xhigh,yhigh);
+      tempdata->SetBinContent(i, vals);
+
     }
     std::cout << "MAPPING SIZE : " << entries.n << " " << dimension1.n
               << std::endl;
 
-    for (int i = 0; i < fDataHist->GetNbinsX(); i++) {
-      std::cout << "VALUE " << i << " " << fDataHist->GetBinContent(i + 1)
+    for (int i = 0; i < tempdata->GetNbinsX(); i++) {
+      std::cout << "VALUE " << i << " " << tempdata->GetBinContent(i + 1)
                 << " " << entries.values[i] << std::endl;
     }
 
     // Non dynamic NUISANCE CRAP
     fSettings.SetDescription(dataname);
     fSettings.SetXTitle(dimension1.title);
-    fSettings.SetYTitle(entries.title);
+    fSettings.SetYTitle(dimension2.title);
+    fSettings.SetZTitle(entries.title);
     fSettings.SetTitle(title);
+
+    fDataHist = (TH2D*) tempdata;
+
   }
 
   std::cout << "[INFO]: Parsing snippet file: " << snippet_file << std::endl;
@@ -264,6 +289,27 @@ ANL_CCQE_HEPDATA::ANL_CCQE_HEPDATA(nuiskey samplekey) {
     if (!proj_func) {
       NUIS_ABORT("Failed to find required function "
                  << fSettings.GetS(dimension1.name)
+                 << " after interpreting snippet_file: " << snippet_file)
+    }
+    projection_funcs.push_back(proj_func);
+  }
+
+  if (dimension2.valid) {
+    if (!fSettings.Has(dimension2.name)) {
+      std::cout << "Known Qualifiers: " << std::endl;
+      for (int i = 0; i < qualifiers.size(); i++) {
+        std::cout << "\t" << qualifiers[i]["name"].as<std::string>() << ": "
+                  << qualifiers[i]["value"].as<std::string>() << std::endl;
+      }
+      NUIS_ABORT("Could not find qualifier named: "
+                 << dimension2.name << " for projection function definition.");
+    }
+
+    auto proj_func =
+        nuiscling::Get().GetProjectionFunction(fSettings.GetS(dimension2.name));
+    if (!proj_func) {
+      NUIS_ABORT("Failed to find required function "
+                 << fSettings.GetS(dimension2.name)
                  << " after interpreting snippet_file: " << snippet_file)
     }
     projection_funcs.push_back(proj_func);
@@ -312,29 +358,30 @@ ANL_CCQE_HEPDATA::ANL_CCQE_HEPDATA(nuiskey samplekey) {
 }
 
 //********************************************************************
-void ANL_CCQE_HEPDATA::FillEventVariables(FitEvent *event) {
+void ANL_CCQE_HEPDATA_2D::FillEventVariables(FitEvent *event) {
   //********************************************************************
   fXVar = projection_funcs[0](event);
+  fYVar = projection_funcs[1](event);
 };
 
 //********************************************************************
-bool ANL_CCQE_HEPDATA::isSignal(FitEvent *event) {
+bool ANL_CCQE_HEPDATA_2D::isSignal(FitEvent *event) {
   //********************************************************************
   return filter_func(event);
 };
 
 //********************************************************************
-void ANL_CCQE_HEPDATA::FillHistograms() {
+void ANL_CCQE_HEPDATA_2D::FillHistograms() {
   //********************************************************************
 
   // Should not be needed in the future.
-  Measurement1D::FillHistograms();
+  Measurement2D::FillHistograms();
 }
 
 //********************************************************************
-void ANL_CCQE_HEPDATA::ScaleEvents() {
+void ANL_CCQE_HEPDATA_2D::ScaleEvents() {
   //********************************************************************
 
   // Should not be needed in the future.
-  Measurement1D::ScaleEvents();
+  Measurement2D::ScaleEvents();
 }
