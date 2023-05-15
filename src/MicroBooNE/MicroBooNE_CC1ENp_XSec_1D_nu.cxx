@@ -35,19 +35,19 @@ MicroBooNE_CC1ENp_XSec_1D_nu::MicroBooNE_CC1ENp_XSec_1D_nu(nuiskey samplekey) {
     ObjSuffix = "elec_e";
     fDist = kElecEnergy;
     fSettings.SetXTitle("Electron Energy (GeV)");
-    fSettings.SetYTitle("d#sigma/dE (cm^{2}/GeV/Nucleon)");
+    fSettings.SetYTitle("d#sigma/dE (cm^{2}/GeV/Nucleus)");
   }
   else if (!name.compare("MicroBooNE_CC1ENp_XSec_1DOpeningAngle_nu")) {
     ObjSuffix = "opening_angle";
     fDist = kOpeningAngle;
     fSettings.SetXTitle("Opening Angle cos #theta_{ep}");
-    fSettings.SetYTitle("d#sigma/d(cos #theta_{ep}) (cm^{2}/GeV/Nucleon)");
+    fSettings.SetYTitle("d#sigma/d(cos #theta_{ep}) (cm^{2}/GeV/Nucleus)");
   }
   else if (!name.compare("MicroBooNE_CC1ENp_XSec_1DTrueVisibleEnergy_nu")) {
     ObjSuffix = "true_e_visible";
     fDist = kTrueVisibleEnergy;
     fSettings.SetXTitle("True Visible Energy [GeV]");
-    fSettings.SetYTitle("d#sigma/dE (cm^{2}/GeV/Nucleon)");
+    fSettings.SetYTitle("d#sigma/dE (cm^{2}/GeV/Nucleus)");
   }
   else {
     assert(false);
@@ -77,7 +77,13 @@ MicroBooNE_CC1ENp_XSec_1D_nu::MicroBooNE_CC1ENp_XSec_1D_nu(nuiskey samplekey) {
   ScaleData(1E-38);
 
   // ScaleFactor for DiffXSec/cm2/Nucleus (According to L.P. 11/05/23)
-  fScaleFactor = (GetEventHistogram()->Integral("width") * 1E-38) / (double(fNEvents) * TotalIntegratedFlux());
+  //fScaleFactor = GetEventHistogram()->Integral("width") / (double(fNEvents) * TotalIntegratedFlux("",0.05,20)); // Standard differential cross section per nucleon 
+  fScaleFactor = GetEventHistogram()->Integral("width") / (double(fNEvents) * TotalIntegratedFlux()); // Standard differential cross section per nucleon 
+  fScaleFactor *= 40; // Convert to per nucleus (Ar40)
+  fScaleFactor *= 1E-38; // Convert units
+
+  std::cout << "fScaleFactor:" << fScaleFactor << std::endl;
+  std::cout << "TotalIntegratedFlux():" << TotalIntegratedFlux() << std::endl;
 
   SetCovarFromRootFile(inputFile, CovMatName);
 
@@ -163,5 +169,6 @@ void MicroBooNE_CC1ENp_XSec_1D_nu::ConvertEventRates() {
   for (int iBin=0;iBin<nBins;iBin++) {
     fMCHist->SetBinContent(iBin+1, SmearedMC(iBin));
   }
+
 }
 
