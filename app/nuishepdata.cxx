@@ -66,7 +66,7 @@ bool inRangeComp(double p, double v1, double v2) {
          : v2 <= p && p <= v1;
 }
 
-
+/*
 class Histogram {
    
    struct {
@@ -174,7 +174,9 @@ class Histogram {
       FillBin( FindBin(x), w ); 
    }   
 }
+*/
 
+/*
 #define ROOT 1
 #ifdef ROOT
    TH1D* Histogram_to_TH1D(Histogram* h);
@@ -182,7 +184,7 @@ class Histogram {
    TH2Poly* Histogram_to_TH2Poly(Histogram* h);
    TGraph* Histogram_to_TGraph(Histogram* h);
 #endif
-
+*/
 
 std::vector<double>& GetColumn(FuckOffMatrix& m, std::string column_name){
    for (int i = 0; i < m.column_headers.size(); i++){
