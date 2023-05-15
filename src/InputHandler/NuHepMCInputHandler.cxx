@@ -131,6 +131,7 @@ NuHepMCInputHandler::NuHepMCInputHandler(std::string const &handle,
   size_t NWeights = 0;
   // Loop through events and get N
   fNEvents = 0;
+  double sum_of_weights = 0;
   while (!fReader->failed()) {
     fReader->read_event(fHepMC3Evt);
     if (!fReader->failed()) {
@@ -161,6 +162,10 @@ NuHepMCInputHandler::NuHepMCInputHandler(std::string const &handle,
       if (xs) {
         if (NWeights > 0) {
           best_xs_estimate = xs->xsecs()[0];
+          sum_of_weights += fHepMC3Evt.weights()[0];
+          std::cout << "xs:xsec()[0] = " << xs->xsecs()[0]
+                    << ", weights()[0] = " << fHepMC3Evt.weights()[0]
+                    << std::endl;
         }
       } else {
         std::cout << "[WARN]: Failed to read xs info for " << (fNEvents - 1)
@@ -168,6 +173,10 @@ NuHepMCInputHandler::NuHepMCInputHandler(std::string const &handle,
       }
     }
   }
+
+  std::cout << "sum of weights = " << sum_of_weights << std::endl;
+  std::cout << "nevents = " << fNEvents << std::endl;
+  std::cout << "best_xs_estimate = " << best_xs_estimate << std::endl;
 
   // Open the file again
   fReader = HepMC3::deduce_reader(fFilename);
