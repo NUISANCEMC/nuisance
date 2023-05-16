@@ -222,21 +222,39 @@ ANL_CCQE_HEPDATA_2D::ANL_CCQE_HEPDATA_2D(nuiskey samplekey) {
 
   std::string title = dataname + ";" + dimension1.title + ";" + dimension2.title + ";" + entries.title;
 
+
+  std::string covarkey = "";
+  if (samplekey.Has("covar")) covarkey = samplekey.GetS("covar");
+
+  if (!covarkey.empty()){
+
+   YAML::Node covar_doc = YAML::LoadFile(covarkey);
+
+    HepDataVariables covar_vals = covar_doc["dependent_variables"][0].as<HepDataVariables>();
+    HepDataVariables covar_dim1 = covar_doc["independent_variables"][0].as<HepDataVariables>();
+    HepDataVariables covar_dim2 = covar_doc["independent_variables"][1].as<HepDataVariables>();
+
+    std::cout << "COVARIANCE SIZE " << covar_dim1.n << " " << covar_dim2.n << " " << covar_vals.n << std::endl;
+    // Covariance is assumed to be square, so matrix size is sqrt that.
+    std::cout << " Nbins in matrix " << sqrt(covar_vals.n) << std::endl;
+    TMatrixDSym* fFullCovar = new TMatrixDSym(sqrt(covar_vals.n));
+    for (int i = 0; i < covar_vals.n; i++){
+      int bin1 = covar_dim1.values[i];
+      int bin2 = covar_dim2.values[i];
+      double cov = covar_vals.values[i];
+      std::cout << "BIN COV : " << bin1 << " " << bin2 << " " << cov << std::endl;
+      (*fFullCovar)(bin2,bin1) = cov;
+    }
+    // fFullCovar = (TMatrixDSym*) holder;
+  }
+
+
   if (dimension1.valid && dimension2.valid) {
 
-    TH2Poly* tempdata = new TH2Poly();
-
-
-    // std::cout << "CREATED TH2D" << std::endl;
-    // fDataHist = new TH1D(dataname.c_str(), title.c_str(), 
-    //                     dimension1.n,
-    //                     &dimension1.edges[0],
-    //                     dimension2.n,
-    //                     &dimension2.edges[0]);
+    fRealDataHist = new TH2Poly();
 
     for (int i = 0; i < entries.values.size(); i++) {
 
-      
       double xlow  = dimension1.low[i];
       double xhigh = dimension1.high[i];
       double ylow  = dimension2.low[i];
@@ -245,17 +263,17 @@ ANL_CCQE_HEPDATA_2D::ANL_CCQE_HEPDATA_2D(nuiskey samplekey) {
       // double xedges[4] = {xlow,xlow,xhigh,xhigh};
       // double yedges[4] = {ylow,yhigh,yhigh,ylow};
 
-      tempdata->AddBin(xlow,ylow,xhigh,yhigh);
-      tempdata->SetBinContent(i, vals);
-
+      fRealDataHist->AddBin(xlow,ylow,xhigh,yhigh);
+      fRealDataHist->SetBinContent(i, vals);
+  
     }
     std::cout << "MAPPING SIZE : " << entries.n << " " << dimension1.n
               << std::endl;
 
-    for (int i = 0; i < tempdata->GetNbinsX(); i++) {
-      std::cout << "VALUE " << i << " " << tempdata->GetBinContent(i + 1)
-                << " " << entries.values[i] << std::endl;
-    }
+    // for (int i = 0; i < fRealDataHist->GetNbinsX(); i++) {
+      // std::cout << "VALUE " << i << " " << tempdata->GetBinContent(i + 1)
+                // << " " << entries.values[i] << std::endl;
+    // }
 
     // Non dynamic NUISANCE CRAP
     fSettings.SetDescription(dataname);
@@ -264,8 +282,10 @@ ANL_CCQE_HEPDATA_2D::ANL_CCQE_HEPDATA_2D(nuiskey samplekey) {
     fSettings.SetZTitle(entries.title);
     fSettings.SetTitle(title);
 
-    fDataHist = (TH2D*) tempdata;
-
+    fDataHist = new TH1D((dataname + "_data").c_str(),(title.c_str()),entries.n, 0.0, (double)entries.n);
+    for (int i = 0; i < entries.n; i++){
+      fDataHist->SetBinContent(i+1, fRealDataHist->GetBinContent(i));
+    }
   }
 
   std::cout << "[INFO]: Parsing snippet file: " << snippet_file << std::endl;
@@ -360,8 +380,9 @@ ANL_CCQE_HEPDATA_2D::ANL_CCQE_HEPDATA_2D(nuiskey samplekey) {
 //********************************************************************
 void ANL_CCQE_HEPDATA_2D::FillEventVariables(FitEvent *event) {
   //********************************************************************
-  fXVar = projection_funcs[0](event);
-  fYVar = projection_funcs[1](event);
+  double x = projection_funcs[0](event);
+  double y = projection_funcs[1](event);
+  fXVar = fRealDataHist->FindBin(x,y) + 0.5; // Convert to a bin index
 };
 
 //********************************************************************
@@ -375,7 +396,7 @@ void ANL_CCQE_HEPDATA_2D::FillHistograms() {
   //********************************************************************
 
   // Should not be needed in the future.
-  Measurement2D::FillHistograms();
+  Measurement1D::FillHistograms();
 }
 
 //********************************************************************
@@ -383,5 +404,5 @@ void ANL_CCQE_HEPDATA_2D::ScaleEvents() {
   //********************************************************************
 
   // Should not be needed in the future.
-  Measurement2D::ScaleEvents();
+  Measurement1D::ScaleEvents();
 }

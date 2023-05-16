@@ -20,7 +20,7 @@
 #ifndef ANL_CCQE_HEPDATA_2D_H_SEEN
 #define ANL_CCQE_HEPDATA_2D_H_SEEN
 
-#include "Measurement2D.h"
+#include "Measurement1D.h"
 #include "CustomVariableBoxes.h"
 #include "nuiscling_ftypes.h"
 
@@ -31,7 +31,7 @@
 ///  - PRD.26.537  = ANL_CCQE_XSec_1DQ2_nu_PRD26, or ANL_CCQE_XSec_1DEnu_nu
 ///  - PRD.16.3103 = ANL_CCQE_XSec_1DQ2_nu_PRD16
 ///  - PRL.31.844  = ANL_CCQE_XSec_1DEQ2_nu_PRL31
-class ANL_CCQE_HEPDATA_2D : public Measurement2D {
+class ANL_CCQE_HEPDATA_2D : public Measurement1D {
 public:
 
   ANL_CCQE_HEPDATA_2D(nuiskey samplekey);
@@ -51,6 +51,7 @@ public:
   
  private:
 
+  TH2Poly* fRealDataHist;
   nuiscling_ftypes::filter filter_func;
   std::vector<nuiscling_ftypes::project> projection_funcs;
 
