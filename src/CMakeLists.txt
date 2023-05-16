@@ -10,6 +10,7 @@ SET(CoreDirs
 	Smearceptance
 	Splines
 	Statistical
+        HEPDATA
 	Utils)
 
 foreach(CD ${CoreDirs})

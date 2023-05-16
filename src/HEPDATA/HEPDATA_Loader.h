@@ -17,25 +17,17 @@
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 
-#ifndef ANL_CCQE_HEPDATA_2D_H_SEEN
-#define ANL_CCQE_HEPDATA_2D_H_SEEN
+#ifndef HEPDATA_Loader_H_SEEN
+#define HEPDATA_Loader_H_SEEN
 
 #include "Measurement1D.h"
-#include "CustomVariableBoxes.h"
 #include "nuiscling_ftypes.h"
 
-/// \brief ANL Charged Current Quasi-elastic Measurement.
-///  1D Event Rate in Q2QE 
-///
-///  Class supports multiple published datasets: \n
-///  - PRD.26.537  = ANL_CCQE_XSec_1DQ2_nu_PRD26, or ANL_CCQE_XSec_1DEnu_nu
-///  - PRD.16.3103 = ANL_CCQE_XSec_1DQ2_nu_PRD16
-///  - PRL.31.844  = ANL_CCQE_XSec_1DEQ2_nu_PRL31
-class ANL_CCQE_HEPDATA_2D : public Measurement1D {
+class HEPDATA_Loader : public Measurement1D {
 public:
 
-  ANL_CCQE_HEPDATA_2D(nuiskey samplekey);
-  virtual ~ANL_CCQE_HEPDATA_2D() {}; 
+  HEPDATA_Loader(nuiskey samplekey);
+  virtual ~HEPDATA_Loader() {}; 
   
   /// \brief Fill Q2QE Event Information
   void FillEventVariables(FitEvent *event);       
@@ -48,12 +40,18 @@ public:
 
   /// \brief scale normal MC and corrected MC
   void ScaleEvents();
-  
- private:
 
-  TH2Poly* fRealDataHist;
+  void Write(std::string drawOpt);
+  
+  private:
+
+  int fHEPDATA_NDIM;
   nuiscling_ftypes::filter filter_func;
   std::vector<nuiscling_ftypes::project> projection_funcs;
+
+  TH2Poly* fDataHist_TH2Poly;
+  TH2Poly* fMCHist_TH2Poly;
+
 
 };
   

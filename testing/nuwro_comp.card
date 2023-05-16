@@ -1,5 +1,6 @@
 
 <nuisance>
-   <sample name="MENTALANALYSIS" input="NEUT:NEUT.numu.numu_flux.ANL_1977_2horn_rescan.1500.evts.root"
+   <sample name="HEPDATA" input="NEUT:NEUT.numu.numu_flux.ANL_1977_2horn_rescan.1500.evts.root"
    release="./T2K/" table="CrossSection-CosThetaMuPMu_AnalysisI" snippet_file="./T2K/snippet.cxx" covar="T2K/covar-costhetamupmu_analysisi.yaml"/>
+<config UseSVDInverse="1" />
 </nuisance>
