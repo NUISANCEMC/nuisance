@@ -51,26 +51,31 @@ bool isCC1MuNp(FitEvent* event, double EnuMin, double EnuMax) {
 }
 
 bool isCC1ENp(FitEvent* event, double EnuMin, double EnuMax) {
+  bool Verbose = false;
+
   // ==============================================================================================================================
   // Check CC inclusive
   if (!SignalDef::isCCINC(event, 12, EnuMin, EnuMax)) return false;
 
   // ==============================================================================================================================
   // Veto events which don't have exactly 1 FS electron
-  if (event->NumFSElectron() != 1) return false;
+  /*
+  if (event->NumFSElectron() != 1) {
+    if (Verbose) {std::cout << "DB: ElectronCut failed" << std::endl;}
+    return false;
+  }
+  */
 
   // ==============================================================================================================================
   // Veto events which don't have 1 or more FS protons that have kinetic energy > 40MeV
-  double ProtonKEThreshold = 40.0/1000; //Units in GeV
-  uint nProtonsWithKEAboveThreshold = 0;
   std::vector<FitParticle*> ProtonParticles = event->GetAllFSProton();
+
+  double ProtonKEThreshold = 40.0;
+  uint nProtonsWithKEAboveThreshold = 0;
   for (uint i=0;i<ProtonParticles.size();i++) {
     if (ProtonParticles[i]->KE()>=ProtonKEThreshold) {
       nProtonsWithKEAboveThreshold += 1;
     }
-  }
-  if (nProtonsWithKEAboveThreshold != event->NumFSProton()) {
-    std::cout << nProtonsWithKEAboveThreshold << " " << event->NumFSProton() << std::endl;
   }
   if (nProtonsWithKEAboveThreshold == 0) return false;
 
@@ -83,7 +88,7 @@ bool isCC1ENp(FitEvent* event, double EnuMin, double EnuMax) {
   for (uint i=0;i<PiPlusParticles.size();i++) {ChargedPionParticles.push_back(PiPlusParticles[i]);}
   for (uint i=0;i<PiMinusParticles.size();i++) {ChargedPionParticles.push_back(PiMinusParticles[i]);}
 
-  double ChargedPionKEThreshold = 40.0/1000; //Units in GeV
+  double ChargedPionKEThreshold = 40.0;
   uint nChargedPionsWithKEAboveThreshold = 0;
   for (uint i=0;i<ChargedPionParticles.size();i++) {
     if (ChargedPionParticles[i]->KE()>=ChargedPionKEThreshold) {
