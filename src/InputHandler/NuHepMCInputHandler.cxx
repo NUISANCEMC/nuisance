@@ -128,6 +128,7 @@ NuHepMCInputHandler::NuHepMCInputHandler(std::string const &handle,
   bool has_running_xsec_estimate = false;
   double best_xs_estimate = 0;
   bool has_FATX = false;
+  double to_1em38_cm2 = 1; // Conversion factor to the typical 10^-38 cm^2 units used
   size_t NWeights = 0;
   // Loop through events and get N
   fNEvents = 0;
@@ -149,6 +150,8 @@ NuHepMCInputHandler::NuHepMCInputHandler(std::string const &handle,
       has_FATX = NuHepMC::SignalsConvention(frun_info, "G.C.4");
       has_running_xsec_estimate =
           NuHepMC::SignalsConvention(frun_info, "E.C.4");
+      if(NuHepMC::SignalsConvention(frun_info, "E.C.5")) 
+          to_1em38_cm2 = 1e2;
 
       std::cout << "Input file contains weights:" << std::endl;
       for (auto const &wn : frun_info->weight_names()) {
@@ -192,9 +195,9 @@ NuHepMCInputHandler::NuHepMCInputHandler(std::string const &handle,
   if (has_FATX) {
     double FATX = NuHepMC::CheckedAttributeValue<HepMC3::DoubleAttribute>(
         frun_info, "NuHepMC.FluxAveragedTotalCrossSection");
-    fatx_cm2 = FATX; // back into cm2
+    fatx_cm2 = FATX*to_1em38_cm2; // back into 1e-38 cm2
   } else if (has_running_xsec_estimate) {
-    fatx_cm2 = best_xs_estimate; // back into cm2
+    fatx_cm2 = best_xs_estimate*to_1em38_cm2; // back into 1e-38 cm2
   }
 
   // Dupe the FATX
