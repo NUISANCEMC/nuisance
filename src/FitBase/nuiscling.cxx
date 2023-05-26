@@ -2,6 +2,8 @@
 
 #include "FitEvent.h"
 
+#include "TInterpreter.h"
+
 using namespace nuiscling_ftypes;
 
 //Borrowed from Cling::utils

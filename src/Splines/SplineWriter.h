@@ -14,6 +14,9 @@
 
 #endif
 
+#include "SplineReader.h"
+
+
 class SplineFCN {
 public:
 

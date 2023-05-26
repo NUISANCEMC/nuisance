@@ -17,6 +17,7 @@
  *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 #include "BaseFitEvt.h"
+#include "SplineReader.h"
 
 #include "FitParticle.h"
 #include "GIBUUInputHandler.h"

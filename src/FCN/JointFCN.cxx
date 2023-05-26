@@ -2,6 +2,9 @@
 #include "FitUtils.h"
 #include <stdio.h>
 
+#include "SplineReader.h"
+
+
 //***************************************************
 JointFCN::JointFCN(TFile *outfile) {
   //***************************************************

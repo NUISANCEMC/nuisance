@@ -21,7 +21,6 @@
 #include "GenericFlux_Vectors.h"
 #include "InputUtils.h"
 #include "MeasurementBase.h"
-#include "Smearceptance_Tester.h"
 
 // Global Arguments
 std::string gOptInputFile = "";

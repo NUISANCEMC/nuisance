@@ -7,10 +7,10 @@ SET(CoreDirs
 	Logger
 	MCStudies
 	Routines
-	Smearceptance
+	# Smearceptance
 	Splines
 	Statistical
-        HEPDATA
+  HEPDATA
 	Utils)
 
 foreach(CD ${CoreDirs})

@@ -26,7 +26,7 @@ LIST(APPEND TARGETS_TO_BUILD
   nuis_flat_tree_combiner
   nuiscomp
   nuisflat
-  nuissmear
+  # nuissmear
   nuissyst
   nuisbayes
   nuisbac

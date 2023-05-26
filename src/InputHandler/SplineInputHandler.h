@@ -5,6 +5,9 @@
 #include "FitEvent.h"
 #include "PlotUtils.h"
 
+#include "SplineReader.h"
+
+
 /// Spline InputHandler. Almost functionally identical to FitEventInputHandler
 /// with an extension to handle the spline co-efficients.
 class SplineInputHandler : public InputHandlerBase {

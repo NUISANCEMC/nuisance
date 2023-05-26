@@ -28,7 +28,7 @@ set(MCStudies_Impl_Files
   T2K2017_FakeData.cxx
   MCStudy_CCQEHistograms.cxx
   OfficialNIWGPlots.cxx
-  Smearceptance_Tester.cxx
+  # Smearceptance_Tester.cxx
   
   SigmaEnuHists.cxx
 )
@@ -36,7 +36,8 @@ set(MCStudies_Impl_Files
 if(Prob3plusplus_ENABLED)
   LIST(APPEND MCStudies_Impl_Files 
     Simple_Osc.cxx
-    Smear_SVDUnfold_Propagation_Osc.cxx)
+    # Smear_SVDUnfold_Propagation_Osc.cxx
+    )
 endif()
 
 add_library(MCStudies SHARED ${MCStudies_Impl_Files})

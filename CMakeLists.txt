@@ -58,13 +58,6 @@ else()
 endif()
 
 CPMFindPackage(
-    NAME Boost
-    #VERSION 1.78.0
-    GITHUB_REPOSITORY "boostorg/boost"
-    GIT_TAG "boost-1.78.0"
-)
-
-CPMFindPackage(
     NAME yaml-cpp
     VERSION 0.7.0
     GITHUB_REPOSITORY "jbeder/yaml-cpp"

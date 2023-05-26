@@ -50,9 +50,10 @@ using namespace genie;
 #endif
 
 #include "StdHepEvt.h"
-#include "SplineReader.h"
 #include "InputTypes.h"
 #include "GeneratorInfoBase.h"
+
+class SplineReader;
 
 /// Base Event Class used to store just the generator event pointers
 class BaseFitEvt {
