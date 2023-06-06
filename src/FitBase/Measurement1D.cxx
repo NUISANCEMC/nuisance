@@ -606,11 +606,8 @@ void Measurement1D::FinaliseMeasurement() {
   // Comment this out until the covariance/data scaling is consistent!
   StatUtils::SetDataErrorFromCov(fDataHist, fFullCovar, 1E-38);
   
-  std::cout << "I made it to the first barrier" << std::endl;
-
   // If shape only, set covar and fDecomp using the shape-only matrix (if set)
   if (fIsShape && fShapeCovar && FitPar::Config().GetParB("UseShapeCovar")) {
-	std::cout << "I made it past the first barrier" << std::endl;
     if (covar)
       delete covar;
     covar = StatUtils::GetInvert(fShapeCovar, true);
@@ -640,36 +637,17 @@ void Measurement1D::FinaliseMeasurement() {
 
   fIsNS = FitPar::Config().GetParB("UseNormShapeCovariance");
 	
-  std::cout << "I made it to the second barrier" << std::endl;
   if (fIsNS) {
     if (covar)
       delete covar;
       
-    std::cout << "I made it past the second barrier" << std::endl;
-
-    //std::cout<<"** fFullCovar : ";
-    //fFullCovar->Print();
-
     fNSCovar = StatUtils::ExtractNSCovar(fFullCovar, fDataHist, 1e-38);
-
-    //std::cout<<"** fNSCovar : ";
-    //fNSCovar->Print();
 
     fDataNSHist = StatUtils::InitToNS(fDataHist, 1e-38);
     StatUtils::SetDataErrorFromCov(fDataNSHist, fNSCovar, 1e-38, false);
 
-    //std::cout<<"** fDataHist : ";
-    //fDataHist->Print("all");
-
-    //std::cout<<"** fDataNSHist : ";
-    //fDataNSHist->Print("all");
-
     covar = StatUtils::GetInvert(fNSCovar);
     fInvNormalCovar = StatUtils::GetInvert(fFullCovar);
-
-    //std::cout<<"** covar : ";
-    //covar->Print();
-
 
   }	
 
