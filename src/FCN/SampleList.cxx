@@ -266,6 +266,9 @@
 
 #include "MINERvA_CC0pi_XSec_1DQ2_TgtRatio_nu.h"
 #include "MINERvA_CC0pi_XSec_1DQ2_Tgt_nu.h"
+
+// MINERvA Nuke CC0pi muon 2d
+#include "MINERvA_NukeCC0pi_XSec_2D_nu.h"
 #endif
 
 #ifdef T2K_ENABLED
@@ -1358,6 +1361,25 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
     return (new MINERvA_CCCOHPI_XSec_joint(samplekey));
   } else if (!name.compare("MINERvA_CCCOHPI_XSec_1DQ2_joint")) {
     return (new MINERvA_CCCOHPI_XSec_joint(samplekey));
+  } else if (!name.compare("MINERvA_NukeCC0pi_CH_XSec_2D_nu")) {
+    return (new MINERvA_NukeCC0pi_CH_XSec_2D_nu(samplekey));
+  } else if (!name.compare("MINERvA_NukeCC0pi_C_XSec_2D_nu")) {
+    return (new MINERvA_NukeCC0pi_C_XSec_2D_nu(samplekey));
+  } else if (!name.compare("MINERvA_NukeCC0pi_H2O_XSec_2D_nu")) {
+    return (new MINERvA_NukeCC0pi_H2O_XSec_2D_nu(samplekey));
+  } else if (!name.compare("MINERvA_NukeCC0pi_Fe_XSec_2D_nu")) {
+    return (new MINERvA_NukeCC0pi_Fe_XSec_2D_nu(samplekey));
+  } else if (!name.compare("MINERvA_NukeCC0pi_Pb_XSec_2D_nu")) {
+    return (new MINERvA_NukeCC0pi_Pb_XSec_2D_nu(samplekey));
+  } else if (!name.compare("MINERvA_NukeCC0pi_CH_C_Flux_XSec_2D_nu")) {
+    return (new MINERvA_NukeCC0pi_CH_C_Flux_XSec_2D_nu(samplekey));
+  } else if (!name.compare("MINERvA_NukeCC0pi_CH_H2O_Flux_XSec_2D_nu")) {
+    return (new MINERvA_NukeCC0pi_CH_H2O_Flux_XSec_2D_nu(samplekey));
+  } else if (!name.compare("MINERvA_NukeCC0pi_CH_Fe_Flux_XSec_2D_nu")) {
+    return (new MINERvA_NukeCC0pi_CH_Fe_Flux_XSec_2D_nu(samplekey));
+  } else if (!name.compare("MINERvA_NukeCC0pi_CH_Pb_Flux_XSec_2D_nu")) {
+    return (new MINERvA_NukeCC0pi_CH_Pb_Flux_XSec_2D_nu(samplekey));
+    
 
     /*
     T2K Samples
