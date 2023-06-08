@@ -771,6 +771,23 @@ TH2D *PlotUtils::GetTH2DFromRootFile(std::string file, std::string name) {
   return tempHist;
 }
 
+TH3D *PlotUtils::GetTH3DFromRootFile(std::string file, std::string name) {
+  if (name.empty()) {
+    std::vector<std::string> tempfile = GeneralUtils::ParseToStr(file, ";");
+    file = tempfile[0];
+    name = tempfile[1];
+  }
+
+  TFile *rootHistFile = new TFile(file.c_str(), "READ");
+  TH3D *tempHist = (TH3D *)rootHistFile->Get(name.c_str())->Clone();
+  tempHist->SetDirectory(0);
+
+  rootHistFile->Close();
+  delete rootHistFile;
+
+  return tempHist;
+}
+
 TH1 *PlotUtils::GetTH1FromRootFile(std::string file, std::string name) {
   if (name.empty()) {
     std::vector<std::string> tempfile = GeneralUtils::ParseToStr(file, ";");

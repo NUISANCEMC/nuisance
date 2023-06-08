@@ -202,6 +202,8 @@
 #include "MINERvA_CC0pi_XSec_1D_2018_nu.h"
 #include "MINERvA_CC0pi_XSec_2D_nu.h"
 // #include "MINERvA_CC0pi_XSec_3DptpzTp_nu.h"
+#include "MINERvA_CC0pi_XSec_3DptpzTp_1DVersion_nu.h"
+#include "MINERvA_CC0pi_XSec_3Dq0qeemuTp_1DVersion_nu.h"
 
 // 2018 MINERvA CC0pi 2D antinu
 #include "MINERvA_CC0pi_XSec_2D_antinu.h"
@@ -1157,6 +1159,12 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
 
     // } else if (!name.compare("MINERvA_CC0pi_XSec_3DptpzTp_nu")) {
     // return (new MINERvA_CC0pi_XSec_3DptpzTp_nu(samplekey));
+
+  } else if (!name.compare("MINERvA_CC0pi_XSec_3DptpzTp_1DVersion_nu")) {
+    return (new MINERvA_CC0pi_XSec_3DptpzTp_1DVersion_nu(samplekey));
+
+  } else if (!name.compare("MINERvA_CC0pi_XSec_3Dq0qeemuTp_1DVersion_nu")) {
+    return (new MINERvA_CC0pi_XSec_3Dq0qeemuTp_1DVersion_nu(samplekey));
 
   } else if (!name.compare("MINERvA_CC0pi_XSec_1Dpt_nu") ||
              !name.compare("MINERvA_CC0pi_XSec_1Dpz_nu") ||
