@@ -23,7 +23,7 @@
 
 #include "systematicstools/interface/types.hh"
 
-#include "nusystematics/artless/response_helper.hh"
+#include "nusystematics/utility/response_helper.hh"
 
 #include <cmath>
 

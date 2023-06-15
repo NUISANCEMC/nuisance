@@ -1,16 +1,17 @@
 # NUISANCE
 
-Authors:
+Core Authors:
    Luke Pickering,
    Callum Wilkinson,
-   Clarence Wret
+   Clarence Wret,
+   Patrick Stowell
 
-Previous Authors: Patrick Stowell, Ryan Terri
+Previous Core Authors: Ryan Terri
 
 Contact: (luke[dot]pickering[at]rhul[dot]ac[dot]uk, cwilkinson[at]lbl[dot]gov, c[dot]wret[at]rochester[dot]edu)
 
+### Compilation
 
---- Compilation
 The following instructions should be used to build the fitter after checking out.
 
 1. Make sure environmental variables required for the generators you wish to build against are set.
@@ -42,10 +43,16 @@ $ source Linux/setup.sh
 If you prefer, most configure variables can be entered through a cmake UI, such as
 ccmake. e.g. "$ mkdir build && cd build && ccmake ../"
 
---- Adding Classes
+#### `nusystematics`
+
+NUISANCE will build `nusystematics` for you if you configure with `-Dnusystematics_BUILTIN=ON`, this implies `-Dnusystematics_ENABLED=ON`.
+
+### Adding Classes
     The fitter is designed to be easily extended by adding new measurement classes whilst keeping the input convertors and tuning functionality the same.
     The Devel module folder is setup with some examples of how to add new classes into the framework. Feel free to email me if there are difficulties adding new measurements.
 
---- Running Fits
+### Running Fits
     Whilst running fits is relatively quick and simple, there are now a large range of possible options. Doxygen Documentation is being added to the $NUISANCE/doc/html folder.
     Refer thre for guidance on how to properly formulate a card file.
+
+
