@@ -57,7 +57,7 @@ class MINERvA_NukeCC0pi_XSec_2D_nu : public Measurement2D {
   // Set up settings based on distribution
   void _SetupDataSettings(measurement measurement);
   // Do nothing and then have the subclasses change which settings are used
-  virtual void SetupDataSettings() {}; 
+  virtual void SetupDataSettings() {};
 
   std::string covar_name;
 };
