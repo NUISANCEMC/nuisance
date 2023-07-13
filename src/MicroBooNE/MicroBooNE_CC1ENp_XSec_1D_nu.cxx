@@ -79,7 +79,7 @@ MicroBooNE_CC1ENp_XSec_1D_nu::MicroBooNE_CC1ENp_XSec_1D_nu(nuiskey samplekey) {
   // ScaleFactor for DiffXSec/cm2/Nucleus (According to L.P. 11/05/23)
   //fScaleFactor = GetEventHistogram()->Integral("width") / (double(fNEvents) * TotalIntegratedFlux("",0.05,20)); // Standard differential cross section per nucleon 
   fScaleFactor = GetEventHistogram()->Integral("width") / (double(fNEvents) * TotalIntegratedFlux()); // Standard differential cross section per nucleon 
-  fScaleFactor *= 40; // Convert to per nucleus (Ar40)
+  //fScaleFactor *= 40; // Convert to per nucleus (Ar40)
   fScaleFactor *= 1E-38; // Convert units
 
   std::cout << "fScaleFactor:" << fScaleFactor << std::endl;
