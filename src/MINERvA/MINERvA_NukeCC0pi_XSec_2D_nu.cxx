@@ -46,7 +46,7 @@ void MINERvA_NukeCC0pi_XSec_2D_nu::_SetupDataSettings(measurement measurement) {
   switch (measurement) {
     case ch: distdescript = "MINERvA_NukeCC0pi_CH_XSec_2D_nu sample"; 
       histname = "absolute_xsec_ch"; covar_name = "absolute_xsec_ch_covariance"; break;
-    case c: distdescript = "MINERvA_NukeCC0pi_C_XSec_2D_nu sample"; 
+    case carbon: distdescript = "MINERvA_NukeCC0pi_C_XSec_2D_nu sample"; 
       histname = "absolute_xsec_carbon"; covar_name = "absolute_xsec_carbon_covariance"; break;
     case h2o: distdescript = "MINERvA_NukeCC0pi_H2O_XSec_2D_nu sample"; 
       histname = "absolute_xsec_water"; covar_name = "absolute_xsec_water_covariance"; break;
