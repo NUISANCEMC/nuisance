@@ -20,6 +20,7 @@
 #define MICROBOONE_CC1MUNP_2D_NU_H_SEEN
 
 #include <functional>
+#include <memory>
 #include <vector>
 
 #include "Measurement1D.h"
@@ -47,7 +48,10 @@ public:
   MicroBooNE_CC1MuNp_XSec_2D_nu( nuiskey samplekey );
 
   /// Virtual Destructor
-  ~MicroBooNE_CC1MuNp_XSec_2D_nu() {};
+  inline ~MicroBooNE_CC1MuNp_XSec_2D_nu() {
+    fResidualHist = NULL;
+    fChi2LessBinHist = NULL;
+  };
 
   /// Apply signal definition
   bool isSignal( FitEvent* nvect );
@@ -56,6 +60,13 @@ public:
   void FillEventVariables( FitEvent* customEvent );
 
   virtual void FillHistograms() override;
+
+  ///  Adjust the standard event rate conversion to include
+  ///  application of the additional smearing matrix A_C
+  void ConvertEventRates() override;
+
+  /// Work around some hard-coded assumptions in Measurement1D::GetLikelihood()
+  double GetLikelihood() override;
 
 private:
 
@@ -68,6 +79,9 @@ private:
   // Temporary storage for the index of each bin that passed all cuts for any
   // particular event
   std::vector< size_t > fPassingBins;
+
+  // Additional smearing matrix used to transform the input MC predictions
+  std::unique_ptr< TMatrixD > fAddSmear;
 
 };
 

@@ -23,6 +23,7 @@
 #include "MicroBooNE_CC1MuNp_XSec_2D_nu.h"
 #include "MicroBooNE_SignalDef.h"
 #include "TH2D.h"
+#include "TMatrixD.h"
 
 namespace {
   constexpr int MASS_NUMBER_40AR = 40;
@@ -126,50 +127,70 @@ MicroBooNE_CC1MuNp_XSec_2D_nu
 
   fSettings.SetDescription( descrip );
   fSettings.SetTitle( name );
-  fSettings.SetAllowedTypes( "FULL,DIAG/FREE,SHAPE,FIX/SYSTCOV/STATCOV",
-    "FIX/FULL" );
+  fSettings.SetAllowedTypes( "FULL", "FIX/FULL" );
   fSettings.SetEnuRange( 0.0, 6.8 );
   fSettings.DefineAllowedTargets( "Ar" );
   fSettings.DefineAllowedSpecies( "numu" );
   FinaliseSampleSettings();
 
-  // Scale factor for the flux-averaged total cross section (cm^2 / ^{40}Ar) in
-  // each bin
+  // Scale factor for the flux-averaged total cross section
+  // (10^{-38} cm^2 / Ar) in each bin
   fScaleFactor = GetEventHistogram()->Integral( "width" )
-    * 1e-38 * MASS_NUMBER_40AR / fNEvents / TotalIntegratedFlux();
+    * MASS_NUMBER_40AR / fNEvents / TotalIntegratedFlux();
 
   // Get bin definitions
   this->LoadBinDefinitions();
 
-  // TODO: replace with real data!
-  int num_bins = fBinDefinitions.size();
-  fDataHist = new TH1D( "dummy", "dummy", num_bins, 0., num_bins );
-  for ( int b = 1; b <= num_bins; ++b ) {
-    fDataHist->SetBinContent( b, 1e-38 );
-    fDataHist->SetBinError( b, 3e-39 );
-  }
+  std::string data_file_name( FitPar::GetDataBase()
+    + "/MicroBooNE/CC1MuNp/2D/data_release.root" );
 
-  //fDataHist = PlotUtils::GetTH1DFromRootFile(datafile, histname);
+  // Load the additional smearing matrix
+  TMatrixD* A_C = StatUtils::GetMatrixFromRootFile( data_file_name,
+    "add_smear" );
+  fAddSmear.reset( A_C );
+
+  // Load the measured data points
+  fDataHist = PlotUtils::GetTH1DFromRootFile( data_file_name,
+    "unfolded_signal" );
+
   fDataHist->SetNameTitle( (fSettings.GetName() + "_data").c_str(),
     fSettings.GetFullTitles().c_str() );
 
-  this->SetCovarFromDiagonal();
-  //SetCovarFromRootFile(inputFile, "CovarianceMatrix_" + objSuffix);
+  // Also retrieve the total covariance matrix and its inverse (pre-computed in
+  // the data release ROOT file for convenience)
+  //this->SetCovarFromRootFile( data_file_name, "cov_total" );
+  fFullCovar = StatUtils::GetCovarFromRootFile( data_file_name, "cov_total" );
+  covar = StatUtils::GetCovarFromRootFile( data_file_name,
+    "inverse_cov_total" );
 
-  // Set up the "MC fine" histogram ahead of calling FinaliseMeasurement().
-  // This prevents auto-creation of this histogram. Since we're using a
-  // 1D histogram with bin number along the x-axis, it doesn't make sense
-  // to subdivide the bins. Rather than doing that automatically, I just
-  // copy the original data histogram binning here. Thus, MCFine ends up
-  // using the same bins as regular MC.
-  fMCFine = dynamic_cast< TH1D* >( fDataHist->Clone("mcfine") );
+  //fDecomp = StatUtils::GetDecomp( fFullCovar );
+  TDecompChol chol( *fFullCovar );
+  chol.Decompose();
+  fDecomp = new TMatrixDSym( fFullCovar->GetNrows(),
+    chol.GetU().GetMatrixArray(), "" );
+
+  // Push the diagonals of fFullCovar onto the data histogram
+  StatUtils::SetDataErrorFromCov( fDataHist, fFullCovar, 1.0, false );
+
+  // Setup fMCHist from data
+  fMCHist = dynamic_cast< TH1D* >( fDataHist->Clone() );
+  fMCHist->SetNameTitle( (fSettings.GetName() + "_MC").c_str(),
+   fSettings.GetFullTitles().c_str() );
+  fMCHist->Reset();
+
+  fMCStat = dynamic_cast< TH1D* >( fMCHist->Clone() );
+  fMCStat->Reset();
+
+  // Since we're using a 1D histogram with bin number along the x-axis, it
+  // doesn't make sense to subdivide the bins. Rather than doing that
+  // automatically, I just copy the original data histogram binning here. Thus,
+  // MCFine ends up using the same bins as regular MC.
+  fMCFine = dynamic_cast< TH1D* >( fMCHist->Clone() );
   fMCFine->SetNameTitle( (fSettings.GetName() + "_MC_FINE").c_str(),
     fSettings.GetFullTitles().c_str() );
   fMCFine->Reset();
 
-  // Having created MCFine in advance, we can now proceed to the usual
-  // steps in finalizing the measurement
-  this->FinaliseMeasurement();
+  //this->FinaliseMeasurement();
 }
 
 
@@ -209,7 +230,7 @@ void MicroBooNE_CC1MuNp_XSec_2D_nu::FillEventVariables( FitEvent* event ) {
 
 void MicroBooNE_CC1MuNp_XSec_2D_nu::LoadBinDefinitions() {
   std::string binning_file_name( FitPar::GetDataBase()
-    + "/MicroBooNE/myconfig_uB2D.txt" );
+    + "/MicroBooNE/CC1MuNp/2D/bin_defs.txt" );
 
   std::ifstream bin_file( binning_file_name );
   std::string dummy_str;
@@ -360,4 +381,52 @@ void MicroBooNE_CC1MuNp_XSec_2D_nu::FillHistograms() {
     if ( fMCFine_Modes ) fMCFine_Modes->Fill( Mode, bin, Weight );
   }
 
+}
+
+void MicroBooNE_CC1MuNp_XSec_2D_nu::ConvertEventRates() {
+  // Do the standard conversion
+  Measurement1D::ConvertEventRates();
+
+  // Build a column vector using the predicted cross sections
+  int num_bins = fMCHist->GetNbinsX();
+  TMatrixD pred( num_bins, 1 );
+  for ( int b = 0; b < num_bins; ++b ) {
+    pred( b, 0 ) = fMCHist->GetBinContent( b + 1 );
+  }
+
+  // Apply the additional smearing matrix to create a new prediction
+  TMatrixD new_pred( *fAddSmear, TMatrixD::kMult, pred );
+
+  // Update the MC prediction histogram with the smeared version
+  for ( int b = 0; b < num_bins; ++b ) {
+    double xsec = new_pred( b, 0 );
+    fMCHist->SetBinContent( b + 1, xsec );
+  }
+}
+
+double MicroBooNE_CC1MuNp_XSec_2D_nu::GetLikelihood() {
+
+  if ( fNoData || !fDataHist ) return 0.;
+
+  // Apply Masking to MC if Required.
+  if ( fIsMask and fMaskHist ) {
+    NUIS_ERR(FTL, "Bin masks not yet supported by"
+      " the MicroBooNE_CC1MuNp_XSec_2D_nu sample" );
+    //PlotUtils::MaskBins(fMCHist, fMaskHist);
+  }
+
+  // Likelihood Calculation
+  double stat = 0.;
+  if ( fIsChi2 ) {
+    if ( fIsNS ) {
+      NUIS_ERR(FTL, "Norm-shape covariance not yet supported by"
+        " the MicroBooNE_CC1MuNp_XSec_2D_nu sample" );
+    }
+    stat = StatUtils::GetChi2FromCov( fDataHist, fMCHist, covar, NULL, 1.0,
+      1.0, fIsWriting ? fResidualHist : NULL );
+  }
+
+  fLikelihood = stat;
+
+  return stat;
 }

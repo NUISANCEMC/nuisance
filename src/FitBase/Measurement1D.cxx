@@ -133,8 +133,8 @@ Measurement1D::~Measurement1D(void) {
     delete fInvNormalCovar;
   // ***** end NS covar modifications *****
 
-  delete fResidualHist;
-  delete fChi2LessBinHist;
+  if ( fResidualHist ) delete fResidualHist;
+  if ( fChi2LessBinHist ) delete fChi2LessBinHist;
 }
 
 //********************************************************************
@@ -639,6 +639,7 @@ void Measurement1D::FinaliseMeasurement() {
   // ***** norm-shape (NS) covariance modifications *****
 
   fIsNS = FitPar::Config().GetParB("UseNormShapeCovariance");
+
   if (fIsNS) {
     if (covar)
       delete covar;
