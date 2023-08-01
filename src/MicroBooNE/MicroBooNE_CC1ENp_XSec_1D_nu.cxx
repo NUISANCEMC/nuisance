@@ -158,16 +158,49 @@ void MicroBooNE_CC1ENp_XSec_1D_nu::ConvertEventRates() {
   // Do standard conversion
   Measurement1D::ConvertEventRates();
 
-  // Apply Weiner-SVD additional smearing Ac
+  // Apply Weiner-SVD additional smearing Ac - Needs to be applied on 'event rate' units then converted back to 'xsec units'
   int nBins = fMCHist->GetNbinsX();
-  TVectorD OriginalMC(nBins);
+  double Flux_CV = 6699174026.68;
+  double nTargets = 4.240685683288815e+31;
+  
+  std::cout << "Original MC (Xsec Units)" << std::endl;
   for (int iBin=0;iBin<nBins;iBin++) {
-    OriginalMC(iBin) = fMCHist->GetBinContent(iBin+1);
+    std::cout << iBin << " " << fMCHist->GetBinContent(iBin+1) << std::endl;
   }
-  TVectorD SmearedMC = (*fSmearingMatrix) * OriginalMC;
 
+  // First convert to event rate units
+  TVectorD MC_EVRUnits(nBins);
   for (int iBin=0;iBin<nBins;iBin++) {
-    fMCHist->SetBinContent(iBin+1, SmearedMC(iBin));
+    MC_EVRUnits(iBin) = fMCHist->GetBinContent(iBin+1) * nTargets * Flux_CV * fMCHist->GetXaxis()->GetBinWidth(iBin+1);
+  }
+
+  std::cout << "MC in EVR Units" << std::endl;
+  for (int iBin=0;iBin<nBins;iBin++) {
+    std::cout << iBin << " " << MC_EVRUnits(iBin) << std::endl;
+  }
+
+  // Apply smearing
+  TVectorD SmearedMC_EVRUnits = (*fSmearingMatrix) * MC_EVRUnits;
+
+  std::cout << "Smeared MC in EVR Units" << std::endl;
+  for (int iBin=0;iBin<nBins;iBin++) {
+    std::cout << iBin << " " << SmearedMC_EVRUnits(iBin) << std::endl;
+  }
+
+  // Convert back to xsec units
+  TVectorD SmearedMC_XSecUnits(nBins);
+  for (int iBin=0;iBin<nBins;iBin++) {
+    SmearedMC_XSecUnits(iBin) = SmearedMC_EVRUnits(iBin) / (nTargets * Flux_CV * fMCHist->GetXaxis()->GetBinWidth(iBin+1));
+  }
+
+  std::cout << "Smeared MC in XSec Units" << std::endl;
+  for (int iBin=0;iBin<nBins;iBin++) {
+    std::cout << iBin << " " << SmearedMC_XSecUnits(iBin) << std::endl;
+  }
+
+  // Then copy results back to histogram
+  for (int iBin=0;iBin<nBins;iBin++) {
+    fMCHist->SetBinContent(iBin+1, SmearedMC_XSecUnits(iBin));
   }
 
 }
