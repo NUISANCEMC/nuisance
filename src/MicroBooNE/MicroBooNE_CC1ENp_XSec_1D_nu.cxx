@@ -76,14 +76,8 @@ MicroBooNE_CC1ENp_XSec_1D_nu::MicroBooNE_CC1ENp_XSec_1D_nu(nuiskey samplekey) {
   SetDataFromRootFile(inputFile, DataHistName);
   ScaleData(1E-38);
 
-  // ScaleFactor for DiffXSec/cm2/Nucleus (According to L.P. 11/05/23)
-  //fScaleFactor = GetEventHistogram()->Integral("width") / (double(fNEvents) * TotalIntegratedFlux("",0.05,20)); // Standard differential cross section per nucleon 
   fScaleFactor = GetEventHistogram()->Integral("width") / (double(fNEvents) * TotalIntegratedFlux()); // Standard differential cross section per nucleon 
-  //fScaleFactor *= 40; // Convert to per nucleus (Ar40)
   fScaleFactor *= 1E-38; // Convert units
-
-  std::cout << "fScaleFactor:" << fScaleFactor << std::endl;
-  std::cout << "TotalIntegratedFlux():" << TotalIntegratedFlux() << std::endl;
 
   SetCovarFromRootFile(inputFile, CovMatName);
 
@@ -93,15 +87,15 @@ MicroBooNE_CC1ENp_XSec_1D_nu::MicroBooNE_CC1ENp_XSec_1D_nu(nuiskey samplekey) {
 
   TFile* inputRootFile = TFile::Open(inputFile.c_str());
   assert(inputRootFile && inputRootFile->IsOpen());
-  TH2D* hsmear = (TH2D*)inputRootFile->Get(ACMatName.c_str());
-  assert(hsmear);
+  TH2D* hSmearMat_TH2 = (TH2D*)inputRootFile->Get(ACMatName.c_str());
+  assert(hSmearMat_TH2);
 
-  int nrows = hsmear->GetNbinsX();
-  int ncols = hsmear->GetNbinsY();
+  int nrows = hSmearMat_TH2->GetNbinsX();
+  int ncols = hSmearMat_TH2->GetNbinsY();
   fSmearingMatrix = new TMatrixD(nrows, ncols);
   for (int i=0; i<nrows; i++) {
     for (int j=0; j<ncols; j++) {
-      (*fSmearingMatrix)(i,j) = hsmear->GetBinContent(i+1, j+1);
+      (*fSmearingMatrix)(i,j) = hSmearMat_TH2->GetBinContent(i+1, j+1);
     }
   }
 
@@ -162,11 +156,6 @@ void MicroBooNE_CC1ENp_XSec_1D_nu::ConvertEventRates() {
   int nBins = fMCHist->GetNbinsX();
   double Flux_CV = 6699174026.68;
   double nTargets = 4.240685683288815e+31;
-  
-  std::cout << "Original MC (Xsec Units)" << std::endl;
-  for (int iBin=0;iBin<nBins;iBin++) {
-    std::cout << iBin << " " << fMCHist->GetBinContent(iBin+1) << std::endl;
-  }
 
   // First convert to event rate units
   TVectorD MC_EVRUnits(nBins);
@@ -174,28 +163,13 @@ void MicroBooNE_CC1ENp_XSec_1D_nu::ConvertEventRates() {
     MC_EVRUnits(iBin) = fMCHist->GetBinContent(iBin+1) * nTargets * Flux_CV * fMCHist->GetXaxis()->GetBinWidth(iBin+1);
   }
 
-  std::cout << "MC in EVR Units" << std::endl;
-  for (int iBin=0;iBin<nBins;iBin++) {
-    std::cout << iBin << " " << MC_EVRUnits(iBin) << std::endl;
-  }
-
   // Apply smearing
   TVectorD SmearedMC_EVRUnits = (*fSmearingMatrix) * MC_EVRUnits;
-
-  std::cout << "Smeared MC in EVR Units" << std::endl;
-  for (int iBin=0;iBin<nBins;iBin++) {
-    std::cout << iBin << " " << SmearedMC_EVRUnits(iBin) << std::endl;
-  }
 
   // Convert back to xsec units
   TVectorD SmearedMC_XSecUnits(nBins);
   for (int iBin=0;iBin<nBins;iBin++) {
     SmearedMC_XSecUnits(iBin) = SmearedMC_EVRUnits(iBin) / (nTargets * Flux_CV * fMCHist->GetXaxis()->GetBinWidth(iBin+1));
-  }
-
-  std::cout << "Smeared MC in XSec Units" << std::endl;
-  for (int iBin=0;iBin<nBins;iBin++) {
-    std::cout << iBin << " " << SmearedMC_XSecUnits(iBin) << std::endl;
   }
 
   // Then copy results back to histogram
