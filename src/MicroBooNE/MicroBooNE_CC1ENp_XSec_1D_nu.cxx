@@ -20,6 +20,7 @@
 #include "MicroBooNE_CC1ENp_XSec_1D_nu.h"
 #include "MicroBooNE_SignalDef.h"
 #include "TH2D.h"
+#include <cmath>
 
 //********************************************************************
 MicroBooNE_CC1ENp_XSec_1D_nu::MicroBooNE_CC1ENp_XSec_1D_nu(nuiskey samplekey) {
@@ -32,7 +33,7 @@ MicroBooNE_CC1ENp_XSec_1D_nu::MicroBooNE_CC1ENp_XSec_1D_nu(nuiskey samplekey) {
   std::string ObjSuffix;
 
   if (!name.compare("MicroBooNE_CC1ENp_XSec_1DElecEnergy_nu")) {
-    ObjSuffix = "elec_e";
+    ObjSuffix = "elec_ke";
     fDist = kElecEnergy;
     fSettings.SetXTitle("Electron Energy (GeV)");
     fSettings.SetYTitle("d#sigma/dE (cm^{2}/GeV/Nucleus)");
@@ -120,10 +121,35 @@ void MicroBooNE_CC1ENp_XSec_1D_nu::FillEventVariables(FitEvent* event) {
     fXVar = event->GetHMFSParticle(11)->fP.E()/1000.0;
   }
   else if (fDist == kOpeningAngle) {
-    TVector3 HMProtonVec = event->GetHMFSParticle(2212)->P3();
-    TVector3 HMElectronVec = event->GetHMFSParticle(11)->P3();
+    int nParticles = event->NParticles();
 
-    fXVar = HMProtonVec.Angle(HMElectronVec);
+    double LeadingProtonMom = 0.;
+    double LeadingProtonKE = 0.;
+
+    TVector3 LeadingProtonVec; //Already required atleast one proton so don't have to provide default value
+    for (int iParticle=0;iParticle<nParticles;iParticle++) {
+      FitParticle* Particle = event->GetParticle(iParticle);
+      if (!Particle->IsFinalState()) {
+        continue;
+      }
+
+      if (Particle->PDG() == 2212) { //Proton
+	double Momentum = Particle->p();
+	double KE = Particle->KE();
+	if (Momentum > LeadingProtonMom) {
+	  LeadingProtonMom = Momentum;
+	  LeadingProtonVec = Particle->P3();
+	  LeadingProtonKE = KE;
+	}
+      }
+    }
+
+    TVector3 HMElectronVec = event->GetHMFSParticle(11)->P3();
+    if (LeadingProtonKE >= 40.) {
+      fXVar = cos(LeadingProtonVec.Angle(HMElectronVec));
+    } else {
+      fXVar = -999.;
+    }
   }
   else if (fDist == kTrueVisibleEnergy) {
     int nParticles = event->NParticles();
@@ -139,7 +165,9 @@ void MicroBooNE_CC1ENp_XSec_1D_nu::FillEventVariables(FitEvent* event) {
 	TrueVisibleEnergy += Particle->E();
       }
       else if (Particle->PDG() == 2212) { //Proton
-	TrueVisibleEnergy += Particle->KE();
+	if (Particle->KE() >= 40.) { //Proton must be above threshold
+	  TrueVisibleEnergy += Particle->KE();
+	}
       }
     }
     
