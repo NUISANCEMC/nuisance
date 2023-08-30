@@ -599,4 +599,77 @@ bool isCC1pim_MINERvA(FitEvent* event, double EnuMin, double EnuMax)
   return true;
 }
 
+// Signal definition for Minerva ME nuclear target 2d muon result
+// See Phys. Rev. Lett. 130, 161801 
+bool isNukeCC0pi_MINERvAPTPZ(FitEvent *event, double EnuMin, double EnuMax) {
+
+  // CC0pi requires only 1 outgoing lepton but this signal def doesn't care about n leptons
+  if (!isCCINC(event, 14, EnuMin, EnuMax))
+    return false;
+
+  TLorentzVector pnu = event->GetHMISParticle(14)->fP;
+  TLorentzVector pmu = event->GetHMFSParticle(13)->fP;
+
+  // Muon momentum cuts
+  // TODO should isCC0pi_MINERvAPTPZ have these too?
+  if (pmu.Vect().Mag() < 2000 || pmu.Vect().Mag() > 20000)
+    return false;
+  // Muon angle cuts
+  if (pmu.Vect().Angle(pnu.Vect()) > (M_PI / 180.0) * 17.0)
+    return false;
+    
+  // Exclude any events with mesons. Also exclude photons > 10 MeV and heavy baryons
+  int genie_n_muons = 0;
+  int genie_n_mesons = 0;
+  int genie_n_heavy_baryons_plus_pi0s = 0;
+  int genie_n_photons = 0;
+
+  for (unsigned int i = 0; i < event->NParticles(); ++i) {
+    FitParticle *p = event->GetParticle(i);
+    if (p->Status() != kFinalState)
+      continue;
+
+    int pdg = p->fPID;
+    double energy = p->fP.E();
+
+    if (pdg == 13) {
+      genie_n_muons++;
+    } else if (pdg == 22 && energy > 10.0) {
+      genie_n_photons++;
+    } else if (abs(pdg) == 211 || abs(pdg) == 321 || abs(pdg) == 323 ||
+               pdg == 111 || pdg == 130 || pdg == 310 || pdg == 311 ||
+               pdg == 313 || abs(pdg) == 221 || abs(pdg) == 331) {
+      genie_n_mesons++;
+    } else if (pdg == 3112 || pdg == 3122 || pdg == 3212 || pdg == 3222 ||
+               pdg == 4112 || pdg == 4122 || pdg == 4212 || pdg == 4222 ||
+               pdg == 411 || pdg == 421 || pdg == 111) {
+      genie_n_heavy_baryons_plus_pi0s++;
+    }
+  }
+
+  if (genie_n_muons == 1 && genie_n_mesons == 0 &&
+      genie_n_heavy_baryons_plus_pi0s == 0 && genie_n_photons == 0)
+    return true;
+  else return false;
+}
+
+
+// MINERvA nuclear target CC0pi1p transverse variables signal defintion
+bool isNukeCC0piNp_MINERvA_STV(FitEvent *event, double EnuMin, double EnuMax) {
+
+  // This cut has all the cuts on the muon and cc0pi events.
+  if (!isNukeCC0pi_MINERvAPTPZ(event, EnuMin, EnuMax)) return false;
+
+  // Require at least one FS proton
+  if (event->NumFSParticle(2212) == 0)
+    return false;
+
+  // Look for a proton < 70 deg, p between 500 and 1100 MeV
+  const double ctheta_cut = cos((M_PI / 180.0) * 70.0);
+  if (MINERvAUtils::GetProtonInRange(event, 500, 1100, ctheta_cut).E() == 0)
+    return false;
+  return true;
+}
+
+
 } // namespace SignalDef

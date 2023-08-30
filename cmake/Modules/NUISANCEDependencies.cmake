@@ -20,15 +20,15 @@ endif()
 set(GiBUU_ENABLED TRUE)
 target_compile_definitions(GeneratorCompileDependencies INTERFACE GiBUU_ENABLED)
 
-DefineEnabledRequiredSwitch(T2KReWeight)
-DefineEnabledRequiredSwitch(NIWGLegacy)
-DefineEnabledRequiredSwitch(NOvARwgt)
-DefineEnabledRequiredSwitch(nusystematics)
-DefineEnabledRequiredSwitch(NEUT)
-DefineEnabledRequiredSwitch(GENIE)
-DefineEnabledRequiredSwitch(NuWro)
-DefineEnabledRequiredSwitch(Prob3plusplus)
-DefineEnabledRequiredSwitch(HepMC3)
+DefineEnabledRequiredSwitch(T2KReWeight TRUE)
+DefineEnabledRequiredSwitch(NIWGLegacy TRUE)
+DefineEnabledRequiredSwitch(NOvARwgt TRUE)
+DefineEnabledRequiredSwitch(nusystematics TRUE)
+DefineEnabledRequiredSwitch(NEUT TRUE)
+DefineEnabledRequiredSwitch(GENIE TRUE)
+DefineEnabledRequiredSwitch(NuWro TRUE)
+DefineEnabledRequiredSwitch(Prob3plusplus FALSE)
+DefineEnabledRequiredSwitch(HepMC3 FALSE)
 
 if (T2KReWeight_ENABLED)
   include(T2KReWeight)
@@ -82,11 +82,21 @@ if (NOvARwgt_ENABLED)
 endif()
 
 if (nusystematics_ENABLED)
-  find_package(nusystematics 1.00.3)
 
-  if(NOT nusystematics_FOUND)
+  if(nusystematics_BUILTIN)
+    SET(nusystematics_REQUIRED TRUE)
+    CPMAddPackage(
+      NAME nusystematics
+      GIT_TAG develop
+      GITHUB_REPOSITORY luketpickering/nusystematics-merge
+    )
+  else()
+    find_package(nusystematics 23.06)
+  endif()
+
+  if(NOT TARGET nusyst::all)
     if(nusystematics_REQUIRED)
-      cmessage(FATAL_ERROR "nusystematics was explicitly enabled but cannot be found.")
+      cmessage(FATAL_ERROR "nusystematics was explicitly enabled but target nusyst::all was not declared after running find_package(nusystematics 23.06).")
     endif()
     SET(nusystematics_ENABLED FALSE)
   else()
@@ -94,7 +104,7 @@ if (nusystematics_ENABLED)
     add_library(NUISANCEnusystematics INTERFACE)
     set_target_properties(NUISANCEnusystematics PROPERTIES 
       INTERFACE_COMPILE_OPTIONS "-Dnusystematics_ENABLED"
-      INTERFACE_LINK_LIBRARIES nusystematics::all)
+      INTERFACE_LINK_LIBRARIES nusyst::all)
 
     target_link_libraries(GeneratorCompileDependencies INTERFACE NUISANCEnusystematics)
   endif()
@@ -214,11 +224,12 @@ if(NOUNDEF_INDEX GREATER -1)
 endif()
 
 if (HepMC3_ENABLED)
+  set(HepMC3_ENABLED TRUE)
   CPMAddPackage(
       NAME HepMC3
-      VERSION 3.2.5
+      VERSION 3.2.6
       GIT_REPOSITORY "https://gitlab.cern.ch/hepmc/HepMC3.git"
-      GIT_TAG 3.2.5
+      GIT_TAG 3.2.6
       OPTIONS
         "HEPMC3_CXX_STANDARD ${CMAKE_CXX_STANDARD}"
         "HEPMC3_ENABLE_SEARCH OFF"

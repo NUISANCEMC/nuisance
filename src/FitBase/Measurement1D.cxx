@@ -80,6 +80,13 @@ Measurement1D::Measurement1D(void) {
   // Extra Histograms
   fMCHist_Modes = NULL;
   fMCFine_Modes = NULL;
+  // ***** NS covar modifications *****
+  fIsNS = false;
+  fNSCovar = NULL;
+  fDataNSHist = NULL;
+  fMCNSHist = NULL;
+  fInvNormalCovar = NULL;
+  // ***** end NS covar modifications *****
 }
 
 //********************************************************************
@@ -110,6 +117,17 @@ Measurement1D::~Measurement1D(void) {
     delete fInvert;
   if (fDecomp)
     delete fDecomp;
+
+  // ***** NS covar modifications *****
+  if (fNSCovar)
+    delete fNSCovar;
+  if (fDataNSHist)
+    delete fDataNSHist;
+  if (fMCNSHist)
+    delete fMCNSHist;
+  if (fInvNormalCovar)
+    delete fInvNormalCovar;
+  // ***** end NS covar modifications *****
 
   delete fResidualHist;
   delete fChi2LessBinHist;
@@ -587,7 +605,7 @@ void Measurement1D::FinaliseMeasurement() {
   // Push the diagonals of fFullCovar onto the data histogram
   // Comment this out until the covariance/data scaling is consistent!
   StatUtils::SetDataErrorFromCov(fDataHist, fFullCovar, 1E-38);
-
+  
   // If shape only, set covar and fDecomp using the shape-only matrix (if set)
   if (fIsShape && fShapeCovar && FitPar::Config().GetParB("UseShapeCovar")) {
     if (covar)
@@ -612,7 +630,29 @@ void Measurement1D::FinaliseMeasurement() {
                                << ", using shape/norm decomp with norm error: "
                                << fNormError);
     }
+
   }
+
+  // ***** NS covar modifications *****
+
+  fIsNS = FitPar::Config().GetParB("UseNormShapeCovariance");
+	
+  if (fIsNS) {
+    if (covar)
+      delete covar;
+      
+    fNSCovar = StatUtils::ExtractNSCovar(fFullCovar, fDataHist, 1e-38);
+
+    fDataNSHist = StatUtils::InitToNS(fDataHist, 1e-38);
+    StatUtils::SetDataErrorFromCov(fDataNSHist, fNSCovar, 1e-38, false);
+
+    covar = StatUtils::GetInvert(fNSCovar);
+    fInvNormalCovar = StatUtils::GetInvert(fFullCovar);
+
+  }	
+
+  // ***** end NS covar modifications *****
+
 
   // Setup fMCHist from data
   fMCHist = (TH1D *)fDataHist->Clone();
@@ -1091,12 +1131,28 @@ double Measurement1D::GetLikelihood() {
       }
     }
   }
+ 
+  // ***** NS covar modifications *****
+
+  if (fIsNS) {
+    fMCNSHist = StatUtils::InitToNS(fMCHist, 1e-38);
+  }
+
+  // ***** end NS covar modifications *****
 
   // Likelihood Calculation
   double stat = 0.;
   if (fIsChi2) {
+    // ***** NS covar modifications *****
+    if (fIsNS) {
+      NUIS_LOG(SAM, "**** Computing chi2 from NS covar ****");
+      stat = StatUtils::GetChi2FromCov(fDataNSHist, fMCNSHist, covar, NULL);
+      NUIS_LOG(SAM, "**** For comparison, here's the normal chi2: " 
+               << StatUtils::GetChi2FromCov(fDataHist, fMCHist, fInvNormalCovar, NULL));
 
-    if (fIsRawEvents) {
+    // ***** end NS covar modifications *****
+
+    } else if (fIsRawEvents) {
       stat = StatUtils::GetChi2FromEventRate(fDataHist, fMCHist, fMaskHist);
     } else if (fIsDiag) {
       stat = StatUtils::GetChi2FromDiag(fDataHist, fMCHist, fMaskHist);

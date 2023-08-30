@@ -51,6 +51,7 @@
 #include <TFile.h>
 #include <TH1D.h>
 #include <TH2D.h>
+#include <TH3D.h>
 #include <THStack.h>
 #include <TKey.h>
 #include <TLegend.h>
@@ -194,6 +195,8 @@ inline TH* GetTH2FromRootFile(std::string file, std::string name){
   return tempHist;
 }
 
+//! Grab a 3D Histrogram from a ROOT File
+TH3D* GetTH3DFromRootFile(std::string file, std::string name);
 
 //! Get a TGraph from a ROOT file
 TGraph* GetTGraphFromRootFile(std::string file, std::string name);
