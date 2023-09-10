@@ -1,6 +1,6 @@
 ALL
 stv_tree
-367
+366
 0 0 "mc_is_signal && mc_p3_mu.Mag() >= 0.1 && mc_p3_mu.Mag() < 0.24 && mc_p3_mu.CosTheta() >= -1 && mc_p3_mu.CosTheta() < -0.55"
 0 0 "mc_is_signal && mc_p3_mu.Mag() >= 0.1 && mc_p3_mu.Mag() < 0.24 && mc_p3_mu.CosTheta() >= -0.55 && mc_p3_mu.CosTheta() < -0.25"
 0 0 "mc_is_signal && mc_p3_mu.Mag() >= 0.1 && mc_p3_mu.Mag() < 0.24 && mc_p3_mu.CosTheta() >= -0.25 && mc_p3_mu.CosTheta() < 0"
@@ -334,8 +334,7 @@ stv_tree
 0 12 "mc_is_signal && mc_p3_lead_p.Mag() >= 0.85 && mc_p3_lead_p.Mag() < 0.9"
 0 12 "mc_is_signal && mc_p3_lead_p.Mag() >= 0.9 && mc_p3_lead_p.Mag() < 0.95"
 0 12 "mc_is_signal && mc_p3_lead_p.Mag() >= 0.95 && mc_p3_lead_p.Mag() < 1"
-0 13 "mc_is_signal && mc_p3_mu.Mag() >= 0.1 && mc_p3_mu.Mag() < 0.15"
-0 13 "mc_is_signal && mc_p3_mu.Mag() >= 0.15 && mc_p3_mu.Mag() < 0.175"
+0 13 "mc_is_signal && mc_p3_mu.Mag() >= 0.1 && mc_p3_mu.Mag() < 0.175"
 0 13 "mc_is_signal && mc_p3_mu.Mag() >= 0.175 && mc_p3_mu.Mag() < 0.2"
 0 13 "mc_is_signal && mc_p3_mu.Mag() >= 0.2 && mc_p3_mu.Mag() < 0.225"
 0 13 "mc_is_signal && mc_p3_mu.Mag() >= 0.225 && mc_p3_mu.Mag() < 0.25"
@@ -368,7 +367,7 @@ stv_tree
 1 -1 "category == 9"
 1 -1 "category == 10"
 1 -1 "category == 11"
-360
+359
 0 0 "sel_CCNp0pi && p3_mu.Mag() >= 0.1 && p3_mu.Mag() < 0.24 && p3_mu.CosTheta() >= -1 && p3_mu.CosTheta() < -0.55"
 0 0 "sel_CCNp0pi && p3_mu.Mag() >= 0.1 && p3_mu.Mag() < 0.24 && p3_mu.CosTheta() >= -0.55 && p3_mu.CosTheta() < -0.25"
 0 0 "sel_CCNp0pi && p3_mu.Mag() >= 0.1 && p3_mu.Mag() < 0.24 && p3_mu.CosTheta() >= -0.25 && p3_mu.CosTheta() < 0"
@@ -702,8 +701,7 @@ stv_tree
 0 12 "sel_CCNp0pi && p3_lead_p.Mag() >= 0.85 && p3_lead_p.Mag() < 0.9"
 0 12 "sel_CCNp0pi && p3_lead_p.Mag() >= 0.9 && p3_lead_p.Mag() < 0.95"
 0 12 "sel_CCNp0pi && p3_lead_p.Mag() >= 0.95 && p3_lead_p.Mag() < 1"
-0 13 "sel_CCNp0pi && p3_mu.Mag() >= 0.1 && p3_mu.Mag() < 0.15"
-0 13 "sel_CCNp0pi && p3_mu.Mag() >= 0.15 && p3_mu.Mag() < 0.175"
+0 13 "sel_CCNp0pi && p3_mu.Mag() >= 0.1 && p3_mu.Mag() < 0.175"
 0 13 "sel_CCNp0pi && p3_mu.Mag() >= 0.175 && p3_mu.Mag() < 0.2"
 0 13 "sel_CCNp0pi && p3_mu.Mag() >= 0.2 && p3_mu.Mag() < 0.225"
 0 13 "sel_CCNp0pi && p3_mu.Mag() >= 0.225 && p3_mu.Mag() < 0.25"
