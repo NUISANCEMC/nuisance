@@ -57,7 +57,7 @@ set(InputHandler_Hdr_Files
   HistogramInputHandler.h
 )
 
-if(HepMC3_ENABLED)
+if(NuHepMC_ENABLED)
   LIST(APPEND InputHandler_Impl_Files NuHepMCInputHandler.cxx)
 endif()
 
@@ -75,13 +75,13 @@ endif()
 
 add_library(InputHandler SHARED ${InputHandler_Impl_Files})
 
-if(HepMC3_ENABLED)
-  target_compile_definitions(InputHandler PRIVATE HepMC3_ENABLED)
+if(NuHepMC_ENABLED)
+  target_compile_definitions(InputHandler PRIVATE NuHepMC_ENABLED)
 endif()
 
 target_link_libraries(InputHandler GeneratorCompileDependencies Experiments CoreIncludes)
-if(HepMC3_ENABLED)
-  target_link_libraries(InputHandler HepMC3)
+if(NuHepMC_ENABLED)
+  target_link_libraries(InputHandler NuHepMC::CPPUtils)
 endif()
 target_link_libraries(InputHandler ROOT::ROOT)
 set_target_properties(InputHandler PROPERTIES PUBLIC_HEADER "${InputHandler_Hdr_Files}")

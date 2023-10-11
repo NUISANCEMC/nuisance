@@ -44,9 +44,7 @@ InputType ParseInputType(std::string const &inp) {
   size_t nInputTypes = GeneralUtils::GetArraySize(filetypes);
 
   for (size_t i = 0; i < nInputTypes; i++) {
-    std::cout << "inpcheck: " << inp << " =?= " << filetypes[i] << std::endl;
     if (inp == filetypes[i]) {
-      std::cout << "yay" << std::endl;
       return InputType(i);
     }
   }

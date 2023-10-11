@@ -30,4 +30,5 @@ public:
   UInt_t nextentry;
   HepMC3::GenEvent fHepMC3Evt;
   std::string fFilename;
+  double fToMeV;
 };

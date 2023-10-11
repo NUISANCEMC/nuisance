@@ -25,7 +25,7 @@
 #include "SigmaQ0HistogramInputHandler.h"
 #include "SplineInputHandler.h"
 
-#ifdef HepMC3_ENABLED
+#ifdef NuHepMC_ENABLED
 #include "NuHepMCInputHandler.h"
 #endif
 
@@ -104,7 +104,7 @@ InputHandlerBase *CreateInputHandler(std::string const &handle,
 #endif
     break;
   case (kNuHepMC_Input):
-#ifdef HepMC3_ENABLED
+#ifdef NuHepMC_ENABLED
     input = new NuHepMCInputHandler(handle, newinputs);
 #else
     NUIS_ERR(FTL, "Tried to create NuHepMCInputHandler : "

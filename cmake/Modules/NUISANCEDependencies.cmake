@@ -17,6 +17,8 @@ if(DEFINED ROOT_VERSION_MAJOR)
   target_compile_definitions(GeneratorCompileDependencies INTERFACE ROOT_VERSION_MAJOR=${ROOT_VERSION_MAJOR})
 endif()
 
+target_compile_options(GeneratorCompileDependencies INTERFACE -Wno-unused-function -Wno-unused-variable)
+
 set(GiBUU_ENABLED TRUE)
 target_compile_definitions(GeneratorCompileDependencies INTERFACE GiBUU_ENABLED)
 
@@ -28,7 +30,7 @@ DefineEnabledRequiredSwitch(NEUT TRUE)
 DefineEnabledRequiredSwitch(GENIE TRUE)
 DefineEnabledRequiredSwitch(NuWro TRUE)
 DefineEnabledRequiredSwitch(Prob3plusplus FALSE)
-DefineEnabledRequiredSwitch(HepMC3 FALSE)
+DefineEnabledRequiredSwitch(NuHepMC FALSE)
 
 if (T2KReWeight_ENABLED)
   include(T2KReWeight)
@@ -88,7 +90,7 @@ if (nusystematics_ENABLED)
     CPMAddPackage(
       NAME nusystematics
       GIT_TAG develop
-      GITHUB_REPOSITORY luketpickering/nusystematics-merge
+      GITHUB_REPOSITORY luketpickering/nusystematics
     )
   else()
     find_package(nusystematics 23.06)
@@ -223,24 +225,14 @@ if(NOUNDEF_INDEX GREATER -1)
   cmessage(STATUS "Removed -Wl,--no-undefined flag from CMAKE_SHARED_LINKER_FLAGS at the end of NUISANCEDependencies")
 endif()
 
-if (HepMC3_ENABLED)
-  set(HepMC3_ENABLED TRUE)
+if (NuHepMC_ENABLED)
+  set(NuHepMC_ENABLED TRUE)
   CPMAddPackage(
-      NAME HepMC3
-      VERSION 3.2.6
-      GIT_REPOSITORY "https://gitlab.cern.ch/hepmc/HepMC3.git"
-      GIT_TAG 3.2.6
-      OPTIONS
-        "HEPMC3_CXX_STANDARD ${CMAKE_CXX_STANDARD}"
-        "HEPMC3_ENABLE_SEARCH OFF"
-        "HEPMC3_ENABLE_ROOTIO ON"
-        "HEPMC3_ENABLE_PROTOBUFIO OFF"
-        "HEPMC3_ENABLE_PYTHON OFF"
-        "HEPMC3_BUILD_DOCS OFF"
-        "HEPMC3_BUILD_EXAMPLES OFF"
-        "HEPMC3_INSTALL_EXAMPLES OFF"
-        "HEPMC3_ENABLE_TEST OFF"
-        "HEPMC3_INSTALL_INTERFACES OFF"
-        "HEPMC3_BUILD_STATIC_LIBS OFF"
+    NAME NuHepMC_CPPUtils
+    GIT_TAG main
+    GIT_REPOSITORY "https://github.com/NuHepMC/cpputils.git"
+    OPTIONS "BUILTIN_HEPMC3 ON"
   )
+  target_compile_definitions(GeneratorCompileDependencies INTERFACE NuHepMC_ENABLED)
+  target_link_libraries(GeneratorCompileDependencies INTERFACE NuHepMC::CPPUtils)
 endif()
