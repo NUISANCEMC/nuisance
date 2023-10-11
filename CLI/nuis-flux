@@ -243,7 +243,7 @@ case $EXPERIMENT in
     ;;
   MicroBooNE)
     if [ "${PROBE}" == "numu" ] && [ "${BEAMMODE}" == "nu" ]; then
-      echo "${NUISANCE}/data/flux/MicroBooNE_FHC_numu_flux.root,numu_hist"
+      echo "${NUISANCE}/data/flux/BNB_uBooNE_numu_flux_2019.root,numu"
       exit 0
     fi
     ;;
