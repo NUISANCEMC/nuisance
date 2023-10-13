@@ -55,3 +55,7 @@ install(TARGETS ${TARGETS_TO_BUILD} DESTINATION bin)
 add_executable(nuishistrange nuishistrange.cxx)
 target_link_libraries(nuishistrange ROOT::ROOT)
 install(TARGETS nuishistrange DESTINATION bin)
+
+add_executable(nuishistdewidth nuishistdewidth.cxx)
+target_link_libraries(nuishistdewidth ROOT::ROOT)
+install(TARGETS nuishistdewidth DESTINATION bin)
