@@ -31,4 +31,5 @@ public:
   HepMC3::GenEvent fHepMC3Evt;
   std::string fFilename;
   double fToMeV;
+  double fsumevw;
 };

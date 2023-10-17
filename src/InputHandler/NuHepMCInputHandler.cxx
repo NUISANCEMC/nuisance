@@ -11,6 +11,26 @@
 
 NuHepMCInputHandler::~NuHepMCInputHandler() {}
 
+struct KBAccumulator {
+  double sum;
+  double corr;
+  KBAccumulator(double s = 0, double c = 0) : sum(s), corr(c) {}
+
+  KBAccumulator &operator+=(double el) {
+    double y = el - corr;
+    double t = sum + y;
+
+    corr = (t - sum) - y;
+    sum = t;
+
+    return *this;
+  }
+  KBAccumulator operator+(double el) {
+    *this += el;
+    return *this;
+  }
+};
+
 NuHepMCInputHandler::NuHepMCInputHandler(std::string const &handle,
                                          std::string const &rawinputs)
     : frun_info(nullptr) {
@@ -50,23 +70,32 @@ NuHepMCInputHandler::NuHepMCInputHandler(std::string const &handle,
 
   std::cout << "NuHepMCInputHandler: FATX = " << fatx_cm2 << std::endl;
 
-  auto rdr = HepMC3::deduce_reader(fFilename);
-  if (!rdr) {
+  fReader = HepMC3::deduce_reader(fFilename);
+  if (!fReader) {
     NUIS_ABORT("Failed to instantiate HepMC3::Reader from " << fFilename);
   }
   HepMC3::GenEvent evt;
   fNEvents = 0;
-  while (!rdr->failed()) {
-    rdr->read_event(evt);
+  KBAccumulator sumw;
+  double sumw_d = 0;
+  while (!fReader->failed()) {
+    fReader->read_event(evt);
     if (!fNEvents) {
       fToMeV = NuHepMC::Event::ToMeVFactor(evt);
     }
-    if (!rdr->failed()) {
+    if (!fReader->failed()) {
       fNEvents++;
     } else {
       break;
     }
+
+    sumw += evt.weights()[0];
+    sumw_d += evt.weights()[0];
   }
+  fsumevw = sumw.sum;
+
+  std::cout << "sumw = " << sumw.sum << std::endl;
+  std::cout << "sumw_d = " << sumw_d << std::endl;
   // Dupe the FATX
   fEventHist = new TH1D("eventhist", "eventhist", 10, 0.0, 10.0);
   fEventHist->SetBinContent(5, fatx_cm2);
@@ -76,6 +105,8 @@ NuHepMCInputHandler::NuHepMCInputHandler(std::string const &handle,
   fNUISANCEEvent = new FitEvent();
   fNUISANCEEvent->HardReset();
   fBaseEvent = static_cast<BaseFitEvt *>(fNUISANCEEvent);
+
+  fReader = HepMC3::deduce_reader(fFilename);
 };
 
 FitEvent *NuHepMCInputHandler::GetNuisanceEvent(const UInt_t entry, bool) {
@@ -111,6 +142,9 @@ FitEvent *NuHepMCInputHandler::GetNuisanceEvent(const UInt_t entry, bool) {
   } else {
     fNUISANCEEvent->InputWeight = 1.0;
   }
+
+  fNUISANCEEvent->InputWeight *=
+      fHepMC3Evt.weights()[0] * double(fNEvents) / fsumevw;
 
   // Run NUISANCE Vector Filler
   CalcNUISANCEKinematics();
