@@ -32,6 +32,8 @@ namespace SignalDef {
  */
 bool isCC1MuNp(FitEvent* event, double EnuMin, double EnuMax);
 
+bool isCC1ENp(FitEvent* event, double EnuMin, double EnuMax);
+
   }  // namespace MicroBooNE
 }  // namespace SignalDef
 
