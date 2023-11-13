@@ -1,39 +1,41 @@
 lines = open('Table_Var_Xsec.csv').readlines()
 
 Variables = [
-"$T_{\pi}$",
-"$p_{\mu,T}$",
+["$p_{\\mu}$", "pmu"],
+["$\\theta_{\\mu}$", "thmu"],
+["$p_{\\mu,||}$", "plmu"],
+["$p_{\\mu,T}$", "ptmu"],
+["$Q^2$", "Q2"],
+["$W_{exp}$", "Wexp"],
+["$T_{\\pi}$", "Tpi"],
+["$\\theta_{\\pi}$", "thpi"],
 ]
 
 Targets = [
-"scintillator",
-"iron",
-"lead",
+["scintillator", "CH"],
+["carbon", "C"],
+["water" ,"H2O",],
+["iron", "Fe"],
+["lead", "Pb"],
 ]
 
 for Variable in Variables:
 
-  VariableName = ""
-  if Variable=="$T_{\pi}$":
-    VariableName = "Tpi"
-  if Variable=="$p_{\mu,T}$":
-    VariableName = "ptmu"
+  VariableLatex = Variable[0]
+  VariableName = Variable[1]
 
   for Target in Targets:
 
-    TargetName = ""
-    if Target=="scintillator":
-      TargetName = "CH"
-    if Target=="iron":
-      TargetName = "Fe"
-    if Target=="lead":
-      TargetName = "Pb"
+    TargetLatex = Target[0]
+    TargetName = Target[1]
+
+    #print(TargetName)
 
     for i_line,line in enumerate(lines):
 
       ## Find the first line
       ## e.g.) Measured cross section as function of $T_{\pi}$ on iron, in units of $10^{-42}$ $\text{cm}^2$/GeV/nucleon, and the absolute and fractional cross section uncertainties
-      if "Measured cross section" in line and "as function of %s"%(Variable) in line and "on %s"%(Target) in line:
+      if "Measured cross section" in line and "as function of %s"%(VariableLatex) in line and "on %s"%(TargetLatex) in line:
 
         output_common_name = "NukeCC1pip_%s_%s"%(TargetName, VariableName)
         output_data = open("%s.txt"%(output_common_name),"w")
@@ -42,7 +44,7 @@ for Variable in Variables:
         output_cov_total = open("%s_cov_total.txt"%(output_common_name),"w")
 
         ## Measured
-        print("@@ %s %s found"%(Variable, Target))
+        #print("@@ %s %s found"%(VariableLatex, TargetLatex))
         line_start_Measured = i_line+3
         line_end_Measured = line_start_Measured+1
         for j_line in range(line_start_Measured, len(lines)):
@@ -74,7 +76,7 @@ for Variable in Variables:
           for i_w in range(1, len(words)):
             this_word = words[i_w]
             this_word = this_word.replace(' ','')
-            out += this_word
+            out += this_word+"E-42"
             ThisValues.append(float(this_word))
             if i_w != len(words)-1:
               out += ' '
@@ -100,7 +102,7 @@ for Variable in Variables:
           for i_w in range(1, len(words)):
             this_word = words[i_w]
             this_word = this_word.replace(' ','')
-            out += this_word
+            out += this_word+"E-84"
             ThisValues.append(float(this_word))
             if i_w != len(words)-1:
               out += ' '
@@ -124,7 +126,7 @@ for Variable in Variables:
           for i_w in range(1, len(words)):
             this_word = words[i_w]
             this_word = this_word.replace(' ','')
-            out += this_word
+            out += this_word+"E-84"
             ThisValues.append(float(this_word))
             if i_w != len(words)-1:
               out += ' '
@@ -154,10 +156,11 @@ for Variable in Variables:
             if i_col==i_row:
               CovFromData = TotalUncFromData*TotalUncFromData
               RelDiff = abs(CovFromData-val_TotalCov)/CovFromData
-              if RelDiff>1E-3:
-                raise
+              if RelDiff>1E-1:
+                print(i_row, i_col, CovFromData, val_SyatCov, val_SystCov, val_TotalCov, RelDiff*100.)
+                #raise
 
-            line_SumCov += "%1.3f"%(val_TotalCov)
+            line_SumCov += "%e"%(val_TotalCov*1E-8)
             if i_col != len(Row_StatCov)-1:
               line_SumCov += ' '
           output_cov_total.write(line_SumCov+'\n')

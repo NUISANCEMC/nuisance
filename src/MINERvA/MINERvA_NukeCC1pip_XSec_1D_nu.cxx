@@ -51,13 +51,37 @@ void MINERvA_NukeCC1pip_XSec_1D_nu::SetupDataSettings(){
   }
 
   std::string titles = "";
-  if(distribution_str=="Tpi"){
-    fDistribution = kTpi;
-    titles    = "T_{#pi} (GeV);d#sigma/dT_{#pi} (10^{-42}cm^{2}/nucleon/GeV)";
+  if(distribution_str=="pmu"){
+    fDistribution = kpmu;
+    titles    = "p_{#mu} (GeV);d#sigma/dp_{#mu} (cm^{2}/nucleon/GeV)";
+  }
+  else if(distribution_str=="thmu"){
+    fDistribution = kthmu;
+    titles    = "#theta_{#mu} (deg);d#sigma/d#theta_{#mu} (cm^{2}/nucleon/deg)";
+  }
+  else if(distribution_str=="plmu"){
+    fDistribution = kplmu;
+    titles    = "p_{#mu,||} (GeV);d#sigma/dp_{#mu,||} (cm^{2}/nucleon/GeV)";
   }
   else if(distribution_str=="ptmu"){
     fDistribution = kptmu;
-    titles    = "p_{T,#mu} (GeV);d#sigma/p_{T,#mu} (10^{-42}cm^{2}/nucleon/GeV)";
+    titles    = "p_{#mu,T} (GeV);d#sigma/dp_{#mu,T} (cm^{2}/nucleon/GeV)";
+  }
+  else if(distribution_str=="Q2"){
+    fDistribution = kQ2;
+    titles    = "Q^{2} (GeV^{2});d#sigma/dQ^{2} (cm^{2}/nucleon/GeV^{2})";
+  }
+  else if(distribution_str=="Wexp"){
+    fDistribution = kWexp;
+    titles    = "W_{exp} (GeV/c^{2});d#sigma/dW_{exp} (cm^{2}/nucleon/(GeV/c^{2}))";
+  }
+  else if(distribution_str=="Tpi"){
+    fDistribution = kTpi;
+    titles    = "T_{#pi} (GeV);d#sigma/dT_{#pi} (cm^{2}/nucleon/GeV)";
+  }
+  else if(distribution_str=="thpi"){
+    fDistribution = kthpi;
+    titles    = "#theta_{#pi} (deg);d#sigma/d#theta_{#pi} (cm^{2}/nucleon/deg)";
   }
   else{
     NUIS_ABORT("Unknown distribution: " << distribution_str);
@@ -95,9 +119,7 @@ MINERvA_NukeCC1pip_XSec_1D_nu::MINERvA_NukeCC1pip_XSec_1D_nu(nuiskey samplekey) 
 
   FinaliseSampleSettings();
   // Scaling Setup ---------------------------------------------------
-  //fScaleFactor = GetEventHistogram()->Integral("width") * double(1E-38) / double(fNEvents) / TotalIntegratedFlux("width");
-  fScaleFactor = GetEventHistogram()->Integral("width") * double(1E4) / double(fNEvents) / TotalIntegratedFlux("width");
-  //fCovScaleFactor = 1.;
+  fScaleFactor = GetEventHistogram()->Integral("width") * double(1E-38) / double(fNEvents) / TotalIntegratedFlux("width");
 
   // Plot Setup -------------------------------------------------------
 
@@ -122,21 +144,21 @@ void MINERvA_NukeCC1pip_XSec_1D_nu::FillEventVariables(FitEvent *event) {
   TLorentzVector Ppip = event->GetHMFSParticle(PhysConst::pdg_charged_pions)->fP;
   TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
 
-  double Tpi     = (Ppip.E() - Ppip.Mag())/1.E3; // GeV
-  double th      = (180./M_PI)*FitUtils::th(Pnu, Ppip);
-  double pmu     = Pmu.Vect().Mag()/1.E3; // GeV
-  double thmu    = (180.0/M_PI)*FitUtils::th(Pnu, Pmu);
-  double Q2      = fabs((Pmu - Pnu).Mag2()) / 1.E6;  // Using true here?
-  double Enu     = Pnu.E() / 1.E3;
-
   // Pz is the neutrino-direction component of muon 3-momentum
   Double_t pz_mu = Pmu.Vect().Dot( Pnu.Vect().Unit() ); // MeV
   TVector3 pt_mu = Pmu.Vect() - pz_mu * Pnu.Vect().Unit(); // MeV
 
+  double Q2      = fabs((Pmu - Pnu).Mag2()) / 1.E6;  // Using true here?
 
   switch(fDistribution){
-    case kTpi:  fXVar = Tpi;  break;
-    case kptmu: fXVar = pt_mu.Mag()/1000.;   break;
+    case kpmu:  fXVar = Pmu.Vect().Mag()/1.E3; break;
+    case kthmu: fXVar = (180.0/M_PI)*FitUtils::th(Pnu, Pmu); break;
+    case kplmu: fXVar = pz_mu/1000.; break;
+    case kptmu: fXVar = pt_mu.Mag()/1000.; break;
+    case kQ2:   fXVar = Q2; break;
+    case kWexp: fXVar = FitUtils::Wrec(Pnu, Pmu)/1000.; break;
+    case kTpi:  fXVar = (Ppip.E() - Ppip.Mag())/1.E3; break;
+    case kthpi: fXVar = (180.0/M_PI)*FitUtils::th(Pnu, Ppip); break;
     default: NUIS_ABORT("DIST NOT FOUND : " << fDistribution);
   }
 
