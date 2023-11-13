@@ -1,0 +1,3 @@
+- Phys.Rev.Lett. 131 (2023) 1, 011801
+- https://arxiv.org/pdf/1606.07127.pdf
+- Data release: https://minerva.fnal.gov/nuclear-target-charged-current-pi-production-data-release-page/
