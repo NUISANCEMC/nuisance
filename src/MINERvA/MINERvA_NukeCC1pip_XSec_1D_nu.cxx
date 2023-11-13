@@ -97,7 +97,7 @@ MINERvA_NukeCC1pip_XSec_1D_nu::MINERvA_NukeCC1pip_XSec_1D_nu(nuiskey samplekey) 
   // Scaling Setup ---------------------------------------------------
   //fScaleFactor = GetEventHistogram()->Integral("width") * double(1E-38) / double(fNEvents) / TotalIntegratedFlux("width");
   fScaleFactor = GetEventHistogram()->Integral("width") * double(1E4) / double(fNEvents) / TotalIntegratedFlux("width");
-  fCovScaleFactor = 1.;
+  //fCovScaleFactor = 1.;
 
   // Plot Setup -------------------------------------------------------
 
