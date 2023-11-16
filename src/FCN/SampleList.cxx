@@ -269,6 +269,9 @@
 
 // MINERvA Nuke CC0pi muon 2d
 #include "MINERvA_NukeCC0pi_XSec_2D_nu.h"
+// MINERvA Nuke CC1pip 1d
+#include "MINERvA_NukeCC1pip_XSec_1D_nu.h"
+
 #endif
 
 #ifdef T2K_ENABLED
@@ -663,6 +666,11 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
   std::string file = samplekey.GetS("input");
   std::string type = samplekey.GetS("type");
   std::string fkdt = "";
+
+  std::regex pattern_MINERvA_NukeCC1pip_1D("MINERvA_NukeCC1pip_(.*?)_XSec_1D(.*?)_nu");
+  std::smatch matches_MINERvA_NukeCC1pip_1D;
+
+  //
 
   /*
      ANL CCQE Samples
@@ -1379,7 +1387,8 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
     return (new MINERvA_NukeCC0pi_CH_Fe_Flux_XSec_2D_nu(samplekey));
   } else if (!name.compare("MINERvA_NukeCC0pi_CH_Pb_Flux_XSec_2D_nu")) {
     return (new MINERvA_NukeCC0pi_CH_Pb_Flux_XSec_2D_nu(samplekey));
-    
+  } else if ( std::regex_search(name, matches_MINERvA_NukeCC1pip_1D, pattern_MINERvA_NukeCC1pip_1D) && matches_MINERvA_NukeCC1pip_1D.size() == 3 ){
+    return (new MINERvA_NukeCC1pip_XSec_1D_nu(samplekey));
 
     /*
     T2K Samples

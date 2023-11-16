@@ -145,12 +145,61 @@ bool isCC1pip_MINERvA_2017(FitEvent *event, double EnuMin, double EnuMax) {
   TLorentzVector pnu = event->GetHMISParticle(14)->fP;
   TLorentzVector pmu = event->GetHMFSParticle(13)->fP;
 
+  // TODO Test
+  double th_nu_mu = FitUtils::th(pmu, pnu) * 180. / M_PI;
+  if (th_nu_mu >= 20)
+    return false;
+
   // Extract Hadronic Mass
   // This time it's Wrec, not Wtrue
   double hadMass = FitUtils::Wrec(pnu, pmu);
   // Cut on 2017 data is still 1.4 GeV
   if (hadMass > 1400.0)
     return false;
+
+  return true;
+};
+
+bool isNukeCC1pip_MINERvA(FitEvent *event, double EnuMin, double EnuMax) {
+
+  if (!isCCINC(event, 14, EnuMin, EnuMax))
+    return false;
+
+  // Allow pi+
+  int piPDG[] = {211};
+  int nLeptons = event->NumFSLeptons();
+  int nPion = event->NumFSParticle(piPDG);
+
+  // Check that the desired pion exists and is the only meson
+  if (nPion != 1)
+    return false;
+
+  // Check that there is only one final state lepton
+  if (nLeptons != 1)
+    return false;
+
+  TLorentzVector Pnu = event->GetHMISParticle(14)->fP;
+  TLorentzVector Pmu = event->GetHMFSParticle(13)->fP;
+  TLorentzVector Ppip = event->GetHMFSParticle(PhysConst::pdg_charged_pions)->fP;
+
+  // 1.5 < pmu < 20 GeV/c
+  double pmu = Pmu.Vect().Mag()/1.E3; // GeV
+  if( pmu < 1.5 ) return false;
+  if( pmu > 20. ) return false;
+
+  // thmu<13degree
+  double th_nu_mu = FitUtils::th(Pmu, Pnu) * 180. / M_PI;
+  if (th_nu_mu >= 13.) return false;
+
+  // 35 < Tpi < 350 MeV
+  double Tpi = (Ppip.E() - Ppip.Mag()); // MeV
+  if( Tpi < 35. ) return false;
+  if( Tpi > 350. ) return false;
+
+  // Extract Hadronic Mass
+  // This time it's Wrec, not Wtrue
+  double hadMass = FitUtils::Wrec(Pnu, Pmu);
+  if (hadMass > 1400.0) return false;
 
   return true;
 };
