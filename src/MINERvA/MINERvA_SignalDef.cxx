@@ -145,6 +145,11 @@ bool isCC1pip_MINERvA_2017(FitEvent *event, double EnuMin, double EnuMax) {
   TLorentzVector pnu = event->GetHMISParticle(14)->fP;
   TLorentzVector pmu = event->GetHMFSParticle(13)->fP;
 
+  // TODO Test
+  double th_nu_mu = FitUtils::th(pmu, pnu) * 180. / M_PI;
+  if (th_nu_mu >= 20)
+    return false;
+
   // Extract Hadronic Mass
   // This time it's Wrec, not Wtrue
   double hadMass = FitUtils::Wrec(pnu, pmu);
@@ -157,9 +162,6 @@ bool isCC1pip_MINERvA_2017(FitEvent *event, double EnuMin, double EnuMax) {
 
 bool isNukeCC1pip_MINERvA(FitEvent *event, double EnuMin, double EnuMax) {
 
-  // Signal is both pi+ and pi-
-  // WARNING: PI- CONTAMINATION IS FULLY GENIE BECAUSE THE MICHEL TAG
-  // First, make sure it's CCINC
   if (!isCCINC(event, 14, EnuMin, EnuMax))
     return false;
 
