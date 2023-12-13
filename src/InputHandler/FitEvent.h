@@ -70,6 +70,8 @@ public:
   inline int GetTargetZ (void) const { return fTargetZ; };
   /// Get Event Total Cross-section
   inline int GetTotCrs  (void) const { return fTotCrs;  };
+  /// Return True Resonance ID (only works for GENIE)
+  inline int GetResCode (void) const { return fResCode; };
 
   /// Is Event Charged Current?
   inline bool IsCC() const { if (abs(this->probe_pdg) == 11) return false; return (abs(Mode) <= 30); };
@@ -629,6 +631,7 @@ public:
   bool fBound;
   int fDistance;
   int fTargetPDG;
+  int fResCode; 
 
   // Reduced Particle Stack
   UInt_t kMaxParticles;

@@ -135,8 +135,15 @@ void GenericFlux_Vectors::AddEventVariablesToTree() {
   eventVariables->Branch("W_genie", &W_genie, "W_genie/F");
   eventVariables->Branch("x", &x, "x/F");
   eventVariables->Branch("y", &y, "y/F");
-  eventVariables->Branch("Eav", &Eav, "Eav/F");
+  eventVariables->Branch("Erecoil_minerva", &Erecoil_minerva, "Erecoil_minerva/F");
+  eventVariables->Branch("Erecoil_charged", &Erecoil_charged, "Erecoil_charged/F");
   eventVariables->Branch("EavAlt", &EavAlt, "EavAlt/F");
+  
+  // Add in EMiss and PMiss
+  eventVariables->Branch("Emiss", &Emiss, "Emiss/F");
+  eventVariables->Branch("pmiss", &pmiss);
+  eventVariables->Branch("Emiss_preFSI", &Emiss_preFSI, "Emiss_preFSI/F");
+  eventVariables->Branch("pmiss_preFSI", &pmiss_preFSI);
 
   eventVariables->Branch("CosThetaAdler", &CosThetaAdler, "CosThetaAdler/F");
   eventVariables->Branch("PhiAdler", &PhiAdler, "PhiAdler/F");
@@ -220,12 +227,19 @@ void GenericFlux_Vectors::FillEventVariables(FitEvent *event) {
     q0 = (nu->fP - lep->fP).E() / 1E3;
     q3 = (nu->fP - lep->fP).Vect().Mag() / 1E3;
 
+	Emiss = FitUtils::GetEmiss(event);
+	pmiss = FitUtils::GetPmiss(event);
+
+  Emiss_preFSI = FitUtils::GetEmiss(event, 1);
+  pmiss_preFSI = FitUtils::GetPmiss(event, 1);
+
     // These assume C12 binding from MINERvA... not ideal
     Enu_QE = FitUtils::EnuQErec(lep->fP, CosLep, 34., true);
     Q2_QE = FitUtils::Q2QErec(lep->fP, CosLep, 34., true);
 
-    Eav = FitUtils::GetErecoil_MINERvA_LowRecoil(event) / 1.E3;
-    EavAlt = FitUtils::Eavailable(event) / 1.E3;
+    Erecoil_minerva = FitUtils::GetErecoil_MINERvA_LowRecoil(event) / 1.E3;
+    Erecoil_charged = FitUtils::GetErecoil_CHARGED(event) / 1.E3;
+	EavAlt = FitUtils::Eavailable(event) / 1.E3;
 
     // Check if this is a 1pi+ or 1pi0 event
     if ((SignalDef::isCC1pi(event, PDGnu, 211) ||
@@ -355,7 +369,7 @@ void GenericFlux_Vectors::ResetVariables() {
   Mode = PDGnu = tgt = tgta = tgtz = PDGLep = 0;
 
   Enu_true = ELep = CosLep = Q2 = q0 = q3 = Enu_QE = Q2_QE = W_nuc_rest = W =
-      x = y = Eav = EavAlt = CosThetaAdler = PhiAdler = -999.9;
+      x = y = Erecoil_minerva = Erecoil_charged = EavAlt = CosThetaAdler = PhiAdler = Emiss = Emiss_preFSI = -999.9;
 
   W_genie = -999;
   // Other fun variables
@@ -373,6 +387,10 @@ void GenericFlux_Vectors::ResetVariables() {
     px_vert[i] = py_vert[i] = pz_vert[i] = E_vert[i] = -999;
     pdg_vert[i] = 0;
   }
+
+  // Reset pmiss
+  pmiss.SetXYZ(-999.,-999.,-999.);
+  pmiss_preFSI.SetXYZ(-999.,-999.,-999.);
 
   Weight = InputWeight = RWWeight = 0.0;
 

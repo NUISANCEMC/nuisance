@@ -17,7 +17,7 @@
  *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 #include "GENIEInputHandler.h"
-
+#include "InteractionModes.h"
 #ifdef GENIE3_API_ENABLED
 #include "Framework/GHEP/GHepParticle.h"
 #include "Framework/ParticleData/PDGUtils.h"
@@ -122,7 +122,7 @@ bool GENIEInputHandler::IsPrimary(GHepParticle *p) {
 
   // Then do a simple check of mother is associated with the primary
   int MotherID = mother->FirstMother();
-  if (MotherID > 2) return false;
+  //if (MotherID > 2) return false;
 
   // Finally, this should mean that our partcile is marked for transport through the nucleus
   // Could also be interactions of free proton
@@ -380,27 +380,27 @@ int GENIEInputHandler::ConvertGENIEReactionCode(GHepRecord *gheprec) {
 
   // I randomly picked 53 here because NEUT doesn't have an appropriate mode...
   if (gheprec->Summary()->ProcInfo().IsNuElectronElastic()){
-    if (pdg::IsNeutrino(gheprec->Summary()->InitState().ProbePdg())) return 53;
-    else return -53;
+    if (pdg::IsNeutrino(gheprec->Summary()->InitState().ProbePdg())) return InputHandler::kNuElectronElastic;
+    else return -InputHandler::kNuElectronElastic;
   }
 
   // And the same story for 54
   if (gheprec->Summary()->ProcInfo().IsIMDAnnihilation() || gheprec->Summary()->ProcInfo().IsInverseMuDecay()){
-    if (pdg::IsNeutrino(gheprec->Summary()->InitState().ProbePdg())) return 54;
-    else return -54;
+    if (pdg::IsNeutrino(gheprec->Summary()->InitState().ProbePdg())) return InputHandler::kInvMuonDecay;
+    else return -InputHandler::kInvMuonDecay;
   }
 
   // Electron Scattering
   if (gheprec->Summary()->ProcInfo().IsEM()) {
     if (gheprec->Summary()->InitState().ProbePdg() == 11) {
       if (gheprec->Summary()->ProcInfo().IsQuasiElastic())
-        return 1;
+        return InputHandler::kCCQE;
       else if (gheprec->Summary()->ProcInfo().IsMEC())
-        return 2;
+        return InputHandler::kCC2p2h;
       else if (gheprec->Summary()->ProcInfo().IsResonant())
-        return 13;
+        return InputHandler::kCC1piponn;
       else if (gheprec->Summary()->ProcInfo().IsDeepInelastic())
-        return 26;
+        return InputHandler::kCCDIS;
       else {
         NUIS_ERR(WRN,
             "Unknown GENIE Electron Scattering Mode!"
@@ -425,15 +425,15 @@ int GENIEInputHandler::ConvertGENIEReactionCode(GHepRecord *gheprec) {
     // CC MEC
     if (gheprec->Summary()->ProcInfo().IsMEC()) {
       if (pdg::IsNeutrino(gheprec->Summary()->InitState().ProbePdg()))
-        return 2;
+        return InputHandler::kCC2p2h;
       else if (pdg::IsAntiNeutrino(gheprec->Summary()->InitState().ProbePdg()))
-        return -2;
+        return -InputHandler::kCC2p2h;
 #ifdef GENIE3_API_ENABLED
     } else if (gheprec->Summary()->ProcInfo().IsDiffractive()) {
       if (pdg::IsNeutrino(gheprec->Summary()->InitState().ProbePdg()))
-        return 15;
+        return InputHandler::kCCDiffSPP;
       else if (pdg::IsAntiNeutrino(gheprec->Summary()->InitState().ProbePdg()))
-        return -15;
+        return -InputHandler::kCCDiffSPP;
 #endif
       // CC OTHER
     } else {
@@ -445,15 +445,15 @@ int GENIEInputHandler::ConvertGENIEReactionCode(GHepRecord *gheprec) {
     // NC MEC
     if (gheprec->Summary()->ProcInfo().IsMEC()) {
       if (pdg::IsNeutrino(gheprec->Summary()->InitState().ProbePdg()))
-        return 32;
+        return InputHandler::kNC2p2h;
       else if (pdg::IsAntiNeutrino(gheprec->Summary()->InitState().ProbePdg()))
-        return -32;
+        return -InputHandler::kNC2p2h;
 #ifdef GENIE3_API_ENABLED
     } else if (gheprec->Summary()->ProcInfo().IsDiffractive()) {
       if (pdg::IsNeutrino(gheprec->Summary()->InitState().ProbePdg()))
-        return 35;
+        return InputHandler::kNCDiffSPP;
       else if (pdg::IsAntiNeutrino(gheprec->Summary()->InitState().ProbePdg()))
-        return -35;
+        return -InputHandler::kNCDiffSPP;
 #endif
       // NC OTHER
     } else {
@@ -481,6 +481,10 @@ void GENIEInputHandler::CalcNUISANCEKinematics() {
 
   // Convert GENIE Reaction Code
   fNUISANCEEvent->Mode = ConvertGENIEReactionCode(fGenieGHep);
+
+  // Get the resonance ID Code
+  fNUISANCEEvent->fResCode = fGenieGHep->Summary()->ExclTagPtr()->Resonance();
+
 
   if (!fNUISANCEEvent->Mode) {
     NUIS_ERR(WRN, "Failed to determine mode for GENIE event: ");
