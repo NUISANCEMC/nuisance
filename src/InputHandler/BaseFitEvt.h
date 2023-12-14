@@ -43,6 +43,7 @@
 #include "Ntuple/NtpMCEventRecord.h"
 #endif
 using namespace genie;
+class GENIEInputHandler;
 #endif
 
 #ifdef NUANCE_ENABLED
@@ -113,6 +114,10 @@ class BaseFitEvt {
   void SetGenieEvent(NtpMCEventRecord* ntpl);
   NtpMCEventRecord* genie_event;  ///< Pointer to NTuple Genie Event
   GHepRecord* genie_record;  ///< Pointer to actually accessible Genie Record
+#ifdef nusystematics_ENABLED
+  GENIEInputHandler *input_handler;
+  Long64_t input_handler_itree_ent;
+#endif
 #endif
 
 #ifdef NUANCE_ENABLED

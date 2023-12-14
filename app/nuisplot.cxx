@@ -28,7 +28,7 @@ std::string samplename = "";
 std::string mchistname = "";
 std::string datahistname = "";
 
-std::vector<std::pair<std::string, std::string>> slicelist;
+std::vector<std::pair<std::string, std::string> > slicelist;
 
 std::vector<int> NXBinsToRemove;
 std::vector<int> NYBinsToRemove;
@@ -37,6 +37,8 @@ bool variable_yscale = false;
 
 bool split = false;
 bool splity = false;
+
+bool dump_to_numpcsv = false;
 
 void SayUsage(char const *argv[]) {
   std::cout
@@ -80,6 +82,10 @@ void SayUsage(char const *argv[]) {
       << "\t                                         split instead of using\n"
       << "\t                                         the global maximum.\n\n"
       << "\t--chi2                                 : Output the chi2\n\n"
+      << "\t--np-csv                               : Dump plots to "
+      << "\t                                         numpy-parseable csv "
+      << "\t                                         strings instead of "
+      << "\t                                         plotting them."
       << "\t-?|--help                              : Print this message\n\n"
       << std::endl;
 }
@@ -219,6 +225,8 @@ void HandleOpts(int argc, char const *argv[]) {
       variable_yscale = true;
     } else if (std::string(argv[opt]) == "--chi2") {
       saychi2 = true;
+    } else if (std::string(argv[opt]) == "--np-csv") {
+      dump_to_numpcsv = true;
     } else {
       std::cout << "[ERROR]: Unknown option: " << argv[opt] << std::endl;
       SayUsage(argv);
@@ -230,7 +238,7 @@ void HandleOpts(int argc, char const *argv[]) {
 
 std::vector<double> Chi2s;
 int NBins;
-std::vector<std::vector<TH1 *>> MCHists;
+std::vector<std::vector<TH1 *> > MCHists;
 std::vector<TH1 *> DataHists;
 double MaxBinValue;
 
@@ -487,6 +495,36 @@ void Plot1D(std::vector<TH1 *> MCs, TH1 *Data) {
   c1.Print(outputfilename.c_str());
 }
 
+void CSVDump1D(std::vector<TH1 *> MCs, TH1 *Data) {
+
+  std::vector<std::string> colorwheel = {"red",     "blue",   "green",
+                                         "magenta", "orange", "azure"};
+
+  for (size_t i = 0; i < MCs.size(); ++i) {
+    std::cout << "#" << MCTags[i] << ": #chi^{2} = " << Chi2s[i] << "/" << NBins
+              << " bins" << std::endl;
+    std::cout << "mc" << std::to_string(i) << R"(_csvstr =\
+""")";
+    for(int bi = 0; bi < MCs[i]->GetXaxis()->GetNbins(); ++bi){
+      std::cout << "  " << MCs[i]->GetXaxis()->GetBinLowEdge(bi + 1) << ", "
+                << MCs[i]->GetXaxis()->GetBinUpEdge(bi + 1) << ", "
+                << MCs[i]->GetBinContent(bi + 1) << std::endl;
+    }
+    std::cout << R"(""")" << std::endl<< std::endl;
+  }
+
+  std::cout << "#" << DataTag << std::endl;
+    std::cout << R"(data_csvstr =\
+""")";
+    for(int bi = 0; bi < Data->GetXaxis()->GetNbins(); ++bi){
+      std::cout << "  " << Data->GetXaxis()->GetBinLowEdge(bi + 1) << ", "
+                << Data->GetXaxis()->GetBinUpEdge(bi + 1) << ", "
+                << Data->GetBinContent(bi + 1) << ", "
+                << Data->GetBinError(bi + 1) << std::endl;
+    }
+    std::cout << R"(""")" << std::endl<< std::endl;
+}
+
 void Plot2D(std::vector<TH1 *> MC, TH1 *Data) {}
 
 void PlotSingleHist() {
@@ -551,6 +589,67 @@ void PlotSingleHist() {
     }
     MC->GetZaxis()->SetRangeUser(0, MaxBinValue * 1.1);
     Plot2D(MCSingleHists, Data);
+  }
+}
+
+void CSVSingleHist() {
+
+  TH1 *MC = MCHists[0][0];
+  TH1 *Data = DataHists[0];
+
+  if (titles.size()) {
+    MC->SetTitle(titles[0].c_str());
+  } else {
+    MC->SetTitle("");
+  }
+
+  if (xtitleset) {
+    MC->GetXaxis()->SetTitle(xtitle.c_str());
+  }
+
+  MC->GetXaxis()->SetTitleSize(0.05);
+  MC->GetXaxis()->SetLabelSize(0.05);
+  MC->GetXaxis()->SetTitleOffset(1);
+  MC->GetXaxis()->SetLabelOffset(0.01);
+  MC->GetXaxis()->SetNdivisions(505);
+
+  if (NXBinsToRemove.size()) {
+    double lowbinedge = MC->GetXaxis()->GetBinLowEdge(1);
+    double upbinedge = MC->GetXaxis()->GetBinUpEdge(MC->GetXaxis()->GetNbins() -
+                                                    NXBinsToRemove[0]);
+
+    MC->GetXaxis()->SetRangeUser(lowbinedge, upbinedge);
+  }
+
+  if (ytitleset) {
+    MC->GetYaxis()->SetTitle(ytitle.c_str());
+  }
+
+  MC->GetYaxis()->SetTitleSize(0.05);
+  MC->GetYaxis()->SetLabelSize(0.05);
+  MC->GetYaxis()->SetTitleOffset(1);
+  MC->GetYaxis()->SetLabelOffset(0.01);
+  MC->GetYaxis()->SetNdivisions(505);
+
+  if (NYBinsToRemove.size()) {
+    double lowbinedge = MC->GetYaxis()->GetBinLowEdge(1);
+    double upbinedge = MC->GetYaxis()->GetBinUpEdge(MC->GetYaxis()->GetNbins() -
+                                                    NYBinsToRemove[0]);
+
+    MC->GetYaxis()->SetRangeUser(lowbinedge, upbinedge);
+  }
+
+  std::vector<TH1 *> MCSingleHists;
+  for (auto const &MCHistList : MCHists) {
+    MCSingleHists.push_back(MCHistList[0]);
+  }
+
+  int ndims = MC->GetDimension();
+  if (ndims == 1) {
+    MC->GetYaxis()->SetRangeUser(0, MaxBinValue * 1.1);
+    CSVDump1D(MCSingleHists, Data);
+  } else if (ndims == 2) {
+    NUIS_ABORT("Can currently only dump 1D histograms to CSV.");
   }
 }
 
@@ -727,8 +826,15 @@ int main(int argc, char const *argv[]) {
 
   ReadHists();
   if (DataHists.size() > 1) {
+    if (dump_to_numpcsv) {
+      NUIS_ABORT("Cannot yet dump sliced histograms to numpy csv.");
+    }
     PlotSlices();
   } else {
-    PlotSingleHist();
+    if (dump_to_numpcsv) {
+      CSVSingleHist();
+    } else {
+      PlotSingleHist();
+    }
   }
 }

@@ -232,6 +232,7 @@ if (NuHepMC_ENABLED)
     GIT_TAG main
     GIT_REPOSITORY "https://github.com/NuHepMC/cpputils.git"
     OPTIONS "BUILTIN_HEPMC3 ON"
+            "NuHepMC_BUILD_STATIC_LIBS ON"
   )
   target_compile_definitions(GeneratorCompileDependencies INTERFACE NuHepMC_ENABLED)
   target_link_libraries(GeneratorCompileDependencies INTERFACE NuHepMC::CPPUtils)

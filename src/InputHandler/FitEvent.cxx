@@ -414,6 +414,45 @@ int FitEvent::GetHMParticleIndex(int const pdg, int const state) const {
   return maxind;
 }
 
+int FitEvent::GetSHMParticleIndex(int const pdg, int const state) const {
+
+  double maxmom2 = -9999999.9;
+  int maxind = -1;
+
+  double secmom2 = -9999999.9;
+  int secind = -1;
+
+  for (int i = 0; i < fNParticles; i++) {
+    if (state != -1 and fParticleState[i] != (uint)state)
+      continue;
+    if (pdg == 0 or fParticlePDG[i] == pdg) {
+      double newmom2 = GetParticleMom2(i);
+
+      if (newmom2 >= maxmom2) {
+
+        secind = maxind;
+        secmom2 = maxmom2;
+
+        maxind = i;
+        maxmom2 = newmom2;
+
+      }
+
+      if (newmom2 < maxmom2 && newmom2 > secmom2) {
+
+        secind = i;
+        secmom2 = newmom2;
+
+      }
+
+
+    }
+  }
+
+  if (secind == -1) { secind = maxind; }
+  return secind;
+}
+
 int FitEvent::GetBeamNeutrinoIndex(void) const {
   for (int i = 0; i < fNParticles; i++) {
     if (fParticleState[i] != kInitialState)
