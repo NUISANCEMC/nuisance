@@ -1,21 +1,21 @@
 // Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
-*    This file is part of NUISANCE.
-*
-*    NUISANCE is free software: you can redistribute it and/or modify
-*    it under the terms of the GNU General Public License as published by
-*    the Free Software Foundation, either version 3 of the License, or
-*    (at your option) any later version.
-*
-*    NUISANCE is distributed in the hope that it will be useful,
-*    but WITHOUT ANY WARRANTY; without even the implied warranty of
-*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*    GNU General Public License for more details.
-*
-*    You should have received a copy of the GNU General Public License
-*    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
-*******************************************************************************/
+ *    This file is part of NUISANCE.
+ *
+ *    NUISANCE is free software: you can redistribute it and/or modify
+ *    it under the terms of the GNU General Public License as published by
+ *    the Free Software Foundation, either version 3 of the License, or
+ *    (at your option) any later version.
+ *
+ *    NUISANCE is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *    GNU General Public License for more details.
+ *
+ *    You should have received a copy of the GNU General Public License
+ *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
+ *******************************************************************************/
 #ifndef GENIEINPUTHANDLER_H
 #define GENIEINPUTHANDLER_H
 /*!
@@ -37,76 +37,89 @@
 #include "Ntuple/NtpMCEventRecord.h"
 #endif
 
+#ifdef nusystematics_ENABLED
+#include "systematicstools/interface/EventResponse_product.hh"
+#endif
+
 using namespace genie;
 
 /// GENIE Generator Container to save extra particle status codes.
 class GENIEGeneratorInfo : public GeneratorInfoBase {
-  public:
-    GENIEGeneratorInfo() {};
-    virtual ~GENIEGeneratorInfo();
+public:
+  GENIEGeneratorInfo(){};
+  virtual ~GENIEGeneratorInfo();
 
-    /// Assigns information to branches
-    void AddBranchesToTree(TTree* tn);
+  /// Assigns information to branches
+  void AddBranchesToTree(TTree *tn);
 
-    /// Setup reading information from branches
-    void SetBranchesFromTree(TTree* tn);
+  /// Setup reading information from branches
+  void SetBranchesFromTree(TTree *tn);
 
-    /// Allocate any dynamic arrays for a new particle stack size
-    void AllocateParticleStack(int stacksize);
+  /// Allocate any dynamic arrays for a new particle stack size
+  void AllocateParticleStack(int stacksize);
 
-    /// Clear any dynamic arrays
-    void DeallocateParticleStack();
+  /// Clear any dynamic arrays
+  void DeallocateParticleStack();
 
-    /// Read extra genie information from the event
-    void FillGeneratorInfo(NtpMCEventRecord* ntpl);
+  /// Read extra genie information from the event
+  void FillGeneratorInfo(NtpMCEventRecord *ntpl);
 
-    /// Reset extra information to default/empty values
-    void Reset();
+  /// Reset extra information to default/empty values
+  void Reset();
 
-    int  kMaxParticles; ///< Number of particles in stack
-    int* fGenieParticlePDGs; ///< GENIE Particle PDGs (example)
+  int kMaxParticles;       ///< Number of particles in stack
+  int *fGenieParticlePDGs; ///< GENIE Particle PDGs (example)
 };
 
 /// Main GENIE InputHandler
 class GENIEInputHandler : public InputHandlerBase {
-  public:
+public:
+  /// Standard constructor given a name and input files
+  GENIEInputHandler(std::string const &handle, std::string const &rawinputs);
+  virtual ~GENIEInputHandler();
 
-    /// Standard constructor given a name and input files
-    GENIEInputHandler(std::string const& handle, std::string const& rawinputs);
-    virtual ~GENIEInputHandler();
+  /// Create a TTree Cache to speed up file read
+  void CreateCache();
 
-    /// Create a TTree Cache to speed up file read
-    void CreateCache();
+  /// Remove TTree Cache to save memory
+  void RemoveCache();
 
-    /// Remove TTree Cache to save memory
-    void RemoveCache();
+  /// Returns a NUISANCE format event from the GENIE TTree. If !lightweight
+  /// then CalcNUISANCEKinematics() is called to convert the GENIE event into
+  /// a standard NUISANCE format.
+  FitEvent *GetNuisanceEvent(const UInt_t entry,
+                             const bool lightweight = false);
 
-    /// Returns a NUISANCE format event from the GENIE TTree. If !lightweight
-    /// then CalcNUISANCEKinematics() is called to convert the GENIE event into
-    /// a standard NUISANCE format.
-    FitEvent* GetNuisanceEvent(const UInt_t entry, const bool lightweight = false);
+  /// Converts GENIE event into standard NUISANCE FitEvent by looping over all
+  /// particles in the event and adding them to stack in fNUISANCEEvent.
+  void CalcNUISANCEKinematics();
 
-    /// Converts GENIE event into standard NUISANCE FitEvent by looping over all
-    /// particles in the event and adding them to stack in fNUISANCEEvent.
-    void CalcNUISANCEKinematics();
+  /// Placeholder for GENIE related event printing.
+  void Print();
 
-    /// Placeholder for GENIE related event printing.
-    void Print();
+  /// Converts GENIE particle status codes into NUISANCE status codes.
+  int GetGENIEParticleStatus(genie::GHepParticle *part, int mode = 0);
 
-    /// Converts GENIE particle status codes into NUISANCE status codes.
-    int GetGENIEParticleStatus(genie::GHepParticle* part, int mode = 0);
+  /// Converts GENIE event reaction codes into NUISANCE reaction codes.
+  int ConvertGENIEReactionCode(GHepRecord *gheprec);
 
-    /// Converts GENIE event reaction codes into NUISANCE reaction codes.
-    int ConvertGENIEReactionCode(GHepRecord* gheprec);
+  GHepRecord *fGenieGHep;       ///< Pointer to actual event record
+  NtpMCEventRecord *fGenieNtpl; ///< Ntpl Wrapper Class
 
-    GHepRecord* fGenieGHep;         ///< Pointer to actual event record
-    NtpMCEventRecord* fGenieNtpl;   ///< Ntpl Wrapper Class
+  TChain *fGENIETree; ///< Main GENIE Event TTree
+  bool fSaveExtra;    ///< Flag to save Extra GENIE info into Nuisance Event
+  GENIEGeneratorInfo *fGenieInfo; ///< Extra GENIE Generator Info Writer
 
-    TChain* fGENIETree;             ///< Main GENIE Event TTree
-    bool fSaveExtra;    ///< Flag to save Extra GENIE info into Nuisance Event
-    GENIEGeneratorInfo* fGenieInfo; ///< Extra GENIE Generator Info Writer
+  bool IsPrimary(GHepParticle *p);
 
-    bool IsPrimary(GHepParticle *p);
+#ifdef nusystematics_ENABLED
+  std::vector<systtools::event_unit_response_w_cv_t> response_cache;
+  std::vector<bool> response_has_cached;
+  systtools::event_unit_response_w_cv_t *
+  nusystematics_GetCachedResponse(Long64_t itree_ent);
+  void nusystematics_CacheResponse(Long64_t itree_ent,
+                                   systtools::event_unit_response_w_cv_t &&);
+#endif
 };
 /*! @} */
 #endif

@@ -52,6 +52,10 @@ BaseFitEvt::BaseFitEvt() {
 #ifdef GENIE_ENABLED
   genie_event = NULL;
   genie_record = NULL;
+#ifdef nusystematics_ENABLED
+  input_handler = nullptr;
+  input_handler_itree_ent = -1;
+#endif
 #endif
 
 #ifdef NUANCE_ENABLED
