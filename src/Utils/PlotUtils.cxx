@@ -760,7 +760,6 @@ TH1D *PlotUtils::GetTH1DFromRootFile(std::string file, std::string name) {
 
   return tempHist;
 }
-
 TH2D *PlotUtils::GetTH2DFromRootFile(std::string file, std::string name) {
   if (name.empty()) {
     std::vector<std::string> tempfile = GeneralUtils::ParseToStr(file, ";");

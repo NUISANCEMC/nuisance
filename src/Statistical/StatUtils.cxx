@@ -1814,7 +1814,6 @@ TMatrixD *StatUtils::GetMatrixFromRootFile(std::string covfile,
 
   return NULL;
 }
-
 //*******************************************************************
 TMatrixDSym *StatUtils::GetCovarFromTextFile(std::string covfile, int dim) {
   //*******************************************************************
