@@ -72,6 +72,7 @@ public:
   bool SaveSignalFlags;
 
   int Mode;
+  int GENIEResCode;
   bool cc;
   int PDGnu;
   int tgt;
