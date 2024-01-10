@@ -55,6 +55,7 @@ case $KEYARG in
     echo -e "    NOvA_ND"
     echo -e "    SciBooNE"
     echo -e "    T2K_ND"
+    echo -e "    DUNE_ND"
     exit 0
     ;;
 
@@ -145,6 +146,7 @@ while [[ ${#} -gt 0 ]]; do
       echo -e "    NOvA_ND"
       echo -e "    SciBooNE"
       echo -e "    T2K_ND"
+      echo -e "    DUNE_ND"
       exit 0
       ;;
 
@@ -368,6 +370,33 @@ case $EXPERIMENT in
       exit 0
     elif [ "${PROBE}" == "nuebar" ] && [ "${BEAMMODE}" == "nubar" ]; then
       echo "${FLUX_ROOT_DIR}/t2kflux_2016_minus250kA.root,enu_nd280_nueb"
+      exit 0
+    fi
+    ;;
+  DUNE_ND)
+    if [ "${PROBE}" == "numu" ] && [ "${BEAMMODE}" == "nu" ]; then
+      echo "${FLUX_ROOT_DIR}/flux_dune_neutrino_ND.root,numu_flux"
+      exit 0
+    elif [ "${PROBE}" == "numubar" ] && [ "${BEAMMODE}" == "nu" ]; then
+      echo "${FLUX_ROOT_DIR}/flux_dune_neutrino_ND.root,numubar_flux"
+      exit 0
+    elif [ "${PROBE}" == "nue" ] && [ "${BEAMMODE}" == "nu" ]; then
+      echo "${FLUX_ROOT_DIR}/flux_dune_neutrino_ND.root,nue_flux"
+      exit 0
+    elif [ "${PROBE}" == "nuebar" ] && [ "${BEAMMODE}" == "nu" ]; then
+      echo "${FLUX_ROOT_DIR}/flux_dune_neutrino_ND.root,nuebar_flux"
+      exit 0
+    elif [ "${PROBE}" == "numu" ] && [ "${BEAMMODE}" == "nubar" ]; then
+      echo "${FLUX_ROOT_DIR}/flux_dune_antineutrino_ND.root,numu_flux"
+      exit 0
+    elif [ "${PROBE}" == "numubar" ] && [ "${BEAMMODE}" == "nubar" ]; then
+      echo "${FLUX_ROOT_DIR}/flux_dune_antineutrino_ND.root,numubar_flux"
+      exit 0
+    elif [ "${PROBE}" == "nue" ] && [ "${BEAMMODE}" == "nubar" ]; then
+      echo "${FLUX_ROOT_DIR}/flux_dune_antineutrino_ND.root,nue_flux"
+      exit 0
+    elif [ "${PROBE}" == "nuebar" ] && [ "${BEAMMODE}" == "nubar" ]; then
+      echo "${FLUX_ROOT_DIR}/flux_dune_antineutrino_ND.root,nuebar_flux"
       exit 0
     fi
     ;;
