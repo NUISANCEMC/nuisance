@@ -55,6 +55,7 @@ set(InputHandler_Hdr_Files
   InputFactory.h
   SigmaQ0HistogramInputHandler.h
   HistogramInputHandler.h
+  InteractionModes.h
 )
 
 if(NuHepMC_ENABLED)
