@@ -323,6 +323,7 @@ FitEvent *GENIEInputHandler::GetNuisanceEvent(const UInt_t ent,
   return fNUISANCEEvent;
 }
 
+#ifdef nusystematics_ENABLED
 systtools::event_unit_response_w_cv_t *
 GENIEInputHandler::nusystematics_GetCachedResponse(Long64_t itree_ent) {
   // ev index 5
@@ -346,6 +347,7 @@ void GENIEInputHandler::nusystematics_CacheResponse(
   response_cache[itree_ent] = std::move(er);
   response_has_cached[itree_ent] = true;
 }
+#endif
 
 int GENIEInputHandler::GetGENIEParticleStatus(genie::GHepParticle *p,
                                               int mode) {
