@@ -115,8 +115,8 @@ void T2K_NC1pip_XSec_lin2D::FillHistograms() {
 
   fMCHist->AddBinContent(bin+1, Weight);
   fMCStat->AddBinContent(bin+1, 1.0);
-  //if (fMCHist_Modes)
-  //  fMCHist_Modes->AddBinContent(Mode, bin+1, Weight);
+  if (fMCHist_Modes)
+    fMCHist_Modes->Fill(Mode, bin+0.5, Weight);
   
   return;
 };
