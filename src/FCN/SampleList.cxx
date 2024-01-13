@@ -329,6 +329,9 @@
 #include "T2K_CC1pip_H2O_XSec_1Dpmu_nu.h"
 #include "T2K_CC1pip_H2O_XSec_1Dppi_nu.h"
 
+// T2K NC1piplus on CH
+#include "T2K_NC1pip_XSec_lin2D.h"
+
 // add header here
 
 #endif
@@ -1537,6 +1540,9 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
 
       } else if (!name.compare("T2K_CC0pinp_ifk_XSec_3Dinfip_nu")) {
         return (new T2K_CC0pinp_ifk_XSec_3Dinfip_nu(samplekey));
+
+	  } else if (!name.compare("T2K_NC1pip_XSec_lin2D")) {
+	return (new T2K_NC1pip_XSec_lin2D(samplekey));
 
         // SciBooNE COH studies
       } else

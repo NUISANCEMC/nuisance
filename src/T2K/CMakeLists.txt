@@ -56,6 +56,9 @@ set(T2K_Impl_Files
   T2K_CC0pinp_ifk_XSec_3Dinfp_nu.cxx
   T2K_CC0pinp_ifk_XSec_3Dinfa_nu.cxx
   T2K_CC0pinp_ifk_XSec_3Dinfip_nu.cxx
+
+  T2K_NC1pip_XSec_lin2D.cxx
+
   T2K_SignalDef.cxx
 )
 
