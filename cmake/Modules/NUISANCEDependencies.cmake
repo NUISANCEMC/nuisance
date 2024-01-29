@@ -90,15 +90,15 @@ if (nusystematics_ENABLED)
     CPMAddPackage(
       NAME nusystematics
       GIT_TAG develop
-      GITHUB_REPOSITORY luketpickering/nusystematics
+      GITHUB_REPOSITORY NuSystematics/nusystematics
     )
   else()
-    find_package(nusystematics 23.06)
+    find_package(nusystematics 2.0.1)
   endif()
 
   if(NOT TARGET nusyst::all)
     if(nusystematics_REQUIRED)
-      cmessage(FATAL_ERROR "nusystematics was explicitly enabled but target nusyst::all was not declared after running find_package(nusystematics 23.06).")
+      cmessage(FATAL_ERROR "nusystematics was explicitly enabled but target nusyst::all was not declared after running find_package(nusystematics 2.0.1).")
     endif()
     SET(nusystematics_ENABLED FALSE)
   else()
