@@ -140,24 +140,25 @@ void MINERvA_NukeCC1pip_XSec_1D_nu::FillEventVariables(FitEvent *event) {
       event->NumFSParticle(13) == 0)
     return;
 
-  TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
+  TLorentzVector Pnu = event->GetHMISParticle(14)->fP;
+  TLorentzVector Pmu = event->GetHMFSParticle(13)->fP;
   TLorentzVector Ppip = event->GetHMFSParticle(PhysConst::pdg_charged_pions)->fP;
-  TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
 
   // Pz is the neutrino-direction component of muon 3-momentum
   Double_t pz_mu = Pmu.Vect().Dot( Pnu.Vect().Unit() ); // MeV
   TVector3 pt_mu = Pmu.Vect() - pz_mu * Pnu.Vect().Unit(); // MeV
 
-  double Q2      = fabs((Pmu - Pnu).Mag2()) / 1.E6;  // Using true here?
+  float Q2_true = -1 * (Pmu - Pnu).Mag2()/1E6;
+  double Tpi = (Ppip.E() - Ppip.Mag())/1E3; // GeV
 
   switch(fDistribution){
     case kpmu:  fXVar = Pmu.Vect().Mag()/1.E3; break;
     case kthmu: fXVar = (180.0/M_PI)*FitUtils::th(Pnu, Pmu); break;
     case kplmu: fXVar = pz_mu/1000.; break;
     case kptmu: fXVar = pt_mu.Mag()/1000.; break;
-    case kQ2:   fXVar = Q2; break;
+    case kQ2:   fXVar = Q2_true; break;
     case kWexp: fXVar = FitUtils::Wrec(Pnu, Pmu)/1000.; break;
-    case kTpi:  fXVar = (Ppip.E() - Ppip.Mag())/1.E3; break;
+    case kTpi:  fXVar = Tpi; break;
     case kthpi: fXVar = (180.0/M_PI)*FitUtils::th(Pnu, Ppip); break;
     default: NUIS_ABORT("DIST NOT FOUND : " << fDistribution);
   }
@@ -168,5 +169,13 @@ void MINERvA_NukeCC1pip_XSec_1D_nu::FillEventVariables(FitEvent *event) {
 bool MINERvA_NukeCC1pip_XSec_1D_nu::isSignal(FitEvent *event) {
   //********************************************************************
   // Only seem to release full phase space
-  return SignalDef::isNukeCC1pip_MINERvA(event, EnuMin, EnuMax);
+
+  bool IsSignal = SignalDef::isNukeCC1pip_MINERvA(event, EnuMin, EnuMax);
+
+  return IsSignal;
+
+  // Below for COH and H
+  //bool IsH = event->GetTargetA()==1;
+  //bool IsCOH = event->Mode==16;
+  //return IsSignal && (IsCOH||IsH);
 }
