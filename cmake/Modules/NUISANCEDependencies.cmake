@@ -148,7 +148,7 @@ if (NEUT_ENABLED)
 endif()
 
 if (GENIE_ENABLED)
-  find_package(GENIE)
+  find_package(GENIE 3.0.0)
   if(NOT GENIE_FOUND)
     if(GENIE_REQUIRED)
       cmessage(FATAL_ERROR "GENIE was explicitly enabled but cannot be found.")
@@ -227,7 +227,7 @@ endif()
 
 if (NuHepMC_ENABLED)
   set(NuHepMC_ENABLED TRUE)
-  CPMAddPackage(
+  CPMFindPackage(
     NAME NuHepMC_CPPUtils
     GIT_TAG main
     GIT_REPOSITORY "https://github.com/NuHepMC/cpputils.git"
