@@ -643,7 +643,7 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
     // Fill total event hist
     eventhist->Fill(neu->E());
 
-    double countwidth = nevents / 20.0;
+    int countwidth = nevt / 20;
     countwidth = (countwidth >= 1) ? countwidth : 1;
 
     if (i % countwidth == 0) {
