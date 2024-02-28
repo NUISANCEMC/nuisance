@@ -200,23 +200,34 @@ if (NuWro_ENABLED)
 endif()
 
 if (Prob3plusplus_ENABLED)
-  find_package(Prob3plusplus)
+  
+  CPMFindPackage(
+      NAME Prob3plusplus
+      VERSION 3.10.4
+      GITHUB_REPOSITORY rogerwendell/Prob3plusplus
+      GIT_TAG main
+  )
 
-  if(NOT Prob3plusplus_FOUND)
-    if(Prob3plusplus_REQUIRED)
-      cmessage(FATAL_ERROR "Prob3plusplus was explicitly enabled but cannot be found.")
+  SET(Prob3plusplus_ENABLED TRUE)
+  if(NOT TARGET Prob3plusplus::All)
+    if(TARGET Prob3plusplus)
+      add_library(Prob3plusplus::All ALIAS Prob3plusplus)
+    else()
+      if(Prob3plusplus_REQUIRED)
+        cmessage(FATAL_ERROR "Prob3plusplus was explicitly enabled but cannot be found.")
+      else()
+        SET(Prob3plusplus_ENABLED FALSE)
+      endif()
     endif()
-    SET(Prob3plusplus_ENABLED FALSE)
-  else()
-    SET(Prob3plusplus_ENABLED TRUE)
+  endif()
+
+  if(Prob3plusplus_ENABLED)
     add_library(NUISANCEProb3plusplus INTERFACE)
     set_target_properties(NUISANCEProb3plusplus PROPERTIES 
       INTERFACE_COMPILE_OPTIONS "-DProb3plusplus_ENABLED"
       INTERFACE_LINK_LIBRARIES Prob3plusplus::All)
-
     target_link_libraries(GeneratorCompileDependencies INTERFACE NUISANCEProb3plusplus)
   endif()
-  
 endif()
 
 string(FIND "${CMAKE_SHARED_LINKER_FLAGS}" "-Wl,--no-undefined" NOUNDEF_INDEX)
@@ -232,7 +243,6 @@ if (NuHepMC_ENABLED)
     GIT_TAG main
     GIT_REPOSITORY "https://github.com/NuHepMC/cpputils.git"
     OPTIONS "BUILTIN_HEPMC3 ON"
-            "NuHepMC_BUILD_STATIC_LIBS ON"
   )
   target_compile_definitions(GeneratorCompileDependencies INTERFACE NuHepMC_ENABLED)
   target_link_libraries(GeneratorCompileDependencies INTERFACE NuHepMC::CPPUtils)

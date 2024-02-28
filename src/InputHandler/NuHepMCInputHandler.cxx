@@ -71,17 +71,19 @@ NuHepMCInputHandler::NuHepMCInputHandler(std::string const &handle,
       frun_info = evt.run_info();
       fatx_acc = NuHepMC::FATX::MakeAccumulator(frun_info);
       to_cm2_nuc = GetRescaleFactor(
-          evt, automatic,
+          evt, pb_PerAtom,
           Unit{Scale::cm2_ten38, TargetScale::PerTargetNucleon});
     }
 
     fatx_acc->process(evt);
+    fNEvents++;
   }
   fsumevw = fatx_acc->sumweights();
 
   std::cout << "NuHepMC NormInfo: { fatx = " << fatx_acc->fatx()
-            << " pb, sumw = " << fsumevw << ", nevents = " << fatx_acc->events()
-            << std::endl;
+            << " pb/A = " << fatx_acc->fatx() * to_cm2_nuc
+            << " cm^2/N, sumw = " << fsumevw
+            << ", nevents = " << fatx_acc->events() << " } " << std::endl;
   // Dupe the FATX
   fEventHist = new TH1D("eventhist", "eventhist", 10, 0.0, 10.0);
   fEventHist->SetBinContent(5, fatx_acc->fatx() * to_cm2_nuc);
