@@ -24,6 +24,8 @@
 #include "NUANCEInputHandler.h"
 #include "SigmaQ0HistogramInputHandler.h"
 #include "SplineInputHandler.h"
+#include "GenericVectorsInputHandler.h"
+
 
 #ifdef NuHepMC_ENABLED
 #include "NuHepMCInputHandler.h"
@@ -127,6 +129,10 @@ InputHandlerBase *CreateInputHandler(std::string const &handle,
 
   case (kHISTO_Input):
     input = new HistoInputHandler(handle, newinputs);
+    break;
+
+  case (kGenericVectors_Input):
+    input = new GenericVectorsInputHandler(handle, newinputs);
     break;
 
   default:
