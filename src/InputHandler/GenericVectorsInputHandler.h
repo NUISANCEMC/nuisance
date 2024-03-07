@@ -16,8 +16,8 @@
 *    You should have received a copy of the GNU General Public License
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
-#ifndef FITEVENT_INPUTHANDLER_H
-#define FITEVENT_INPUTHANDLER_H
+#ifndef GENERICVECTORS_INPUTHANDLER_H
+#define GENERICVECTORS_INPUTHANDLER_H
 /*!
  *  \addtogroup InputHandler
  *  @{
@@ -86,6 +86,14 @@ public:
   float FlatTreeWeight;
   float FlatTreeInputWeight;
   float FlatTreeRWWeight;
+
+  int FlatTreeMode;
+  int FlatTreeTargetA;
+  int FlatTreeTargetZ;
+  int FlatTreeTargetH;
+  int FlatTreeTargetPDG;
+
+  int FlatTreeIbound;
 
 };
 /*! @} */

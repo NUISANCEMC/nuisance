@@ -66,7 +66,12 @@ GenericVectorsInputHandler::GenericVectorsInputHandler(std::string const &handle
   // Create Fit Event
   fNUISANCEEvent = new FitEvent();
   fNUISANCEEvent->HardReset();
-  fNUISANCEEvent->SetBranchAddress(fFitEventTree);
+
+  fFitEventTree->SetBranchAddress("Mode", &FlatTreeMode);
+  fFitEventTree->SetBranchAddress("tgta", &FlatTreeTargetA);
+  fFitEventTree->SetBranchAddress("tgtz", &FlatTreeTargetZ);
+  fFitEventTree->SetBranchAddress("tgt", &FlatTreeTargetPDG);
+
 
   // Save outgoing particle vectors
   fFitEventTree->SetBranchAddress("nfsp", &nfsp);
@@ -75,7 +80,7 @@ GenericVectorsInputHandler::GenericVectorsInputHandler(std::string const &handle
   fFitEventTree->SetBranchAddress("pz", pz_fsp);
   fFitEventTree->SetBranchAddress("E", E_fsp);
   fFitEventTree->SetBranchAddress("pdg", pdg_fsp);
-  fFitEventTree->SetBranchAddress("pdg_rank", pdg_fsp);
+  // fFitEventTree->SetBranchAddress("pdg_rank", pdg_fsp);
 
   // Save init particle vectors
   fFitEventTree->SetBranchAddress("ninitp", &ninitp);
@@ -98,10 +103,10 @@ GenericVectorsInputHandler::GenericVectorsInputHandler(std::string const &handle
   fFitEventTree->SetBranchAddress("Weight", &FlatTreeWeight);
 
 
-  fFitEventTree->Show(0);
+  // fFitEventTree->Show(0);
   fNUISANCEEvent = GetNuisanceEvent(0);
-  std::cout << "NParticles = " << fNUISANCEEvent->Npart() << std::endl;
-  std::cout << "Event Info " << fNUISANCEEvent->PartInfo(0)->fPID << std::endl;
+  // std::cout << "NParticles = " << fNUISANCEEvent->Npart() << std::endl;
+  // std::cout << "Event Info " << fNUISANCEEvent->PartInfo(0)->fPID << std::endl;
 }
 
 GenericVectorsInputHandler::~GenericVectorsInputHandler() {
@@ -133,6 +138,17 @@ FitEvent *GenericVectorsInputHandler::GetNuisanceEvent(const UInt_t entry,
   // Read NUISANCE Tree
   fFitEventTree->GetEntry(entry);
 
+  fNUISANCEEvent->Mode = FlatTreeMode;
+  fNUISANCEEvent->fEventNo = entry;
+  fNUISANCEEvent->fTargetA = FlatTreeTargetA;
+  fNUISANCEEvent->fTargetZ = FlatTreeTargetZ;
+  fNUISANCEEvent->fTargetPDG = FlatTreeTargetPDG;
+
+
+  // Only allow free protons
+  fNUISANCEEvent->fTargetH = FlatTreeTargetA == 1;
+  fNUISANCEEvent->fBound   = FlatTreeTargetA != 1;
+
   // Fill Stack
   fNUISANCEEvent->fNParticles = 0;
 
@@ -141,10 +157,10 @@ FitEvent *GenericVectorsInputHandler::GetNuisanceEvent(const UInt_t entry,
     fNUISANCEEvent->fParticleState[curpart] = kInitialState;
 
     // Mom
-    fNUISANCEEvent->fParticleMom[curpart][0] = px_init[i];
-    fNUISANCEEvent->fParticleMom[curpart][1] = py_init[i];
-    fNUISANCEEvent->fParticleMom[curpart][2] = pz_init[i];
-    fNUISANCEEvent->fParticleMom[curpart][3] = E_init[i];
+    fNUISANCEEvent->fParticleMom[curpart][0] = px_init[i]*1000.0;
+    fNUISANCEEvent->fParticleMom[curpart][1] = py_init[i]*1000.0;
+    fNUISANCEEvent->fParticleMom[curpart][2] = pz_init[i]*1000.0;
+    fNUISANCEEvent->fParticleMom[curpart][3] = E_init[i]*1000.0;
 
     // PDG
     fNUISANCEEvent->fParticlePDG[curpart] = pdg_init[i];
@@ -153,15 +169,35 @@ FitEvent *GenericVectorsInputHandler::GetNuisanceEvent(const UInt_t entry,
     fNUISANCEEvent->fNParticles++;
   }
 
+  // Don't add the vert stack as its combined init/final
   for (int i = 0; i < nvertp; i++) {
     size_t curpart = fNUISANCEEvent->fNParticles;
+
+    // have to check not already in init or fsp
+    bool duplicate = false;
+    for (int j = 0; j < nfsp; j++) {
+      if (E_fsp[j] == E_vert[i] && pdg_fsp[j] == pdg_vert[i]) {
+        duplicate = true;
+        break;
+      }
+    }
+
+    for (int j = 0; j < ninitp; j++) {
+      if (E_init[j] == E_vert[i] && pdg_init[j] == pdg_vert[i]) {
+        duplicate = true;
+        break;
+      }
+    }
+
+    if (duplicate) continue;
+
     fNUISANCEEvent->fParticleState[curpart] = kFSIState;
 
     // Mom
-    fNUISANCEEvent->fParticleMom[curpart][0] = px_vert[i];
-    fNUISANCEEvent->fParticleMom[curpart][1] = py_vert[i];
-    fNUISANCEEvent->fParticleMom[curpart][2] = pz_vert[i];
-    fNUISANCEEvent->fParticleMom[curpart][3] = E_vert[i];
+    fNUISANCEEvent->fParticleMom[curpart][0] = px_vert[i]*1000.0;
+    fNUISANCEEvent->fParticleMom[curpart][1] = py_vert[i]*1000.0;
+    fNUISANCEEvent->fParticleMom[curpart][2] = pz_vert[i]*1000.0;
+    fNUISANCEEvent->fParticleMom[curpart][3] = E_vert[i]*1000.0;
 
     // PDG
     fNUISANCEEvent->fParticlePDG[curpart] = pdg_vert[i];
@@ -176,10 +212,10 @@ FitEvent *GenericVectorsInputHandler::GetNuisanceEvent(const UInt_t entry,
     fNUISANCEEvent->fParticleState[curpart] = kFinalState;
 
     // Mom
-    fNUISANCEEvent->fParticleMom[curpart][0] = px_fsp[i];
-    fNUISANCEEvent->fParticleMom[curpart][1] = py_fsp[i];
-    fNUISANCEEvent->fParticleMom[curpart][2] = pz_fsp[i];
-    fNUISANCEEvent->fParticleMom[curpart][3] = E[_fspi];
+    fNUISANCEEvent->fParticleMom[curpart][0] = px_fsp[i]*1000.0;
+    fNUISANCEEvent->fParticleMom[curpart][1] = py_fsp[i]*1000.0;
+    fNUISANCEEvent->fParticleMom[curpart][2] = pz_fsp[i]*1000.0;
+    fNUISANCEEvent->fParticleMom[curpart][3] = E_fsp[i]*1000.0;
 
     // PDG
     fNUISANCEEvent->fParticlePDG[curpart] = pdg_fsp[i];
