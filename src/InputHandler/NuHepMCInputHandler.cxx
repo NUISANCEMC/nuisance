@@ -59,7 +59,7 @@ NuHepMCInputHandler::NuHepMCInputHandler(std::string const &handle,
 
   double to_cm2_nuc = 1;
 
-  std::unique_ptr<NuHepMC::FATX::Accumulator> fatx_acc;
+  std::shared_ptr<NuHepMC::FATX::Accumulator> fatx_acc;
   while (!fReader->failed()) {
     fReader->read_event(evt);
     if (fReader->failed()) {

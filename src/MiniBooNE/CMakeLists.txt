@@ -46,6 +46,11 @@ set(MiniBooNE_Impl_Files
 )
 
 add_library(MiniBooNE SHARED ${MiniBooNE_Impl_Files})
-target_link_libraries(MiniBooNE CoreIncludes)
+target_link_libraries(MiniBooNE FrameworkLibraries CoreIncludes)
 
-install(TARGETS MiniBooNE DESTINATION lib)
+install(TARGETS MiniBooNE
+    EXPORT nuisance-targets
+    LIBRARY DESTINATION lib/
+    PUBLIC_HEADER DESTINATION include)
+
+add_library(NUIS::MiniBooNE ALIAS MiniBooNE)

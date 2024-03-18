@@ -43,5 +43,8 @@ target_link_libraries(Utils CoreIncludes ROOT::ROOT)
 set_target_properties(Utils PROPERTIES PUBLIC_HEADER "${Utils_Hdr_Files}")
 
 install(TARGETS Utils
-  LIBRARY DESTINATION lib
-  PUBLIC_HEADER DESTINATION include)
+    EXPORT nuisance-targets
+    LIBRARY DESTINATION lib/
+    PUBLIC_HEADER DESTINATION include)
+
+add_library(NUIS::Utils ALIAS Utils)

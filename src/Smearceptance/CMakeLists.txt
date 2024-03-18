@@ -35,4 +35,9 @@ set(Smearceptance_Impl_Files
 add_library(Smearceptance SHARED ${Smearceptance_Impl_Files})
 target_link_libraries(Smearceptance CoreIncludes ROOT::ROOT)
 
-install(TARGETS Smearceptance DESTINATION lib)
+install(TARGETS Smearceptance
+    EXPORT nuisance-targets
+    LIBRARY DESTINATION lib/
+    PUBLIC_HEADER DESTINATION include)
+
+add_library(NUIS::Smearceptance ALIAS Smearceptance)

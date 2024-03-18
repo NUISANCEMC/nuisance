@@ -25,6 +25,12 @@ set(LikelihoodFunction_Impl_Files
 add_library(FCN SHARED ${LikelihoodFunction_Impl_Files})
 target_link_libraries(FCN Experiments CoreIncludes ROOT::ROOT)
 
-install(TARGETS FCN DESTINATION lib)
-
 install(FILES SampleList.cxx DESTINATION src/FCN)
+set_target_properties(FCN PROPERTIES PUBLIC_HEADER "SampleList.h")
+
+install(TARGETS FCN
+    EXPORT nuisance-targets
+    LIBRARY DESTINATION lib/
+    PUBLIC_HEADER DESTINATION include)
+
+add_library(NUIS::FCN ALIAS FCN)

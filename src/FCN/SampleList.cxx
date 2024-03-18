@@ -649,6 +649,7 @@ MeasurementBase *CreateSample(std::string name, std::string file,
 }
 
 MeasurementBase *CreateSample(nuiskey samplekey) {
+
   if (DynamicSampleFactory::Get().HasSample(samplekey)) {
     NUIS_LOG(SAM, "Instantiating dynamic sample...");
 

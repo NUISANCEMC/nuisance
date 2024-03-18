@@ -32,9 +32,12 @@ add_library(PythiaQuiet SHARED PythiaQuiet.f)
 add_library(Logger SHARED ${Logger_Impl_Files})
 target_link_libraries(Logger CoreIncludes ROOT::ROOT PythiaQuiet)
 
-install(TARGETS Logger DESTINATION lib)
 set_target_properties(Logger PROPERTIES PUBLIC_HEADER "${Logger_Hdr_Files}")
 
 install(TARGETS Logger PythiaQuiet
-  LIBRARY DESTINATION lib
-  PUBLIC_HEADER DESTINATION include)
+    EXPORT nuisance-targets
+    LIBRARY DESTINATION lib/
+    PUBLIC_HEADER DESTINATION include)
+
+add_library(NUIS::Logger ALIAS Logger)
+add_library(NUIS::PythiaQuiet ALIAS PythiaQuiet)

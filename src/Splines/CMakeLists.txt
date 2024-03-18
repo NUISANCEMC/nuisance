@@ -37,5 +37,8 @@ target_link_libraries(Splines CoreIncludes ROOT::ROOT)
 set_target_properties(Splines PROPERTIES PUBLIC_HEADER "${Splines_Hdr_Files}")
 
 install(TARGETS Splines
-  LIBRARY DESTINATION lib
-  PUBLIC_HEADER DESTINATION include)
+    EXPORT nuisance-targets
+    LIBRARY DESTINATION lib/
+    PUBLIC_HEADER DESTINATION include)
+
+add_library(NUIS::Splines ALIAS Splines)

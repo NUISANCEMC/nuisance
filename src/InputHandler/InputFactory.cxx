@@ -17,6 +17,7 @@
  *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 
+#include "DummyInputHandler.h"
 #include "FitEventInputHandler.h"
 #include "GIBUUInputHandler.h"
 #include "GiBUUNativeInputHandler.h"
@@ -58,8 +59,8 @@ InputHandlerBase *CreateInputHandler(std::string const &handle,
 #ifdef NEUT_ENABLED
     input = new NEUTInputHandler(handle, newinputs);
 #else
-    NUIS_ERR(FTL, "Tried to create NEUTInputHandler : " << handle << " " << inpType
-                                                     << " " << inputs);
+    NUIS_ERR(FTL, "Tried to create NEUTInputHandler : "
+                      << handle << " " << inpType << " " << inputs);
     NUIS_ABORT("NEUT is not enabled!");
 #endif
     break;
@@ -69,7 +70,7 @@ InputHandlerBase *CreateInputHandler(std::string const &handle,
     input = new GENIEInputHandler(handle, newinputs);
 #else
     NUIS_ERR(FTL, "Tried to create GENIEInputHandler : "
-                   << handle << " " << inpType << " " << inputs);
+                      << handle << " " << inpType << " " << inputs);
     NUIS_ABORT("GENIE is not enabled!");
 #endif
     break;
@@ -79,7 +80,7 @@ InputHandlerBase *CreateInputHandler(std::string const &handle,
     input = new NuWroInputHandler(handle, newinputs);
 #else
     NUIS_ERR(FTL, "Tried to create NuWroInputHandler : "
-                   << handle << " " << inpType << " " << inputs);
+                      << handle << " " << inpType << " " << inputs);
     NUIS_ABORT("NuWro is not enabled!");
 #endif
     break;
@@ -89,7 +90,7 @@ InputHandlerBase *CreateInputHandler(std::string const &handle,
     input = new GiBUUNativeInputHandler(handle, newinputs);
 #else
     NUIS_ERR(FTL, "Tried to create GiBUUInputHandler : "
-                   << handle << " " << inpType << " " << inputs);
+                      << handle << " " << inpType << " " << inputs);
     NUIS_ABORT("GiBUU is not enabled!");
 #endif
     break;
@@ -99,7 +100,7 @@ InputHandlerBase *CreateInputHandler(std::string const &handle,
     input = new NUANCEInputHandler(handle, newinputs);
 #else
     NUIS_ERR(FTL, "Tried to create NUANCEInputHandler : "
-                   << handle << " " << inpType << " " << inputs);
+                      << handle << " " << inpType << " " << inputs);
     NUIS_ABORT("NUANCE is not enabled!");
 #endif
     break;
@@ -108,7 +109,7 @@ InputHandlerBase *CreateInputHandler(std::string const &handle,
     input = new NuHepMCInputHandler(handle, newinputs);
 #else
     NUIS_ERR(FTL, "Tried to create NuHepMCInputHandler : "
-                   << handle << " " << inpType << " " << inputs);
+                      << handle << " " << inpType << " " << inputs);
     NUIS_ABORT("NuHepMCInputHandler is not enabled!");
 #endif
     break;
@@ -129,6 +130,9 @@ InputHandlerBase *CreateInputHandler(std::string const &handle,
     input = new HistoInputHandler(handle, newinputs);
     break;
 
+  case kDummy_Input:
+    input = new DummyInputHandler();
+    break;
   default:
     break;
   }
@@ -136,8 +140,8 @@ InputHandlerBase *CreateInputHandler(std::string const &handle,
   /// Input failed
   if (!input) {
     NUIS_ABORT("Input handler creation failed!" << std::endl
-                                            << "Generator Type " << inpType
-                                            << " not enabled!");
+                                                << "Generator Type " << inpType
+                                                << " not enabled!");
   }
 
   return input;

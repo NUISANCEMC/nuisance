@@ -31,4 +31,9 @@ endif()
 add_library(Routines SHARED ${Routines_Impl_Files})
 target_link_libraries(Routines CoreIncludes ROOT::ROOT)
 
-install(TARGETS Routines DESTINATION lib)
+install(TARGETS Routines
+    EXPORT nuisance-targets
+    LIBRARY DESTINATION lib/
+    PUBLIC_HEADER DESTINATION include)
+
+add_library(NUIS::Routines ALIAS Routines)

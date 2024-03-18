@@ -45,6 +45,11 @@ set(BNL_Impl_Files
 )
 
 add_library(BNL SHARED ${BNL_Impl_Files})
-target_link_libraries(BNL CoreIncludes)
+target_link_libraries(BNL FrameworkLibraries CoreIncludes)
 
-install(TARGETS BNL DESTINATION lib)
+install(TARGETS BNL
+    EXPORT nuisance-targets
+    LIBRARY DESTINATION lib/
+    PUBLIC_HEADER DESTINATION include)
+
+add_library(NUIS::BNL ALIAS BNL)

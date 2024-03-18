@@ -22,6 +22,11 @@ set(ElectronScatter_Impl_Files
 )
 
 add_library(Electron SHARED ${ElectronScatter_Impl_Files})
-target_link_libraries(Electron CoreIncludes)
+target_link_libraries(Electron FrameworkLibraries CoreIncludes)
 
-install(TARGETS Electron DESTINATION lib)
+install(TARGETS Electron
+    EXPORT nuisance-targets
+    LIBRARY DESTINATION lib/
+    PUBLIC_HEADER DESTINATION include)
+
+add_library(NUIS::Electron ALIAS Electron)

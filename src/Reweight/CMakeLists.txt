@@ -108,5 +108,8 @@ target_link_libraries(Reweight GeneratorCompileDependencies CoreIncludes ROOT::R
 set_target_properties(Reweight PROPERTIES PUBLIC_HEADER "${Reweight_Hdr_Files}")
 
 install(TARGETS Reweight
-  LIBRARY DESTINATION lib
-  PUBLIC_HEADER DESTINATION include)
+    EXPORT nuisance-targets
+    LIBRARY DESTINATION lib/
+    PUBLIC_HEADER DESTINATION include)
+
+add_library(NUIS::Reweight ALIAS Reweight)
