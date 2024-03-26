@@ -60,7 +60,12 @@ set(T2K_Impl_Files
 )
 
 add_library(T2K SHARED ${T2K_Impl_Files})
-target_link_libraries(T2K CoreIncludes)
+target_link_libraries(T2K FrameworkLibraries CoreIncludes)
 
-install(TARGETS T2K DESTINATION lib)
+install(TARGETS T2K
+    EXPORT nuisance-targets
+    LIBRARY DESTINATION lib/
+    PUBLIC_HEADER DESTINATION include)
+
+add_library(NUIS::T2K ALIAS T2K)
 

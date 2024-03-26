@@ -62,6 +62,7 @@ set(InputHandler_Hdr_Files
 
 if(NuHepMC_ENABLED)
   LIST(APPEND InputHandler_Impl_Files NuHepMCInputHandler.cxx)
+  LIST(APPEND InputHandler_Hdr_Files NuHepMCInputHandler.h)
 endif()
 
 if(GENIE_ENABLED)
@@ -82,7 +83,7 @@ if(NuHepMC_ENABLED)
   target_compile_definitions(InputHandler PRIVATE NuHepMC_ENABLED)
 endif()
 
-target_link_libraries(InputHandler GeneratorCompileDependencies Experiments CoreIncludes)
+target_link_libraries(InputHandler GeneratorCompileDependencies CoreIncludes)
 if(NuHepMC_ENABLED)
   target_link_libraries(InputHandler NuHepMC::CPPUtils)
 endif()
@@ -90,6 +91,9 @@ target_link_libraries(InputHandler ROOT::ROOT)
 set_target_properties(InputHandler PROPERTIES PUBLIC_HEADER "${InputHandler_Hdr_Files}")
 
 install(TARGETS InputHandler
-  LIBRARY DESTINATION lib
-  PUBLIC_HEADER DESTINATION include)
+    EXPORT nuisance-targets
+    LIBRARY DESTINATION lib/
+    PUBLIC_HEADER DESTINATION include)
+
+add_library(NUIS::InputHandler ALIAS InputHandler)
 

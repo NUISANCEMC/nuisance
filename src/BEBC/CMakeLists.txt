@@ -32,6 +32,11 @@ set(BEBC_Impl_Files
 )
 
 add_library(BEBC SHARED ${BEBC_Impl_Files})
-target_link_libraries(BEBC CoreIncludes)
+target_link_libraries(BEBC FrameworkLibraries CoreIncludes)
 
-install(TARGETS BEBC DESTINATION lib)
+install(TARGETS BEBC
+    EXPORT nuisance-targets
+    LIBRARY DESTINATION lib/
+    PUBLIC_HEADER DESTINATION include)
+
+add_library(NUIS::BEBC ALIAS BEBC)

@@ -33,6 +33,11 @@ set(MicroBooNE_Hdr_Files
 )
 
 add_library(MicroBooNE SHARED ${MicroBooNE_Impl_Files})
-target_link_libraries(MicroBooNE CoreIncludes)
+target_link_libraries(MicroBooNE FrameworkLibraries CoreIncludes)
 
-install(TARGETS MicroBooNE DESTINATION lib)
+install(TARGETS MicroBooNE
+    EXPORT nuisance-targets
+    LIBRARY DESTINATION lib/
+    PUBLIC_HEADER DESTINATION include)
+
+add_library(NUIS::MicroBooNE ALIAS MicroBooNE)

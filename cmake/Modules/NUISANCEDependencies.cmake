@@ -47,7 +47,8 @@ if (T2KReWeight_ENABLED)
     set_target_properties(NUISANCET2KReWeight PROPERTIES 
       INTERFACE_COMPILE_OPTIONS "-DT2KReWeight_ENABLED"
       INTERFACE_LINK_LIBRARIES T2KReWeight::All)
-
+    install(TARGETS NUISANCET2KReWeight
+      EXPORT nuisance-targets)
     target_link_libraries(GeneratorCompileDependencies INTERFACE NUISANCET2KReWeight)
   endif()
 
@@ -107,7 +108,8 @@ if (nusystematics_ENABLED)
     set_target_properties(NUISANCEnusystematics PROPERTIES 
       INTERFACE_COMPILE_OPTIONS "-Dnusystematics_ENABLED"
       INTERFACE_LINK_LIBRARIES nusyst::all)
-
+    install(TARGETS NUISANCEnusystematics
+      EXPORT nuisance-targets)
     target_link_libraries(GeneratorCompileDependencies INTERFACE NUISANCEnusystematics)
   endif()
   
@@ -141,7 +143,8 @@ if (NEUT_ENABLED)
     set_target_properties(NUISANCENEUT PROPERTIES 
       INTERFACE_COMPILE_OPTIONS "${NUISANCENEUT_COMPILE_OPTIONS}"
       INTERFACE_LINK_LIBRARIES NEUT::All)
-
+    install(TARGETS NUISANCENEUT
+      EXPORT nuisance-targets)
     target_link_libraries(GeneratorCompileDependencies INTERFACE NUISANCENEUT)
   endif()
 
@@ -178,7 +181,8 @@ if (GENIE_ENABLED)
     set_target_properties(NUISANCEGENIE PROPERTIES 
       INTERFACE_COMPILE_OPTIONS "${NUISANCEGENIE_COMPILE_OPTIONS}"
       INTERFACE_LINK_LIBRARIES GENIE::All)
-
+    install(TARGETS NUISANCEGENIE
+      EXPORT nuisance-targets)
     target_link_libraries(GeneratorCompileDependencies INTERFACE NUISANCEGENIE)
   endif()
 
@@ -227,6 +231,8 @@ if (Prob3plusplus_ENABLED)
       INTERFACE_COMPILE_OPTIONS "-DProb3plusplus_ENABLED"
       INTERFACE_LINK_LIBRARIES Prob3plusplus::All)
     target_link_libraries(GeneratorCompileDependencies INTERFACE NUISANCEProb3plusplus)
+    install(TARGETS NUISANCEProb3plusplus
+      EXPORT nuisance-targets)
   endif()
 endif()
 
@@ -246,4 +252,8 @@ if (NuHepMC_ENABLED)
   )
   target_compile_definitions(GeneratorCompileDependencies INTERFACE NuHepMC_ENABLED)
   target_link_libraries(GeneratorCompileDependencies INTERFACE NuHepMC::CPPUtils)
+  target_compile_options(GeneratorCompileDependencies INTERFACE -Wno-unused-parameter -Wno-unused-but-set-variable)
 endif()
+
+install(TARGETS GeneratorCompileDependencies
+    EXPORT nuisance-targets)

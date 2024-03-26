@@ -39,7 +39,11 @@ set(SciBooNE_Impl_Files
 )
 
 add_library(SciBooNE SHARED ${SciBooNE_Impl_Files})
-target_link_libraries(SciBooNE CoreIncludes)
+target_link_libraries(SciBooNE FrameworkLibraries CoreIncludes)
 
-install(TARGETS SciBooNE DESTINATION lib)
+install(TARGETS SciBooNE
+    EXPORT nuisance-targets
+    LIBRARY DESTINATION lib/
+    PUBLIC_HEADER DESTINATION include)
 
+add_library(NUIS::SciBooNE ALIAS SciBooNE)

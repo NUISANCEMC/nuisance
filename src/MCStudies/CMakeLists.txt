@@ -42,4 +42,9 @@ endif()
 add_library(MCStudies SHARED ${MCStudies_Impl_Files})
 target_link_libraries(MCStudies Experiments CoreIncludes ROOT::ROOT)
 
-install(TARGETS MCStudies DESTINATION lib)
+install(TARGETS MCStudies
+    EXPORT nuisance-targets
+    LIBRARY DESTINATION lib/
+    PUBLIC_HEADER DESTINATION include)
+
+add_library(NUIS::MCStudies ALIAS MCStudies)

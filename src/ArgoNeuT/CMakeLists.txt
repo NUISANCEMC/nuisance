@@ -32,6 +32,11 @@ set(ArgoNeuT_Impl_Files
 )
 
 add_library(ArgoNeuT SHARED ${ArgoNeuT_Impl_Files})
-target_link_libraries(ArgoNeuT CoreIncludes)
+target_link_libraries(ArgoNeuT FrameworkLibraries CoreIncludes)
 
-install(TARGETS ArgoNeuT DESTINATION lib)
+install(TARGETS ArgoNeuT
+    EXPORT nuisance-targets
+    LIBRARY DESTINATION lib/
+    PUBLIC_HEADER DESTINATION include)
+
+add_library(NUIS::ArgoNeuT ALIAS ArgoNeuT)

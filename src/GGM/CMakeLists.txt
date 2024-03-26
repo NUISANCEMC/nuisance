@@ -23,6 +23,11 @@ set(GGM_Impl_Files
 )
 
 add_library(GGM SHARED ${GGM_Impl_Files})
-target_link_libraries(GGM CoreIncludes)
+target_link_libraries(GGM FrameworkLibraries CoreIncludes)
 
-install(TARGETS GGM DESTINATION lib)
+install(TARGETS GGM
+    EXPORT nuisance-targets
+    LIBRARY DESTINATION lib/
+    PUBLIC_HEADER DESTINATION include)
+
+add_library(NUIS::GGM ALIAS GGM)

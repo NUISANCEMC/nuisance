@@ -12,6 +12,7 @@
 class NuHepMCInputHandler : public InputHandlerBase {
 public:
 
+  NuHepMCInputHandler(){}
 	NuHepMCInputHandler(std::string const& handle, std::string const& rawinputs);
 	~NuHepMCInputHandler();
 

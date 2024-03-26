@@ -61,6 +61,7 @@ enum InputType {
   kSIGMAQ0HIST_Input,
   kHISTO_Input,
   kGenericVectors_Input,
+  kDummy_Input,
   kInvalid_Input,
   kBNSPLN_Input,  // Not sure if this are currently used.
 };

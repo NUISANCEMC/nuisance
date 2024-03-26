@@ -54,5 +54,8 @@ target_link_libraries(FitBase CoreIncludes ROOT::ROOT)
 set_target_properties(FitBase PROPERTIES PUBLIC_HEADER "${FitBase_Hdr_Files}")
 
 install(TARGETS FitBase
-  LIBRARY DESTINATION lib
-  PUBLIC_HEADER DESTINATION include)
+    EXPORT nuisance-targets
+    LIBRARY DESTINATION lib/
+    PUBLIC_HEADER DESTINATION include)
+
+add_library(NUIS::FitBase ALIAS FitBase)

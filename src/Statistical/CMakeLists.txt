@@ -30,6 +30,8 @@ target_link_libraries(Statistical CoreIncludes ROOT::ROOT)
 set_target_properties(Statistical PROPERTIES PUBLIC_HEADER "${Statistical_Hdr_Files}")
 
 install(TARGETS Statistical
-  LIBRARY DESTINATION lib
-  PUBLIC_HEADER DESTINATION include)
+    EXPORT nuisance-targets
+    LIBRARY DESTINATION lib/
+    PUBLIC_HEADER DESTINATION include)
 
+add_library(NUIS::Statistical ALIAS Statistical)

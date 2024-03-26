@@ -1,0 +1,86 @@
+@PACKAGE_INIT@
+
+if(TARGET NUIS::InputHandler)
+  set(NUISANCE_FOUND TRUE)
+  return()
+endif()
+
+set(NUISANCE_VERSION @PROJECT_VERSION@)
+set(NUISANCE_CXX_STANDARD @CMAKE_CXX_STANDARD@)
+
+get_filename_component(NUISANCE_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+LIST(APPEND CMAKE_MODULE_PATH ${NUISANCE_CMAKE_DIR})
+
+include(${NUISANCE_CMAKE_DIR}/../../../cmake/NuHepMCModules.cmake)
+
+include(ROOT)
+
+if(@T2KReWeight_ENABLED@)
+  find_package(T2KReWeight REQUIRED)
+endif()
+
+if(@NOvARwgt_ENABLED@)
+  find_package(NOvARwgt REQUIRED)
+endif()
+
+if(@nusystematics_ENABLED@)
+  find_package(nusystematics REQUIRED)
+endif()
+
+include(NEUT)
+
+if(@GENIE_ENABLED@)
+  find_package(GENIE REQUIRED)
+endif()
+
+if(@NuWro_ENABLED@)
+  find_package(NuWro REQUIRED)
+endif()
+
+if(@Prob3plusplus_ENABLED@)
+  find_package(Prob3plusplus REQUIRED)
+endif()
+
+if (NuHepMC_ENABLED)
+  find_package(NuHepMC_CPPUtils REQUIRED)
+endif()
+
+set(NUISANCE_FOUND TRUE)
+include(${CMAKE_CURRENT_LIST_DIR}/NUISANCETargets.cmake)
+
+if(NOT TARGET NUIS::InputHandler)
+  set(NUISANCE_FOUND FALSE)
+  return()
+endif()
+
+find_path(NUISANCE_INCLUDE_DIR
+  NAMES SampleList.h
+  PATHS ${NUISANCE_CMAKE_DIR}/../../../include/
+)
+
+find_path(NUISANCE_LIB_DIR
+  NAMES libInputHandler.so libInputHandler.a libInputHandler.dylib
+  PATHS ${NUISANCE_CMAKE_DIR}/../../
+)
+
+find_path(NUISANCE_PREFIX
+  NAMES bin/nuis
+  PATHS ${NUISANCE_CMAKE_DIR}/../../../
+)
+
+include(FindPackageHandleStandardArgs)
+find_package_handle_standard_args(NUISANCE
+    REQUIRED_VARS 
+      NUISANCE_INCLUDE_DIR 
+      NUISANCE_LIB_DIR
+      NUISANCE_PREFIX
+    VERSION_VAR
+      NUISANCE_VERSION
+)
+
+message(STATUS "Found NUISANCE Version: ${NUISANCE_VERSION} in \"${NUISANCE_CMAKE_DIR}\"")
+message(STATUS "    NUISANCE_CXX_STANDARD: ${NUISANCE_CXX_STANDARD}")
+message(STATUS "    NUISANCE_INCLUDE_DIR: ${NUISANCE_INCLUDE_DIR}")
+message(STATUS "    NUISANCE_LIB_DIR: ${NUISANCE_LIB_DIR}")
+message(STATUS "    NUISANCE_PREFIX: ${NUISANCE_PREFIX}")
+

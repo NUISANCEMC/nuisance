@@ -72,8 +72,12 @@ set(ANL_Impl_Files
   ANL_CC2pi_1pip1pip_Evt_1DppipLow_nu.cxx
 )
 
-
 add_library(ANL SHARED ${ANL_Impl_Files})
-target_link_libraries(ANL CoreIncludes)
+target_link_libraries(ANL FrameworkLibraries CoreIncludes)
 
-install(TARGETS ANL DESTINATION lib)
+install(TARGETS ANL
+    EXPORT nuisance-targets
+    LIBRARY DESTINATION lib/
+    PUBLIC_HEADER DESTINATION include)
+
+add_library(NUIS::ANL ALIAS ANL)

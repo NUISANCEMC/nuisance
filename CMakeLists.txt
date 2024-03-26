@@ -22,10 +22,8 @@ cmake_minimum_required (VERSION 3.14 FATAL_ERROR)
 find_program(CMAKE_C_COMPILER NAMES $ENV{CC} gcc PATHS ENV PATH NO_DEFAULT_PATH)
 find_program(CMAKE_CXX_COMPILER NAMES $ENV{CXX} g++ PATHS ENV PATH NO_DEFAULT_PATH)
 
-project(NUISANCE)
-
-enable_language(Fortran)
 set (NUISANCE_VERSION 2.9.9)
+project(NUISANCE VERSION ${NUISANCE_VERSION} LANGUAGES CXX Fortran)
 
 #Changes default install path to be a subdirectory of the build dir.
 #Can set build dir at configure time with -DCMAKE_INSTALL_PREFIX=/install/path
@@ -137,3 +135,30 @@ install(DIRECTORY ${PROJECT_SOURCE_DIR}/parameters DESTINATION
 
 add_subdirectory(CLI)
 add_subdirectory(validation)
+
+
+install(EXPORT nuisance-targets
+  FILE NUISANCETargets.cmake
+  NAMESPACE NUIS::
+  DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/cmake/NUISANCE
+)
+
+include(CMakePackageConfigHelpers)
+configure_package_config_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Templates/NUISANCEConfig.cmake.in 
+  ${CMAKE_CURRENT_BINARY_DIR}/NUISANCEConfig.cmake
+  INSTALL_DESTINATION 
+    /this/is/ignored/for/some/reason/thanks/kitware
+  NO_SET_AND_CHECK_MACRO
+  NO_CHECK_REQUIRED_COMPONENTS_MACRO)
+
+write_basic_package_version_file(
+  ${CMAKE_CURRENT_BINARY_DIR}/NUISANCEConfigVersion.cmake
+  VERSION ${NUISANCE_VERSION}
+  COMPATIBILITY AnyNewerVersion)
+
+install(FILES 
+    ${CMAKE_CURRENT_BINARY_DIR}/NUISANCEConfig.cmake 
+    ${CMAKE_CURRENT_BINARY_DIR}/NUISANCEConfigVersion.cmake
+    ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/FindNOvARwgt.cmake
+  DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/cmake/NUISANCE)
