@@ -39,7 +39,7 @@ InputType ParseInputType(std::string const &inp) {
   // The hard-coded list of supported input generators
   const static std::string filetypes[] = {
       "NEUT",  "NuWro",  "GENIE", "GiBUU",       "NUANCE", "NuHepMC", "EVSPLN",
-      "EMPTY", "FEVENT", "JOINT", "SIGMAQ0HIST", "HISTO",  "Dummy"};
+      "EMPTY", "FEVENT", "JOINT", "SIGMAQ0HIST", "HISTO",  "FLATTREE", "Dummy"};
 
   size_t nInputTypes = GeneralUtils::GetArraySize(filetypes);
 

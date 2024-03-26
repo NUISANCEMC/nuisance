@@ -18,6 +18,7 @@
 *******************************************************************************/
 #ifndef INPUTTYPES_SEEN_H
 #define INPUTTYPES_SEEN_H
+#pragma once
 
 /// Global Enum to define generator type being read with FitEvent
 /// Have to define kNORM as if its a generator for the time being.
@@ -59,6 +60,7 @@ enum InputType {
   kJOINT_Input,
   kSIGMAQ0HIST_Input,
   kHISTO_Input,
+  kGenericVectors_Input,
   kDummy_Input,
   kInvalid_Input,
   kBNSPLN_Input,  // Not sure if this are currently used.
@@ -153,6 +155,9 @@ inline std::ostream &operator<<(std::ostream &os, InputUtils::InputType it) {
   }
   case InputUtils::kHISTO_Input: {
     return os << "kHISTO_Input";
+  }
+  case InputUtils::kGenericVectors_Input: {
+    return os << "kGenericVectors_Input";
   }
   case InputUtils::kInvalid_Input:
   case InputUtils::kBNSPLN_Input:

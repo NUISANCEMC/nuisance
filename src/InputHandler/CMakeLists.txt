@@ -34,6 +34,7 @@ set(InputHandler_Impl_Files
   InputFactory.cxx
   SigmaQ0HistogramInputHandler.cxx
   HistogramInputHandler.cxx
+  GenericVectorsInputHandler.cxx
 )
 
 set(InputHandler_Hdr_Files
@@ -56,6 +57,7 @@ set(InputHandler_Hdr_Files
   SigmaQ0HistogramInputHandler.h
   HistogramInputHandler.h
   InteractionModes.h
+  GenericVectorsInputHandler.h
 )
 
 if(NuHepMC_ENABLED)
