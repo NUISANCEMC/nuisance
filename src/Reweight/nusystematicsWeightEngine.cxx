@@ -179,15 +179,21 @@ double nusystematicsWeightEngine::CalcWeight(BaseFitEvt *evt) {
     } else { // This is very inefficient for fitting, as it recalculates the
              // spline every time.
 
-      // this is a completely backwards way of doing this loop, but the whole
-      // thing is broken anyway.
-      size_t index = GetParamContainerIndex(EnabledParams, resp.pid);
-      if (index != systtools::kParamUnhandled<size_t>) {
-        weight *=
-            (resp.CV_response *
-             DUNErwt.GetParameterResponse(
-                 resp.pid, EnabledParams[index].val,
-                 systtools::event_unit_response_t{{resp.pid, resp.responses}}));
+      // if a given dial is a Correction, just use the CVCorrection
+      if( DUNErwt.GetHeader(resp.pid).isCorrection ){
+        weight *= resp.CV_response;
+      }
+      else{
+        // this is a completely backwards way of doing this loop, but the whole
+        // thing is broken anyway.
+        size_t index = GetParamContainerIndex(EnabledParams, resp.pid);
+        if (index != systtools::kParamUnhandled<size_t>) {
+          weight *=
+              (resp.CV_response *
+               DUNErwt.GetParameterResponse(
+                   resp.pid, EnabledParams[index].val,
+                   systtools::event_unit_response_t{{resp.pid, resp.responses}}));
+        }
       }
     }
   }
