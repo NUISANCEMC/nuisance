@@ -65,6 +65,9 @@ void MinimizerRoutines::Init() {
 //*************************************
 MinimizerRoutines::~MinimizerRoutines(){
     //*************************************
+if (fOutputRootFile) fOutputRootFile->Close();
+        delete fOutputRootFile;
+    
 };
 
 /*
