@@ -684,12 +684,15 @@ void Measurement1D::FinaliseMeasurement() {
 
     SetAutoProcessTH1(fMCHist_Modes, kCMD_Reset, kCMD_Norm, kCMD_Write);
 
-    fMCFine_Modes = new TrueModeStack((fSettings.GetName() + "_MODES").c_str(),
-                                      ("True Channels"), fMCFine);
-    fMCFine_Modes ->SetTitleX(fDataHist->GetXaxis()->GetTitle());
-    fMCFine_Modes ->SetTitleY(fDataHist->GetYaxis()->GetTitle());
+    if (drawOpt.find("FINE") != std::string::npos){
 
-    SetAutoProcessTH1(fMCFine_Modes, kCMD_Reset, kCMD_Norm, kCMD_Write);
+      fMCFine_Modes = new TrueModeStack((fSettings.GetName() + "_FINE_MODES").c_str(),
+					("True Channels"), fMCFine);
+      fMCFine_Modes ->SetTitleX(fDataHist->GetXaxis()->GetTitle());
+      fMCFine_Modes ->SetTitleY(fDataHist->GetYaxis()->GetTitle());
+      
+      SetAutoProcessTH1(fMCFine_Modes, kCMD_Reset, kCMD_Norm, kCMD_Write);
+    }
   }
 
   if (fSettings.Has("maskfile") && fSettings.Has("maskhist")) {
