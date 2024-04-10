@@ -684,7 +684,7 @@ void Measurement1D::FinaliseMeasurement() {
 
     SetAutoProcessTH1(fMCHist_Modes, kCMD_Reset, kCMD_Norm, kCMD_Write);
 
-    if (drawOpt.find("FINE") != std::string::npos){
+    if (drawopts.find("FINE") != std::string::npos){
 
       fMCFine_Modes = new TrueModeStack((fSettings.GetName() + "_FINE_MODES").c_str(),
 					("True Channels"), fMCFine);
