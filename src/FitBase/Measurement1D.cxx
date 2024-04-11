@@ -1533,7 +1533,7 @@ void Measurement1D::Write(std::string drawOpt) {
     (void)GetLikelihood();
     fIsWriting = false;
 
-    fResidualHist->Write((fName + "_RESIDUAL").c_str());
+    if (drawOpt.find("RESIDUAL") != std::string::npos) fResidualHist->Write((fName + "_RESIDUAL").c_str());
     fChi2LessBinHist->Write((fName + "_Chi2NMinusOne").c_str());
   }
 
