@@ -22,6 +22,7 @@ set(MCStudies_Impl_Files
   ExpMultDist_CCQE_XSec_2DVar_FakeStudy.cxx
   GenericFlux_Tester.cxx
   GenericFlux_Vectors.cxx
+  HadronFlux_Vectors.cxx
   #MCStudy_KaonPreSelection.cxx
   MCStudy_MuonValidation.cxx
   ElectronFlux_FlatTree.cxx

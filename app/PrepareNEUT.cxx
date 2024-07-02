@@ -85,12 +85,13 @@ void AddMonoRateHistogram(std::string inputList, double MonoE,
   for (int i = 0; i < nevts; ++i) {
     tn->GetEntry(i);
     NeutPart *part = fNeutVect->PartInfo(0);
-    double E = part->fP.E();
+    double E = part->fP.Vect().Mag();
+
     double xsec = fNeutVect->Totcrs;
     if(fXSecOverride > 0){
       xsec = fXSecOverride;
     }
-    std::cout << "MonoE[" << i << "]: " << E << ", xsec = " << xsec << std::endl;
+    NUIS_LOG(FIT, "MonoE[" << i << "]: " << E << ", xsec = " << xsec);
     // Unit conversion
     if (fFluxInGeV)
       E *= 1E-3;
@@ -231,7 +232,7 @@ void CreateRateHistogram(std::string inputList, std::string flux,
   for (int i = 0; i < nevts; ++i) {
     tn->GetEntry(i);
     NeutPart *part = fNeutVect->PartInfo(0);
-    double E = part->fP.E();
+    double E = part->fP.Vect().Mag();
     double xsec = fNeutVect->Totcrs;
 
     // Unit conversion

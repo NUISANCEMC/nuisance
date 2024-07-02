@@ -19,6 +19,7 @@
 #include "ComparisonRoutines.h"
 #include "GenericFlux_Tester.h"
 #include "GenericFlux_Vectors.h"
+#include "HadronFlux_Vectors.h"
 #include "InputUtils.h"
 #include "MeasurementBase.h"
 #include "Smearceptance_Tester.h"
@@ -62,6 +63,8 @@ void PrintSyntax() {
       << "\n\t\t GenericFlux   : Flat event summary format."
       << "\n\t\t GenericVectors   : Standard event summary format with "
          "particle vectors."
+      << "\n\t\t HadronVectors   : A simplified event summary format with "
+         "particle vectors for hadron scattering."
       << "\n\t "
       << "\n\t[-c crd.xml]: Input card file to override configs or set dial "
          "values."
@@ -195,6 +198,13 @@ int main(int argc, char *argv[]) {
     samplekey.Set("type", gOptType);
     flattreecreator = new GenericFlux_Vectors("FlatTree", gOptInputFile,
                                               FitBase::GetRW(), gOptType, "");
+
+  } else if (!gOptFormat.compare("HadronVectors")) {
+    samplekey.Set("name", "FlatTree");
+    samplekey.Set("input", gOptInputFile);
+    samplekey.Set("type", gOptType);
+    flattreecreator = new HadronFlux_Vectors("FlatTree", gOptInputFile,
+					     FitBase::GetRW(), gOptType, "");
 
   } else {
     NUIS_ERR(FTL, "Unknown FlatTree format!");

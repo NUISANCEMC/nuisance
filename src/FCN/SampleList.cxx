@@ -367,6 +367,7 @@
 
 #include "GenericFlux_Tester.h"
 #include "GenericFlux_Vectors.h"
+#include "HadronFlux_Vectors.h"
 
 #include "ElectronFlux_FlatTree.h"
 
@@ -1614,6 +1615,9 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
         return (new GenericFlux_Tester(name, file, rw, type, fkdt));
       } else if (name.find("GenericVectors") != std::string::npos) {
         return (new GenericFlux_Vectors(name, file, rw, type, fkdt));
+      } else if (name.find("HadronVectors") != std::string::npos) {
+	return (new HadronFlux_Vectors(name, file, rw, type, fkdt));
+
       } else if (!name.compare("T2K2017_FakeData")) {
         return (new T2K2017_FakeData(samplekey));
       } else if (!name.compare("MCStudy_CCQE")) {
