@@ -530,10 +530,10 @@ void GENIEInputHandler::CalcNUISANCEKinematics() {
   fNUISANCEEvent->fResCode = fGenieGHep->Summary()->ExclTagPtr()->Resonance();
 
 
-  if (!fNUISANCEEvent->Mode) {
-    NUIS_ERR(WRN, "Failed to determine mode for GENIE event: ");
-    std::cout << *fGenieGHep << std::endl;
-  }
+  // if (!fNUISANCEEvent->Mode) {
+  //   NUIS_ERR(WRN, "Failed to determine mode for GENIE event: ");
+  //   std::cout << *fGenieGHep << std::endl;
+  // }
 
   // Set Event Info
   fNUISANCEEvent->fEventNo = 0.0;
