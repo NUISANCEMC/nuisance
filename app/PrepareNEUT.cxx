@@ -14,8 +14,10 @@
 std::string fInputFiles = "";
 std::string fOutputFile = "";
 std::string fFluxFile = "";
+std::string fRangeE = "";
 bool fFluxInGeV = false;
 bool fIsMonoEFlux = false;
+bool fIsRangeEFlux = false;
 double fMonoEEnergy = 0xdeadbeef;
 double fXSecOverride = 0;
 
@@ -23,6 +25,8 @@ void PrintOptions();
 void ParseOptions(int argc, char *argv[]);
 void AddMonoRateHistogram(std::string inputList, double MonoE,
                           std::string output);
+void AddRangeRateHistogram(std::string inputList, std::string rangeE,
+			   std::string output);
 void CreateRateHistogram(std::string inputList, std::string flux,
                          std::string output);
 
@@ -37,6 +41,8 @@ int main(int argc, char *argv[]) {
   NUIS_LOG(FIT, "Running PrepareNEUT");
   if (fIsMonoEFlux) {
     AddMonoRateHistogram(fInputFiles, fMonoEEnergy, fOutputFile);
+  } else if (fIsRangeEFlux) {
+    AddRangeRateHistogram(fInputFiles, fRangeE, fOutputFile);
   } else {
     CreateRateHistogram(fInputFiles, fFluxFile, fOutputFile);
   }
@@ -174,6 +180,140 @@ void AddMonoRateHistogram(std::string inputList, double MonoE,
 
   outFile->Close();
 }
+
+// This could probably be partially merged with the mono and flux hist functions...
+void AddRangeRateHistogram(std::string inputList, std::string rangeE,
+			   std::string output) {
+  // Need to allow for more than one file... will do soon
+  TChain *tn = new TChain("neuttree");
+
+  std::vector<std::string> inputs = GeneralUtils::ParseToStr(inputList, ",");
+  for (std::vector<std::string>::iterator it = inputs.begin();
+       it != inputs.end(); ++it) {
+    NUIS_LOG(FIT, "Adding " << *it << " to the output");
+    tn->AddFile((*it).c_str());
+  }
+
+  if (inputs.size() > 1 && output.empty()) {
+    NUIS_ABORT("You must provide a new output file name if you want to have "
+	       "more than 1 input file!");
+  }
+
+  int nevts = tn->GetEntries();
+
+  if (!nevts) {
+    NUIS_ABORT("Either the input file is not from NEUT, or it's empty...");
+  }
+
+  NeutVect *fNeutVect = NULL;
+  tn->SetBranchAddress("vectorbranch", &fNeutVect);
+
+  // Get the flux range
+  std::vector<double> fFluxVect = GeneralUtils::ParseToDbl(fRangeE, ",");
+
+  if (fFluxVect.size() != 2){
+    NUIS_ABORT("A flux range has to be specified with two values: -r E_MIN,E_MAX");
+  }
+  
+  int nbins = 100;
+  TH1D *fluxHist = new TH1D("flux", "flux", 100, fFluxVect[0], fFluxVect[1]);
+
+  for (int bin=0; bin<nbins; ++bin) fluxHist->SetBinContent(bin+1, 1);
+  fluxHist->Scale(1, "width");
+  // Make Event Hist
+  TH1D *xsecHist = (TH1D *)fluxHist->Clone();
+  xsecHist->Reset();
+
+  // Make a total cross section hist for shits and giggles
+  TH1D *entryHist = (TH1D *)xsecHist->Clone();
+
+  for (int i = 0; i < nevts; ++i) {
+    tn->GetEntry(i);
+    NeutPart *part = fNeutVect->PartInfo(0);
+    double E = part->fP.Vect().Mag();
+    double xsec = fNeutVect->Totcrs;
+    
+    // Unit conversion                                                                                                                                                                   
+    if (fFluxInGeV)
+      E *= 1E-3;
+    
+    xsecHist->Fill(E, xsec);
+    entryHist->Fill(E);
+    
+    if (i % (nevts / 20) == 0) {
+      NUIS_LOG(FIT, "Processed " << i << "/" << nevts << " NEUT events."
+	       << "(Enu = " << E << ", xsec = " << xsec << ") ");
+    }
+  }
+
+  NUIS_LOG(FIT, "Processed all events");
+  
+  xsecHist->Divide(entryHist);
+
+  // This will be the evtrt histogram
+  TH1D *evtHist = (TH1D *)xsecHist->Clone();
+  evtHist->Multiply(fluxHist);
+
+  // Check whether the overflow is empty. If not, advise that either the wrong
+  // flux histogram or units were used...
+  if (evtHist->Integral(0, -1) != evtHist->Integral() ||
+      evtHist->Integral(0, -1) == 0) {
+    NUIS_ERR(WRN, "The input file("
+	     << evtHist->Integral(0, -1)
+	     << ") and flux info provided do not match... ");
+    NUIS_ERR(WRN, "Use output with caution...");
+  }
+
+  // Pick where the output should go
+  TFile *outFile = NULL;
+  if (!output.empty()) {
+    NUIS_LOG(FIT, "Saving histograms in " << output);
+    outFile = new TFile(output.c_str(), "RECREATE");
+  } else {
+    NUIS_LOG(FIT, "Saving histograms in " << inputs[0]);
+    outFile = new TFile(inputs[0].c_str(), "UPDATE");
+  }
+  outFile->cd();
+
+  std::string xsec_name = "xsec_PrepareNeut";
+  std::string flux_name = "flux_PrepareNeut";
+  std::string rate_name = "evtrt_PrepareNeut";
+
+  if (output.empty()) {
+    // Check whether we should overwrite existing histograms
+    std::string input_xsec = PlotUtils::GetObjectWithName(outFile, "xsec");
+    std::string input_flux = PlotUtils::GetObjectWithName(outFile, "flux");
+    std::string input_rate = PlotUtils::GetObjectWithName(outFile, "evtrt");
+
+    if (!input_xsec.empty()) {
+      NUIS_LOG(FIT, "Updating histogram: " << input_xsec);
+      xsec_name = input_xsec;
+    }
+    if (!input_flux.empty()) {
+      NUIS_LOG(FIT, "Updating histogram: " << input_flux);
+      flux_name = input_flux;
+    }
+    if (!input_rate.empty()) {
+      NUIS_LOG(FIT, "Updating histogram: " << input_rate);
+      rate_name = input_rate;
+    }
+    
+  } else {
+    NUIS_LOG(FIT, "Cloning neuttree into output file.");
+    StopTalking();
+    TTree *newtree = (TTree *)tn->CloneTree(-1, "fast");
+    StartTalking();
+    newtree->Write();
+  }
+  
+  xsecHist->Write(xsec_name.c_str(), TObject::kOverwrite);
+  fluxHist->Write(flux_name.c_str(), TObject::kOverwrite);
+  evtHist->Write(rate_name.c_str(), TObject::kOverwrite);
+  
+  outFile->Close();
+  }
+
+
 
 //*******************************
 void CreateRateHistogram(std::string inputList, std::string flux,
@@ -394,6 +534,10 @@ void ParseOptions(int argc, char *argv[]) {
         fIsMonoEFlux = true;
         fMonoEEnergy = GeneralUtils::StrToDbl(argv[i + 1]);
         ++i;
+      } else if (!std::strcmp(argv[i],"-r")) {
+	fIsRangeEFlux = true;
+	fRangeE = argv[i+1];
+	++i;
       } else if (!std::strcmp(argv[i],"-X")){
         fXSecOverride = GeneralUtils::StrToDbl(argv[i + 1]);
 	++i;
@@ -410,7 +554,7 @@ void ParseOptions(int argc, char *argv[]) {
     flagopt = true;
   }
 
-  if (fFluxFile == "" && (!flagopt) && (!fIsMonoEFlux)) {
+  if (fFluxFile == "" && (!flagopt) && (!fIsMonoEFlux) && (!fIsRangeEFlux)) {
     NUIS_ERR(FTL, "No flux input specified!");
     flagopt = true;
   }
