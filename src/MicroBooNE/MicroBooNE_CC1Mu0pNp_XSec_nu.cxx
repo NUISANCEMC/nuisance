@@ -77,7 +77,7 @@ MicroBooNE_CC1Mu0pNp_XSec_nu<D>::MicroBooNE_CC1Mu0pNp_XSec_nu(
   // set the errors to the ones from covariance matrix
   // don't think this is actually needed but atleast suppresses some warnings
   for(int i = 0; i < fDataHist->GetNbinsX(); i++)
-    fDataHist->SetBinError(i+1, sqrt(*fFullCovar(i, i))*1E-38);
+    fDataHist->SetBinError(i+1, sqrt((*fFullCovar)(i, i))*1E-38);
 
   // the additional Wiener-SVD Ac smearing matrix
   fSmearingMatrix = ana_helper.get_ac_m();
