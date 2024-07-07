@@ -222,11 +222,10 @@ void MicroBooNE_CC1Mu0pNp_XSec_nu<D>::ConvertEventRates() {
   Measurement1D::ConvertEventRates();
 
   // convert to differential xsec by scaling it wrt the bin widths
-  fMCHist->Sumw2();
   for(int i = 0; i < n; i++){
-    // scale by their bin widths as well
     double bin_width = fTable.get_width(D, i);
     fMCHist->SetBinContent(i + 1, fMCHist->GetBinContent(i + 1)/bin_width);
+    fMCHist->SetBinError(i + 1, fMCHist->GetBinError(i + 1)/bin_width);
   }
 }
 
