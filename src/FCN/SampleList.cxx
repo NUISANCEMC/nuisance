@@ -183,6 +183,8 @@
 #include "MicroBooNE_CC1Mu2p_XSec_1D_nu.h"
 #include "MicroBooNE_CC1MuNp_XSec_1D_nu.h"
 #include "MicroBooNE_CCInc_XSec_2DPcos_nu.h"
+#include "MicroBooNE_CC1Mu0pNp_XSec_nu.h"
+#include "MicroBooNE_CC1Mu0pNp_XSec_nu.cxx"
 #endif
 
 #ifdef MINERvA_ENABLED
@@ -1120,6 +1122,34 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
                !name.compare("MicroBooNE_CC1Mu1p_XSec_1DECal_nu") ||
                !name.compare("MicroBooNE_CC1Mu1p_XSec_1DEQE_nu")) {
       return (new MicroBooNE_CC1Mu1p_XSec_1D_nu(samplekey));
+    } else if (!name.compare("MicroBooNE_CC1Mu0pNp_XSec_EMu_nu")) {
+      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<distribution_t::k0pNpEMu>(samplekey));
+    } else if (!name.compare("MicroBooNE_CC1Mu0pNp_XSec_CosThetaMu_nu")) {
+      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<distribution_t::k0pNpCosThetaMu>(samplekey));
+    } else if (!name.compare("MicroBooNE_CC1Mu0pNp_XSec_ENu_nu")) {
+      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<distribution_t::k0pNpEnu>(samplekey));
+    } else if (!name.compare("MicroBooNE_CC1Mu0pNp_XSec_TransferEnergy_nu")) {
+      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<distribution_t::k0pNpTransferEnergy>(samplekey));
+    } else if (!name.compare("MicroBooNE_CC1Mu0pNp_XSec_AvailEnergy_nu")) {
+      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<distribution_t::k0pNpAvailEnergy>(samplekey));
+    } else if (!name.compare("MicroBooNE_CC1Mu0pNp_XSec_ProtonKE_nu")) {
+      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<distribution_t::kProtonKE>(samplekey));
+    } else if (!name.compare("MicroBooNE_CC1Mu0pNp_XSec_ProtonCosTheta_nu")) {
+      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<distribution_t::kProtonCosTheta>(samplekey));
+    } else if (!name.compare("MicroBooNE_CC1Mu0pNp_XSec_ProtonMult_nu")) {
+      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<distribution_t::kProtonMult>(samplekey));
+    } else if (!name.compare("MicroBooNE_CC1Mu0pNp_XSec_EMuCosThetaMu_nu")) {
+      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<distribution_t::k0pNpEMuCosThetaMu>(samplekey));
+    } else if (!name.compare("MicroBooNE_CC1Mu0pNp_XSec_ProtonKECosTheta_nu")) {
+      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<distribution_t::kNpProtonKECosTheta>(samplekey));
+    } else if (!name.compare("MicroBooNE_CC1MuXp_XSec_EMu_nu")) {
+      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<distribution_t::kXpEMu>(samplekey));
+    } else if (!name.compare("MicroBooNE_CC1MuXp_XSec_CosThetaMu_nu")) {
+      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<distribution_t::kXpCosThetaMu>(samplekey));
+    } else if (!name.compare("MicroBooNE_CC1MuXp_XSec_EMuCosThetaMu_nu")) {
+      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<distribution_t::kXpEMuCosThetaMu>(samplekey));
+    } else if (!name.compare("MicroBooNE_CC1MuXp_XSec_AvailEnergyCosThetaMuEMu_nu")) {
+      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<distribution_t::kXpAvailEnergyCosThetaMuEMu>(samplekey));
     } else
 
 #endif
