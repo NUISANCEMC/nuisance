@@ -74,6 +74,11 @@ MicroBooNE_CC1Mu0pNp_XSec_nu<D>::MicroBooNE_CC1Mu0pNp_XSec_nu(
   fFullCovar = ana_helper.get_cov_m();
   (*fFullCovar) *= 1E4;
 
+  // set the errors to the ones from covariance matrix
+  // don't think this is actually needed but atleast suppresses some warnings
+  for(int i = 0; i < fDataHist->GetNbinsX(); i++)
+    fDataHist->SetBinError(i+1, sqrt(*fFullCovar(i, i))*1E-38);
+
   // the additional Wiener-SVD Ac smearing matrix
   fSmearingMatrix = ana_helper.get_ac_m();
 
@@ -146,7 +151,6 @@ void MicroBooNE_CC1Mu0pNp_XSec_nu<D>::FillEventVariables(FitEvent *customEvent)
       ProtonCosTheta = LeadingProton->P3()[2]/LeadingProton->p();
   }
 
-
   switch(D){
     case k0pNpEMu:
       fXVar = fTable.find_bin<D>(EMu, ProtonKE);
@@ -210,15 +214,20 @@ void MicroBooNE_CC1Mu0pNp_XSec_nu<D>::ConvertEventRates() {
   TVectorD es = (*fSmearingMatrix) * e;
 
   for (int i = 0; i < n; i++) {
-    // scale by their bin widths as well
-    double bin_width = fTable.get_width(D, i);
-
-    fMCHist->SetBinContent(i + 1, vs(i)/bin_width);
-    fMCHist->SetBinError(i + 1, std::sqrt(es(i))/bin_width);
+    fMCHist->SetBinContent(i + 1, vs(i));
+    fMCHist->SetBinError(i + 1, std::sqrt(es(i)));
   }
 
   // have to do standard conversion AFTER wSVD smearing
   Measurement1D::ConvertEventRates();
+
+  // convert to differential xsec by scaling it wrt the bin widths
+  fMCHist->Sumw2();
+  for(int i = 0; i < n; i++){
+    // scale by their bin widths as well
+    double bin_width = fTable.get_width(D, i);
+    fMCHist->SetBinContent(i + 1, fMCHist->GetBinContent(i + 1)/bin_width);
+  }
 }
 
 template class MicroBooNE_CC1Mu0pNp_XSec_nu<k0pNpEMu>;
