@@ -276,6 +276,9 @@ public:
     TVectorD*    m_fulldata = new TVectorD    (full_bins, hFullData->GetArray());
     TMatrixDSym* m_fullcov  = new TMatrixDSym (full_bins, hFullCov->GetArray(), "D");
     TMatrixD*    m_fullac   = new TMatrixD    (full_bins, full_bins, hFullAc->GetArray(), "D");
+    // this needs to be transposed to get the right format for some reason
+    // for the covariance its okay, since its symmetric
+    m_fullac->Transpose(*m_fullac);
     // form subset of histograms based on cached Ds
     int curr_bin = 0;
     for (auto it=this->f_dist.begin(); it != this->f_dist.end(); ++it) {
