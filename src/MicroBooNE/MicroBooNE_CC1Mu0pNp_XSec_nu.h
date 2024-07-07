@@ -21,7 +21,6 @@
 
 #include <TMatrixDfwd.h>
 #include "Measurement1D.h"
-#include "MicroBooNE_CC1Mu1p_XSec_1D_nu.h"
 
 #include <iostream>
 #include <fstream>
