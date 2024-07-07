@@ -199,17 +199,14 @@ public:
 
       f_ndims[curr_D] = n_dim;
       if(n_dim == 1)
-        f_bins_1d[curr_D].push_back({lo_vars[0], hi_vars[0]
-                                            });
+        f_bins_1d[curr_D].push_back({lo_vars[0], hi_vars[0]});
       if(n_dim == 2)
         f_bins_2d[curr_D].push_back({lo_vars[0], hi_vars[0],
-                                              lo_vars[1], hi_vars[1]
-                                            });
+                                     lo_vars[1], hi_vars[1]});
       if(n_dim == 3)
         f_bins_3d[curr_D].push_back({lo_vars[0], hi_vars[0],
-                                              lo_vars[1], hi_vars[1],
-                                              lo_vars[2], hi_vars[2]
-                                            });
+                                     lo_vars[1], hi_vars[1],
+                                     lo_vars[2], hi_vars[2]});
     } // eof
   }
 };
