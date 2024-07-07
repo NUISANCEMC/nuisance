@@ -72,6 +72,8 @@ MicroBooNE_CC1Mu0pNp_XSec_nu<D>::MicroBooNE_CC1Mu0pNp_XSec_nu(
 
   // the measurement covariance
   fFullCovar = ana_helper.get_cov_m();
+  (*fFullCovar) *= 1E4;
+
   // the additional Wiener-SVD Ac smearing matrix
   fSmearingMatrix = ana_helper.get_ac_m();
 
