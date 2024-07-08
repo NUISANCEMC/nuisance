@@ -201,9 +201,19 @@ void MicroBooNE_CC1Mu0pNp_XSec_nu<D>::FillEventVariables(FitEvent *customEvent)
 template <distribution_t D>
 void MicroBooNE_CC1Mu0pNp_XSec_nu<D>::ConvertEventRates() {
 
-  // Apply Weiner-SVD additional smearing Ac
   int n = fMCHist->GetNbinsX();
 
+  // standard conversion
+  Measurement1D::ConvertEventRates();
+
+  // convert to differential xsec by scaling it wrt the bin widths
+  for(int i = 0; i < n; i++){
+    double bin_width = fTable.get_width(D, i);
+    fMCHist->SetBinContent(i + 1, fMCHist->GetBinContent(i + 1)/bin_width);
+    fMCHist->SetBinError(i + 1, fMCHist->GetBinError(i + 1)/bin_width);
+  }
+
+  // now apply Wiener-SVD Ac smearing
   TVectorD v(n), e(n);
   for (int i = 0; i < n; i++) {
     v(i) = fMCHist->GetBinContent(i + 1);
@@ -216,16 +226,6 @@ void MicroBooNE_CC1Mu0pNp_XSec_nu<D>::ConvertEventRates() {
   for (int i = 0; i < n; i++) {
     fMCHist->SetBinContent(i + 1, vs(i));
     fMCHist->SetBinError(i + 1, std::sqrt(es(i)));
-  }
-
-  // have to do standard conversion AFTER wSVD smearing
-  Measurement1D::ConvertEventRates();
-
-  // convert to differential xsec by scaling it wrt the bin widths
-  for(int i = 0; i < n; i++){
-    double bin_width = fTable.get_width(D, i);
-    fMCHist->SetBinContent(i + 1, fMCHist->GetBinContent(i + 1)/bin_width);
-    fMCHist->SetBinError(i + 1, fMCHist->GetBinError(i + 1)/bin_width);
   }
 }
 
