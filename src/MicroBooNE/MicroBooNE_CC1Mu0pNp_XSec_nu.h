@@ -101,7 +101,7 @@ public:
   // apply a general function on the bin edges
   // it simply finds the relevant set of bin edges and applies the function on it
   // func expects a vector of bin edges as the first argument and then a variable set of arguments after
-  // the return is a double
+  // func also should return a double
   template<distribution_t D, typename F, typename... Args>
   double apply(int bin, F func, Args&& ... args){
     static_assert(!(D == distribution_t::kAll), "Invalid lookup!");
@@ -109,15 +109,18 @@ public:
 
     if(dim == 1){
       auto bin_list = (f_bins_1d[D]).at(bin);
-      return func(std::vector<double>{bin_list.begin(), bin_list.end()}, args...);
+      return func(std::vector<double>{bin_list.begin(), bin_list.end()},
+                  args...);
     }
     if(dim == 2){
       auto bin_list = (f_bins_2d[D]).at(bin);
-      return func(std::vector<double>{bin_list.begin(), bin_list.end()}, args...);
+      return func(std::vector<double>{bin_list.begin(), bin_list.end()},
+                  args...);
     }
     if(dim == 3){
       auto bin_list = (f_bins_3d[D]).at(bin);
-      return func(std::vector<double>{bin_list.begin(), bin_list.end()}, args...);
+      return func(std::vector<double>{bin_list.begin(), bin_list.end()},
+                  args...);
     }
     return -1.;
   }
