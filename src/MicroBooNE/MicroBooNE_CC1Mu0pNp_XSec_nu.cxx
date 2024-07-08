@@ -209,8 +209,14 @@ void MicroBooNE_CC1Mu0pNp_XSec_nu<D>::ConvertEventRates() {
   // convert to differential xsec by scaling it wrt the bin widths
   for(int i = 0; i < n; i++){
     double bin_width = fTable.get_width(D, i);
-    fMCHist->SetBinContent(i + 1, fMCHist->GetBinContent(i + 1)/bin_width);
-    fMCHist->SetBinError(i + 1, fMCHist->GetBinError(i + 1)/bin_width);
+    // for xsec vs neutrino energy, we divide by the fraction of flux
+    // producing the events in that energy range
+    double scaling = 1.;
+    if(D == k0pNpEnu)
+      scaling = fTable.apply<D>(i, GetFluxFraction, GetFluxHistogram());
+
+    fMCHist->SetBinContent(i + 1, fMCHist->GetBinContent(i + 1)/(bin_width*scaling));
+    fMCHist->SetBinError(i + 1, fMCHist->GetBinError(i + 1)/(bin_width*scaling));
   }
 
   // now apply Wiener-SVD Ac smearing

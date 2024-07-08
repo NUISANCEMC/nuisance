@@ -98,6 +98,32 @@ public:
     return f_widths.at(D).at(bin);
   }
 
+  // apply a general function on the bin edges
+  // it simply finds the relevant set of bin edges and applies the function on it
+  // func expects a vector of bin edges as the first argument and then a variable set of arguments after
+  // the return is a double
+  template<distribution_t D, typename F, typename... Args>
+  double apply(int bin, F func, Args&& ... args){
+    static_assert(!(D == distribution_t::kAll), "Invalid lookup!");
+    int dim = f_ndims[D];
+
+    if(dim == 1){
+      auto bin_list = (f_bins_1d[D]).at(bin);
+      return func(std::vector<double>{bin_list.begin(), bin_list.end()}, args...);
+    }
+    if(dim == 2){
+      auto bin_list = (f_bins_2d[D]).at(bin);
+      return func(std::vector<double>{bin_list.begin(), bin_list.end()}, args...);
+    }
+    if(dim == 3){
+      auto bin_list = (f_bins_3d[D]).at(bin);
+      return func(std::vector<double>{bin_list.begin(), bin_list.end()}, args...);
+    }
+    return -1.;
+  }
+
+  // similar to the above, this just finds the local bin number for a given distribution
+  // based on input values for individual physics observables
   template <distribution_t D, typename... Args>
   int find_bin(Args&& ... values){
     static_assert(!(D == distribution_t::kAll), "Invalid lookup!");
@@ -178,6 +204,9 @@ public:
       double dx2   = (lo_vars[1] != -1000.) ? hi_vars[1]-lo_vars[1] : 1;
       double dx1   = (lo_vars[0] != -1000.) ? hi_vars[0]-lo_vars[0] : 1;
       double diff  = dx1*dx2*dx3;
+      // for Enu 1D, we don't divide by bin widths anyway
+      // need flux scaling which will be done later
+      if(curr_D == k0pNpEnu) diff = 1.;
 
       // save our lookup tables
       f_nbins[curr_D] = bin + 1;
@@ -332,5 +361,24 @@ private:
   TMatrixD*      fSmearingMatrix;
   LookupTable    fTable;
 
+};
+
+double GetFluxFraction(std::vector<double> edges, TH1D* fluxHist){
+  int lo_bin = fluxHist->FindBin(edges[0]);
+  int hi_bin = fluxHist->FindBin(edges[1]);
+
+  double lo_width = fluxHist->GetBinWidth(lo_bin);
+  double hi_width = fluxHist->GetBinWidth(hi_bin);
+  double lo_content = fluxHist->GetBinContent(lo_bin);
+  double hi_content = fluxHist->GetBinContent(hi_bin);
+  double lo_edge = fluxHist->GetBinLowEdge(lo_bin);
+  double hi_edge = fluxHist->GetBinLowEdge(hi_bin+1);
+
+  double tot_flux = fluxHist->Integral(lo_bin, hi_bin);
+  tot_flux -= (edges[0]-lo_edge)*lo_content/lo_width;
+  tot_flux -= (hi_edge-edges[1])*hi_content/hi_width;
+  tot_flux /= fluxHist->Integral();
+
+  return tot_flux;
 };
 #endif
