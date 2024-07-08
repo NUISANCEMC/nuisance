@@ -19,6 +19,7 @@ void printInputCommands(char *argv[]) {
             << "\t-f : Pass -f argument to '$ hadd' invocation." << std::endl
             << "\t-F : Read input flux from input descriptor." << std::endl
             << "\t-o : Write full output to a new file." << std::endl
+	    << "\t-H : File generated with kaskada." << std::endl
             << std::endl;
 };
 void CreateRateHistograms(std::string inputs, bool force_out);
@@ -27,6 +28,7 @@ void HaddNuwroFiles(std::vector<std::string> &inputs, bool force_out);
 bool outputNewFile = false;
 std::string ofile = "";
 bool haveFluxInputs = false;
+bool fIsHadron = false;
 
 struct FluxInputBlob {
   FluxInputBlob(std::string _File, std::string _Hist, int _PDG,
@@ -124,6 +126,9 @@ int main(int argc, char *argv[]) {
     } else if (!std::strcmp(argv[i], "-o")) {
       outputNewFile = true;
       ofile = argv[++i];
+    } else if (!std::strcmp(argv[i], "-H")) {
+      fIsHadron = true;
+      NUIS_LOG(FIT, "Processing as a kaskada input file!");
     } else if (!std::strcmp(argv[i], "-F")) {
       std::string inpLine = argv[++i];
       std::vector<std::string> fluxInputDescriptor =
@@ -153,7 +158,9 @@ int main(int argc, char *argv[]) {
                    << "\", was expecting "
                       "<FluxRootFile>,<FluxHistName>[,PDG[,speciesFraction]].");
       }
-    } else {
+    } 
+    // Add mono and range options
+    else {
       inputfiles.push_back(std::string(argv[i]));
     }
   }
@@ -412,10 +419,16 @@ void CreateRateHistograms(std::string inputs, bool force_out) {
     nuwrotree->GetEntry(i);
 
     // Get Variables
-    Enu = evt->in[0].t / 1000.0;
-    TotXSec = evt->weight;
-    pdg = evt->in[0].pdg;
-    
+    if (fIsHadron) {
+      Enu = evt->out[0].t / 1000.0;
+      TotXSec = evt->weight;
+      pdg = evt->out[0].pdg;
+    } else {
+      Enu = evt->in[0].t / 1000.0;
+      TotXSec = evt->weight;
+      pdg = evt->in[0].pdg;
+    }
+
     if (std::find(allpdg.begin(), allpdg.end(), pdg) == allpdg.end()) {
       NUIS_ABORT("Not set up to handle PDG: " << pdg << " check your inputs");
     }

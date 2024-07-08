@@ -71,6 +71,7 @@ class NuWroInputHandler : public InputHandlerBase {
 
   TChain* fNuWroTree;  ///< TTree for reading NuWro event vectors
   bool fSaveExtra;     ///< Save Extra NuWro info into Nuisance Event
+  bool fIsHadron; ///< Is a kaskada output file
   NuWroGeneratorInfo* fNuWroInfo;  ///< Extra NuWro Generator Info
 };
 /*! @} */

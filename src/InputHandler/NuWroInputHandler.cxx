@@ -44,6 +44,8 @@ NuWroInputHandler::NuWroInputHandler(std::string const &handle,
   fName = handle;
   fMaxEvents = FitPar::Config().GetParI("MAXEVENTS");
   fSaveExtra = false; // FitPar::Config().GetParB("NuWroSaveExtra");
+  fIsHadron = FitPar::Config().GetParB("IsHadron");
+
   // Setup the TChain
   fNuWroTree = new TChain("treeout");
 
@@ -160,6 +162,10 @@ FitEvent *NuWroInputHandler::GetNuisanceEvent(const UInt_t ent,
 int NuWroInputHandler::ConvertNuwroMode(event *e) {
   Int_t proton_pdg, neutron_pdg, pion_pdg, pion_plus_pdg, pion_minus_pdg,
       lambda_pdg, eta_pdg, kaon_pdg, kaon_plus_pdg;
+
+  // Not yet implemented for hadronic scattering
+  if (fIsHadron) return 0;
+
   proton_pdg = 2212;
   eta_pdg = 221;
   neutron_pdg = 2112;
@@ -328,37 +334,49 @@ void NuWroInputHandler::CalcNUISANCEKinematics() {
   std::vector<particle>::iterator p_iter;
 
   // Get the Initial State
-  for (p_iter = fNuWroEvent->in.begin(); p_iter != fNuWroEvent->in.end();
-       p_iter++) {
-    AddNuWroParticle(fNUISANCEEvent, (*p_iter), kInitialState, true);
-  }
+  // For hadron production, NUISANCE needs to re-jig the output
+  if (fIsHadron){
 
-  // Try to find the FSI state particles
-  // Loop over the primary vertex particles
-  // If they match the post-FSI they haven't undergone FSI.
-  // If they don't match post-FSI they have undergone FSI.
-  for (p_iter = fNuWroEvent->out.begin(); p_iter != fNuWroEvent->out.end();
-       p_iter++) {
-    // Get the particle
-    particle p = (*p_iter);
-    // Check against all the post particles, match them
-    std::vector<particle>::iterator p2_iter;
-    bool match = false;
-    for (p2_iter = fNuWroEvent->post.begin();
-         p2_iter != fNuWroEvent->post.end(); p2_iter++) {
-      particle p2 = (*p2_iter);
-      // Check energy and pdg
-      // A very small cascade which changes the energy by 1E-5 MeV should be
-      // matched
-      match = (fabs(p2.E() - p.E()) < 1E-5 && p2.pdg == p.pdg);
-      // If we match p to p2 break the loop
-      if (match)
-        break;
+    // Get the Initial State
+    // For hadron production, NUISANCE needs to re-jig the output   
+    for (p_iter = fNuWroEvent->out.begin(); p_iter != fNuWroEvent->out.end();
+         p_iter++) {
+      AddNuWroParticle(fNUISANCEEvent, (*p_iter), kInitialState, true);
     }
-    // If we've looped through the whole particle stack of post-FSI and haven't
-    // found a match it's a primary particle that has been FSIed
-    if (!match)
-      AddNuWroParticle(fNUISANCEEvent, (*p_iter), kFSIState, true);
+  } else {
+    // Get the Initial State
+    for (p_iter = fNuWroEvent->in.begin(); p_iter != fNuWroEvent->in.end();
+	 p_iter++) {
+      AddNuWroParticle(fNUISANCEEvent, (*p_iter), kInitialState, true);
+    }
+
+    // Try to find the FSI state particles
+    // Loop over the primary vertex particles
+    // If they match the post-FSI they haven't undergone FSI.
+    // If they don't match post-FSI they have undergone FSI.
+    for (p_iter = fNuWroEvent->out.begin(); p_iter != fNuWroEvent->out.end();
+	 p_iter++) {
+      // Get the particle
+      particle p = (*p_iter);
+      // Check against all the post particles, match them
+      std::vector<particle>::iterator p2_iter;
+      bool match = false;
+      for (p2_iter = fNuWroEvent->post.begin();
+	   p2_iter != fNuWroEvent->post.end(); p2_iter++) {
+	particle p2 = (*p2_iter);
+	// Check energy and pdg
+	// A very small cascade which changes the energy by 1E-5 MeV should be
+	// matched
+	match = (fabs(p2.E() - p.E()) < 1E-5 && p2.pdg == p.pdg);
+	// If we match p to p2 break the loop
+	if (match)
+	  break;
+      }
+      // If we've looped through the whole particle stack of post-FSI and haven't
+      // found a match it's a primary particle that has been FSIed
+      if (!match)
+	AddNuWroParticle(fNUISANCEEvent, (*p_iter), kFSIState, true);
+    }
   }
 
   // Loop over the final state particles
@@ -387,7 +405,7 @@ void NuWroInputHandler::CalcNUISANCEKinematics() {
   fNUISANCEEvent->OrderStack();
 
   FitParticle *ISAnyLepton = fNUISANCEEvent->GetHMISAnyLeptons();
-  if (ISAnyLepton) {
+  if (ISAnyLepton && !fIsHadron) {
     fNUISANCEEvent->probe_E = ISAnyLepton->E();
     fNUISANCEEvent->probe_pdg = ISAnyLepton->PDG();
   }
