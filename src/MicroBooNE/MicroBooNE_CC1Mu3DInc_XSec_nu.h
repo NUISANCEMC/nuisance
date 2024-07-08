@@ -16,8 +16,8 @@
 *    You should have received a copy of the GNU General Public License
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
-#ifndef MICROBOONE_CC1MU0pNp_NU_H_SEEN
-#define MICROBOONE_CC1MU0pNp_NU_H_SEEN
+#ifndef MICROBOONE_CC1MU3DINC_NU_H_SEEN
+#define MICROBOONE_CC1MU3DINC_NU_H_SEEN
 
 #pragma once
 
@@ -29,15 +29,14 @@ class TH1D;
 class TH2D;
 class TFile;
 
-template <distribution_t D, distribution_t... Ds>
-class CC1Mu0pNpHelper {
+class CCInc3DHelper {
 
 public:
-  CC1Mu0pNpHelper() {
+  CCInc3DHelper() {
 
     f_lookup(FitPar::GetDataBase() +
-             "/MicroBooNE/CC1Mu0pNp/real_bins.txt");
-    f_lookup.cache_realbins<D, Ds...>();
+             "/MicroBooNE/CCinc3D/real_bins.txt");
+    f_lookup.cache_realbins<kEnuCosThetaMuEMu>();
 
     int nbins = f_lookup.get_totalbins();
     m_data     = new TVectorD(nbins);
@@ -55,7 +54,6 @@ public:
   LookupTable get_lookuptable() const { return f_lookup; }
 
 private:
-  std::array<distribution_t, sizeof...(Ds) + 1> f_dist{D, Ds...};
   LookupTable f_lookup;
   TMatrixDSym* m_cov = NULL;
   TMatrixD* m_ac = NULL;
@@ -66,10 +64,10 @@ public:
 
     // load our histograms
     TFile* inputRootFile = TFile::Open((FitPar::GetDataBase() +
-                                       "/MicroBooNE/CC1Mu0pNp/MicroBooNE_CC1Mu0pNp_data_release.root").c_str());
-    TH1D* hFullData = (TH1D *)inputRootFile->Get("MicroBooNE_CC1Mu0pNp_data");
-    TH2D* hFullCov =  (TH2D *)inputRootFile->Get("MicroBooNE_CC1Mu0pNp_unfcov");
-    TH2D* hFullAc =   (TH2D *)inputRootFile->Get("MicroBooNE_CC1Mu0pNp_Ac");
+                                       "/MicroBooNE/CCinc3D/MicroBooNE_CCInc3D_data_release.root").c_str());
+    TH1D* hFullData = (TH1D *)inputRootFile->Get("MicroBooNE_CCInc3D_data");
+    TH2D* hFullCov =  (TH2D *)inputRootFile->Get("MicroBooNE_CCInc3D_unfcov");
+    TH2D* hFullAc =   (TH2D *)inputRootFile->Get("MicroBooNE_CCInc3D_Ac");
 
     int full_bins = hFullData->GetNbinsX()+2;
     TVectorD*    m_fulldata = new TVectorD    (full_bins, hFullData->GetArray());
@@ -78,24 +76,11 @@ public:
     // this needs to be transposed to get the right format for some reason
     // for the covariance its okay, since its symmetric
     m_fullac->Transpose(*m_fullac);
-    // form subset of histograms based on cached Ds
-    int curr_bin = 0;
-    for (auto it=this->f_dist.begin(); it != this->f_dist.end(); ++it) {
-      distribution_t dist = *it;
-      // get the sub measurements
-      int  sub_bins = f_lookup.get_nbins(dist);
-      auto sub_data = m_fulldata->GetSub(dist+1, dist+sub_bins);
-      auto sub_cov  = m_fullcov ->GetSub(dist+1, dist+sub_bins,
-                                         dist+1, dist+sub_bins);
-      auto sub_ac   = m_fullac  ->GetSub(dist+1, dist+sub_bins,
-                                         dist+1, dist+sub_bins);
-      // store it in our new bins
-      m_data->SetSub(curr_bin, sub_data);
-      m_cov ->SetSub(curr_bin, sub_cov);
-      m_ac  ->SetSub(curr_bin, curr_bin, sub_ac);
-
-      curr_bin += sub_bins;
-    }
+    *m_data = m_fulldata->GetSub(1, full_bins - 2);
+    *m_cov  = m_fullcov ->GetSub(1, full_bins - 2,
+                                 1, full_bins - 2);
+    *m_ac   = m_fullac  ->GetSub(1, full_bins - 2,
+                                 1, full_bins - 2);
     // free up the memory we just used
     hFullData->Reset();
     hFullCov ->Reset();
@@ -108,15 +93,14 @@ public:
   }
 };
 
-template <distribution_t D>
-class MicroBooNE_CC1Mu0pNp_XSec_nu : public Measurement1D {
+class MicroBooNE_CC1Mu3DInc_XSec_nu : public Measurement1D {
 
 public:
   /// Basic Constructor.
-  MicroBooNE_CC1Mu0pNp_XSec_nu(nuiskey samplekey);
+  MicroBooNE_CC1Mu3DInc_XSec_nu(nuiskey samplekey);
 
   /// Virtual Destructor
-  ~MicroBooNE_CC1Mu0pNp_XSec_nu() {};
+  ~MicroBooNE_CC1Mu3DInc_XSec_nu() {};
 
   /// Apply signal definition
   bool isSignal(FitEvent* nvect);
