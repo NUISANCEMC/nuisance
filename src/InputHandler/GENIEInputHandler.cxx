@@ -275,6 +275,7 @@ FitEvent *GENIEInputHandler::GetNuisanceEvent(const UInt_t ent,
 
   // Read Entry from TTree to fill NEUT Vect in BaseFitEvt;
   fGENIETree->GetEntry(entry);
+  fNUISANCEEvent->SetGenieEvent(fGenieNtpl);
 
   // Run NUISANCE Vector Filler
   if (!lightweight) {
