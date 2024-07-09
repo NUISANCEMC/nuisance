@@ -106,11 +106,11 @@ void MicroBooNE_CC1Mu3DInc_XSec_nu::FillEventVariables(FitEvent *customEvent)
   const double MeV2GeV = 0.001;
 
   FitParticle* Muon = customEvent->GetHMFSParticle(13);
-  double EMu = Muon->E()*MeV2GeV;
+  double PMu = Muon->p()*MeV2GeV;
   double CosThetaMu = Muon->P3()[2]/Muon->p();
 
   double ENu = customEvent->Enu()*MeV2GeV;
-  fXVar = fTable.find_bin<kEnuCosThetaMuEMu>(ENu, CosThetaMu, EMu);
+  fXVar = fTable.find_bin<kEnuCosThetaMuEMu>(ENu, CosThetaMu, PMu);
 }
 
 //********************************************************************
