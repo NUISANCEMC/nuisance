@@ -23,46 +23,21 @@
 
 #include <TMatrixDfwd.h>
 #include "Measurement1D.h"
-#include "WCAnaHelper.h"
+#include "WireCellHelper.h"
 
 class TH1D;
 class TH2D;
 class TFile;
 
 template <distribution_t D, distribution_t... Ds>
-class CC1Mu0pNpHelper {
-
+class CC1Mu0pNpHelper : public IWireCellHelper<D, Ds...> {
 public:
-  CC1Mu0pNpHelper() {
-
-    f_lookup(FitPar::GetDataBase() +
-             "/MicroBooNE/CC1Mu0pNp/real_bins.txt");
-    f_lookup.cache_realbins<D, Ds...>();
-
-    int nbins = f_lookup.get_totalbins();
-    m_data     = new TVectorD(nbins);
-    m_cov      = new TMatrixDSym(nbins);
-    m_ac       = new TMatrixD(nbins, nbins);
-  }
-
-  TH1D* get_data()         const { return new TH1D(*m_data); }
-  TH2D* get_cov()          const { return new TH2D(*m_cov); }
-  TH2D* get_ac()           const { return new TH2D(*m_ac); }
-  TVectorD* get_data_v()   const { return m_data; }
-  TMatrixDSym* get_cov_m() const { return m_cov; }
-  TMatrixD* get_ac_m()     const { return m_ac; }
-
-  LookupTable get_lookuptable() const { return f_lookup; }
-
-private:
-  std::array<distribution_t, sizeof...(Ds) + 1> f_dist{D, Ds...};
-  LookupTable f_lookup;
-  TMatrixDSym* m_cov = NULL;
-  TMatrixD* m_ac = NULL;
-  TVectorD* m_data = NULL;
-
-public:
-  void load_measurement() {
+  CC1Mu0pNpHelper() :
+    IWireCellHelper<D, Ds...>(FitPar::GetDataBase() +
+                              "/MicroBooNE/CC1Mu0pNp/real_bins.txt")
+  {}
+  // this gives us the measurements based on the blocks we requested
+  void load_measurement() override {
 
     // load our histograms
     TFile* inputRootFile = TFile::Open((FitPar::GetDataBase() +
@@ -80,19 +55,20 @@ public:
     m_fullac->Transpose(*m_fullac);
     // form subset of histograms based on cached Ds
     int curr_bin = 0;
-    for (auto it=this->f_dist.begin(); it != this->f_dist.end(); ++it) {
+    auto f_dist = (this->f_lookup).get_dists();
+    for (auto it=f_dist.begin(); it != f_dist.end(); ++it) {
       distribution_t dist = *it;
       // get the sub measurements
-      int  sub_bins = f_lookup.get_nbins(dist);
+      int  sub_bins = (this->f_lookup).get_nbins(dist);
       auto sub_data = m_fulldata->GetSub(dist+1, dist+sub_bins);
       auto sub_cov  = m_fullcov ->GetSub(dist+1, dist+sub_bins,
                                          dist+1, dist+sub_bins);
       auto sub_ac   = m_fullac  ->GetSub(dist+1, dist+sub_bins,
                                          dist+1, dist+sub_bins);
       // store it in our new bins
-      m_data->SetSub(curr_bin, sub_data);
-      m_cov ->SetSub(curr_bin, sub_cov);
-      m_ac  ->SetSub(curr_bin, curr_bin, sub_ac);
+      (this->m_data)->SetSub(curr_bin, sub_data);
+      (this->m_cov) ->SetSub(curr_bin, sub_cov);
+      (this->m_ac)  ->SetSub(curr_bin, curr_bin, sub_ac);
 
       curr_bin += sub_bins;
     }
@@ -103,12 +79,11 @@ public:
     delete m_fulldata;
     delete m_fullcov;
     delete m_fullac;
-
     inputRootFile->Close();
   }
 };
 
-template <distribution_t D>
+template <distribution_t D, distribution_t... Ds>
 class MicroBooNE_CC1Mu0pNp_XSec_nu : public Measurement1D {
 
 public:
@@ -121,8 +96,13 @@ public:
   /// Apply signal definition
   bool isSignal(FitEvent* nvect);
 
-  /// Fill kinematic distributions
+  /// Fill (but don't actually) kinematic distributions
   void FillEventVariables(FitEvent* customEvent);
+
+  /// we override the base class method and
+  /// fill for each block
+  /// since an event can belong to multiple bins
+  void FillHistograms();
 
   /// Additional smearing matrix multiplication by Ac
   void ConvertEventRates();
@@ -130,6 +110,8 @@ public:
 private:
   TMatrixD*      fSmearingMatrix;
   LookupTable    fTable;
+  dists_t        fDists;
+  std::map<distribution_t, double> fXVars;
 
 };
 #endif

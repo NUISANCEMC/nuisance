@@ -23,44 +23,16 @@
 
 #include <TMatrixDfwd.h>
 #include "Measurement1D.h"
-#include "WCAnaHelper.h"
+#include "WireCellHelper.h"
 
-class TH1D;
-class TH2D;
-class TFile;
-
-class CCInc3DHelper {
+class CCInc3DHelper : public IWireCellHelper<kEnuCosThetaMuEMu> {
 
 public:
-  CCInc3DHelper() {
-
-    f_lookup(FitPar::GetDataBase() +
-             "/MicroBooNE/CCinc3D/real_bins.txt");
-    f_lookup.cache_realbins<kEnuCosThetaMuEMu>();
-
-    int nbins = f_lookup.get_totalbins();
-    m_data     = new TVectorD(nbins);
-    m_cov      = new TMatrixDSym(nbins);
-    m_ac       = new TMatrixD(nbins, nbins);
-  }
-
-  TH1D* get_data()         const { return new TH1D(*m_data); }
-  TH2D* get_cov()          const { return new TH2D(*m_cov); }
-  TH2D* get_ac()           const { return new TH2D(*m_ac); }
-  TVectorD* get_data_v()   const { return m_data; }
-  TMatrixDSym* get_cov_m() const { return m_cov; }
-  TMatrixD* get_ac_m()     const { return m_ac; }
-
-  LookupTable get_lookuptable() const { return f_lookup; }
-
-private:
-  LookupTable f_lookup;
-  TMatrixDSym* m_cov = NULL;
-  TMatrixD* m_ac = NULL;
-  TVectorD* m_data = NULL;
-
-public:
-  void load_measurement() {
+  CCInc3DHelper() :
+    IWireCellHelper<kEnuCosThetaMuEMu>(FitPar::GetDataBase() +
+                                       "/MicroBooNE/CCinc3D/real_bins.txt")
+  {}
+  void load_measurement() override {
 
     // load our histograms
     TFile* inputRootFile = TFile::Open((FitPar::GetDataBase() +
@@ -76,10 +48,10 @@ public:
     // this needs to be transposed to get the right format for some reason
     // for the covariance its okay, since its symmetric
     m_fullac->Transpose(*m_fullac);
-    *m_data = m_fulldata->GetSub(1, full_bins - 2);
-    *m_cov  = m_fullcov ->GetSub(1, full_bins - 2,
+    *(this->m_data) = m_fulldata->GetSub(1, full_bins - 2);
+    *(this->m_cov)  = m_fullcov ->GetSub(1, full_bins - 2,
                                  1, full_bins - 2);
-    *m_ac   = m_fullac  ->GetSub(1, full_bins - 2,
+    *(this->m_ac)   = m_fullac  ->GetSub(1, full_bins - 2,
                                  1, full_bins - 2);
     // free up the memory we just used
     hFullData->Reset();
@@ -88,7 +60,6 @@ public:
     delete m_fulldata;
     delete m_fullcov;
     delete m_fullac;
-
     inputRootFile->Close();
   }
 };

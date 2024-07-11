@@ -24,8 +24,8 @@
 #include "TH2D.h"
 
 //********************************************************************
-template <distribution_t D>
-MicroBooNE_CC1Mu0pNp_XSec_nu<D>::MicroBooNE_CC1Mu0pNp_XSec_nu(
+template <distribution_t D, distribution_t... Ds>
+MicroBooNE_CC1Mu0pNp_XSec_nu<D, Ds...>::MicroBooNE_CC1Mu0pNp_XSec_nu(
     nuiskey samplekey) {
   //********************************************************************
 
@@ -59,11 +59,14 @@ MicroBooNE_CC1Mu0pNp_XSec_nu<D>::MicroBooNE_CC1Mu0pNp_XSec_nu(
                   1E-38 / (TotalIntegratedFlux())) * 40;
 
   // Setup Histograms
-  CC1Mu0pNpHelper<D> ana_helper;
+  CC1Mu0pNpHelper<D, Ds...> ana_helper;
   ana_helper.load_measurement();
 
   // we access bin numbers and widths for each measurement based on input physics values
   fTable = ana_helper.get_lookuptable();
+  // we don't use the template arguments and fetch it from here instead
+  // to handle the kAll case
+  fDists = fTable.get_dists();
 
   // the data histogram
   fDataHist = (TH1D *)ana_helper.get_data();
@@ -72,7 +75,13 @@ MicroBooNE_CC1Mu0pNp_XSec_nu<D>::MicroBooNE_CC1Mu0pNp_XSec_nu(
 
   // the measurement covariance
   fFullCovar = ana_helper.get_cov_m();
-  (*fFullCovar) *= 1E4;
+  // scale it by a large factor to help the inversion
+  (*fFullCovar) *= 1E10;
+  covar = StatUtils::GetInvert(fFullCovar, true);
+
+  // scale it back to the real scale
+  (*fFullCovar) *= 1E-6;
+  (*covar) *= 1E6;
 
   // set the errors to the ones from covariance matrix
   // don't think this is actually needed but atleast suppresses some warnings
@@ -89,15 +98,15 @@ MicroBooNE_CC1Mu0pNp_XSec_nu<D>::MicroBooNE_CC1Mu0pNp_XSec_nu(
 }
 
 //********************************************************************
-template <distribution_t D>
-bool MicroBooNE_CC1Mu0pNp_XSec_nu<D>::isSignal(FitEvent *nvect)
+template <distribution_t D, distribution_t... Ds>
+bool MicroBooNE_CC1Mu0pNp_XSec_nu<D, Ds...>::isSignal(FitEvent *nvect)
 {
-  return SignalDef::isCCINC(nvect, 14, EnuMin, EnuMax);
+  return (SignalDef::isCCINC(nvect, 14, EnuMin, EnuMax)) && (nvect->NumFSMuon() == 1);
 }
 
 //********************************************************************
-template <distribution_t D>
-void MicroBooNE_CC1Mu0pNp_XSec_nu<D>::FillEventVariables(FitEvent *customEvent)
+template <distribution_t D, distribution_t... Ds>
+void MicroBooNE_CC1Mu0pNp_XSec_nu<D, Ds...>::FillEventVariables(FitEvent *customEvent)
 {
 
   if (!isSignal(customEvent)) { // double the work, but it lets us use the below
@@ -113,11 +122,11 @@ void MicroBooNE_CC1Mu0pNp_XSec_nu<D>::FillEventVariables(FitEvent *customEvent)
   double CosThetaMu = Muon->P3()[2]/Muon->p();
 
   double ENu = customEvent->Enu()*MeV2GeV;
-  double TransferEnergy = Enu - EMu;
+  double TransferEnergy = ENu - EMu;
 
   int NProton = 0;
   double AvailEnergy = 0.;
-  std::vector<int> AllFSIndices = customEvent->GetAllFSParticleIndices();
+  std::vector<int> AllFSIndices = customEvent->GetAllFSParticleIndices(0);
   // start loop
   for(int i = 0; i < AllFSIndices.size(); i++){
     int pdg = customEvent->GetParticlePDG(AllFSIndices.at(i));
@@ -151,75 +160,105 @@ void MicroBooNE_CC1Mu0pNp_XSec_nu<D>::FillEventVariables(FitEvent *customEvent)
       ProtonCosTheta = LeadingProton->P3()[2]/LeadingProton->p();
   }
 
-  switch(D){
-    case k0pNpEMu:
-      fXVar = fTable.find_bin<D>(EMu, ProtonKE);
-      break;
-    case k0pNpCosThetaMu:
-      fXVar = fTable.find_bin<D>(CosThetaMu, ProtonKE);
-      break;
-    case k0pNpEnu:
-      fXVar = fTable.find_bin<D>(ENu, ProtonKE);
-      break;
-    case k0pNpTransferEnergy:
-      fXVar = fTable.find_bin<D>(TransferEnergy, ProtonKE);
-      break;
-    case k0pNpAvailEnergy:
-      fXVar = fTable.find_bin<D>(AvailEnergy, ProtonKE);
-      break;
-    case kProtonKE:
-      fXVar = fTable.find_bin<D>(ProtonKE);
-      break;
-    case kProtonCosTheta:
-      fXVar = fTable.find_bin<D>(ProtonCosTheta);
-      break;
-    case kProtonMult:
-      fXVar = fTable.find_bin<D>(NProton);
-      break;
-    case k0pNpEMuCosThetaMu:
-      fXVar = fTable.find_bin<D>(EMu, CosThetaMu, ProtonKE);
-      break;
-    case kNpProtonKECosTheta:
-      fXVar = fTable.find_bin<D>(ProtonKE, ProtonCosTheta);
-      break;
-    case kXpEMu:
-      fXVar = fTable.find_bin<D>(EMu);
-      break;
-    case kXpCosThetaMu:
-      fXVar = fTable.find_bin<D>(CosThetaMu);
-      break;
-    case kXpEMuCosThetaMu:
-      fXVar = fTable.find_bin<D>(EMu, CosThetaMu);
-      break;
-    case kXpAvailEnergyCosThetaMuEMu:
-      fXVar = fTable.find_bin<D>(EMu, CosThetaMu, AvailEnergy);
-      break;
+  int curr_bin = 0;
+  // loop over our blocks
+  for(auto it = fDists.begin(); it != fDists.end(); ++it){
+    distribution_t dist = *it;
+    int nblockbins = fTable.get_nbins(dist);
+    int localbin = -1;
+    switch(dist){
+      case k0pNpEMu:
+        localbin = fTable.find_bin(dist, EMu, ProtonKE);
+        break;
+      case k0pNpCosThetaMu:
+        localbin = fTable.find_bin(dist, CosThetaMu, ProtonKE);
+        break;
+      case k0pNpEnu:
+        localbin = fTable.find_bin(dist, ENu, ProtonKE);
+        break;
+      case k0pNpTransferEnergy:
+        localbin = fTable.find_bin(dist, TransferEnergy, ProtonKE);
+        break;
+      case k0pNpAvailEnergy:
+        localbin = fTable.find_bin(dist, AvailEnergy, ProtonKE);
+        break;
+      case kProtonKE:
+        localbin = fTable.find_bin(dist, ProtonKE);
+        break;
+      case kProtonCosTheta:
+        localbin = fTable.find_bin(dist, ProtonCosTheta);
+        break;
+      case kProtonMult:
+        localbin = fTable.find_bin(dist, NProton);
+        break;
+      case k0pNpEMuCosThetaMu:
+        localbin = fTable.find_bin(dist, EMu, CosThetaMu, ProtonKE);
+        break;
+      case kNpProtonKECosTheta:
+        localbin = fTable.find_bin(dist, ProtonKE, ProtonCosTheta);
+        break;
+      case kXpEMu:
+        localbin = fTable.find_bin(dist, EMu);
+        break;
+      case kXpCosThetaMu:
+        localbin = fTable.find_bin(dist, CosThetaMu);
+        break;
+      case kXpEMuCosThetaMu:
+        localbin = fTable.find_bin(dist, EMu, CosThetaMu);
+        break;
+      case kXpAvailEnergyCosThetaMuEMu:
+        localbin = fTable.find_bin(dist, EMu, CosThetaMu, AvailEnergy);
+        break;
+    }
+    // don't do anything else here
+    // we fill in our own FillHistograms directly
+    // since an event can belong to multiple bins
+    fXVars[dist] = (localbin < 0) ? -999 : localbin + curr_bin;
+    curr_bin += nblockbins;
   }
 }
 
 //********************************************************************
-template <distribution_t D>
-void MicroBooNE_CC1Mu0pNp_XSec_nu<D>::ConvertEventRates() {
+template <distribution_t D, distribution_t... Ds>
+void MicroBooNE_CC1Mu0pNp_XSec_nu<D, Ds...>::FillHistograms() {
+  // loop over our blocks and fill for each one of them
+  for(auto it = fDists.begin(); it != fDists.end(); ++it){
+    distribution_t dist = *it;
+    fXVar = fXVars[dist];
+    Measurement1D::FillHistograms();
+  }
+}
 
-  int n = fMCHist->GetNbinsX();
+//********************************************************************
+template <distribution_t D, distribution_t... Ds>
+void MicroBooNE_CC1Mu0pNp_XSec_nu<D, Ds...>::ConvertEventRates() {
 
   // standard conversion
   Measurement1D::ConvertEventRates();
+  int curr_bin = 0;
+  // loop over our blocks
+  for(auto it = fDists.begin(); it != fDists.end(); ++it){
+    distribution_t dist = *it;
+    int nblockbins = fTable.get_nbins(dist);
+    // loop through the block
+    for(int i = 0; i < nblockbins; i++){
+      // convert to differential xsec by scaling it wrt the bin widths
+      double bin_width = fTable.get_width(dist, i);
+      // for xsec vs neutrino energy, we divide by the fraction of flux
+      // producing the events in that energy range
+      double scaling = 1.;
+      if(dist == k0pNpEnu)
+        scaling = fTable.apply(dist, i,
+                               GetFluxFraction, GetFluxHistogram());
 
-  // convert to differential xsec by scaling it wrt the bin widths
-  for(int i = 0; i < n; i++){
-    double bin_width = fTable.get_width(D, i);
-    // for xsec vs neutrino energy, we divide by the fraction of flux
-    // producing the events in that energy range
-    double scaling = 1.;
-    if(D == k0pNpEnu)
-      scaling = fTable.apply<D>(i, GetFluxFraction, GetFluxHistogram());
-
-    fMCHist->SetBinContent(i + 1, fMCHist->GetBinContent(i + 1)/(bin_width*scaling));
-    fMCHist->SetBinError(i + 1, fMCHist->GetBinError(i + 1)/(bin_width*scaling));
+      fMCHist->SetBinContent(curr_bin + i + 1, fMCHist->GetBinContent(curr_bin + i + 1)/(bin_width*scaling));
+      fMCHist->SetBinError(curr_bin + i + 1, fMCHist->GetBinError(curr_bin + i + 1)/(bin_width*scaling));
+    }
+    curr_bin += nblockbins;
   }
 
   // now apply Wiener-SVD Ac smearing
+  int n = fMCHist->GetNbinsX();
   TVectorD v(n), e(n);
   for (int i = 0; i < n; i++) {
     v(i) = fMCHist->GetBinContent(i + 1);
@@ -249,3 +288,4 @@ template class MicroBooNE_CC1Mu0pNp_XSec_nu<kXpEMu>;
 template class MicroBooNE_CC1Mu0pNp_XSec_nu<kXpCosThetaMu>;
 template class MicroBooNE_CC1Mu0pNp_XSec_nu<kXpEMuCosThetaMu>;
 template class MicroBooNE_CC1Mu0pNp_XSec_nu<kXpAvailEnergyCosThetaMuEMu>;
+template class MicroBooNE_CC1Mu0pNp_XSec_nu<kAll>;

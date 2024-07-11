@@ -110,7 +110,7 @@ void MicroBooNE_CC1Mu3DInc_XSec_nu::FillEventVariables(FitEvent *customEvent)
   double CosThetaMu = Muon->P3()[2]/Muon->p();
 
   double ENu = customEvent->Enu()*MeV2GeV;
-  fXVar = fTable.find_bin<kEnuCosThetaMuEMu>(ENu, CosThetaMu, PMu);
+  fXVar = fTable.find_bin(kEnuCosThetaMuEMu, ENu, CosThetaMu, PMu);
 }
 
 //********************************************************************
@@ -126,7 +126,8 @@ void MicroBooNE_CC1Mu3DInc_XSec_nu::ConvertEventRates() {
     double bin_width = fTable.get_width(kEnuCosThetaMuEMu, i);
     // for xsec vs neutrino energy, we divide by the fraction of flux
     // producing the events in that energy range
-    double scaling = fTable.apply<kEnuCosThetaMuEMu>(i, GetFluxFraction, GetFluxHistogram());
+    double scaling = fTable.apply(kEnuCosThetaMuEMu, i,
+                                  GetFluxFraction, GetFluxHistogram());
 
     fMCHist->SetBinContent(i + 1, fMCHist->GetBinContent(i + 1)/(bin_width*scaling));
     fMCHist->SetBinError(i + 1, fMCHist->GetBinError(i + 1)/(bin_width*scaling));

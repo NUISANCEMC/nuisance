@@ -1150,6 +1150,8 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
       return (new MicroBooNE_CC1Mu0pNp_XSec_nu<distribution_t::kXpEMuCosThetaMu>(samplekey));
     } else if (!name.compare("MicroBooNE_CC1MuXp_XSec_AvailEnergyCosThetaMuEMu_nu")) {
       return (new MicroBooNE_CC1Mu0pNp_XSec_nu<distribution_t::kXpAvailEnergyCosThetaMuEMu>(samplekey));
+    } else if (!name.compare("MicroBooNE_CC1Mu0pNp_XSec_All_nu")) {
+      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<distribution_t::kAll>(samplekey));
     } else if (!name.compare("MicroBooNE_CC1Mu3DInc_XSec_nu")) {
       return (new MicroBooNE_CC1Mu3DInc_XSec_nu(samplekey));
     } else
