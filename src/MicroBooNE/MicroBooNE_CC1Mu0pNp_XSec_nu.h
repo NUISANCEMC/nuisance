@@ -47,12 +47,12 @@ public:
     TH2D* hFullAc =   (TH2D *)inputRootFile->Get("MicroBooNE_CC1Mu0pNp_Ac");
 
     int full_bins = hFullData->GetNbinsX()+2;
-    TVectorD*    m_fulldata = new TVectorD    (full_bins, hFullData->GetArray());
-    TMatrixDSym* m_fullcov  = new TMatrixDSym (full_bins, hFullCov->GetArray(), "D");
-    TMatrixD*    m_fullac   = new TMatrixD    (full_bins, full_bins, hFullAc->GetArray(), "D");
+    TVectorD*    m_fulldata = new TVectorD (full_bins, hFullData->GetArray());
+    TMatrixD*    m_fullcov  = new TMatrixD (full_bins, full_bins, hFullCov->GetArray(), "D");
+    TMatrixD*    m_fullac   = new TMatrixD (full_bins, full_bins, hFullAc->GetArray(), "D");
     // this needs to be transposed to get the right format for some reason
-    // for the covariance its okay, since its symmetric
     m_fullac->Transpose(*m_fullac);
+    m_fullcov->Transpose(*m_fullcov);
 
     // form subset of histograms based on cached Ds
     // loop over the row
@@ -72,8 +72,12 @@ public:
           // get the block measurements
           int block_bins_j = (this->f_lookup).get_nbins(dist_j);
           for(int j = 0; j < block_bins_j; j++){
-             (*(this->m_cov))(curr_bin_i + i, curr_bin_j + j) = (*m_fullcov)(dist_i + i + 1, dist_j + j + 1);
-             (*(this->m_ac))(curr_bin_i + i, curr_bin_j + j) = (*m_fullac)(dist_i + i + 1, dist_j + j + 1);
+            (*(this->m_ac))(curr_bin_i + i, curr_bin_j + j) = (*m_fullac)(dist_i + i + 1, dist_j + j + 1);
+            // make sure its read as symmetric
+            if(dist_j+j > dist_i+i)
+              (*(this->m_cov))(curr_bin_i + i, curr_bin_j + j) = (*m_fullcov)(dist_i + i + 1, dist_j + j + 1);
+            else
+              (*(this->m_cov))(curr_bin_i + i, curr_bin_j + j) = (*m_fullcov)(dist_j + j + 1, dist_i + i + 1);
           }
           curr_bin_j += block_bins_j;
         } // end column

@@ -77,14 +77,7 @@ MicroBooNE_CC1Mu0pNp_XSec_nu<D, Ds...>::MicroBooNE_CC1Mu0pNp_XSec_nu(
   // the measurement covariance
   fFullCovar = ana_helper.get_cov_m();
   // scale it by a large factor to help the inversion
-  (*fFullCovar) *= 1E20;
-  covar = StatUtils::GetInvert(fFullCovar, true);
-  fDecomp = StatUtils::GetDecomp(fFullCovar);
-
-  // scale it back to the real scale
-  (*fFullCovar) *= 1E-16;
-  (*fDecomp) *= 1E-16;
-  (*covar) *= 1E16;
+  (*fFullCovar) *= 1E4;
 
   // set the errors to the ones from covariance matrix
   // don't think this is actually needed but atleast suppresses some warnings
@@ -98,6 +91,7 @@ MicroBooNE_CC1Mu0pNp_XSec_nu<D, Ds...>::MicroBooNE_CC1Mu0pNp_XSec_nu(
   FinaliseMeasurement();
 
   fSaveFine = false;
+
 }
 
 //********************************************************************
