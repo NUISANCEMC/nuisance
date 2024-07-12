@@ -53,25 +53,33 @@ public:
     // this needs to be transposed to get the right format for some reason
     // for the covariance its okay, since its symmetric
     m_fullac->Transpose(*m_fullac);
-    // form subset of histograms based on cached Ds
-    int curr_bin = 0;
-    auto f_dist = (this->f_lookup).get_dists();
-    for (auto it=f_dist.begin(); it != f_dist.end(); ++it) {
-      distribution_t dist = *it;
-      // get the sub measurements
-      int  sub_bins = (this->f_lookup).get_nbins(dist);
-      auto sub_data = m_fulldata->GetSub(dist+1, dist+sub_bins);
-      auto sub_cov  = m_fullcov ->GetSub(dist+1, dist+sub_bins,
-                                         dist+1, dist+sub_bins);
-      auto sub_ac   = m_fullac  ->GetSub(dist+1, dist+sub_bins,
-                                         dist+1, dist+sub_bins);
-      // store it in our new bins
-      (this->m_data)->SetSub(curr_bin, sub_data);
-      (this->m_cov) ->SetSub(curr_bin, sub_cov);
-      (this->m_ac)  ->SetSub(curr_bin, curr_bin, sub_ac);
 
-      curr_bin += sub_bins;
-    }
+    // form subset of histograms based on cached Ds
+    // loop over the row
+    int curr_bin_i = 0;
+    auto f_dist = (this->f_lookup).get_dists();
+    for (auto it_i=f_dist.begin(); it_i != f_dist.end(); ++it_i) {
+      distribution_t dist_i = *it_i;
+      // get the block measurements
+      int block_bins_i = (this->f_lookup).get_nbins(dist_i);
+      for(int i = 0; i < block_bins_i; i++){
+        (*(this->m_data))[curr_bin_i + i] = (*m_fulldata)(dist_i + i + 1);
+
+        // now loop over the column
+        int curr_bin_j = 0;
+        for (auto it_j=f_dist.begin(); it_j != f_dist.end(); ++it_j) {
+          distribution_t dist_j = *it_j;
+          // get the block measurements
+          int block_bins_j = (this->f_lookup).get_nbins(dist_j);
+          for(int j = 0; j < block_bins_j; j++){
+             (*(this->m_cov))(curr_bin_i + i, curr_bin_j + j) = (*m_fullcov)(dist_i + i + 1, dist_j + j + 1);
+             (*(this->m_ac))(curr_bin_i + i, curr_bin_j + j) = (*m_fullac)(dist_i + i + 1, dist_j + j + 1);
+          }
+          curr_bin_j += block_bins_j;
+        } // end column
+      }
+      curr_bin_i += block_bins_i;
+    } // end row
     // free up the memory we just used
     hFullData->Reset();
     hFullCov ->Reset();

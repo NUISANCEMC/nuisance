@@ -22,6 +22,7 @@
 
 #include "TH1D.h"
 #include "TH2D.h"
+#include "WireCellHelper.h"
 
 //********************************************************************
 template <distribution_t D, distribution_t... Ds>
@@ -76,12 +77,14 @@ MicroBooNE_CC1Mu0pNp_XSec_nu<D, Ds...>::MicroBooNE_CC1Mu0pNp_XSec_nu(
   // the measurement covariance
   fFullCovar = ana_helper.get_cov_m();
   // scale it by a large factor to help the inversion
-  (*fFullCovar) *= 1E10;
+  (*fFullCovar) *= 1E20;
   covar = StatUtils::GetInvert(fFullCovar, true);
+  fDecomp = StatUtils::GetDecomp(fFullCovar);
 
   // scale it back to the real scale
-  (*fFullCovar) *= 1E-6;
-  (*covar) *= 1E6;
+  (*fFullCovar) *= 1E-16;
+  (*fDecomp) *= 1E-16;
+  (*covar) *= 1E16;
 
   // set the errors to the ones from covariance matrix
   // don't think this is actually needed but atleast suppresses some warnings
@@ -117,47 +120,55 @@ void MicroBooNE_CC1Mu0pNp_XSec_nu<D, Ds...>::FillEventVariables(FitEvent *custom
   // real physics observables go here
   const double MeV2GeV = 0.001;
 
+  // muon
   FitParticle* Muon = customEvent->GetHMFSParticle(13);
   double EMu = Muon->E()*MeV2GeV;
   double CosThetaMu = Muon->P3()[2]/Muon->p();
 
+  // energy related
   double ENu = customEvent->Enu()*MeV2GeV;
   double TransferEnergy = ENu - EMu;
-
-  int NProton = 0;
   double AvailEnergy = 0.;
+
+  // proton
+  int NProton = 0;
+  double ProtonKE = 0.;
+  double ProtonCosTheta = -5.;
+
   std::vector<int> AllFSIndices = customEvent->GetAllFSParticleIndices(0);
   // start loop
   for(int i = 0; i < AllFSIndices.size(); i++){
     int pdg = customEvent->GetParticlePDG(AllFSIndices.at(i));
+    // ignore muon and neutrons
     if(abs(pdg) == 13 || pdg == 2112) continue;
 
     double KE = customEvent->GetParticle(AllFSIndices.at(i))->KE()*MeV2GeV;
+    double E  = customEvent->GetParticle(AllFSIndices.at(i))->E()*MeV2GeV;
+    double M  = customEvent->GetParticle(AllFSIndices.at(i))->M()*MeV2GeV;
+    double Pz  = customEvent->GetParticle(AllFSIndices.at(i))->P3()[2]*MeV2GeV;
+    double P  = customEvent->GetParticle(AllFSIndices.at(i))->p()*MeV2GeV;
+
+    // Ben saw some weirdness with GiBUU, so lets replicate his checks
+    if(E < M) continue;
     // sum up protons
     if(pdg == 2212){
+      // get the leading proton observables
+      if(KE > ProtonKE){
+        ProtonKE = KE;
+        if(KE >= 0.035) ProtonCosTheta = Pz/P;
+      }
+      // 35 MeV threhold
       if(KE >= 0.035) {
         NProton++;
         AvailEnergy += KE;
       }
     }
     // sum up pions
-    else if(abs(pdg) == 211 || pdg == 111){
-      if(KE >= 0.01) {
-        AvailEnergy += KE;
-      }
+    else if(abs(pdg) == 211){
+      // 10 MeV threshold
+      if(KE >= 0.01) AvailEnergy += KE;
     }
     else AvailEnergy += KE;
-  }
-
-  // leading proton observables
-  int NFSProtons = customEvent->NumFSParticle(2212);
-  double ProtonKE = 0.;
-  double ProtonCosTheta = -5.;
-  if(NFSProtons > 0) {
-    FitParticle* LeadingProton = customEvent->GetHMFSParticle(2212);
-    ProtonKE = LeadingProton->KE()*MeV2GeV;
-    if(NProton > 0)
-      ProtonCosTheta = LeadingProton->P3()[2]/LeadingProton->p();
   }
 
   int curr_bin = 0;
@@ -289,3 +300,4 @@ template class MicroBooNE_CC1Mu0pNp_XSec_nu<kXpCosThetaMu>;
 template class MicroBooNE_CC1Mu0pNp_XSec_nu<kXpEMuCosThetaMu>;
 template class MicroBooNE_CC1Mu0pNp_XSec_nu<kXpAvailEnergyCosThetaMuEMu>;
 template class MicroBooNE_CC1Mu0pNp_XSec_nu<kAll>;
+template class MicroBooNE_CC1Mu0pNp_XSec_nu<k0pNpEMu, k0pNpCosThetaMu, k0pNpEnu, k0pNpTransferEnergy, k0pNpAvailEnergy, kProtonKE, kProtonCosTheta, kProtonMult>;

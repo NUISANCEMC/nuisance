@@ -924,8 +924,7 @@ bool StatUtils::IsMatrixWellBehaved(TMatrixDSym *mat) {
   double d1, d2;
   mat_decomp.Det(d1, d2);
 
-  // mat_decomp.SetTol(TMath::Power(10., -76.));
-  mat_decomp.SetTol(std::numeric_limits<double>::min());
+  mat_decomp.SetTol(TMath::Power(10., -76.));
 
   // Check if the matrix is singular
   if (d1 * TMath::Power(2., d2) < mat_decomp.GetTol()) {
