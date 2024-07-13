@@ -22,6 +22,7 @@
 #include "NuisConfig.h"
 #include "TH1D.h"
 #include "TVector.h"
+#include <limits>
 
 //*******************************************************************
 Double_t StatUtils::GetChi2FromDiag(TH1D *data, TH1D *mc, TH1I *mask) {
@@ -125,6 +126,23 @@ Double_t StatUtils::GetChi2FromCov(TH1D *data, TH1D *mc, TMatrixDSym *invcov,
 
   calc_data->SetDirectory(NULL);
   calc_mc->SetDirectory(NULL);
+  // This fixes a weird ROOT collision where
+  // the TMatrixDSym constructor allows filling a non-symmetric array
+  // whereas cloning that TMatrixDSym object forces it to be symmetric
+  // When using SVDDecomp, it sometimes returns a non-symmetric inverse
+  // which then gets forced symmetric by invcov->Clone above
+  // This means invcov and calc_cov can be different!
+  // And the chisq from this function can become highly inaccurate.
+  // This seems to happen for measurements with large number of bins
+  // Here, we just ensure the Clone actually is identical to the inverse matrix passed in the argument
+  if(UseSVDDecomp){
+    for(int i = 0; i < invcov->GetNrows(); i++){
+      for(int j = 0; j < invcov->GetNrows(); j++){
+        (*calc_cov)(i, j) = (*invcov)(i, j);
+      }
+    }
+  }
+
 
   // If a mask if applied we need to apply it before the matrix is inverted
   if (mask) {
@@ -924,7 +942,7 @@ bool StatUtils::IsMatrixWellBehaved(TMatrixDSym *mat) {
   double d1, d2;
   mat_decomp.Det(d1, d2);
 
-  mat_decomp.SetTol(TMath::Power(10., -76.));
+  mat_decomp.SetTol(std::numeric_limits<double>::min());
 
   // Check if the matrix is singular
   if (d1 * TMath::Power(2., d2) < mat_decomp.GetTol()) {
