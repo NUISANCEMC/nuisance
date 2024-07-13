@@ -76,7 +76,7 @@ MicroBooNE_CC1Mu0pNp_XSec_nu<D, Ds...>::MicroBooNE_CC1Mu0pNp_XSec_nu(
 
   // the measurement covariance
   fFullCovar = ana_helper.get_cov_m();
-  // scale it by a large factor to help the inversion
+  // convert from 10^-72 -> 10^-76 which nuisance expects
   (*fFullCovar) *= 1E4;
 
   // set the errors to the ones from covariance matrix
