@@ -68,10 +68,10 @@ static std::map<distribution_t, int> kProtonBoundary = {
 
 // don't want to type all these out
 template<std::size_t N> using edges_t = std::map<distribution_t, std::vector<std::array<double, 2*N>>>;
-using widths_t = std::map<distribution_t, std::vector<double>>;
+using widths_t     = std::map<distribution_t, std::vector<double>>;
 using dimensions_t = std::map<distribution_t, int>;
-using bins_t = std::map<distribution_t, int>;
-using dists_t = std::vector<distribution_t>;
+using bins_t       = std::map<distribution_t, int>;
+using dists_t      = std::vector<distribution_t>;
 
 // our main helper class that returns a combination of measurements if asked for
 class LookupTable {
@@ -84,10 +84,10 @@ public:
   LookupTable& operator=(const LookupTable &) = default;
   void operator()(std::string newfile) { f_txtfile = newfile; }
 
-  dimensions_t get_ndims() const { return f_ndims;  }
-  widths_t get_widths()    const { return f_widths; }
-  bins_t get_nbins()       const { return f_nbins;  }
-  dists_t get_dists()      const { return f_dists;  }
+  dimensions_t get_ndims()  const { return f_ndims;  }
+  widths_t     get_widths() const { return f_widths; }
+  bins_t       get_nbins()  const { return f_nbins;  }
+  dists_t      get_dists()  const { return f_dists;  }
 
   int get_totalbins() const {
     int n = 0;
@@ -97,11 +97,11 @@ public:
   }
   // useful functions for each distribution within the cache
   int get_nbins(distribution_t D) const {
-    assert(!(D == distribution_t::kAll));
+    assert(!(D == distribution_t::kAll) && "Invalid Lookup!");
     return f_nbins.at(D);
   }
   double get_width(distribution_t D, int bin) const {
-    assert(!(D == distribution_t::kAll));
+    assert(!(D == distribution_t::kAll) && "Invalid Lookup!");
     return f_widths.at(D).at(bin);
   }
   // apply a general function on the bin edges
@@ -110,7 +110,7 @@ public:
   // func also should return a double
   template<typename F, typename... Args>
   double apply(distribution_t D, int bin, F func, Args&& ... args) const {
-    assert(!(D == distribution_t::kAll));
+    assert(!(D == distribution_t::kAll) && "Invalid Lookup!");
     int dim = f_ndims.at(D);
     // this might be a bit ugly but feel like it comes together later
     if(dim == 1){
@@ -134,7 +134,7 @@ public:
   // based on input values for individual physics observables
   template <typename... Args>
   int find_bin(distribution_t D, Args&& ... values) const {
-    assert(!(D == distribution_t::kAll));
+    assert(!(D == distribution_t::kAll) && "Invalid Lookup!");
 
     std::array<double, sizeof...(values)> array_vals({static_cast<double>(values)...});
     int dim = f_ndims.at(D);
@@ -168,15 +168,15 @@ public:
   }
 
 private:
-  std::string f_txtfile;
-  bins_t f_nbins;
+  std::string  f_txtfile;
+  bins_t       f_nbins;
   dimensions_t f_ndims;
-  widths_t f_widths;
-  dists_t f_dists;
+  widths_t     f_widths;
+  dists_t      f_dists;
   // max dimension of measurement is 3
-  edges_t<3> f_bins_3d;
-  edges_t<2> f_bins_2d;
-  edges_t<1> f_bins_1d;
+  edges_t<3>   f_bins_3d;
+  edges_t<2>   f_bins_2d;
+  edges_t<1>   f_bins_1d;
 
 public:
   // actually read in the bin edges text file here
@@ -202,10 +202,8 @@ public:
         lo_vars[0] >> hi_vars[0];
 
       // difference between global and local bin indices are constant when we are within the same distribution
-      auto i_dist = std::find(f_dists.begin(), f_dists.end(),
-                             global_bin-bin);
-      if(i_dist == std::end(f_dists))
-        continue;
+      auto i_dist = std::find(f_dists.begin(), f_dists.end(), global_bin-bin);
+      if(i_dist == std::end(f_dists)) continue;
       distribution_t curr_D = f_dists.at(i_dist - f_dists.begin());
 
       int    n_dim = (lo_vars[2] != -1000.) + (lo_vars[1] != -1000.) + 1;
@@ -283,24 +281,24 @@ public:
     m_ac       = new TMatrixD(nbins, nbins);
   }
 
-  TH1D* get_data()         const { return new TH1D(*m_data); }
-  TH2D* get_cov()          const { return new TH2D(*m_cov); }
-  TH2D* get_ac()           const { return new TH2D(*m_ac); }
-  TVectorD* get_data_v()   const { return m_data; }
-  TMatrixDSym* get_cov_m() const { return m_cov; }
-  TMatrixD* get_ac_m()     const { return m_ac; }
+  TH1D*        get_data()        const { return new TH1D(*m_data); }
+  TH2D*        get_cov()         const { return new TH2D(*m_cov); }
+  TH2D*        get_ac()          const { return new TH2D(*m_ac); }
+  TVectorD*    get_data_v()      const { return m_data; }
+  TMatrixDSym* get_cov_m()       const { return m_cov; }
+  TMatrixD*    get_ac_m()        const { return m_ac; }
 
-  LookupTable get_lookuptable() const { return f_lookup; }
+  LookupTable  get_lookuptable() const { return f_lookup; }
   // implement your own method to load
   // a large blockwise reported result or otherwise
   // and distribute into the helper class' measurements
   virtual void load_measurement() = 0;
 
 protected:
-  LookupTable f_lookup;
-  TMatrixDSym* m_cov = NULL;
-  TMatrixD* m_ac = NULL;
-  TVectorD* m_data = NULL;
+  LookupTable  f_lookup;
+  TMatrixDSym* m_cov  = NULL;
+  TMatrixD*    m_ac   = NULL;
+  TVectorD*    m_data = NULL;
 };
 
 // get the flux fraction based on energy ranges
@@ -310,16 +308,19 @@ double GetFluxFraction(std::vector<double> edges, TH1D* fluxHist){
   int lo_bin = fluxHist->FindBin(edges[0]);
   int hi_bin = fluxHist->FindBin(edges[1]);
 
-  double lo_width = fluxHist->GetBinWidth(lo_bin);
-  double hi_width = fluxHist->GetBinWidth(hi_bin);
+  double lo_width   = fluxHist->GetBinWidth(lo_bin);
+  double hi_width   = fluxHist->GetBinWidth(hi_bin);
   double lo_content = fluxHist->GetBinContent(lo_bin);
   double hi_content = fluxHist->GetBinContent(hi_bin);
-  double lo_edge = fluxHist->GetBinLowEdge(lo_bin);
-  double hi_edge = fluxHist->GetBinLowEdge(hi_bin+1);
+  double lo_edge    = fluxHist->GetBinLowEdge(lo_bin);
+  double hi_edge    = fluxHist->GetBinLowEdge(hi_bin+1);
 
+  // get the total integral
   double tot_flux = fluxHist->Integral(lo_bin, hi_bin);
+  // remove fraction upto the low edge and from the high edge
   tot_flux -= (edges[0]-lo_edge)*lo_content/lo_width;
   tot_flux -= (hi_edge-edges[1])*hi_content/hi_width;
+  // fraction of total flux
   tot_flux /= fluxHist->Integral();
 
   return tot_flux;

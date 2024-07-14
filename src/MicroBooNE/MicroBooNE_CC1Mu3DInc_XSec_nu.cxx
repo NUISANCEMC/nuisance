@@ -130,7 +130,7 @@ void MicroBooNE_CC1Mu3DInc_XSec_nu::ConvertEventRates() {
                                   GetFluxFraction, GetFluxHistogram());
 
     fMCHist->SetBinContent(i + 1, fMCHist->GetBinContent(i + 1)/(bin_width*scaling));
-    fMCHist->SetBinError(i + 1, fMCHist->GetBinError(i + 1)/(bin_width*scaling));
+    fMCHist->SetBinError  (i + 1, fMCHist->GetBinError(i + 1)/(bin_width*scaling));
   }
 
   // now apply Wiener-SVD Ac smearing

@@ -139,7 +139,7 @@ void MicroBooNE_CC1Mu0pNp_XSec_nu<D, Ds...>::FillEventVariables(FitEvent *custom
     double KE = customEvent->GetParticle(AllFSIndices.at(i))->KE()*MeV2GeV;
     double E  = customEvent->GetParticle(AllFSIndices.at(i))->E()*MeV2GeV;
     double M  = customEvent->GetParticle(AllFSIndices.at(i))->M()*MeV2GeV;
-    double Pz  = customEvent->GetParticle(AllFSIndices.at(i))->P3()[2]*MeV2GeV;
+    double Pz = customEvent->GetParticle(AllFSIndices.at(i))->P3()[2]*MeV2GeV;
     double P  = customEvent->GetParticle(AllFSIndices.at(i))->p()*MeV2GeV;
 
     // Ben saw some weirdness with GiBUU, so lets replicate his checks
@@ -257,7 +257,7 @@ void MicroBooNE_CC1Mu0pNp_XSec_nu<D, Ds...>::ConvertEventRates() {
                                GetFluxFraction, GetFluxHistogram());
 
       fMCHist->SetBinContent(curr_bin + i + 1, fMCHist->GetBinContent(curr_bin + i + 1)/(bin_width*scaling));
-      fMCHist->SetBinError(curr_bin + i + 1, fMCHist->GetBinError(curr_bin + i + 1)/(bin_width*scaling));
+      fMCHist->SetBinError  (curr_bin + i + 1, fMCHist->GetBinError(curr_bin + i + 1)/(bin_width*scaling));
     }
     curr_bin += nblockbins;
   }

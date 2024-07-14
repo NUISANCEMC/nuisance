@@ -50,9 +50,9 @@ public:
     m_fullac->Transpose(*m_fullac);
     *(this->m_data) = m_fulldata->GetSub(1, full_bins - 2);
     *(this->m_cov)  = m_fullcov ->GetSub(1, full_bins - 2,
-                                 1, full_bins - 2);
+                                         1, full_bins - 2);
     *(this->m_ac)   = m_fullac  ->GetSub(1, full_bins - 2,
-                                 1, full_bins - 2);
+                                         1, full_bins - 2);
     // free up the memory we just used
     hFullData->Reset();
     hFullCov ->Reset();
