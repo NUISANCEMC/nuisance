@@ -294,4 +294,3 @@ template class MicroBooNE_CC1Mu0pNp_XSec_nu<kXpCosThetaMu>;
 template class MicroBooNE_CC1Mu0pNp_XSec_nu<kXpEMuCosThetaMu>;
 template class MicroBooNE_CC1Mu0pNp_XSec_nu<kXpAvailEnergyCosThetaMuEMu>;
 template class MicroBooNE_CC1Mu0pNp_XSec_nu<kAll>;
-template class MicroBooNE_CC1Mu0pNp_XSec_nu<k0pNpEMu, k0pNpCosThetaMu, k0pNpEnu, k0pNpTransferEnergy, k0pNpAvailEnergy, kProtonKE, kProtonCosTheta, kProtonMult>;
