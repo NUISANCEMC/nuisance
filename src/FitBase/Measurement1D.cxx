@@ -605,7 +605,7 @@ void Measurement1D::FinaliseMeasurement() {
   // Push the diagonals of fFullCovar onto the data histogram
   // Comment this out until the covariance/data scaling is consistent!
   StatUtils::SetDataErrorFromCov(fDataHist, fFullCovar, 1E-38);
-  
+
   // If shape only, set covar and fDecomp using the shape-only matrix (if set)
   if (fIsShape && fShapeCovar && FitPar::Config().GetParB("UseShapeCovar")) {
     if (covar)
@@ -636,11 +636,11 @@ void Measurement1D::FinaliseMeasurement() {
   // ***** NS covar modifications *****
 
   fIsNS = FitPar::Config().GetParB("UseNormShapeCovariance");
-	
+
   if (fIsNS) {
     if (covar)
       delete covar;
-      
+
     fNSCovar = StatUtils::ExtractNSCovar(fFullCovar, fDataHist, 1e-38);
 
     fDataNSHist = StatUtils::InitToNS(fDataHist, 1e-38);
@@ -649,7 +649,7 @@ void Measurement1D::FinaliseMeasurement() {
     covar = StatUtils::GetInvert(fNSCovar);
     fInvNormalCovar = StatUtils::GetInvert(fFullCovar);
 
-  }	
+  }
 
   // ***** end NS covar modifications *****
 
@@ -690,7 +690,7 @@ void Measurement1D::FinaliseMeasurement() {
 					("True Channels"), fMCFine);
       fMCFine_Modes ->SetTitleX(fDataHist->GetXaxis()->GetTitle());
       fMCFine_Modes ->SetTitleY(fDataHist->GetYaxis()->GetTitle());
-      
+
       SetAutoProcessTH1(fMCFine_Modes, kCMD_Reset, kCMD_Norm, kCMD_Write);
     }
   }
@@ -963,7 +963,7 @@ void Measurement1D::FillHistograms() {
       if (fMCHist_Modes)
 	fMCHist_Modes->Fill(Mode, fXVar, Weight);
     }
-    
+
     fMCFine->Fill(fXVar, Weight);
     if (fMCFine_Modes)
       fMCFine_Modes->Fill(Mode, fXVar, Weight);
@@ -1046,7 +1046,7 @@ void Measurement1D::ScaleEvents() {
       fMCHist_Modes->Scale(fScaleFactor);
     if (fMCFine_Modes)
       fMCFine_Modes->Scale(fScaleFactor, "width");
-    
+
     // Any other differential scaling
   } else {
     fMCHist->Scale(fScaleFactor, "width");
@@ -1134,7 +1134,7 @@ double Measurement1D::GetLikelihood() {
       }
     }
   }
- 
+
   // ***** NS covar modifications *****
 
   if (fIsNS) {
@@ -1150,7 +1150,7 @@ double Measurement1D::GetLikelihood() {
     if (fIsNS) {
       NUIS_LOG(SAM, "**** Computing chi2 from NS covar ****");
       stat = StatUtils::GetChi2FromCov(fDataNSHist, fMCNSHist, covar, NULL);
-      NUIS_LOG(SAM, "**** For comparison, here's the normal chi2: " 
+      NUIS_LOG(SAM, "**** For comparison, here's the normal chi2: "
                << StatUtils::GetChi2FromCov(fDataHist, fMCHist, fInvNormalCovar, NULL));
 
     // ***** end NS covar modifications *****
@@ -1524,17 +1524,21 @@ void Measurement1D::Write(std::string drawOpt) {
     fResidualHist->GetYaxis()->SetTitle("#Delta#chi^{2}");
     fResidualHist->Reset();
 
-    fChi2LessBinHist =
-        (TH1D *)fMCHist->Clone((fName + "_Chi2NMinusOne").c_str());
-    fChi2LessBinHist->GetYaxis()->SetTitle("Total #chi^{2} without bin_{i}");
-    fChi2LessBinHist->Reset();
+    if (drawOpt.find("RESIDUAL") != std::string::npos) {
+      fChi2LessBinHist =
+          (TH1D *)fMCHist->Clone((fName + "_Chi2NMinusOne").c_str());
+      fChi2LessBinHist->GetYaxis()->SetTitle("Total #chi^{2} without bin_{i}");
+      fChi2LessBinHist->Reset();
+    }
 
     fIsWriting = true;
     (void)GetLikelihood();
     fIsWriting = false;
 
-    if (drawOpt.find("RESIDUAL") != std::string::npos) fResidualHist->Write((fName + "_RESIDUAL").c_str());
-    fChi2LessBinHist->Write((fName + "_Chi2NMinusOne").c_str());
+    if (drawOpt.find("RESIDUAL") != std::string::npos) {
+      fResidualHist->Write((fName + "_RESIDUAL").c_str());
+      fChi2LessBinHist->Write((fName + "_Chi2NMinusOne").c_str());
+    }
   }
 
   // Write Extra Histograms
