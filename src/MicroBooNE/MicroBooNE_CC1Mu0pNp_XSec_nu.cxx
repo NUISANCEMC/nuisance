@@ -161,7 +161,7 @@ void MicroBooNE_CC1Mu0pNp_XSec_nu<D, Ds...>::FillEventVariables(FitEvent *custom
       // 10 MeV threshold
       if(KE >= 0.01) AvailEnergy += KE;
     }
-    else AvailEnergy += KE;
+    else AvailEnergy += E;
   }
 
   int curr_bin = 0;
