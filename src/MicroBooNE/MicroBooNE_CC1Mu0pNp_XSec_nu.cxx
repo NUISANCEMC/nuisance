@@ -87,10 +87,9 @@ MicroBooNE_CC1Mu0pNp_XSec_nu<D, Ds...>::MicroBooNE_CC1Mu0pNp_XSec_nu(
   // the additional Wiener-SVD Ac smearing matrix
   fSmearingMatrix = ana_helper.get_ac_m();
 
+  fSaveFine = false;
   // Final setup  ---------------------------------------------------
   FinaliseMeasurement();
-
-  fSaveFine = false;
 
 }
 
