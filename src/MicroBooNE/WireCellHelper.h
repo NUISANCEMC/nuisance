@@ -211,10 +211,12 @@ public:
       double dx2   = (lo_vars[1] != -1000.) ?  hi_vars[1]-lo_vars[1] : 1;
       double dx1   = (lo_vars[0] != -1000.) ?  hi_vars[0]-lo_vars[0] : 1;
       double diff  = dx1*dx2*dx3;
-      // for Enu 1D or 3D, we don't divide by bin widths anyway
+      // for Enu 1D or 3D or proton multiplicity, we don't divide by bin widths anyway
       // need flux scaling which will be done later
-      if(curr_D == k0pNpEnu)          diff = 1.;
-      if(curr_D == kEnuCosThetaMuEMu) diff = dx2*dx3;
+      if(curr_D == k0pNpEnu || curr_D == kProtonMult)
+        diff = 1.;
+      if(curr_D == kEnuCosThetaMuEMu)
+        diff = dx2*dx3;
 
       // save our lookup tables
       f_nbins[curr_D] = bin + 1;

@@ -73,11 +73,7 @@ public:
           int block_bins_j = (this->f_lookup).get_nbins(dist_j);
           for(int j = 0; j < block_bins_j; j++){
             (*(this->m_ac))(curr_bin_i + i, curr_bin_j + j) = (*m_fullac)(dist_i + i + 1, dist_j + j + 1);
-            // make sure its read as symmetric
-            if(dist_j+j > dist_i+i)
-              (*(this->m_cov))(curr_bin_i + i, curr_bin_j + j) = (*m_fullcov)(dist_i + i + 1, dist_j + j + 1);
-            else
-              (*(this->m_cov))(curr_bin_i + i, curr_bin_j + j) = (*m_fullcov)(dist_j + j + 1, dist_i + i + 1);
+            (*(this->m_cov))(curr_bin_i + i, curr_bin_j + j) = (*m_fullcov)(dist_i + i + 1, dist_j + j + 1);
           }
           curr_bin_j += block_bins_j;
         } // end column
