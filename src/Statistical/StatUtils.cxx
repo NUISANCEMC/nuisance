@@ -1385,7 +1385,7 @@ TMatrixDSym *StatUtils::ExtractShapeOnlyCovar(TMatrixDSym *full_covar,
                     total_covar * data_i / total_data / total_data);
 
       (*shape_covar)(i, j) =
-          (*full_covar)(i, j) - mix_term1 - mix_term2 - norm_term;
+          (*full_covar)(i, j) - mix_term1 - mix_term2 + norm_term;
     }
   }
   return shape_covar;

@@ -136,6 +136,7 @@ FitEvent *NuWroInputHandler::GetNuisanceEvent(const UInt_t ent,
 
   // Read Entry from TTree to fill NEUT Vect in BaseFitEvt;
   fNuWroTree->GetEntry(entry);
+  fNUISANCEEvent->fNuwroEvent = fNuWroEvent;
 
   // Run NUISANCE Vector Filler
   if (!lightweight) {

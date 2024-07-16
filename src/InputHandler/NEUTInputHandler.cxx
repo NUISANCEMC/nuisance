@@ -141,7 +141,7 @@ NEUTInputHandler::NEUTInputHandler(std::string const &handle,
     defined(NEUT_VERSION) && (NEUT_VERSION >= 541)
   fNEUTTree->SetAutoDelete(true);
 #endif
-      fNEUTTree->GetEntry(0);
+  fNEUTTree->GetEntry(0);
 
   // Create Fit Event
   fNUISANCEEvent = new FitEvent();
@@ -155,10 +155,10 @@ NEUTInputHandler::NEUTInputHandler(std::string const &handle,
   fNUISANCEEvent->HardReset();
 };
 
-NEUTInputHandler::~NEUTInputHandler(){
-    //  if (fNEUTTree) delete fNEUTTree;
-    //  if (fNeutVect) delete fNeutVect;
-    //  if (fNeutInfo) delete fNeutInfo;
+NEUTInputHandler::~NEUTInputHandler() {
+  //  if (fNEUTTree) delete fNEUTTree;
+  //  if (fNeutVect) delete fNeutVect;
+  //  if (fNeutInfo) delete fNeutInfo;
 };
 
 void NEUTInputHandler::CreateCache() {
@@ -184,6 +184,9 @@ FitEvent *NEUTInputHandler::GetNuisanceEvent(const UInt_t ent,
 
   // Read Entry from TTree to fill NEUT Vect in BaseFitEvt;
   fNEUTTree->GetEntry(entry);
+  // reset this after every read as it seems that sometimes ROOT moves the
+  // tbranch reader variable from under our feet.
+  fNUISANCEEvent->SetNeutVect(fNeutVect);
 
   // Run NUISANCE Vector Filler
   if (!lightweight) {

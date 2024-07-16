@@ -275,6 +275,7 @@ FitEvent *GENIEInputHandler::GetNuisanceEvent(const UInt_t ent,
 
   // Read Entry from TTree to fill NEUT Vect in BaseFitEvt;
   fGENIETree->GetEntry(entry);
+  fNUISANCEEvent->SetGenieEvent(fGenieNtpl);
 
   // Run NUISANCE Vector Filler
   if (!lightweight) {
@@ -329,7 +330,7 @@ GENIEInputHandler::nusystematics_GetCachedResponse(Long64_t itree_ent) {
   // ev index 5
   // response_cache[5] is the 6th event. So have cached if response_cache.size()
   // > 5
-  if (response_has_cached.size() <= itree_ent) {
+  if (Long64_t(response_has_cached.size()) <= itree_ent) {
     return nullptr;
   }
   return response_has_cached[itree_ent] ? &response_cache[itree_ent] : nullptr;
@@ -340,7 +341,7 @@ void GENIEInputHandler::nusystematics_CacheResponse(
   // response_cache[5] is the 6th event. So need more space if
   // response_cache.size()
   // <= 5
-  if (response_cache.size() <= itree_ent) {
+  if (Long64_t(response_cache.size()) <= itree_ent) {
     response_cache.resize(itree_ent+1);
     response_has_cached.resize(itree_ent+1);
   }
