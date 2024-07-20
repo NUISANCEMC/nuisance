@@ -44,9 +44,9 @@ public:
     TH2D* hFullAc =   (TH2D *)inputRootFile->Get("MicroBooNE_CCInc3D_Ac");
 
     int full_bins = hFullData->GetNbinsX()+2;
-    auto m_fulldata = make_unique<TVectorD>   (full_bins, hFullData->GetArray());
-    auto m_fullcov  = make_unique<TMatrixDSym>(full_bins, hFullCov->GetArray(), "D");
-    auto m_fullac   = make_unique<TMatrixD>   (full_bins, full_bins, hFullAc->GetArray(), "D");
+    auto m_fulldata = std::make_unique<TVectorD>   (full_bins, hFullData->GetArray());
+    auto m_fullcov  = std::make_unique<TMatrixDSym>(full_bins, hFullCov->GetArray(), "D");
+    auto m_fullac   = std::make_unique<TMatrixD>   (full_bins, full_bins, hFullAc->GetArray(), "D");
     // this needs to be transposed to get the right format for some reason
     // for the covariance its okay, since its symmetric
     m_fullac->Transpose(*m_fullac);
