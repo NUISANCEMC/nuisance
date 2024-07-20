@@ -19,28 +19,30 @@
 
 std::string gInputFiles = "";
 std::string gOutputFile = "";
-std::string gFluxFile = "";
+std::string gFlux = "";
 std::string gTarget = "";
-double MonoEnergy;
 int gNEvents = -999;
-bool IsMonoE = false;
+bool fIsMono = false;
+bool fIsRange = false;
 bool useNOvAWeights = false;
+
+bool fIsHadron=true;
 
 void PrintOptions();
 void ParseOptions(int argc, char *argv[]);
-void RunGENIEPrepareMono(std::string input, std::string target,
-                         std::string output);
+//void RunGENIEPrepareMono(std::string input, std::string target,
+//                         std::string output);
 void RunGENIEPrepare(std::string input, std::string flux, std::string target,
-                     std::string output);
+                     std::string output, bool isMono=false, bool isRange=false);
 bool CheckConfig(std::string filename);
 
 int main(int argc, char *argv[]) {
   ParseOptions(argc, argv);
-  if (IsMonoE) {
-    RunGENIEPrepareMono(gInputFiles, gTarget, gOutputFile);
-  } else {
-    RunGENIEPrepare(gInputFiles, gFluxFile, gTarget, gOutputFile);
-  }
+  //if (fIsMono) {
+  //  RunGENIEPrepareMono(gInputFiles, gTarget, gOutputFile);
+  //} else {
+  RunGENIEPrepare(gInputFiles, gFlux, gTarget, gOutputFile, fIsMono, fIsRange);
+    //}
 }
 
 // CWret October 2019
@@ -85,440 +87,455 @@ bool CheckConfig(std::string filename) {
   return ShouldScale;
 }
 
-void RunGENIEPrepareMono(std::string input, std::string target,
-    std::string output) {
+// void RunGENIEPrepareMono(std::string input, std::string target,
+//     std::string output) {
 
-  NUIS_LOG(FIT, "Running GENIE Prepare in mono energetic with E = " << MonoEnergy
-      << " GeV");
+//   NUIS_LOG(FIT, "Running GENIE Prepare in mono energetic with E = " << MonoEnergy
+//       << " GeV");
 
-  // Setup TTree
-  TChain *tn = new TChain("gtree");
-  std::string first_file = "";
+//   // Setup TTree
+//   TChain *tn = new TChain("gtree");
+//   std::string first_file = "";
 
-  if (input.find_first_of(',') != std::string::npos) {
-    std::vector<std::string> inputvect = GeneralUtils::ParseToStr(input, ",");
+//   if (input.find_first_of(',') != std::string::npos) {
+//     std::vector<std::string> inputvect = GeneralUtils::ParseToStr(input, ",");
 
-    for (size_t iv_it = 0; iv_it < inputvect.size(); ++iv_it) {
-      tn->AddFile(inputvect[iv_it].c_str());
-      NUIS_LOG(FIT, "Added input file: " << inputvect[iv_it]);
-      if (!first_file.length()) {
-        first_file = inputvect[iv_it];
-      }
-    }
-  } else { // The Add form can accept wildcards.
-    tn->Add(input.c_str());
-    first_file = input;
-  }
+//     for (size_t iv_it = 0; iv_it < inputvect.size(); ++iv_it) {
+//       tn->AddFile(inputvect[iv_it].c_str());
+//       NUIS_LOG(FIT, "Added input file: " << inputvect[iv_it]);
+//       if (!first_file.length()) {
+//         first_file = inputvect[iv_it];
+//       }
+//     }
+//   } else { // The Add form can accept wildcards.
+//     tn->Add(input.c_str());
+//     first_file = input;
+//   }
 
-  if (tn->GetFile() == NULL) {
-    tn->Print();
-    NUIS_ERR(FTL, "gtree not located in GENIE file: " << input);
-    NUIS_ABORT("Check your inputs, they may need to be completely regenerated!");
+//   if (tn->GetFile() == NULL) {
+//     tn->Print();
+//     NUIS_ERR(FTL, "gtree not located in GENIE file: " << input);
+//     NUIS_ABORT("Check your inputs, they may need to be completely regenerated!");
+//     throw;
+//   }
+
+//   int nevt = tn->GetEntries();
+//   if (gNEvents != -999) {
+//     NUIS_LOG(FIT, "Overriding number of events by user from " << nevt << " to "
+//         << gNEvents);
+//     nevt = gNEvents;
+//   }
+
+//   if (!nevt) {
+//     NUIS_ABORT("Couldn't load any events from input specification: \""
+//         << input.c_str() << "\"");
+//   } else {
+//     NUIS_LOG(FIT, "Found " << nevt << " input entries in " << input);
+//   }
+
+//   StopTalking();
+//   NtpMCEventRecord *genientpl = NULL;
+//   tn->SetBranchAddress("gmcrec", &genientpl);
+//   StartTalking();
+
+//   // Have the TH1D go from MonoEnergy/2 to MonoEnergy/2
+//   TH1D *fluxhist =
+//     new TH1D("flux", "flux", 1000, MonoEnergy / 2., MonoEnergy * 2.);
+//   fluxhist->Fill(MonoEnergy);
+//   fluxhist->Scale(1, "width");
+
+//   // Make Event Hist
+//   TH1D *eventhist = (TH1D *)fluxhist->Clone();
+//   eventhist->Reset();
+
+//   TH1D *xsechist = (TH1D *)eventhist->Clone();
+
+//   // Create maps
+//   std::map<std::string, TH1D *> modexsec;
+//   std::map<std::string, TH1D *> modecount;
+//   std::vector<std::string> genieids;
+//   std::vector<std::string> targetids;
+//   std::vector<std::string> interids;
+
+//   // Loop over all events
+//   for (int i = 0; i < nevt; i++) {
+//     tn->GetEntry(i);
+
+//     StopTalking();
+//     EventRecord &event = *(genientpl->event);
+//     GHepParticle *neu = event.Probe();
+//     StartTalking();
+
+//     // Get XSec From Spline
+//     GHepRecord genie_record = static_cast<GHepRecord>(event);
+//     double xsec = (genie_record.XSec() / (1E-38 * genie::units::cm2));
+
+//     // Parse Interaction String
+//     std::string mode = genie_record.Summary()->AsString();
+//     std::vector<std::string> modevec = GeneralUtils::ParseToStr(mode, ";");
+//     std::string targ = (modevec[0] + ";" + modevec[1]);
+//     std::string inter = mode;
+
+//     // Fill lists of Unique IDS
+//     if (std::find(targetids.begin(), targetids.end(), targ) ==
+//         targetids.end()) {
+//       targetids.push_back(targ);
+//     }
+
+//     if (std::find(interids.begin(), interids.end(), inter) == interids.end()) {
+//       interids.push_back(inter);
+//     }
+
+//     // Create entries Mode Maps
+//     if (modexsec.find(mode) == modexsec.end()) {
+//       genieids.push_back(mode);
+
+//       modexsec[mode] = (TH1D *)xsechist->Clone();
+//       modecount[mode] = (TH1D *)xsechist->Clone();
+
+//       modexsec[mode]->GetYaxis()->SetTitle(
+//           "d#sigma/dE_{#nu} #times 10^{-38} (events weighted by #sigma)");
+//       modecount[mode]->GetYaxis()->SetTitle("Number of events in file");
+//     }
+
+//     // Fill XSec Histograms
+//     modexsec[mode]->Fill(neu->E(), xsec);
+//     modecount[mode]->Fill(neu->E());
+
+//     // Fill total event hist
+//     eventhist->Fill(neu->E());
+
+//     // Clear Event
+//     genientpl->Clear();
+
+//     size_t freq = nevt / 20;
+//     if (freq && !(i % freq)) {
+//       NUIS_LOG(FIT, "Processed "
+//           << i << "/" << nevt << " GENIE events (E: " << neu->E()
+//           << " GeV, xsec: " << xsec << " E-38 cm^2/nucleon)");
+//     }
+//   }
+//   NUIS_LOG(FIT, "Processed all events");
+
+//   // Check if we need to correct MEC events before possibly deleting the TChain below
+//   bool MECcorrect = CheckConfig(std::string(tn->GetFile()->GetName()));
+
+//   TFile *outputfile;
+
+//   // If no output is specified just append to the file
+//   if (!gOutputFile.length()) {
+//     // Shut the chain;
+//     delete tn;
+//     outputfile = new TFile(first_file.c_str(), "UPDATE");
+//   } else {
+//     outputfile = new TFile(gOutputFile.c_str(), "RECREATE");
+//     outputfile->cd();
+
+//     NUIS_LOG(FIT, "Cloning input vector to output file: " << gOutputFile);
+//     TTree *cloneTree = tn->CloneTree(-1, "fast");
+//     cloneTree->SetDirectory(outputfile);
+//     cloneTree->Write();
+
+//     if (useNOvAWeights){
+//       NUIS_LOG(FIT, "Cloning input nova_wgts to output file: " << gOutputFile);
+//       // ***********************************
+//       // ***********************************
+//       // FUDGE FOR NOVA MINERVA WORKSHOP
+//       //  Also check for the nova_wgts tree from Jeremy
+//       TChain *nova_chain = new TChain("nova_wgts");
+//       nova_chain->AddFile(input.c_str());
+//       TTree *nova_tree = nova_chain->GetTree();
+//       if (!nova_tree) {
+// 	NUIS_LOG(FIT, "Could not find nova_wgts tree in " << gOutputFile);
+//       } else {
+// 	NUIS_LOG(FIT, "Found nova_wgts tree in " << gOutputFile);
+//       }
+//       if (nova_tree) {
+// 	nova_tree->SetDirectory(outputfile);
+// 	nova_tree->Write();
+//       }
+//     }
+
+//     NUIS_LOG(FIT, "Done cloning tree.");
+//   }
+
+//   NUIS_LOG(FIT, "Getting splines in mono-energetic...");
+
+//   // Save each of the reconstructed splines to file
+//   std::map<std::string, TH1D *> modeavg;
+
+//   TDirectory *inddir = (TDirectory *)outputfile->Get("IndividualGENIESplines");
+//   if (!inddir) inddir = (TDirectory *)outputfile->mkdir("IndividualGENIESplines");
+
+//   // Loop over GENIE ID's and get MEC count
+//   int MECcount = 0;
+//   // Count up the number of MEC splines
+//   for (UInt_t i = 0; i < genieids.size(); i++) {
+//     if (genieids[i].find("MEC") != std::string::npos && genieids[i].find("[CC]") != std::string::npos) {
+//       MECcount++;
+//     }
+//   }
+
+//   inddir->cd();
+//   for (UInt_t i = 0; i < genieids.size(); i++) {
+//     std::string mode = genieids[i];
+
+//     modexsec[mode]->Write((mode + "_summed_xsec").c_str(), TObject::kOverwrite);
+//     modecount[mode]->Write((mode + "_summed_evt").c_str(), TObject::kOverwrite);
+
+//     // Form extra avg xsec map -> Reconstructed spline
+//     modeavg[mode] = (TH1D *)modexsec[mode]->Clone();
+//     modeavg[mode]->GetYaxis()->SetTitle(
+//         "#sigma (E_{#nu}) #times 10^{-38} (cm^{2}/target)");
+//     modeavg[mode]->Divide(modecount[mode]);
+
+//     if (MECcorrect && mode.find("MEC") != std::string::npos && mode.find("[CC]") != std::string::npos) {
+//       NUIS_LOG(FIT, "Scaling spline " << mode << " by 1/" << MECcount << " because there are " << MECcount << " repeated Nieves 2p2h instances.");
+//       modeavg[mode]->Scale(1.0 / double(MECcount));
+//     }
+
+//     modeavg[mode]->Write((mode + "_rec_spline").c_str(), TObject::kOverwrite);
+//   }
+
+//   TDirectory *targdir = (TDirectory *)outputfile->Get("TargetGENIESplines");
+//   if (!targdir)
+//     targdir = (TDirectory *)outputfile->mkdir("TargetGENIESplines");
+//   targdir->cd();
+
+//   NUIS_LOG(FIT, "Getting Target Splines");
+
+//   // For each target save a total spline
+//   std::map<std::string, TH1D *> targetsplines;
+
+//   for (uint i = 0; i < targetids.size(); i++) {
+//     std::string targ = targetids[i];
+//     NUIS_LOG(FIT, "Getting target " << i << ": " << targ);
+//     targetsplines[targ] = (TH1D *)xsechist->Clone();
+//     targetsplines[targ]->GetYaxis()->SetTitle(
+//         "#sigma (E_{#nu}) #times 10^{-38} (cm^{2}/target)");
+//     NUIS_LOG(FIT, "Created target spline for " << targ);
+
+//     for (uint j = 0; j < genieids.size(); j++) {
+//       std::string mode = genieids[j];
+
+//       if (mode.find(targ) != std::string::npos) {
+//         NUIS_LOG(FIT, "    Mode " << mode << " contains " << targ << " target");
+//         targetsplines[targ]->Add(modeavg[mode]);
+//         NUIS_LOG(FIT,
+//             "Finished with Mode " << mode << " " << modeavg[mode]->Integral());
+//       }
+//     }
+
+//     NUIS_LOG(FIT, "Saving target spline:" << targ);
+//     targetsplines[targ]->Write(("Total_" + targ).c_str(), TObject::kOverwrite);
+//   }
+
+//   NUIS_LOG(FIT, "Getting total splines");
+//   // Now we have each of the targets we need to create a total cross-section.
+//   int totalnucl = 0;
+//   // Get the targets specified by the user, separated by commas
+//   // This has structure target1[fraction1], target2[fraction2]
+//   std::vector<std::string> targprs = GeneralUtils::ParseToStr(target, ",");
+
+//   std::vector<std::string> targ_list;
+//   std::vector<std::string> frac_list;
+
+//   // Chop up the target string which has format
+//   // TARGET1[fraction1],TARGET2[fraction2]
+
+//   // Loop over the vector of strings "TARGET1[fraction1]" "TARGET2[fraction2]"
+//   for (std::vector<std::string>::iterator it = targprs.begin();
+//       it != targprs.end(); ++it) {
+//     // Cut into "TARGET1" and "fraction1]"
+//     std::vector<std::string> targind = GeneralUtils::ParseToStr(*it, "[");
+//     // Cut into "TARGET1" and "fraction1"
+//     for (std::vector<std::string>::iterator jt = targind.begin();
+//         jt != targind.end(); ++jt) {
+//       if ((*jt).find("]") != std::string::npos) {
+//         (*jt) = (*jt).substr(0, (*jt).find("]"));
+//         frac_list.push_back(*jt);
+//         // Won't find bracket for target
+//       } else {
+//         targ_list.push_back(*jt);
+//       }
+//     }
+//   }
+
+//   targprs = targ_list;
+
+//   std::vector<double> targ_fractions;
+//   double minimum = 1.0;
+//   for (std::vector<std::string>::iterator it = frac_list.begin();
+//       it != frac_list.end(); it++) {
+//     double frac = std::atof((*it).c_str());
+//     targ_fractions.push_back(frac);
+//     if (frac < minimum)
+//       minimum = frac;
+//   }
+
+//   std::vector<double>::iterator it = targ_fractions.begin();
+//   std::vector<std::string>::iterator jt = targ_list.begin();
+//   double scaling = 0;
+//   for (; it != targ_fractions.end(); it++, jt++) {
+//     // First get the mass number from the targ_list
+//     int nucl = atoi((*jt).c_str());
+//     nucl = (nucl % 10000) / 10;
+//     // Gets the relative portions right
+//     *it = (*it) / minimum;
+//     // Scale relative the atomic mass
+//     double tempscaling = double(nucl) / (*it);
+//     if (tempscaling > scaling) scaling = tempscaling;
+//   }
+//   it = targ_fractions.begin();
+//   for (; it != targ_fractions.end(); it++) {
+//     // Round the scaling to nearest integer and multiply
+//     *it *= int(scaling + 0.5);
+//     // Round to nearest integer
+//     *it = int(*it + 0.5);
+//     totalnucl += *it;
+//   }
+
+//   // Report on what we've got
+//   it = targ_fractions.begin();
+//   jt = targ_list.begin();
+//   for (; it != targ_fractions.end(); it++, jt++){
+//     NUIS_LOG(FIT, "Found target " << *jt << " with weight " << *it);
+//   }
+
+
+//   if (totalnucl == 0) {
+//     NUIS_ABORT("Didn't find any nucleons in input file. Did you really specify the "
+//         "target ratios?\ne.g. TARGET1[fraction1],TARGET2[fraction2]");
+//   }
+//   TH1D *totalxsec = (TH1D *)xsechist->Clone();
+
+//   it = targ_fractions.begin();
+//   for (uint i = 0; i < targprs.size(); i++, it++) {
+//     std::string targpdg = targprs[i];
+//     // Check that we found the user requested target in GENIE
+//     bool FoundTarget = false;
+//     for (std::map<std::string, TH1D *>::iterator iter = targetsplines.begin();
+//         iter != targetsplines.end(); iter++) {
+//       std::string targstr = iter->first;
+//       TH1D *xsec = iter->second;
+
+//       // Match the user targets to the targets found in GENIE
+//       if (targstr.find(targpdg) != std::string::npos) {
+//         FoundTarget = true;
+
+// 	int nucl = atoi(targpdg.c_str());
+//         nucl = (nucl % 10000) / 10;
+
+// 	NUIS_LOG(FIT, "Scaling target " << targstr << " by " << *it << "/" << nucl);
+//         xsec->Scale(*it/double(nucl));
+
+//         NUIS_LOG(FIT, "Adding target spline "
+//             << targstr << " Integral = " << xsec->Integral("width"));
+//         totalxsec->Add(xsec);
+//       }
+//     }
+
+//     // Check that targets were all found
+//     if (!FoundTarget) {
+//       NUIS_ERR(WRN, "Didn't find target "
+//           << targpdg
+//           << " in the list of targets recorded by GENIE");
+//       NUIS_ERR(WRN, "  The list of targets you requested is: ");
+//       for (uint i = 0; i < targprs.size(); ++i)
+//         NUIS_ERR(WRN, "    " << targprs[i]);
+//       NUIS_ERR(WRN, "  The list of targets found in GENIE is: ");
+//       for (std::map<std::string, TH1D *>::iterator iter = targetsplines.begin();
+//           iter != targetsplines.end(); iter++)
+//         NUIS_ERR(WRN, "    " << iter->first);
+//     }
+//   }
+
+//   outputfile->cd();
+//   totalxsec->GetYaxis()->SetTitle(
+//       "#sigma (E_{#nu}) #times 10^{-38} (cm^{2}/nucleon)");
+//   totalxsec->Write("nuisance_xsec", TObject::kOverwrite);
+
+//   eventhist = (TH1D *)fluxhist->Clone();
+//   eventhist->Multiply(totalxsec);
+//   eventhist->GetYaxis()->SetTitle(
+//       (std::string("Event rate (N = #sigma #times #Phi) #times 10^{-38} "
+//                    "(cm^{2}/nucleon) #times ") +
+//        eventhist->GetYaxis()->GetTitle())
+//       .c_str());
+
+//   NUIS_LOG(FIT, "Dividing by Total Nucl = " << totalnucl);
+//   eventhist->Scale(1.0 / double(totalnucl));
+
+//   eventhist->Write("nuisance_events", TObject::kOverwrite);
+//   fluxhist->Write("nuisance_flux", TObject::kOverwrite);
+
+//   NUIS_LOG(FIT, "Inclusive XSec Per Nucleon = " << eventhist->Integral("width") *
+//       1E-38 /
+//       fluxhist->Integral("width"));
+//   NUIS_LOG(FIT, "XSec Hist Integral = " << totalxsec->Integral("width"));
+
+//   outputfile->Close();
+
+//   return;
+// }
+
+void RunGENIEPrepare(std::string input, std::string flux, std::string target,
+		     std::string output, bool isMono, bool isRange) {
+
+  // Now decide what type of flux it is within the one function
+  TH1 *fluxhist = NULL;
+  if (isMono && isRange) {
+    NUIS_ERR(FTL, "Incompatible mono and range flux options passed...");
     throw;
   }
 
-  int nevt = tn->GetEntries();
-  if (gNEvents != -999) {
-    NUIS_LOG(FIT, "Overriding number of events by user from " << nevt << " to "
-        << gNEvents);
-    nevt = gNEvents;
+  if (isMono){
+    NUIS_LOG(FIT, "Running GENIE Prepare with a monoenergetic flux...");
+    double MonoEnergy = GeneralUtils::StrToDbl(flux);
+    // Have the TH1D go from MonoEnergy/2 to MonoEnergy/2
+    fluxhist = new TH1D("flux", "flux", 1000, MonoEnergy / 2., MonoEnergy * 2.);
+    fluxhist->Fill(MonoEnergy);
+    fluxhist->Scale(1, "width");
+    fluxhist->SetDirectory(0);
   }
 
-  if (!nevt) {
-    NUIS_ABORT("Couldn't load any events from input specification: \""
-        << input.c_str() << "\"");
-  } else {
-    NUIS_LOG(FIT, "Found " << nevt << " input entries in " << input);
-  }
-
-  StopTalking();
-  NtpMCEventRecord *genientpl = NULL;
-  tn->SetBranchAddress("gmcrec", &genientpl);
-  StartTalking();
-
-  // Have the TH1D go from MonoEnergy/2 to MonoEnergy/2
-  TH1D *fluxhist =
-    new TH1D("flux", "flux", 1000, MonoEnergy / 2., MonoEnergy * 2.);
-  fluxhist->Fill(MonoEnergy);
-  fluxhist->Scale(1, "width");
-
-  // Make Event Hist
-  TH1D *eventhist = (TH1D *)fluxhist->Clone();
-  eventhist->Reset();
-
-  TH1D *xsechist = (TH1D *)eventhist->Clone();
-
-  // Create maps
-  std::map<std::string, TH1D *> modexsec;
-  std::map<std::string, TH1D *> modecount;
-  std::vector<std::string> genieids;
-  std::vector<std::string> targetids;
-  std::vector<std::string> interids;
-
-  // Loop over all events
-  for (int i = 0; i < nevt; i++) {
-    tn->GetEntry(i);
-
-    StopTalking();
-    EventRecord &event = *(genientpl->event);
-    GHepParticle *neu = event.Probe();
-    StartTalking();
-
-    // Get XSec From Spline
-    GHepRecord genie_record = static_cast<GHepRecord>(event);
-    double xsec = (genie_record.XSec() / (1E-38 * genie::units::cm2));
-
-    // Parse Interaction String
-    std::string mode = genie_record.Summary()->AsString();
-    std::vector<std::string> modevec = GeneralUtils::ParseToStr(mode, ";");
-    std::string targ = (modevec[0] + ";" + modevec[1]);
-    std::string inter = mode;
-
-    // Fill lists of Unique IDS
-    if (std::find(targetids.begin(), targetids.end(), targ) ==
-        targetids.end()) {
-      targetids.push_back(targ);
-    }
-
-    if (std::find(interids.begin(), interids.end(), inter) == interids.end()) {
-      interids.push_back(inter);
-    }
-
-    // Create entries Mode Maps
-    if (modexsec.find(mode) == modexsec.end()) {
-      genieids.push_back(mode);
-
-      modexsec[mode] = (TH1D *)xsechist->Clone();
-      modecount[mode] = (TH1D *)xsechist->Clone();
-
-      modexsec[mode]->GetYaxis()->SetTitle(
-          "d#sigma/dE_{#nu} #times 10^{-38} (events weighted by #sigma)");
-      modecount[mode]->GetYaxis()->SetTitle("Number of events in file");
-    }
-
-    // Fill XSec Histograms
-    modexsec[mode]->Fill(neu->E(), xsec);
-    modecount[mode]->Fill(neu->E());
-
-    // Fill total event hist
-    eventhist->Fill(neu->E());
-
-    // Clear Event
-    genientpl->Clear();
-
-    size_t freq = nevt / 20;
-    if (freq && !(i % freq)) {
-      NUIS_LOG(FIT, "Processed "
-          << i << "/" << nevt << " GENIE events (E: " << neu->E()
-          << " GeV, xsec: " << xsec << " E-38 cm^2/nucleon)");
-    }
-  }
-  NUIS_LOG(FIT, "Processed all events");
-
-  // Check if we need to correct MEC events before possibly deleting the TChain below
-  bool MECcorrect = CheckConfig(std::string(tn->GetFile()->GetName()));
-
-  TFile *outputfile;
-
-  // If no output is specified just append to the file
-  if (!gOutputFile.length()) {
-    // Shut the chain;
-    delete tn;
-    outputfile = new TFile(first_file.c_str(), "UPDATE");
-  } else {
-    outputfile = new TFile(gOutputFile.c_str(), "RECREATE");
-    outputfile->cd();
-
-    NUIS_LOG(FIT, "Cloning input vector to output file: " << gOutputFile);
-    TTree *cloneTree = tn->CloneTree(-1, "fast");
-    cloneTree->SetDirectory(outputfile);
-    cloneTree->Write();
-
-    if (useNOvAWeights){
-      NUIS_LOG(FIT, "Cloning input nova_wgts to output file: " << gOutputFile);
-      // ***********************************
-      // ***********************************
-      // FUDGE FOR NOVA MINERVA WORKSHOP
-      //  Also check for the nova_wgts tree from Jeremy
-      TChain *nova_chain = new TChain("nova_wgts");
-      nova_chain->AddFile(input.c_str());
-      TTree *nova_tree = nova_chain->GetTree();
-      if (!nova_tree) {
-	NUIS_LOG(FIT, "Could not find nova_wgts tree in " << gOutputFile);
-      } else {
-	NUIS_LOG(FIT, "Found nova_wgts tree in " << gOutputFile);
-      }
-      if (nova_tree) {
-	nova_tree->SetDirectory(outputfile);
-	nova_tree->Write();
-      }
-    }
-
-    NUIS_LOG(FIT, "Done cloning tree.");
-  }
-
-  NUIS_LOG(FIT, "Getting splines in mono-energetic...");
-
-  // Save each of the reconstructed splines to file
-  std::map<std::string, TH1D *> modeavg;
-
-  TDirectory *inddir = (TDirectory *)outputfile->Get("IndividualGENIESplines");
-  if (!inddir) inddir = (TDirectory *)outputfile->mkdir("IndividualGENIESplines");
-
-  // Loop over GENIE ID's and get MEC count
-  int MECcount = 0;
-  // Count up the number of MEC splines
-  for (UInt_t i = 0; i < genieids.size(); i++) {
-    if (genieids[i].find("MEC") != std::string::npos && genieids[i].find("[CC]") != std::string::npos) {
-      MECcount++;
-    }
-  }
-
-  inddir->cd();
-  for (UInt_t i = 0; i < genieids.size(); i++) {
-    std::string mode = genieids[i];
-
-    modexsec[mode]->Write((mode + "_summed_xsec").c_str(), TObject::kOverwrite);
-    modecount[mode]->Write((mode + "_summed_evt").c_str(), TObject::kOverwrite);
-
-    // Form extra avg xsec map -> Reconstructed spline
-    modeavg[mode] = (TH1D *)modexsec[mode]->Clone();
-    modeavg[mode]->GetYaxis()->SetTitle(
-        "#sigma (E_{#nu}) #times 10^{-38} (cm^{2}/target)");
-    modeavg[mode]->Divide(modecount[mode]);
-
-    if (MECcorrect && mode.find("MEC") != std::string::npos && mode.find("[CC]") != std::string::npos) {
-      NUIS_LOG(FIT, "Scaling spline " << mode << " by 1/" << MECcount << " because there are " << MECcount << " repeated Nieves 2p2h instances.");
-      modeavg[mode]->Scale(1.0 / double(MECcount));
-    }
-
-    modeavg[mode]->Write((mode + "_rec_spline").c_str(), TObject::kOverwrite);
-  }
-
-  TDirectory *targdir = (TDirectory *)outputfile->Get("TargetGENIESplines");
-  if (!targdir)
-    targdir = (TDirectory *)outputfile->mkdir("TargetGENIESplines");
-  targdir->cd();
-
-  NUIS_LOG(FIT, "Getting Target Splines");
-
-  // For each target save a total spline
-  std::map<std::string, TH1D *> targetsplines;
-
-  for (uint i = 0; i < targetids.size(); i++) {
-    std::string targ = targetids[i];
-    NUIS_LOG(FIT, "Getting target " << i << ": " << targ);
-    targetsplines[targ] = (TH1D *)xsechist->Clone();
-    targetsplines[targ]->GetYaxis()->SetTitle(
-        "#sigma (E_{#nu}) #times 10^{-38} (cm^{2}/target)");
-    NUIS_LOG(FIT, "Created target spline for " << targ);
-
-    for (uint j = 0; j < genieids.size(); j++) {
-      std::string mode = genieids[j];
-
-      if (mode.find(targ) != std::string::npos) {
-        NUIS_LOG(FIT, "    Mode " << mode << " contains " << targ << " target");
-        targetsplines[targ]->Add(modeavg[mode]);
-        NUIS_LOG(FIT,
-            "Finished with Mode " << mode << " " << modeavg[mode]->Integral());
-      }
-    }
-
-    NUIS_LOG(FIT, "Saving target spline:" << targ);
-    targetsplines[targ]->Write(("Total_" + targ).c_str(), TObject::kOverwrite);
-  }
-
-  NUIS_LOG(FIT, "Getting total splines");
-  // Now we have each of the targets we need to create a total cross-section.
-  int totalnucl = 0;
-  // Get the targets specified by the user, separated by commas
-  // This has structure target1[fraction1], target2[fraction2]
-  std::vector<std::string> targprs = GeneralUtils::ParseToStr(target, ",");
-
-  std::vector<std::string> targ_list;
-  std::vector<std::string> frac_list;
-
-  // Chop up the target string which has format
-  // TARGET1[fraction1],TARGET2[fraction2]
-
-  // Loop over the vector of strings "TARGET1[fraction1]" "TARGET2[fraction2]"
-  for (std::vector<std::string>::iterator it = targprs.begin();
-      it != targprs.end(); ++it) {
-    // Cut into "TARGET1" and "fraction1]"
-    std::vector<std::string> targind = GeneralUtils::ParseToStr(*it, "[");
-    // Cut into "TARGET1" and "fraction1"
-    for (std::vector<std::string>::iterator jt = targind.begin();
-        jt != targind.end(); ++jt) {
-      if ((*jt).find("]") != std::string::npos) {
-        (*jt) = (*jt).substr(0, (*jt).find("]"));
-        frac_list.push_back(*jt);
-        // Won't find bracket for target
-      } else {
-        targ_list.push_back(*jt);
-      }
-    }
-  }
-
-  targprs = targ_list;
-
-  std::vector<double> targ_fractions;
-  double minimum = 1.0;
-  for (std::vector<std::string>::iterator it = frac_list.begin();
-      it != frac_list.end(); it++) {
-    double frac = std::atof((*it).c_str());
-    targ_fractions.push_back(frac);
-    if (frac < minimum)
-      minimum = frac;
-  }
-
-  std::vector<double>::iterator it = targ_fractions.begin();
-  std::vector<std::string>::iterator jt = targ_list.begin();
-  double scaling = 0;
-  for (; it != targ_fractions.end(); it++, jt++) {
-    // First get the mass number from the targ_list
-    int nucl = atoi((*jt).c_str());
-    nucl = (nucl % 10000) / 10;
-    // Gets the relative portions right
-    *it = (*it) / minimum;
-    // Scale relative the atomic mass
-    double tempscaling = double(nucl) / (*it);
-    if (tempscaling > scaling) scaling = tempscaling;
-  }
-  it = targ_fractions.begin();
-  for (; it != targ_fractions.end(); it++) {
-    // Round the scaling to nearest integer and multiply
-    *it *= int(scaling + 0.5);
-    // Round to nearest integer
-    *it = int(*it + 0.5);
-    totalnucl += *it;
-  }
-
-  // Report on what we've got
-  it = targ_fractions.begin();
-  jt = targ_list.begin();
-  for (; it != targ_fractions.end(); it++, jt++){
-    NUIS_LOG(FIT, "Found target " << *jt << " with weight " << *it);
-  }
-
-
-  if (totalnucl == 0) {
-    NUIS_ABORT("Didn't find any nucleons in input file. Did you really specify the "
-        "target ratios?\ne.g. TARGET1[fraction1],TARGET2[fraction2]");
-  }
-  TH1D *totalxsec = (TH1D *)xsechist->Clone();
-
-  it = targ_fractions.begin();
-  for (uint i = 0; i < targprs.size(); i++, it++) {
-    std::string targpdg = targprs[i];
-    // Check that we found the user requested target in GENIE
-    bool FoundTarget = false;
-    for (std::map<std::string, TH1D *>::iterator iter = targetsplines.begin();
-        iter != targetsplines.end(); iter++) {
-      std::string targstr = iter->first;
-      TH1D *xsec = iter->second;
-
-      // Match the user targets to the targets found in GENIE
-      if (targstr.find(targpdg) != std::string::npos) {
-        FoundTarget = true;
-
-	int nucl = atoi(targpdg.c_str());
-        nucl = (nucl % 10000) / 10;
-
-	NUIS_LOG(FIT, "Scaling target " << targstr << " by " << *it << "/" << nucl);
-        xsec->Scale(*it/double(nucl));
-
-        NUIS_LOG(FIT, "Adding target spline "
-            << targstr << " Integral = " << xsec->Integral("width"));
-        totalxsec->Add(xsec);
-      }
-    }
-
-    // Check that targets were all found
-    if (!FoundTarget) {
-      NUIS_ERR(WRN, "Didn't find target "
-          << targpdg
-          << " in the list of targets recorded by GENIE");
-      NUIS_ERR(WRN, "  The list of targets you requested is: ");
-      for (uint i = 0; i < targprs.size(); ++i)
-        NUIS_ERR(WRN, "    " << targprs[i]);
-      NUIS_ERR(WRN, "  The list of targets found in GENIE is: ");
-      for (std::map<std::string, TH1D *>::iterator iter = targetsplines.begin();
-          iter != targetsplines.end(); iter++)
-        NUIS_ERR(WRN, "    " << iter->first);
-    }
-  }
-
-  outputfile->cd();
-  totalxsec->GetYaxis()->SetTitle(
-      "#sigma (E_{#nu}) #times 10^{-38} (cm^{2}/nucleon)");
-  totalxsec->Write("nuisance_xsec", TObject::kOverwrite);
-
-  eventhist = (TH1D *)fluxhist->Clone();
-  eventhist->Multiply(totalxsec);
-  eventhist->GetYaxis()->SetTitle(
-      (std::string("Event rate (N = #sigma #times #Phi) #times 10^{-38} "
-                   "(cm^{2}/nucleon) #times ") +
-       eventhist->GetYaxis()->GetTitle())
-      .c_str());
-
-  NUIS_LOG(FIT, "Dividing by Total Nucl = " << totalnucl);
-  eventhist->Scale(1.0 / double(totalnucl));
-
-  eventhist->Write("nuisance_events", TObject::kOverwrite);
-  fluxhist->Write("nuisance_flux", TObject::kOverwrite);
-
-  NUIS_LOG(FIT, "Inclusive XSec Per Nucleon = " << eventhist->Integral("width") *
-      1E-38 /
-      fluxhist->Integral("width"));
-  NUIS_LOG(FIT, "XSec Hist Integral = " << totalxsec->Integral("width"));
-
-  outputfile->Close();
-
-  return;
-}
-
-void RunGENIEPrepare(std::string input, std::string flux, std::string target,
-    std::string output) {
-  NUIS_LOG(FIT, "Running GENIE Prepare with flux...");
-
-  // Get Flux Hist
-  std::vector<std::string> fluxvect = GeneralUtils::ParseToStr(flux, ",");
-  TH1 *fluxhist = NULL;
-  if (fluxvect.size() == 3) {
-    double from = GeneralUtils::StrToDbl(fluxvect[0]);
-    double to = GeneralUtils::StrToDbl(fluxvect[1]);
-    double step = GeneralUtils::StrToDbl(fluxvect[2]);
-
-    int nstep = ceil((to - from) / step);
-    to = from + step * nstep;
-
-    NUIS_LOG(FIT, "Generating flat flux histogram from "
-        << from << " to " << to << " with bins " << step
-        << " wide (NBins = " << nstep << ").");
+  if (isRange){
+    NUIS_LOG(FIT, "Running GENIE Prepare with a flux range...");
+
+    std::vector<double> fluxvect = GeneralUtils::ParseToDbl(flux, ",");
+    double min = fluxvect[0];
+    double max = fluxvect[1];
+    int nbins = 100;
 
     fluxhist =
-      new TH1D("spectrum", ";E_{#nu} (GeV);Count (A.U.)", nstep, from, to);
-
-    for (Int_t bi_it = 1; bi_it < fluxhist->GetXaxis()->GetNbins(); ++bi_it) {
-      fluxhist->SetBinContent(bi_it, 1.0 / double(step * nstep));
+      new TH1D("spectrum", ";E_{#nu} (GeV);Count (A.U.)", nbins, min, max);
+    
+    for (Int_t bi_it = 0; bi_it < fluxhist->GetXaxis()->GetNbins(); ++bi_it) {
+      fluxhist->SetBinContent(bi_it+1, 1.0);
     }
+    fluxhist->Scale(1, "width");
     fluxhist->SetDirectory(0);
-  } else if (fluxvect.size() == 2) {
+  }
+
+  if (!isMono && !isRange){
+    NUIS_LOG(FIT, "Running GENIE Prepare with an input flux histogram...");
+    
+    // Get Flux Hist
+    std::vector<std::string> fluxvect = GeneralUtils::ParseToStr(flux, ",");
     TFile *fluxfile = new TFile(fluxvect[0].c_str(), "READ");
     if (!fluxfile->IsZombie()) {
       fluxhist = dynamic_cast<TH1 *>(fluxfile->Get(fluxvect[1].c_str()));
       if (!fluxhist) {
-        NUIS_ERR(FTL, "Couldn't find histogram named: \""
-            << fluxvect[1] << "\" in file: \"" << fluxvect[0]);
-        throw;
+	NUIS_ERR(FTL, "Couldn't find histogram named: \""
+		 << fluxvect[1] << "\" in file: \"" << fluxvect[0]);
+	throw;
       }
       fluxhist->SetDirectory(0);
     }
-  } else if (fluxvect.size() == 1) {
-    MonoEnergy = GeneralUtils::StrToDbl(fluxvect[0]);
-    RunGENIEPrepareMono(input, target, output);
-    return;
-  } else {
+    fluxfile->Close();
+  }
+
+  if (!fluxhist){
     NUIS_LOG(FTL, "Bad flux specification: \"" << flux << "\".");
     throw;
   }
@@ -598,6 +615,9 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
     // Get the GHepRecord
     GHepRecord genie_record = static_cast<GHepRecord>(event);
     double xsec = (genie_record.XSec() / (1E-38 * genie::units::cm2));
+
+    // if hadron scattering
+    if (fIsHadron) xsec = 1;
 
     // Parse Interaction String
     std::string mode = genie_record.Summary()->AsString();
@@ -807,6 +827,7 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
   std::vector<double>::iterator it = targ_fractions.begin();
   std::vector<std::string>::iterator jt = targ_list.begin();
   double scaling = 0;
+
   for (; it != targ_fractions.end(); it++, jt++) {
     // First get the mass number from the targ_list
     int nucl = atoi((*jt).c_str());
@@ -819,6 +840,7 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
     if (tempscaling > scaling)
       scaling = tempscaling;
   }
+
   it = targ_fractions.begin();
   for (; it != targ_fractions.end(); it++) {
     // Round the scaling to nearest integer and multiply
@@ -885,20 +907,36 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
   }
 
   outputfile->cd();
-  totalxsec->GetYaxis()->SetTitle(
-      "#sigma (E_{#nu}) #times 10^{-38} (cm^{2}/nucleon)");
-  totalxsec->Write("nuisance_xsec", TObject::kOverwrite);
+  
+  if (!fIsHadron){
+    totalxsec->GetYaxis()->SetTitle(
+    "#sigma (E_{#nu}) #times 10^{-38} (cm^{2}/nucleon)");
+    totalxsec->Write("nuisance_xsec", TObject::kOverwrite);
+    
+    eventhist = (TH1D *)fluxhist->Clone();
+    eventhist->Multiply(totalxsec);
+    eventhist->GetYaxis()->SetTitle(
+	     (std::string("Event rate (N = #sigma #times #Phi) #times 10^{-38} "
+			  "(cm^{2}/nucleon) #times ") +
+	      eventhist->GetYaxis()->GetTitle())
+	     .c_str());
+    
+    NUIS_LOG(FIT, "Dividing by Total Nucl = " << totalnucl);
+    eventhist->Scale(1.0 / double(totalnucl));
+  }
+  else {
+    // Hadrons will only work for a single target, because GENIE doesn't store the target info
+    int nucl = atoi(targprs[0].c_str());
+    nucl = (nucl % 10000) / 10;
+    double xsec = 10*M_PI*(3*1.4*pow(double(nucl),1/3.))*(3*1.4*pow(double(nucl),1/3.));
+    std::cout << "Found " << nucl << " " << xsec << std::endl;
 
-  eventhist = (TH1D *)fluxhist->Clone();
-  eventhist->Multiply(totalxsec);
-  eventhist->GetYaxis()->SetTitle(
-      (std::string("Event rate (N = #sigma #times #Phi) #times 10^{-38} "
-                   "(cm^{2}/nucleon) #times ") +
-       eventhist->GetYaxis()->GetTitle())
-      .c_str());
+    for (int i=0; i<totalxsec->GetNbinsX(); ++i) totalxsec ->SetBinContent(i+1, xsec/nevt);
 
-  NUIS_LOG(FIT, "Dividing by Total Nucl = " << totalnucl);
-  eventhist->Scale(1.0 / double(totalnucl));
+    totalxsec->Write("nuisance_xsec", TObject::kOverwrite);
+    eventhist = (TH1D *)fluxhist->Clone();
+    eventhist->Multiply(totalxsec);
+  }
 
   eventhist->Write("nuisance_events", TObject::kOverwrite);
   fluxhist->Write("nuisance_flux", TObject::kOverwrite);
@@ -952,6 +990,9 @@ void PrintOptions() {
   std::cout << " [ -m Mono_E_nu_GeV ] : Run in mono-energetic mode with m GeV "
     "neutrino energy."
     << std::endl;
+  std::cout << " [ -r E_MIN,E_MAX ] : Run with a uniform flux between E_MIN and E_MAX (GeV) "
+    "neutrino energy."
+    << std::endl;
   std::cout << " [ -n number_of_evt ] : Run with a reduced number of events "
     "for debugging purposes"
     << std::endl;
@@ -989,7 +1030,7 @@ void ParseOptions(int argc, char *argv[]) {
         gOutputFile = argv[i + 1];
         ++i;
       } else if (!std::strcmp(argv[i], "-f")) {
-        gFluxFile = argv[i + 1];
+        gFlux = argv[i + 1];
         ++i;
       } else if (!std::strcmp(argv[i], "-t")) {
         gTarget = argv[i + 1];
@@ -998,8 +1039,12 @@ void ParseOptions(int argc, char *argv[]) {
         gNEvents = GeneralUtils::StrToInt(argv[i + 1]);
         ++i;
       } else if (!std::strcmp(argv[i], "-m")) {
-        MonoEnergy = GeneralUtils::StrToDbl(argv[i + 1]);
-        IsMonoE = true;
+        fIsMono = true;
+        gFlux = argv[i + 1]; 
+        ++i;
+      } else if (!std::strcmp(argv[i], "-r")) {
+        fIsRange = true;
+        gFlux = argv[i+1];
         ++i;
       } else {
         NUIS_ERR(FTL, "ERROR: unknown command line option given! - '"
@@ -1015,7 +1060,7 @@ void ParseOptions(int argc, char *argv[]) {
     flagopt = true;
   }
 
-  if (gFluxFile == "" && !flagopt && !IsMonoE) {
+  if (gFlux == "" && !flagopt) {
     NUIS_ERR(FTL, "No flux input specified for Prepare Mode");
     flagopt = true;
   }

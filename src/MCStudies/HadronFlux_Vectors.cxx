@@ -57,15 +57,14 @@ HadronFlux_Vectors::HadronFlux_Vectors(std::string name,
   // correctly.
 
   // This needs some care...
-  this->fScaleFactor =
-      (this->PredictedEventRate("width", 0, EnuMax) / double(fNEvents)) /
-      this->TotalIntegratedFlux("width");
+  this->fScaleFactor = 
+    this->PredictedEventRate("width")*1E38 /
+    this->TotalIntegratedFlux("width");
 
-  NUIS_LOG(SAM, "Generic Flux Scaling Factor = "
-                    << fScaleFactor << " [= "
-                    << (GetEventHistogram()->Integral("width") * 1E-38) << "/("
-                    << (fNEvents + 0.) << "*" << TotalIntegratedFlux("width")
-                    << ")]");
+  std::cout << "EVTRT: " << this->PredictedEventRate("width")*1E38 << " " <<this->PredictedEventRate()*1E38 << std::endl;
+  std::cout << "EVTRT: " << this->TotalIntegratedFlux("width") << " " <<this->TotalIntegratedFlux() << std::endl;
+
+  NUIS_LOG(SAM, "Flux Scaling Factor = " << fScaleFactor);
 
   if (fScaleFactor <= 0.0) {
     // NUIS_ABORT("SCALE FACTOR TOO LOW");
@@ -143,7 +142,6 @@ void HadronFlux_Vectors::FillEventVariables(FitEvent *event) {
   Mode = event->Mode;
 
   // Get the incoming particle
-  // TODO: check this works
   FitParticle *in_part = event->GetBeamPart();
 
   in_pdg = in_part->fPID;
@@ -156,7 +154,7 @@ void HadronFlux_Vectors::FillEventVariables(FitEvent *event) {
 
   // Loop over the particles and store all the final state particles in a vector
   for (UInt_t i = 0; i < event->Npart(); ++i) {
-
+    
     if (event->PartInfo(i)->fIsAlive &&
         event->PartInfo(i)->Status() == kFinalState)
       partList.push_back(event->PartInfo(i));

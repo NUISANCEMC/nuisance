@@ -9,6 +9,7 @@
 #include "TFile.h"
 #include "TH1D.h"
 #include "TTree.h"
+#include <math.h>
 
 void printInputCommands(char *argv[]) {
   std::cout << "[USAGE]: " << argv[0]
@@ -158,9 +159,7 @@ int main(int argc, char *argv[]) {
                    << "\", was expecting "
                       "<FluxRootFile>,<FluxHistName>[,PDG[,speciesFraction]].");
       }
-    } 
-    // Add mono and range options
-    else {
+    } else {
       inputfiles.push_back(std::string(argv[i]));
     }
   }
@@ -301,6 +300,7 @@ void CreateRateHistograms(std::string inputs, bool force_out) {
     int pdg = evt->par.beam_particle;
     double Elow = double(fluxvals[0]) / 1000.0;
     double Ehigh = double(fluxvals[1]) / 1000.0;
+    int nbins = 100;
     TH1D *fluxplot = NULL;
 
     if (Elow > Ehigh)
@@ -309,19 +309,16 @@ void CreateRateHistograms(std::string inputs, bool force_out) {
     // For files produced with a flux distribution
     if (!isMono) {
       NUIS_LOG(FIT, "Adding new nuwro flux "
-                        << "pdg: " << pdg << " Elow: " << Elow
-                        << " Ehigh: " << Ehigh);
+	       << "pdg: " << pdg << " Elow: " << Elow
+	       << " Ehigh: " << Ehigh);
 
       fluxplot =
-          new TH1D("fluxplot", "fluxplot", fluxvals.size() - 4, Elow, Ehigh);
-      for (uint j = 2; j < fluxvals.size(); j++) {
-        NUIS_LOG(DEB, j << " " << fluxvals[j]);
-        fluxplot->SetBinContent(j - 1, fluxvals[j]);
-      }
+	new TH1D("fluxplot", "fluxplot", nbins, Elow, Ehigh);
+      for (uint j = 0; j < nbins; j++) fluxplot->SetBinContent(j+1, 1);
     } else { // For monoenergetic fluxes
       NUIS_LOG(FIT, "Adding mono-energetic nuwro flux "
-                        << "pdg: " << pdg << " E: " << Elow);
-
+	       << "pdg: " << pdg << " E: " << Elow);
+      
       fluxplot = new TH1D("fluxplot", "fluxplot", 100, 0, Elow * 2);
       fluxplot->SetBinContent(fluxplot->FindBin(Elow), 1);
     }
@@ -421,7 +418,11 @@ void CreateRateHistograms(std::string inputs, bool force_out) {
     // Get Variables
     if (fIsHadron) {
       Enu = evt->out[0].t / 1000.0;
-      TotXSec = evt->weight;
+      
+      // For hadron scattering, evt->weight isn't filled, need to add by hand
+      double r = sqrt(evt->out[0].r[1]*evt->out[0].r[1] + evt->out[0].r[2]*evt->out[0].r[2] + evt->out[0].r[3]*evt->out[0].r[3]);
+	
+      TotXSec = 4*M_PI*r*r;
       pdg = evt->out[0].pdg;
     } else {
       Enu = evt->in[0].t / 1000.0;
@@ -458,10 +459,13 @@ void CreateRateHistograms(std::string inputs, bool force_out) {
     int pdg = allpdg[i];
     double AvgXSec = intxseclist[0] * 1E38 / double(nevtlist[0]);
 
+    if (fIsHadron) AvgXSec = intxseclist[0] / double(nevtlist[0]);
+
     NUIS_LOG(FIT, pdg << " Avg XSec = " << AvgXSec);
     NUIS_LOG(FIT, pdg << " nevents = " << double(nevtlist[pdg]));
 
     if (!isMono) {
+      std::cout << "Scaling with width" << std::endl;
       // Convert events to PDF
       eventlist[pdg]->Scale(1.0 / zeroevents->Integral("width"));
 
