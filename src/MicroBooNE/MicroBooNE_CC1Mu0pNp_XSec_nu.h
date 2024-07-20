@@ -21,6 +21,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include <TMatrixDfwd.h>
 #include "Measurement1D.h"
 #include "WireCellHelper.h"
@@ -47,9 +49,9 @@ public:
     TH2D* hFullAc =   (TH2D *)inputRootFile->Get("MicroBooNE_CC1Mu0pNp_Ac");
 
     int full_bins = hFullData->GetNbinsX()+2;
-    TVectorD*    m_fulldata = new TVectorD (full_bins, hFullData->GetArray());
-    TMatrixD*    m_fullcov  = new TMatrixD (full_bins, full_bins, hFullCov->GetArray(), "D");
-    TMatrixD*    m_fullac   = new TMatrixD (full_bins, full_bins, hFullAc->GetArray(), "D");
+    auto m_fulldata = make_unique<TVectorD> (full_bins, hFullData->GetArray());
+    auto m_fullcov  = make_unique<TMatrixD> (full_bins, full_bins, hFullCov->GetArray(), "D");
+    auto m_fullac   = make_unique<TMatrixD> (full_bins, full_bins, hFullAc->GetArray(), "D");
     // this needs to be transposed to get the right format for some reason
     m_fullac->Transpose(*m_fullac);
     m_fullcov->Transpose(*m_fullcov);
@@ -81,12 +83,6 @@ public:
       curr_bin_i += block_bins_i;
     } // end row
     // free up the memory we just used
-    hFullData->Reset();
-    hFullCov ->Reset();
-    hFullAc  ->Reset();
-    delete m_fulldata;
-    delete m_fullcov;
-    delete m_fullac;
     inputRootFile->Close();
   }
 };

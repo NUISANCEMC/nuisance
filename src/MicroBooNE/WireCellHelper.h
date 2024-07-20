@@ -136,9 +136,9 @@ public:
   int find_bin(distribution_t D, Args&& ... values) const {
     assert(!(D == distribution_t::kAll) && "Invalid Lookup!");
 
-    std::array<double, sizeof...(values)> array_vals({static_cast<double>(values)...});
     int dim = f_ndims.at(D);
     if(dim != sizeof...(values)) return -1;
+    std::array<double, sizeof...(values)> array_vals({static_cast<double>(values)...});
     // this might be a bit ugly but feel like it comes together later
     if(dim == 1){
       auto bin_list = f_bins_1d.at(D);
@@ -298,9 +298,9 @@ public:
 
 protected:
   LookupTable  f_lookup;
+  TVectorD*    m_data = NULL;
   TMatrixDSym* m_cov  = NULL;
   TMatrixD*    m_ac   = NULL;
-  TVectorD*    m_data = NULL;
 };
 
 // get the flux fraction based on energy ranges
