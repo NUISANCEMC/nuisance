@@ -53,7 +53,7 @@ enum distribution_t {
   // the 1000 here is arbitrary, but text file is offset accordingly
   kEnuCosThetaMuEMu = 1000,
   // the 2000 here is arbitrary, but text file is offset accordingly
-  kAllNCpi0 = 1999,
+  kAllNCpi0 = -2,
   k0pNpPpi0 = 2000,
   kXpPpi0 = 2012,
   k0pNpCosThetaPi0 = 2021,
@@ -106,11 +106,11 @@ public:
   }
   // useful functions for each distribution within the cache
   int get_nbins(distribution_t D) const {
-    assert(!(D == distribution_t::kAll) && "Invalid Lookup!");
+    assert(D >= 0 && "Invalid Lookup!");
     return f_nbins.at(D);
   }
   double get_width(distribution_t D, int bin) const {
-    assert(!(D == distribution_t::kAll) && "Invalid Lookup!");
+    assert(D >= 0 && "Invalid Lookup!");
     return f_widths.at(D).at(bin);
   }
   // apply a general function on the bin edges
@@ -119,7 +119,7 @@ public:
   // func also should return a double
   template<typename F, typename... Args>
   double apply(distribution_t D, int bin, F func, Args&& ... args) const {
-    assert(!(D == distribution_t::kAll) && "Invalid Lookup!");
+    assert(D >= 0 && "Invalid Lookup!");
     int dim = f_ndims.at(D);
     // this might be a bit ugly but feel like it comes together later
     if(dim == 1){
@@ -143,8 +143,7 @@ public:
   // based on input values for individual physics observables
   template <typename... Args>
   int find_bin(distribution_t D, Args&& ... values) const {
-    assert(!(D == distribution_t::kAll) && "Invalid Lookup!");
-
+    assert(D >= 0 && "Invalid Lookup!");
     int dim = f_ndims.at(D);
     if(dim != sizeof...(values)) return -1;
     std::array<double, sizeof...(values)> array_vals({static_cast<double>(values)...});

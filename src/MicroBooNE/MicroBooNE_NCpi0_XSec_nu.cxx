@@ -75,7 +75,7 @@ MicroBooNE_NCpi0_XSec_nu<D, Ds...>::MicroBooNE_NCpi0_XSec_nu(
   // the data histogram
   fDataHist = (TH1D *)ana_helper.get_data();
   fDataHist->SetName(Form("%s_data", sample_name.c_str()));
-  ScaleData(1E-36/1000*40);
+  ScaleData(1E-39*40);
 
   // the measurement covariance
   fFullCovar = ana_helper.get_cov_m();
@@ -123,14 +123,13 @@ void MicroBooNE_NCpi0_XSec_nu<D, Ds...>::FillEventVariables(FitEvent *customEven
   double CosThetaPi0 = pi0->P3()[2]/pi0->p();
 
   //proton
-  FitParticle* proton;
   double Kp = 0;
   if(customEvent->HasFSParticle(2212)){
-    proton = customEvent->GetHMFSParticle(2212);
+    FitParticle* proton = customEvent->GetHMFSParticle(2212);
     Kp = proton->KE()*MeV2GeV;
   }
 
-  int curr_bin =0;
+  int curr_bin = 0;
   // loop over our blocks
   for(auto it = fDists.begin(); it != fDists.end(); ++it){
     distribution_t dist = *it;
@@ -179,7 +178,6 @@ void MicroBooNE_NCpi0_XSec_nu<D, Ds...>::ConvertEventRates() {
   // standard conversion
   Measurement1D::ConvertEventRates();
   int curr_bin = 0;
-  //int curr_bin = -2000;
   // loop over our blocks
   for(auto it = fDists.begin(); it != fDists.end(); ++it){
     distribution_t dist = *it;
@@ -202,8 +200,6 @@ void MicroBooNE_NCpi0_XSec_nu<D, Ds...>::ConvertEventRates() {
     v(i) = fMCHist->GetBinContent(i + 1);
     e(i) = std::pow(fMCHist->GetBinError(i + 1), 2);
   }
-
-  v.Print();
 
   TVectorD vs = (*fSmearingMatrix) * v;
   TVectorD es = (*fSmearingMatrix) * e;
