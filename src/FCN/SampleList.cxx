@@ -185,6 +185,7 @@
 #include "MicroBooNE_CCInc_XSec_2DPcos_nu.h"
 #include "MicroBooNE_CC1Mu0pNp_XSec_nu.h"
 #include "MicroBooNE_CC1Mu3DInc_XSec_nu.h"
+#include "MicroBooNE_NCpi0_XSec_nu.h"
 #endif
 
 #ifdef MINERvA_ENABLED
@@ -1154,6 +1155,19 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
       return (new MicroBooNE_CC1Mu0pNp_XSec_nu<distribution_t::kAll>(samplekey));
     } else if (!name.compare("MicroBooNE_CC1Mu3DInc_XSec_nu")) {
       return (new MicroBooNE_CC1Mu3DInc_XSec_nu(samplekey));
+
+    } else if (!name.compare("MicroBooNE_NCpi0_XSec_0pNpPpi0_nu")) {
+      return (new MicroBooNE_NCpi0_XSec_nu<distribution_t::k0pNpPpi0>(samplekey));
+    } else if (!name.compare("MicroBooNE_NCpi0_XSec_XpPpi0_nu")) {
+      return (new MicroBooNE_NCpi0_XSec_nu<distribution_t::kXpPpi0>(samplekey));
+    } else if (!name.compare("MicroBooNE_NCpi0_XSec_0pNpCosThetaPi0_nu")) {
+      return (new MicroBooNE_NCpi0_XSec_nu<distribution_t::k0pNpCosThetaPi0>(samplekey));
+    } else if (!name.compare("MicroBooNE_NCpi0_XSec_XpCosThetaPi0_nu")) {
+      return (new MicroBooNE_NCpi0_XSec_nu<distribution_t::kXpCosThetaPi0>(samplekey));
+    } else if (!name.compare("MicroBooNE_NCpi0_XSec_XpPpi0CosThetaPi0_nu")) {
+      return (new MicroBooNE_NCpi0_XSec_nu<distribution_t::kXpPpi0CosThetaPi0>(samplekey));
+    } else if (!name.compare("MicroBooNE_NCpi0_XSec_AllNCpi0_nu")) {
+      return (new MicroBooNE_NCpi0_XSec_nu<distribution_t::kAllNCpi0>(samplekey));
     } else
 
 #endif

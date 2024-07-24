@@ -142,6 +142,22 @@ bool isCC1Mu1p(FitEvent* event, double EnuMin, double EnuMax) {
   return true;
 }
 
+bool isNCpi0(FitEvent* event) {
+
+  // Check that we have a NC event
+  int nu_pdg = event->GetBeamNeutrinoPDG();
+  if( !event->HasFSParticle(nu_pdg) ) return false;
+
+  // Check that we have a pi0 in ther right momentum range
+  if (event->NumFSParticle(111) != 1) return false;
+  double p = event->GetHMFSParticle(111)->fP.Vect().Mag();
+  if (p > 1200 || p<=0) return false;
+  return true;
+
+}
+
+
+
     //----------------------------------------//
 
 

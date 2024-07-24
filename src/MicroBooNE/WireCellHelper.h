@@ -51,10 +51,17 @@ enum distribution_t {
   kXpAvailEnergyCosThetaMuEMu = 455,
   // separate file and data release
   // the 1000 here is arbitrary, but text file is offset accordingly
-  kEnuCosThetaMuEMu = 1000
+  kEnuCosThetaMuEMu = 1000,
+  // the 2000 here is arbitrary, but text file is offset accordingly
+  kAllNCpi0 = -2,
+  k0pNpPpi0 = 2000,
+  kXpPpi0 = 2012,
+  k0pNpCosThetaPi0 = 2021,
+  kXpCosThetaPi0 = 2044,
+  kXpPpi0CosThetaPi0 = 2061,
 };
 
-// some of CC1Mu0pNp reported measurements is "joint" 0pNp
+// some of CC1Mu0pNp and NCpi0 reported measurements is "joint" 0pNp
 // with a given observable but split into different hadron final states
 // we store those boundaries
 static std::map<distribution_t, int> kProtonBoundary = {
@@ -63,7 +70,9 @@ static std::map<distribution_t, int> kProtonBoundary = {
   {distribution_t::k0pNpEnu, 66},
   {distribution_t::k0pNpTransferEnergy, 79},
   {distribution_t::k0pNpAvailEnergy, 90},
-  {distribution_t::k0pNpEMuCosThetaMu, 193}
+  {distribution_t::k0pNpEMuCosThetaMu, 193},
+  {distribution_t::k0pNpPpi0, 2006},
+  {distribution_t::k0pNpCosThetaPi0, 2029},
 };
 
 // don't want to type all these out
@@ -97,11 +106,11 @@ public:
   }
   // useful functions for each distribution within the cache
   int get_nbins(distribution_t D) const {
-    assert(!(D == distribution_t::kAll) && "Invalid Lookup!");
+    assert(D >= 0 && "Invalid Lookup!");
     return f_nbins.at(D);
   }
   double get_width(distribution_t D, int bin) const {
-    assert(!(D == distribution_t::kAll) && "Invalid Lookup!");
+    assert(D >= 0 && "Invalid Lookup!");
     return f_widths.at(D).at(bin);
   }
   // apply a general function on the bin edges
@@ -110,7 +119,7 @@ public:
   // func also should return a double
   template<typename F, typename... Args>
   double apply(distribution_t D, int bin, F func, Args&& ... args) const {
-    assert(!(D == distribution_t::kAll) && "Invalid Lookup!");
+    assert(D >= 0 && "Invalid Lookup!");
     int dim = f_ndims.at(D);
     // this might be a bit ugly but feel like it comes together later
     if(dim == 1){
@@ -134,8 +143,7 @@ public:
   // based on input values for individual physics observables
   template <typename... Args>
   int find_bin(distribution_t D, Args&& ... values) const {
-    assert(!(D == distribution_t::kAll) && "Invalid Lookup!");
-
+    assert(D >= 0 && "Invalid Lookup!");
     int dim = f_ndims.at(D);
     if(dim != sizeof...(values)) return -1;
     std::array<double, sizeof...(values)> array_vals({static_cast<double>(values)...});
@@ -217,13 +225,12 @@ public:
         diff = 1.;
       if(curr_D == kEnuCosThetaMuEMu)
         diff = dx2*dx3;
-
       // save our lookup tables
       f_nbins[curr_D] = bin + 1;
       f_widths[curr_D].push_back(diff);
 
       // add an extra dimension for 0p Np lookup table with a 35 MeV proton KE boundary
-      if((curr_D <= k0pNpAvailEnergy) || (curr_D == k0pNpEMuCosThetaMu)){
+      if((curr_D <= k0pNpAvailEnergy) || (curr_D == k0pNpEMuCosThetaMu) || (curr_D == k0pNpPpi0) || (curr_D == k0pNpCosThetaPi0)){
         if(global_bin < kProtonBoundary[curr_D]){
           lo_vars[n_dim] = std::numeric_limits<double>::lowest();
           hi_vars[n_dim] = 0.035;
@@ -268,6 +275,18 @@ void LookupTable::cache_realbins<distribution_t::kAll>() {
                    kXpAvailEnergyCosThetaMuEMu
                   >();
 };
+template <>
+void LookupTable::cache_realbins<distribution_t::kAllNCpi0>() {
+  this->template cache_realbins<
+                   k0pNpPpi0,
+                   kXpPpi0,
+                   k0pNpCosThetaPi0,
+                   kXpCosThetaPi0,
+                   kXpPpi0CosThetaPi0
+                  >();
+};
+
+
 
 // helper classes for various wirecell measurements
 template <distribution_t D, distribution_t... Ds>
