@@ -26,6 +26,7 @@
 #include <vector>
 #include <map>
 #include <cassert>
+#include <utility>
 
 class TH1D;
 class TH2D;
@@ -121,24 +122,24 @@ public:
   // func expects a vector of bin edges as the first argument and then a variable set of arguments after
   // func also should return a double
   template<typename F, typename... Args>
-  double apply(distribution_t D, int bin, F func, Args&& ... args) const {
+  double apply(distribution_t D, int bin, F& func, Args&& ... args) const {
     assert(D >= 0 && "Invalid Lookup!");
     int dim = f_ndims.at(D);
     // this might be a bit ugly but feel like it comes together later
     if(dim == 1){
       auto bin_edges = (f_bins_1d.at(D)).at(bin);
       return func(std::vector<double>{bin_edges.begin(), bin_edges.end()},
-                  args...);
+                  std::forward<Args>(args)...);
     }
     if(dim == 2){
       auto bin_edges = (f_bins_2d.at(D)).at(bin);
       return func(std::vector<double>{bin_edges.begin(), bin_edges.end()},
-                  args...);
+                  std::forward<Args>(args)...);
     }
     if(dim == 3){
       auto bin_edges = (f_bins_3d.at(D)).at(bin);
       return func(std::vector<double>{bin_edges.begin(), bin_edges.end()},
-                  args...);
+                  std::forward<Args>(args)...);
     }
     return -1.;
   }
@@ -233,8 +234,7 @@ public:
       f_widths[curr_D].push_back(diff);
 
       // add an extra dimension for 0p Np lookup table with a 35 MeV proton KE boundary
-      if((curr_D <= kCC0pNpAvailEnergy) || (curr_D == kCC0pNpEMuCosThetaMu) ||
-         (curr_D == kNC0pNpPpi0) || (curr_D == kNC0pNpCosThetaPi0)){
+      if(kProtonBoundary.find(curr_D) != kProtonBoundary.end()){
         if(global_bin < kProtonBoundary[curr_D]){
           lo_vars[n_dim] = std::numeric_limits<double>::lowest();
           hi_vars[n_dim] = 0.035;
