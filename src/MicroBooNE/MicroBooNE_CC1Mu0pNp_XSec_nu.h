@@ -60,6 +60,7 @@ public:
     // loop over the row
     int curr_bin_i = 0;
     auto f_dist = (this->f_lookup).get_dists();
+
     for (auto it_i=f_dist.begin(); it_i != f_dist.end(); ++it_i) {
       distribution_t dist_i = *it_i;
       // get the block measurements

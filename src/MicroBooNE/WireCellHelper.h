@@ -64,8 +64,28 @@ enum distribution_t {
   kNCXpPpi0CosThetaPi0 = 2061,
 };
 
+// define an bin edges container
+template <size_t N>
+struct e_array {
+  constexpr size_t size() { return 2*N; }
+
+  // check if arguments is within the array of edges (low and high edges alternating)
+  template <typename... Args>
+  bool is_within(Args&& ... values) {
+    std::array<double, sizeof...(values)> v_a({static_cast<double>(values)...});
+    if(sizeof...(values) > N) return false;
+    int ret = 1;
+    for(size_t i = 0; i < v_a.size(); ++i){
+      ret *= (v_a.at(i) >= el.at(2*i)) && (v_a.at(i) < el.at(2*i+1));
+    }
+    return (bool) ret;
+  }
+
+  std::array<double, 2*N> el;
+};
+
 // don't want to type all these out
-template<std::size_t N> using edges_t = std::map<distribution_t, std::vector<std::array<double, 2*N>>>;
+template<std::size_t N> using edges_t = std::map<distribution_t, std::vector<e_array<N>>>;
 using widths_t     = std::map<distribution_t, std::vector<double>>;
 using dimensions_t = std::map<distribution_t, int>;
 using bins_t       = std::map<distribution_t, int>;
@@ -87,13 +107,12 @@ public:
   bins_t       get_nbins()  const { return f_nbins;  }
   dists_t      get_dists()  const { return f_dists;  }
 
+  // useful functions for each distribution within the cache
   int get_totalbins() const {
     int n = 0;
-    for(auto &i: f_nbins)
-      n += i.second;
+    for(auto &i: f_nbins) { n += i.second; }
     return n;
   }
-  // useful functions for each distribution within the cache
   int get_nbins(distribution_t D) const {
     assert(D >= 0 && "Invalid Lookup!");
     return f_nbins.at(D);
@@ -110,23 +129,10 @@ public:
   double apply(distribution_t D, int bin, F& func, Args&& ... args) const {
     assert(D >= 0 && "Invalid Lookup!");
     int dim = f_ndims.at(D);
-    // this might be a bit ugly but feel like it comes together later
-    if(dim == 1){
-      auto bin_edges = (f_bins_1d.at(D)).at(bin);
-      return func(std::vector<double>{bin_edges.begin(), bin_edges.end()},
-                  std::forward<Args>(args)...);
-    }
-    if(dim == 2){
-      auto bin_edges = (f_bins_2d.at(D)).at(bin);
-      return func(std::vector<double>{bin_edges.begin(), bin_edges.end()},
-                  std::forward<Args>(args)...);
-    }
-    if(dim == 3){
-      auto bin_edges = (f_bins_3d.at(D)).at(bin);
-      return func(std::vector<double>{bin_edges.begin(), bin_edges.end()},
-                  std::forward<Args>(args)...);
-    }
-    return -1.;
+    auto bin_edges = (f_bins.at(D)).at(bin).el;
+    // apply the function
+    return func(std::vector<double>{bin_edges.begin(), bin_edges.end()},
+                std::forward<Args>(args)...);
   }
   // similar to the above, this just finds the local bin number for a given distribution
   // based on input values for individual physics observables
@@ -135,31 +141,11 @@ public:
     assert(D >= 0 && "Invalid Lookup!");
     int dim = f_ndims.at(D);
     if(dim != sizeof...(values)) return -1;
-    std::array<double, sizeof...(values)> array_vals({static_cast<double>(values)...});
-    // this might be a bit ugly but feel like it comes together later
-    if(dim == 1){
-      auto bin_list = f_bins_1d.at(D);
-      for(auto it = bin_list.begin(); it != bin_list.end(); ++it){
-        if(array_vals[0] >= it->at(0) && array_vals[0] < it->at(1))
-          return it - bin_list.begin();
-      }
-    }
-    if(dim == 2){
-      auto bin_list = f_bins_2d.at(D);
-      for(auto it = bin_list.begin(); it != bin_list.end(); ++it){
-        if(array_vals[0] >= it->at(0) && array_vals[0] < it->at(1) &&
-           array_vals[1] >= it->at(2) && array_vals[1] < it->at(3))
-          return it - bin_list.begin();
-      }
-    }
-    if(dim == 3){
-      auto bin_list = f_bins_3d.at(D);
-      for(auto it = bin_list.begin(); it != bin_list.end(); ++it){
-        if(array_vals[0] >= it->at(0) && array_vals[0] < it->at(1) &&
-           array_vals[1] >= it->at(2) && array_vals[1] < it->at(3) &&
-           array_vals[2] >= it->at(4) && array_vals[2] < it->at(5))
-          return it - bin_list.begin();
-      }
+    auto bin_list = f_bins.at(D);
+    // find bin in which values belongs to
+    for(auto it = bin_list.begin(); it != bin_list.end(); ++it){
+      if(it->is_within(values...))
+        return it - bin_list.begin();
     }
     return -1;
   }
@@ -171,9 +157,7 @@ private:
   widths_t     f_widths;
   dists_t      f_dists;
   // max dimension of measurement is 3
-  edges_t<3>   f_bins_3d;
-  edges_t<2>   f_bins_2d;
-  edges_t<1>   f_bins_1d;
+  edges_t<3>   f_bins;
 
 public:
   // actually read in the bin edges text file here
@@ -213,16 +197,9 @@ public:
       f_nbins[curr_D] = bin + 1;
       f_widths[curr_D].push_back(diff);
       f_ndims[curr_D] = n_dim;
-
-      if(n_dim == 1)
-        f_bins_1d[curr_D].push_back({lo_vars[0], hi_vars[0]});
-      if(n_dim == 2)
-        f_bins_2d[curr_D].push_back({lo_vars[0], hi_vars[0],
-                                     lo_vars[1], hi_vars[1]});
-      if(n_dim == 3)
-        f_bins_3d[curr_D].push_back({lo_vars[0], hi_vars[0],
-                                     lo_vars[1], hi_vars[1],
-                                     lo_vars[2], hi_vars[2]});
+      f_bins[curr_D].push_back({lo_vars[0], hi_vars[0],
+                                lo_vars[1], hi_vars[1],
+                                lo_vars[2], hi_vars[2]});
     } // eof
   }
 };
@@ -323,4 +300,4 @@ double GetFluxFraction(std::vector<double> edges, TH1D* fluxHist){
 // expects energy range to be in the 1st two elements
 double GetEnergyBinWidth(std::vector<double> edges){
   return (edges[1] - edges[0]);
-}
+};
