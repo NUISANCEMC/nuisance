@@ -53,7 +53,6 @@ enum distribution_t {
   kCCXpEMuCosThetaMu = 386,
   kCCXpAvailEnergyCosThetaMuEMu = 455,
   // CCinc 3D
-  // separate file and data release
   // the 1000 here is arbitrary, but text file is offset accordingly
   kCCEnuCosThetaMuEMu = 1000,
   // NCpi0
@@ -63,20 +62,6 @@ enum distribution_t {
   kNC0pNpCosThetaPi0 = 2021,
   kNCXpCosThetaPi0 = 2044,
   kNCXpPpi0CosThetaPi0 = 2061,
-};
-
-// some of CC1Mu0pNp and NCpi0 reported measurements is "joint" 0pNp
-// with a given observable but split into different hadron final states
-// we store those boundaries
-static std::map<distribution_t, int> kProtonBoundary = {
-  {distribution_t::kCC0pNpEMu, 11},
-  {distribution_t::kCC0pNpCosThetaMu, 39},
-  {distribution_t::kCC0pNpEnu, 66},
-  {distribution_t::kCC0pNpTransferEnergy, 79},
-  {distribution_t::kCC0pNpAvailEnergy, 90},
-  {distribution_t::kCC0pNpEMuCosThetaMu, 193},
-  {distribution_t::kNC0pNpPpi0, 2006},
-  {distribution_t::kNC0pNpCosThetaPi0, 2029},
 };
 
 // don't want to type all these out
@@ -223,30 +208,12 @@ public:
       double dx2   = (lo_vars[1] != -1000.) ?  hi_vars[1]-lo_vars[1] : 1;
       double dx1   = (lo_vars[0] != -1000.) ?  hi_vars[0]-lo_vars[0] : 1;
       double diff  = dx1*dx2*dx3;
-      // for Enu 1D or 3D or proton multiplicity, we don't divide by bin widths anyway
-      // need flux scaling which will be done later
-      if(curr_D == kCC0pNpEnu || curr_D == kCCProtonMult)
-        diff = 1.;
-      if(curr_D == kCCEnuCosThetaMuEMu)
-        diff = dx2*dx3;
+
       // save our lookup tables
       f_nbins[curr_D] = bin + 1;
       f_widths[curr_D].push_back(diff);
-
-      // add an extra dimension for 0p Np lookup table with a 35 MeV proton KE boundary
-      if(kProtonBoundary.find(curr_D) != kProtonBoundary.end()){
-        if(global_bin < kProtonBoundary[curr_D]){
-          lo_vars[n_dim] = std::numeric_limits<double>::lowest();
-          hi_vars[n_dim] = 0.035;
-        }
-        else{
-          lo_vars[n_dim] = 0.035;
-          hi_vars[n_dim] = std::numeric_limits<double>::max();
-        }
-        n_dim += 1; // extra for 0pNp dimensions
-      }
-
       f_ndims[curr_D] = n_dim;
+
       if(n_dim == 1)
         f_bins_1d[curr_D].push_back({lo_vars[0], hi_vars[0]});
       if(n_dim == 2)
@@ -259,7 +226,7 @@ public:
     } // eof
   }
 };
-// specialize it for all bins (doesn't include CCinc 3D because that's separate)
+// specialize it for all CC blocks (doesn't include CCinc 3D because that's separate)
 template <>
 void LookupTable::cache_realbins<distribution_t::kAllCC>() {
   this->template cache_realbins<
@@ -327,9 +294,9 @@ protected:
   TMatrixD*    m_ac   = NULL;
 };
 
+// the below functions are useful for Enu based measurements which wirecell has multiple results of
 // get the flux fraction based on energy ranges
 // expects energy range to be in the 1st two elements
-// include this here because wirecell reports multiple Enu based measurements
 double GetFluxFraction(std::vector<double> edges, TH1D* fluxHist){
   int lo_bin = fluxHist->FindBin(edges[0]);
   int hi_bin = fluxHist->FindBin(edges[1]);
@@ -351,3 +318,9 @@ double GetFluxFraction(std::vector<double> edges, TH1D* fluxHist){
 
   return tot_flux;
 };
+
+// get the bin width based on energy ranges
+// expects energy range to be in the 1st two elements
+double GetEnergyBinWidth(std::vector<double> edges){
+  return (edges[1] - edges[0]);
+}

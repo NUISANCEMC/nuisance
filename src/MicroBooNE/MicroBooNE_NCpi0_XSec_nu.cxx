@@ -135,15 +135,17 @@ void MicroBooNE_NCpi0_XSec_nu<D, Ds...>::FillEventVariables(FitEvent *customEven
     distribution_t dist = *it;
     int nblockbins = fTable.get_nbins(dist);
     int localbin = -1;
+    int Channel0pNp = Kp >= 0.035;
+
     switch(dist){
       case kNC0pNpPpi0:
-        localbin = fTable.find_bin(dist, Ppi0, Kp);
+        localbin = fTable.find_bin(dist, Ppi0, Channel0pNp);
         break;
       case kNCXpPpi0:
         localbin = fTable.find_bin(dist, Ppi0);
         break;
       case kNC0pNpCosThetaPi0:
-        localbin = fTable.find_bin(dist, CosThetaPi0, Kp);
+        localbin = fTable.find_bin(dist, CosThetaPi0, Channel0pNp);
         break;
       case kNCXpCosThetaPi0:
         localbin = fTable.find_bin(dist, CosThetaPi0);

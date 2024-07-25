@@ -163,6 +163,9 @@ void MicroBooNE_CC1Mu0pNp_XSec_nu<D, Ds...>::FillEventVariables(FitEvent *custom
     }
     else AvailEnergy += E;
   }
+  // last bin contains everything beyond 3 protons
+  if(NProton > 3) NProton = 3;
+
 
   int curr_bin = 0;
   // loop over our blocks
@@ -170,21 +173,23 @@ void MicroBooNE_CC1Mu0pNp_XSec_nu<D, Ds...>::FillEventVariables(FitEvent *custom
     distribution_t dist = *it;
     int nblockbins = fTable.get_nbins(dist);
     int localbin = -1;
+    int Channel0pNp = ProtonKE >= 0.035;
+
     switch(dist){
       case kCC0pNpEMu:
-        localbin = fTable.find_bin(dist, EMu, ProtonKE);
+        localbin = fTable.find_bin(dist, EMu, Channel0pNp);
         break;
       case kCC0pNpCosThetaMu:
-        localbin = fTable.find_bin(dist, CosThetaMu, ProtonKE);
+        localbin = fTable.find_bin(dist, CosThetaMu, Channel0pNp);
         break;
       case kCC0pNpEnu:
-        localbin = fTable.find_bin(dist, ENu, ProtonKE);
+        localbin = fTable.find_bin(dist, ENu, Channel0pNp);
         break;
       case kCC0pNpTransferEnergy:
-        localbin = fTable.find_bin(dist, TransferEnergy, ProtonKE);
+        localbin = fTable.find_bin(dist, TransferEnergy, Channel0pNp);
         break;
       case kCC0pNpAvailEnergy:
-        localbin = fTable.find_bin(dist, AvailEnergy, ProtonKE);
+        localbin = fTable.find_bin(dist, AvailEnergy, Channel0pNp);
         break;
       case kCCProtonKE:
         localbin = fTable.find_bin(dist, ProtonKE);
@@ -196,7 +201,7 @@ void MicroBooNE_CC1Mu0pNp_XSec_nu<D, Ds...>::FillEventVariables(FitEvent *custom
         localbin = fTable.find_bin(dist, NProton);
         break;
       case kCC0pNpEMuCosThetaMu:
-        localbin = fTable.find_bin(dist, EMu, CosThetaMu, ProtonKE);
+        localbin = fTable.find_bin(dist, EMu, CosThetaMu, Channel0pNp);
         break;
       case kCCNpProtonKECosTheta:
         localbin = fTable.find_bin(dist, ProtonKE, ProtonCosTheta);
@@ -250,13 +255,12 @@ void MicroBooNE_CC1Mu0pNp_XSec_nu<D, Ds...>::ConvertEventRates() {
       double bin_width = fTable.get_width(dist, i);
       // for xsec vs neutrino energy, we divide by the fraction of flux
       // producing the events in that energy range
-      double scaling = 1.;
       if(dist == kCC0pNpEnu)
-        scaling = fTable.apply(dist, i,
+        bin_width = fTable.apply(dist, i,
                                GetFluxFraction, GetFluxHistogram());
 
-      fMCHist->SetBinContent(curr_bin + i + 1, fMCHist->GetBinContent(curr_bin + i + 1)/(bin_width*scaling));
-      fMCHist->SetBinError  (curr_bin + i + 1, fMCHist->GetBinError(curr_bin + i + 1)/(bin_width*scaling));
+      fMCHist->SetBinContent(curr_bin + i + 1, fMCHist->GetBinContent(curr_bin + i + 1)/(bin_width));
+      fMCHist->SetBinError  (curr_bin + i + 1, fMCHist->GetBinError(curr_bin + i + 1)/(bin_width));
     }
     curr_bin += nblockbins;
   }

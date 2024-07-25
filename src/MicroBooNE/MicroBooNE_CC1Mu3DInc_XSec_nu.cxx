@@ -22,6 +22,7 @@
 
 #include "TH1D.h"
 #include "TH2D.h"
+#include "WireCellHelper.h"
 
 //********************************************************************
 MicroBooNE_CC1Mu3DInc_XSec_nu::MicroBooNE_CC1Mu3DInc_XSec_nu(
@@ -128,9 +129,12 @@ void MicroBooNE_CC1Mu3DInc_XSec_nu::ConvertEventRates() {
     // producing the events in that energy range
     double scaling = fTable.apply(kCCEnuCosThetaMuEMu, i,
                                   GetFluxFraction, GetFluxHistogram());
+    // this rescales the bin width by the width in the energy dimension to get a double differential
+    // in PMu and CosThetaMu
+    double enu_width = fTable.apply(kCCEnuCosThetaMuEMu, i, GetEnergyBinWidth);
 
-    fMCHist->SetBinContent(i + 1, fMCHist->GetBinContent(i + 1)/(bin_width*scaling));
-    fMCHist->SetBinError  (i + 1, fMCHist->GetBinError(i + 1)/(bin_width*scaling));
+    fMCHist->SetBinContent(i + 1, fMCHist->GetBinContent(i + 1)/(bin_width*scaling/enu_width));
+    fMCHist->SetBinError  (i + 1, fMCHist->GetBinError(i + 1)/(bin_width*scaling/enu_width));
   }
 
   // now apply Wiener-SVD Ac smearing
