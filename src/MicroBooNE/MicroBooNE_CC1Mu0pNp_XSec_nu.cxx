@@ -55,7 +55,7 @@ MicroBooNE_CC1Mu0pNp_XSec_nu<D, Ds...>::MicroBooNE_CC1Mu0pNp_XSec_nu(
   FinaliseSampleSettings();
 
   // Scaling Setup ---------------------------------------------------
-  // ScaleFactor automatically setup for DiffXSec/cm2/Nucleon
+  // ScaleFactor setup for DiffXSec/cm2/Ar nucleus
   fScaleFactor = ((GetEventHistogram()->Integral("width") / (fNEvents + 0.)) *
                   1E-38 / (TotalIntegratedFlux())) * 40;
 
@@ -171,46 +171,46 @@ void MicroBooNE_CC1Mu0pNp_XSec_nu<D, Ds...>::FillEventVariables(FitEvent *custom
     int nblockbins = fTable.get_nbins(dist);
     int localbin = -1;
     switch(dist){
-      case k0pNpEMu:
+      case kCC0pNpEMu:
         localbin = fTable.find_bin(dist, EMu, ProtonKE);
         break;
-      case k0pNpCosThetaMu:
+      case kCC0pNpCosThetaMu:
         localbin = fTable.find_bin(dist, CosThetaMu, ProtonKE);
         break;
-      case k0pNpEnu:
+      case kCC0pNpEnu:
         localbin = fTable.find_bin(dist, ENu, ProtonKE);
         break;
-      case k0pNpTransferEnergy:
+      case kCC0pNpTransferEnergy:
         localbin = fTable.find_bin(dist, TransferEnergy, ProtonKE);
         break;
-      case k0pNpAvailEnergy:
+      case kCC0pNpAvailEnergy:
         localbin = fTable.find_bin(dist, AvailEnergy, ProtonKE);
         break;
-      case kProtonKE:
+      case kCCProtonKE:
         localbin = fTable.find_bin(dist, ProtonKE);
         break;
-      case kProtonCosTheta:
+      case kCCProtonCosTheta:
         localbin = fTable.find_bin(dist, ProtonCosTheta);
         break;
-      case kProtonMult:
+      case kCCProtonMult:
         localbin = fTable.find_bin(dist, NProton);
         break;
-      case k0pNpEMuCosThetaMu:
+      case kCC0pNpEMuCosThetaMu:
         localbin = fTable.find_bin(dist, EMu, CosThetaMu, ProtonKE);
         break;
-      case kNpProtonKECosTheta:
+      case kCCNpProtonKECosTheta:
         localbin = fTable.find_bin(dist, ProtonKE, ProtonCosTheta);
         break;
-      case kXpEMu:
+      case kCCXpEMu:
         localbin = fTable.find_bin(dist, EMu);
         break;
-      case kXpCosThetaMu:
+      case kCCXpCosThetaMu:
         localbin = fTable.find_bin(dist, CosThetaMu);
         break;
-      case kXpEMuCosThetaMu:
+      case kCCXpEMuCosThetaMu:
         localbin = fTable.find_bin(dist, EMu, CosThetaMu);
         break;
-      case kXpAvailEnergyCosThetaMuEMu:
+      case kCCXpAvailEnergyCosThetaMuEMu:
         localbin = fTable.find_bin(dist, EMu, CosThetaMu, AvailEnergy);
         break;
     }
@@ -251,7 +251,7 @@ void MicroBooNE_CC1Mu0pNp_XSec_nu<D, Ds...>::ConvertEventRates() {
       // for xsec vs neutrino energy, we divide by the fraction of flux
       // producing the events in that energy range
       double scaling = 1.;
-      if(dist == k0pNpEnu)
+      if(dist == kCC0pNpEnu)
         scaling = fTable.apply(dist, i,
                                GetFluxFraction, GetFluxHistogram());
 
@@ -278,18 +278,18 @@ void MicroBooNE_CC1Mu0pNp_XSec_nu<D, Ds...>::ConvertEventRates() {
   }
 }
 
-template class MicroBooNE_CC1Mu0pNp_XSec_nu<k0pNpEMu>;
-template class MicroBooNE_CC1Mu0pNp_XSec_nu<k0pNpCosThetaMu>;
-template class MicroBooNE_CC1Mu0pNp_XSec_nu<k0pNpEnu>;
-template class MicroBooNE_CC1Mu0pNp_XSec_nu<k0pNpTransferEnergy>;
-template class MicroBooNE_CC1Mu0pNp_XSec_nu<k0pNpAvailEnergy>;
-template class MicroBooNE_CC1Mu0pNp_XSec_nu<kProtonKE>;
-template class MicroBooNE_CC1Mu0pNp_XSec_nu<kProtonCosTheta>;
-template class MicroBooNE_CC1Mu0pNp_XSec_nu<kProtonMult>;
-template class MicroBooNE_CC1Mu0pNp_XSec_nu<k0pNpEMuCosThetaMu>;
-template class MicroBooNE_CC1Mu0pNp_XSec_nu<kNpProtonKECosTheta>;
-template class MicroBooNE_CC1Mu0pNp_XSec_nu<kXpEMu>;
-template class MicroBooNE_CC1Mu0pNp_XSec_nu<kXpCosThetaMu>;
-template class MicroBooNE_CC1Mu0pNp_XSec_nu<kXpEMuCosThetaMu>;
-template class MicroBooNE_CC1Mu0pNp_XSec_nu<kXpAvailEnergyCosThetaMuEMu>;
-template class MicroBooNE_CC1Mu0pNp_XSec_nu<kAll>;
+template class MicroBooNE_CC1Mu0pNp_XSec_nu<kCC0pNpEMu>;
+template class MicroBooNE_CC1Mu0pNp_XSec_nu<kCC0pNpCosThetaMu>;
+template class MicroBooNE_CC1Mu0pNp_XSec_nu<kCC0pNpEnu>;
+template class MicroBooNE_CC1Mu0pNp_XSec_nu<kCC0pNpTransferEnergy>;
+template class MicroBooNE_CC1Mu0pNp_XSec_nu<kCC0pNpAvailEnergy>;
+template class MicroBooNE_CC1Mu0pNp_XSec_nu<kCCProtonKE>;
+template class MicroBooNE_CC1Mu0pNp_XSec_nu<kCCProtonCosTheta>;
+template class MicroBooNE_CC1Mu0pNp_XSec_nu<kCCProtonMult>;
+template class MicroBooNE_CC1Mu0pNp_XSec_nu<kCC0pNpEMuCosThetaMu>;
+template class MicroBooNE_CC1Mu0pNp_XSec_nu<kCCNpProtonKECosTheta>;
+template class MicroBooNE_CC1Mu0pNp_XSec_nu<kCCXpEMu>;
+template class MicroBooNE_CC1Mu0pNp_XSec_nu<kCCXpCosThetaMu>;
+template class MicroBooNE_CC1Mu0pNp_XSec_nu<kCCXpEMuCosThetaMu>;
+template class MicroBooNE_CC1Mu0pNp_XSec_nu<kCCXpAvailEnergyCosThetaMuEMu>;
+template class MicroBooNE_CC1Mu0pNp_XSec_nu<kAllCC>;

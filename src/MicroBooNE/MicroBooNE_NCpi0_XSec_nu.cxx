@@ -59,7 +59,7 @@ MicroBooNE_NCpi0_XSec_nu<D, Ds...>::MicroBooNE_NCpi0_XSec_nu(
   // Scaling Setup ---------------------------------------------------
   // ScaleFactor automatically setup for DiffXSec/cm2/Nucleon
   fScaleFactor = ((GetEventHistogram()->Integral("width") / (fNEvents + 0.)) *
-                  1E-38 / (TotalIntegratedFlux())) * 40;
+                  1E-38 / (TotalIntegratedFlux()));
   //NEED TO CHANGE
 
   // Setup Histograms
@@ -75,12 +75,12 @@ MicroBooNE_NCpi0_XSec_nu<D, Ds...>::MicroBooNE_NCpi0_XSec_nu(
   // the data histogram
   fDataHist = (TH1D *)ana_helper.get_data();
   fDataHist->SetName(Form("%s_data", sample_name.c_str()));
-  ScaleData(1E-39*40);
+  ScaleData(1E-39);
 
   // the measurement covariance
   fFullCovar = ana_helper.get_cov_m();
   // convert from 10^-78/nucleon/nuceon -> 10^-76/A/A which nuisance expects
-  (*fFullCovar) *= 1E-2*40*40;
+  (*fFullCovar) *= 1E-2;
 
   // set the errors to the ones from covariance matrix
   // don't think this is actually needed but atleast suppresses some warnings
@@ -136,19 +136,19 @@ void MicroBooNE_NCpi0_XSec_nu<D, Ds...>::FillEventVariables(FitEvent *customEven
     int nblockbins = fTable.get_nbins(dist);
     int localbin = -1;
     switch(dist){
-      case k0pNpPpi0:
+      case kNC0pNpPpi0:
         localbin = fTable.find_bin(dist, Ppi0, Kp);
         break;
-      case kXpPpi0:
+      case kNCXpPpi0:
         localbin = fTable.find_bin(dist, Ppi0);
         break;
-      case k0pNpCosThetaPi0:
+      case kNC0pNpCosThetaPi0:
         localbin = fTable.find_bin(dist, CosThetaPi0, Kp);
         break;
-      case kXpCosThetaPi0:
+      case kNCXpCosThetaPi0:
         localbin = fTable.find_bin(dist, CosThetaPi0);
         break;
-      case kXpPpi0CosThetaPi0:
+      case kNCXpPpi0CosThetaPi0:
         localbin = fTable.find_bin(dist, Ppi0, CosThetaPi0);
         break;
     }
@@ -210,9 +210,9 @@ void MicroBooNE_NCpi0_XSec_nu<D, Ds...>::ConvertEventRates() {
   }
 }
 
-template class MicroBooNE_NCpi0_XSec_nu<k0pNpPpi0>;
-template class MicroBooNE_NCpi0_XSec_nu<kXpPpi0>;
-template class MicroBooNE_NCpi0_XSec_nu<k0pNpCosThetaPi0>;
-template class MicroBooNE_NCpi0_XSec_nu<kXpCosThetaPi0>;
-template class MicroBooNE_NCpi0_XSec_nu<kXpPpi0CosThetaPi0>;
+template class MicroBooNE_NCpi0_XSec_nu<kNC0pNpPpi0>;
+template class MicroBooNE_NCpi0_XSec_nu<kNCXpPpi0>;
+template class MicroBooNE_NCpi0_XSec_nu<kNC0pNpCosThetaPi0>;
+template class MicroBooNE_NCpi0_XSec_nu<kNCXpCosThetaPi0>;
+template class MicroBooNE_NCpi0_XSec_nu<kNCXpPpi0CosThetaPi0>;
 template class MicroBooNE_NCpi0_XSec_nu<kAllNCpi0>;

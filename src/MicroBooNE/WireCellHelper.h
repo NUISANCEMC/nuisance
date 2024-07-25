@@ -33,46 +33,49 @@ class TFile;
 
 enum distribution_t {
   // text file with bin edges expects the global bin to be offset by this number
-  // kAll is handled specially for the CC1Mu0pNp measurement
-  kAll = -1,
-  k0pNpEMu = 0,
-  k0pNpCosThetaMu = 22,
-  k0pNpEnu = 56,
-  k0pNpTransferEnergy = 76,
-  k0pNpAvailEnergy = 85,
-  kProtonKE = 99,
-  kProtonCosTheta = 114,
-  kProtonMult = 134,
-  k0pNpEMuCosThetaMu = 138,
-  kNpProtonKECosTheta = 262,
-  kXpEMu = 358,
-  kXpCosThetaMu = 369,
-  kXpEMuCosThetaMu = 386,
-  kXpAvailEnergyCosThetaMuEMu = 455,
+  // kAll is handled specially for the CC1Mu0pNp and NCpi0 measurements
+  kAllNCpi0 = -2,
+  kAllCC = -1,
+  // CC1Mu0pNp
+  kCC0pNpEMu = 0,
+  kCC0pNpCosThetaMu = 22,
+  kCC0pNpEnu = 56,
+  kCC0pNpTransferEnergy = 76,
+  kCC0pNpAvailEnergy = 85,
+  kCCProtonKE = 99,
+  kCCProtonCosTheta = 114,
+  kCCProtonMult = 134,
+  kCC0pNpEMuCosThetaMu = 138,
+  kCCNpProtonKECosTheta = 262,
+  kCCXpEMu = 358,
+  kCCXpCosThetaMu = 369,
+  kCCXpEMuCosThetaMu = 386,
+  kCCXpAvailEnergyCosThetaMuEMu = 455,
+  // CCinc 3D
   // separate file and data release
   // the 1000 here is arbitrary, but text file is offset accordingly
-  kEnuCosThetaMuEMu = 1000,
+  kCCEnuCosThetaMuEMu = 1000,
+  // NCpi0
   // the 2000 here is arbitrary, but text file is offset accordingly
-  kAllNCpi0 = -2,
-  k0pNpPpi0 = 2000,
-  kXpPpi0 = 2012,
-  k0pNpCosThetaPi0 = 2021,
-  kXpCosThetaPi0 = 2044,
-  kXpPpi0CosThetaPi0 = 2061,
+  kNC0pNpPpi0 = 2000,
+  kNCXpPpi0 = 2012,
+  kNC0pNpCosThetaPi0 = 2021,
+  kNCXpCosThetaPi0 = 2044,
+  kNCXpPpi0CosThetaPi0 = 2061,
 };
 
 // some of CC1Mu0pNp and NCpi0 reported measurements is "joint" 0pNp
 // with a given observable but split into different hadron final states
 // we store those boundaries
 static std::map<distribution_t, int> kProtonBoundary = {
-  {distribution_t::k0pNpEMu, 11},
-  {distribution_t::k0pNpCosThetaMu, 39},
-  {distribution_t::k0pNpEnu, 66},
-  {distribution_t::k0pNpTransferEnergy, 79},
-  {distribution_t::k0pNpAvailEnergy, 90},
-  {distribution_t::k0pNpEMuCosThetaMu, 193},
-  {distribution_t::k0pNpPpi0, 2006},
-  {distribution_t::k0pNpCosThetaPi0, 2029},
+  {distribution_t::kCC0pNpEMu, 11},
+  {distribution_t::kCC0pNpCosThetaMu, 39},
+  {distribution_t::kCC0pNpEnu, 66},
+  {distribution_t::kCC0pNpTransferEnergy, 79},
+  {distribution_t::kCC0pNpAvailEnergy, 90},
+  {distribution_t::kCC0pNpEMuCosThetaMu, 193},
+  {distribution_t::kNC0pNpPpi0, 2006},
+  {distribution_t::kNC0pNpCosThetaPi0, 2029},
 };
 
 // don't want to type all these out
@@ -221,16 +224,17 @@ public:
       double diff  = dx1*dx2*dx3;
       // for Enu 1D or 3D or proton multiplicity, we don't divide by bin widths anyway
       // need flux scaling which will be done later
-      if(curr_D == k0pNpEnu || curr_D == kProtonMult)
+      if(curr_D == kCC0pNpEnu || curr_D == kCCProtonMult)
         diff = 1.;
-      if(curr_D == kEnuCosThetaMuEMu)
+      if(curr_D == kCCEnuCosThetaMuEMu)
         diff = dx2*dx3;
       // save our lookup tables
       f_nbins[curr_D] = bin + 1;
       f_widths[curr_D].push_back(diff);
 
       // add an extra dimension for 0p Np lookup table with a 35 MeV proton KE boundary
-      if((curr_D <= k0pNpAvailEnergy) || (curr_D == k0pNpEMuCosThetaMu) || (curr_D == k0pNpPpi0) || (curr_D == k0pNpCosThetaPi0)){
+      if((curr_D <= kCC0pNpAvailEnergy) || (curr_D == kCC0pNpEMuCosThetaMu) ||
+         (curr_D == kNC0pNpPpi0) || (curr_D == kNC0pNpCosThetaPi0)){
         if(global_bin < kProtonBoundary[curr_D]){
           lo_vars[n_dim] = std::numeric_limits<double>::lowest();
           hi_vars[n_dim] = 0.035;
@@ -257,32 +261,33 @@ public:
 };
 // specialize it for all bins (doesn't include CCinc 3D because that's separate)
 template <>
-void LookupTable::cache_realbins<distribution_t::kAll>() {
+void LookupTable::cache_realbins<distribution_t::kAllCC>() {
   this->template cache_realbins<
-                   k0pNpEMu,
-                   k0pNpCosThetaMu,
-                   k0pNpEnu,
-                   k0pNpTransferEnergy,
-                   k0pNpAvailEnergy,
-                   kProtonKE,
-                   kProtonCosTheta,
-                   kProtonMult,
-                   k0pNpEMuCosThetaMu,
-                   kNpProtonKECosTheta,
-                   kXpEMu,
-                   kXpCosThetaMu,
-                   kXpEMuCosThetaMu,
-                   kXpAvailEnergyCosThetaMuEMu
+                   kCC0pNpEMu,
+                   kCC0pNpCosThetaMu,
+                   kCC0pNpEnu,
+                   kCC0pNpTransferEnergy,
+                   kCC0pNpAvailEnergy,
+                   kCCProtonKE,
+                   kCCProtonCosTheta,
+                   kCCProtonMult,
+                   kCC0pNpEMuCosThetaMu,
+                   kCCNpProtonKECosTheta,
+                   kCCXpEMu,
+                   kCCXpCosThetaMu,
+                   kCCXpEMuCosThetaMu,
+                   kCCXpAvailEnergyCosThetaMuEMu
                   >();
 };
+// specialization for all NCpi0 blocks
 template <>
 void LookupTable::cache_realbins<distribution_t::kAllNCpi0>() {
   this->template cache_realbins<
-                   k0pNpPpi0,
-                   kXpPpi0,
-                   k0pNpCosThetaPi0,
-                   kXpCosThetaPi0,
-                   kXpPpi0CosThetaPi0
+                   kNC0pNpPpi0,
+                   kNCXpPpi0,
+                   kNC0pNpCosThetaPi0,
+                   kNCXpCosThetaPi0,
+                   kNCXpPpi0CosThetaPi0
                   >();
 };
 

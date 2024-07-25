@@ -27,11 +27,11 @@
 #include "Measurement1D.h"
 #include "WireCellHelper.h"
 
-class CCInc3DHelper : public IWireCellHelper<kEnuCosThetaMuEMu> {
+class CCInc3DHelper : public IWireCellHelper<kCCEnuCosThetaMuEMu> {
 
 public:
   CCInc3DHelper() :
-    IWireCellHelper<kEnuCosThetaMuEMu>(FitPar::GetDataBase() +
+    IWireCellHelper<kCCEnuCosThetaMuEMu>(FitPar::GetDataBase() +
                                        "/MicroBooNE/CCinc3D/real_bins.txt")
   {}
   void load_measurement() override {

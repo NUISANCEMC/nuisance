@@ -59,13 +59,14 @@ public:
     // form subset of histograms based on cached Ds
     // loop over the row
     int curr_bin_i = 0;
+    int offset = kNC0pNpPpi0;
     auto f_dist = (this->f_lookup).get_dists();
     for (auto it_i=f_dist.begin(); it_i != f_dist.end(); ++it_i) {
       distribution_t dist_i = *it_i;
       // get the block measurements
       int block_bins_i = (this->f_lookup).get_nbins(dist_i);
       for(int i = 0; i < block_bins_i; i++){
-        (*(this->m_data))[curr_bin_i + i] = (*m_fulldata)(dist_i + i + 1 - k0pNpPpi0);
+        (*(this->m_data))[curr_bin_i + i] = (*m_fulldata)(dist_i + i + 1 - offset);
         // now loop over the column
         int curr_bin_j = 0;
         for (auto it_j=f_dist.begin(); it_j != f_dist.end(); ++it_j) {
@@ -73,8 +74,8 @@ public:
           // get the block measurements
           int block_bins_j = (this->f_lookup).get_nbins(dist_j);
           for(int j = 0; j < block_bins_j; j++){
-            (*(this->m_ac))(curr_bin_i + i, curr_bin_j + j) = (*m_fullac)(dist_i + i + 1 - k0pNpPpi0, dist_j + j + 1 - k0pNpPpi0);
-            (*(this->m_cov))(curr_bin_i + i, curr_bin_j + j) = (*m_fullcov)(dist_i + i + 1 - k0pNpPpi0, dist_j + j + 1 - k0pNpPpi0);
+            (*(this->m_ac))(curr_bin_i + i, curr_bin_j + j) = (*m_fullac)(dist_i + i + 1 - offset, dist_j + j + 1 - offset);
+            (*(this->m_cov))(curr_bin_i + i, curr_bin_j + j) = (*m_fullcov)(dist_i + i + 1 - offset, dist_j + j + 1 - offset);
           }
           curr_bin_j += block_bins_j;
         } // end column
