@@ -119,6 +119,9 @@ private:
   LookupTable    fTable;
   dists_t        fDists;
   std::map<distribution_t, double> fXVars;
+  // keep track of how many species we have run over
+  // used to scale the NC cross-section appropriately
+  int fMultipleSpecies = 0;
 
 };
 #endif

@@ -40,7 +40,7 @@ MicroBooNE_NCpi0_XSec_nu<D, Ds...>::MicroBooNE_NCpi0_XSec_nu(
   fSettings = LoadSampleSettings(samplekey);
   fSettings.SetDescription(descrip);
   fSettings.SetXTitle("Bin Number");
-  fSettings.SetYTitle("d#sigma (cm^{2}/^{40}/Ar)");
+  fSettings.SetYTitle("d#sigma (cm^{2}/^{40}/nucleon)");
 
   fSettings.SetAllowedTypes("FULL,DIAG/FREE,SHAPE,FIX/SYSTCOV/STATCOV",
                             "FIX/FULL");
@@ -50,7 +50,7 @@ MicroBooNE_NCpi0_XSec_nu<D, Ds...>::MicroBooNE_NCpi0_XSec_nu(
   // Plot information
   fSettings.SetTitle("MicroBooNE_NCpi0_XSec_nu");
   //hack for now, need all species
-  fSettings.DefineAllowedSpecies("numu");
+  fSettings.DefineAllowedSpecies("numu, antinumu");
 
   std::string sample_name = fSettings.GetName();
   FinaliseSampleSettings();
@@ -101,6 +101,8 @@ MicroBooNE_NCpi0_XSec_nu<D, Ds...>::MicroBooNE_NCpi0_XSec_nu(
 template <distribution_t D, distribution_t... Ds>
 bool MicroBooNE_NCpi0_XSec_nu<D, Ds...>::isSignal(FitEvent *nvect)
 {
+  // if we find anything other numu assume multiple species
+  if(nvect->GetBeamNeutrinoPDG() != 14) fMultipleSpecies = 1;
   return SignalDef::MicroBooNE::isNCpi0(nvect);
 }
 
@@ -135,7 +137,7 @@ void MicroBooNE_NCpi0_XSec_nu<D, Ds...>::FillEventVariables(FitEvent *customEven
     distribution_t dist = *it;
     int nblockbins = fTable.get_nbins(dist);
     int localbin = -1;
-    int Channel0pNp = Kp >= 0.035;
+    int Channel0pNp = (Kp >= 0.035);
 
     switch(dist){
       case kNC0pNpPpi0:
@@ -184,8 +186,12 @@ void MicroBooNE_NCpi0_XSec_nu<D, Ds...>::ConvertEventRates() {
   for(auto it = fDists.begin(); it != fDists.end(); ++it){
     distribution_t dist = *it;
     int nblockbins = fTable.get_nbins(dist);
+    // Approximation for now. Produces nearly identical cross section to the 4 flavor case, but using on the numus-only.
+    // The scale here is approximately (BNB numu flux) + 0.33*(BNB numubar flux)/total BNB flux
+    // if there's multiple neutrino species then don't do any scaling
+    double scale = fMultipleSpecies ? 1 : 0.975;
+
     // loop through the block
-    double scale = 0.975; // Approximation for now. Produces nearly identical cross section to the 4 flavor case, but using on the numus.
     for(int i = 0; i < nblockbins; i++){
       // convert to differential xsec by scaling it wrt the bin widths
       double bin_width = fTable.get_width(dist, i);

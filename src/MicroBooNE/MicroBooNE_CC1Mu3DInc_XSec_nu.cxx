@@ -39,7 +39,7 @@ MicroBooNE_CC1Mu3DInc_XSec_nu::MicroBooNE_CC1Mu3DInc_XSec_nu(
   fSettings = LoadSampleSettings(samplekey);
   fSettings.SetDescription(descrip);
   fSettings.SetXTitle("Bin Number");
-  fSettings.SetYTitle("d#sigma (cm^{2}/^{40}Ar)");
+  fSettings.SetYTitle("d#sigma (cm^{2}/^{40}/Ar)");
 
   fSettings.SetAllowedTypes("FULL,DIAG/FREE,SHAPE,FIX/SYSTCOV/STATCOV",
                             "FIX/FULL");

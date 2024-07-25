@@ -40,7 +40,7 @@ MicroBooNE_CC1Mu0pNp_XSec_nu<D, Ds...>::MicroBooNE_CC1Mu0pNp_XSec_nu(
   fSettings = LoadSampleSettings(samplekey);
   fSettings.SetDescription(descrip);
   fSettings.SetXTitle("Bin Number");
-  fSettings.SetYTitle("d#sigma (cm^{2}/^{40}Ar)");
+  fSettings.SetYTitle("d#sigma (cm^{2}/^{40}/Ar)");
 
   fSettings.SetAllowedTypes("FULL,DIAG/FREE,SHAPE,FIX/SYSTCOV/STATCOV",
                             "FIX/FULL");
@@ -173,7 +173,7 @@ void MicroBooNE_CC1Mu0pNp_XSec_nu<D, Ds...>::FillEventVariables(FitEvent *custom
     distribution_t dist = *it;
     int nblockbins = fTable.get_nbins(dist);
     int localbin = -1;
-    int Channel0pNp = ProtonKE >= 0.035;
+    int Channel0pNp = (ProtonKE >= 0.035);
 
     switch(dist){
       case kCC0pNpEMu:
@@ -257,7 +257,7 @@ void MicroBooNE_CC1Mu0pNp_XSec_nu<D, Ds...>::ConvertEventRates() {
       // producing the events in that energy range
       if(dist == kCC0pNpEnu)
         bin_width = fTable.apply(dist, i,
-                               GetFluxFraction, GetFluxHistogram());
+                                 GetFluxFraction, GetFluxHistogram());
 
       fMCHist->SetBinContent(curr_bin + i + 1, fMCHist->GetBinContent(curr_bin + i + 1)/(bin_width));
       fMCHist->SetBinError  (curr_bin + i + 1, fMCHist->GetBinError(curr_bin + i + 1)/(bin_width));
