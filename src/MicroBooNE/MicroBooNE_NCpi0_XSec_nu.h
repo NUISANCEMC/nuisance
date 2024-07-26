@@ -23,13 +23,9 @@
 
 #include <memory>
 
-#include <TMatrixDfwd.h>
+#include <TFile.h>
 #include "Measurement1D.h"
 #include "WireCellHelper.h"
-
-class TH1D;
-class TH2D;
-class TFile;
 
 template <distribution_t D, distribution_t... Ds>
 class NCpi0Helper : public IWireCellHelper<D, Ds...> {
@@ -125,4 +121,3 @@ private:
 
 };
 #endif
-

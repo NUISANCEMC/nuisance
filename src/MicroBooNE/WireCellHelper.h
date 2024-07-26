@@ -25,10 +25,13 @@
 #include <vector>
 #include <map>
 #include <utility>
+#include <algorithm>
 
-class TH1D;
-class TH2D;
-class TFile;
+#include <TH1D.h>
+#include <TH2D.h>
+#include <TVectorD.h>
+#include <TMatrixD.h>
+#include <TMatrixDSym.h>
 
 enum distribution_t {
   // text file with bin edges expects the global bin to be offset by this number
@@ -199,7 +202,7 @@ public:
 };
 // specialize it for all CC blocks (doesn't include CCinc 3D because that's separate)
 template <>
-void LookupTable::cache_realbins<kAllCC>() {
+inline void LookupTable::cache_realbins<kAllCC>() {
   this->template cache_realbins<
                    kCC0pNpEMu,
                    kCC0pNpCosThetaMu,
@@ -216,10 +219,10 @@ void LookupTable::cache_realbins<kAllCC>() {
                    kCCXpEMuCosThetaMu,
                    kCCXpAvailEnergyCosThetaMuEMu
                   >();
-};
+}
 // specialization for all NCpi0 blocks
 template <>
-void LookupTable::cache_realbins<kAllNCpi0>() {
+inline void LookupTable::cache_realbins<kAllNCpi0>() {
   this->template cache_realbins<
                    kNC0pNpPpi0,
                    kNCXpPpi0,
@@ -227,7 +230,7 @@ void LookupTable::cache_realbins<kAllNCpi0>() {
                    kNCXpCosThetaPi0,
                    kNCXpPpi0CosThetaPi0
                   >();
-};
+}
 
 // helper classes for various wirecell measurements
 template <distribution_t D, distribution_t... Ds>
@@ -266,7 +269,7 @@ protected:
 // the below functions are useful for Enu based measurements which wirecell has multiple results of
 // get the flux fraction based on energy ranges
 // expects energy range to be in the 1st two elements
-double GetFluxFraction(std::vector<double> edges, TH1D* fluxHist){
+inline double GetFluxFraction(std::vector<double> edges, TH1D* fluxHist){
   int lo_bin = fluxHist->FindBin(edges[0]);
   int hi_bin = fluxHist->FindBin(edges[1]);
 
@@ -286,10 +289,10 @@ double GetFluxFraction(std::vector<double> edges, TH1D* fluxHist){
   tot_flux /= fluxHist->Integral();
 
   return tot_flux;
-};
+}
 
 // get the bin width based on energy ranges
 // expects energy range to be in the 1st two elements
-double GetEnergyBinWidth(std::vector<double> edges){
+inline double GetEnergyBinWidth(std::vector<double> edges){
   return (edges[1] - edges[0]);
-};
+}
