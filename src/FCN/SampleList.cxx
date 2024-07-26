@@ -1124,50 +1124,50 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
                !name.compare("MicroBooNE_CC1Mu1p_XSec_1DEQE_nu")) {
       return (new MicroBooNE_CC1Mu1p_XSec_1D_nu(samplekey));
     } else if (!name.compare("MicroBooNE_CC1Mu0pNp_XSec_EMu_nu")) {
-      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<distribution_t::kCC0pNpEMu>(samplekey));
+      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<kCC0pNpEMu>(samplekey));
     } else if (!name.compare("MicroBooNE_CC1Mu0pNp_XSec_CosThetaMu_nu")) {
-      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<distribution_t::kCC0pNpCosThetaMu>(samplekey));
+      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<kCC0pNpCosThetaMu>(samplekey));
     } else if (!name.compare("MicroBooNE_CC1Mu0pNp_XSec_ENu_nu")) {
-      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<distribution_t::kCC0pNpEnu>(samplekey));
+      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<kCC0pNpEnu>(samplekey));
     } else if (!name.compare("MicroBooNE_CC1Mu0pNp_XSec_TransferEnergy_nu")) {
-      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<distribution_t::kCC0pNpTransferEnergy>(samplekey));
+      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<kCC0pNpTransferEnergy>(samplekey));
     } else if (!name.compare("MicroBooNE_CC1Mu0pNp_XSec_AvailEnergy_nu")) {
-      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<distribution_t::kCC0pNpAvailEnergy>(samplekey));
+      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<kCC0pNpAvailEnergy>(samplekey));
     } else if (!name.compare("MicroBooNE_CC1Mu0pNp_XSec_ProtonKE_nu")) {
-      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<distribution_t::kCCProtonKE>(samplekey));
+      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<kCCProtonKE>(samplekey));
     } else if (!name.compare("MicroBooNE_CC1Mu0pNp_XSec_ProtonCosTheta_nu")) {
-      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<distribution_t::kCCProtonCosTheta>(samplekey));
+      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<kCCProtonCosTheta>(samplekey));
     } else if (!name.compare("MicroBooNE_CC1Mu0pNp_XSec_ProtonMult_nu")) {
-      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<distribution_t::kCCProtonMult>(samplekey));
+      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<kCCProtonMult>(samplekey));
     } else if (!name.compare("MicroBooNE_CC1Mu0pNp_XSec_EMuCosThetaMu_nu")) {
-      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<distribution_t::kCC0pNpEMuCosThetaMu>(samplekey));
+      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<kCC0pNpEMuCosThetaMu>(samplekey));
     } else if (!name.compare("MicroBooNE_CC1Mu0pNp_XSec_ProtonKECosTheta_nu")) {
-      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<distribution_t::kCCNpProtonKECosTheta>(samplekey));
+      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<kCCNpProtonKECosTheta>(samplekey));
     } else if (!name.compare("MicroBooNE_CC1Mu0pNp_XSec_XpEMu_nu")) {
-      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<distribution_t::kCCXpEMu>(samplekey));
+      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<kCCXpEMu>(samplekey));
     } else if (!name.compare("MicroBooNE_CC1Mu0pNp_XSec_XpCosThetaMu_nu")) {
-      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<distribution_t::kCCXpCosThetaMu>(samplekey));
+      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<kCCXpCosThetaMu>(samplekey));
     } else if (!name.compare("MicroBooNE_CC1Mu0pNp_XSec_XpEMuCosThetaMu_nu")) {
-      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<distribution_t::kCCXpEMuCosThetaMu>(samplekey));
+      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<kCCXpEMuCosThetaMu>(samplekey));
     } else if (!name.compare("MicroBooNE_CC1Mu0pNp_XSec_XpAvailEnergyCosThetaMuEMu_nu")) {
-      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<distribution_t::kCCXpAvailEnergyCosThetaMuEMu>(samplekey));
+      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<kCCXpAvailEnergyCosThetaMuEMu>(samplekey));
     } else if (!name.compare("MicroBooNE_CC1Mu0pNp_XSec_All_nu")) {
-      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<distribution_t::kAllCC>(samplekey));
+      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<kAllCC>(samplekey));
     } else if (!name.compare("MicroBooNE_CC1Mu3DInc_XSec_nu")) {
       return (new MicroBooNE_CC1Mu3DInc_XSec_nu(samplekey));
 
     } else if (!name.compare("MicroBooNE_NCpi0_XSec_0pNpPpi0_nu")) {
-      return (new MicroBooNE_NCpi0_XSec_nu<distribution_t::kNC0pNpPpi0>(samplekey));
+      return (new MicroBooNE_NCpi0_XSec_nu<kNC0pNpPpi0>(samplekey));
     } else if (!name.compare("MicroBooNE_NCpi0_XSec_XpPpi0_nu")) {
-      return (new MicroBooNE_NCpi0_XSec_nu<distribution_t::kNCXpPpi0>(samplekey));
+      return (new MicroBooNE_NCpi0_XSec_nu<kNCXpPpi0>(samplekey));
     } else if (!name.compare("MicroBooNE_NCpi0_XSec_0pNpCosThetaPi0_nu")) {
-      return (new MicroBooNE_NCpi0_XSec_nu<distribution_t::kNC0pNpCosThetaPi0>(samplekey));
+      return (new MicroBooNE_NCpi0_XSec_nu<kNC0pNpCosThetaPi0>(samplekey));
     } else if (!name.compare("MicroBooNE_NCpi0_XSec_XpCosThetaPi0_nu")) {
-      return (new MicroBooNE_NCpi0_XSec_nu<distribution_t::kNCXpCosThetaPi0>(samplekey));
+      return (new MicroBooNE_NCpi0_XSec_nu<kNCXpCosThetaPi0>(samplekey));
     } else if (!name.compare("MicroBooNE_NCpi0_XSec_XpPpi0CosThetaPi0_nu")) {
-      return (new MicroBooNE_NCpi0_XSec_nu<distribution_t::kNCXpPpi0CosThetaPi0>(samplekey));
+      return (new MicroBooNE_NCpi0_XSec_nu<kNCXpPpi0CosThetaPi0>(samplekey));
     } else if (!name.compare("MicroBooNE_NCpi0_XSec_AllNCpi0_nu")) {
-      return (new MicroBooNE_NCpi0_XSec_nu<distribution_t::kAllNCpi0>(samplekey));
+      return (new MicroBooNE_NCpi0_XSec_nu<kAllNCpi0>(samplekey));
     } else
 
 #endif

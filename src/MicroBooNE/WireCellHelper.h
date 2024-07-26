@@ -20,12 +20,10 @@
 
 #include <iostream>
 #include <fstream>
-#include <limits>
 #include <sstream>
 #include <array>
 #include <vector>
 #include <map>
-#include <cassert>
 #include <utility>
 
 class TH1D;
@@ -114,11 +112,9 @@ public:
     return n;
   }
   int get_nbins(distribution_t D) const {
-    assert(D >= 0 && "Invalid Lookup!");
     return f_nbins.at(D);
   }
   double get_width(distribution_t D, int bin) const {
-    assert(D >= 0 && "Invalid Lookup!");
     return f_widths.at(D).at(bin);
   }
   // apply a general function on the bin edges
@@ -127,7 +123,6 @@ public:
   // func also should return a double
   template<typename F, typename... Args>
   double apply(distribution_t D, int bin, F& func, Args&& ... args) const {
-    assert(D >= 0 && "Invalid Lookup!");
     int dim = f_ndims.at(D);
     auto bin_edges = (f_bins.at(D)).at(bin).el;
     // apply the function
@@ -138,7 +133,6 @@ public:
   // based on input values for individual physics observables
   template <typename... Args>
   int find_bin(distribution_t D, Args&& ... values) const {
-    assert(D >= 0 && "Invalid Lookup!");
     int dim = f_ndims.at(D);
     if(dim != sizeof...(values)) return -1;
     auto bin_list = f_bins.at(D);
@@ -205,7 +199,7 @@ public:
 };
 // specialize it for all CC blocks (doesn't include CCinc 3D because that's separate)
 template <>
-void LookupTable::cache_realbins<distribution_t::kAllCC>() {
+void LookupTable::cache_realbins<kAllCC>() {
   this->template cache_realbins<
                    kCC0pNpEMu,
                    kCC0pNpCosThetaMu,
@@ -225,7 +219,7 @@ void LookupTable::cache_realbins<distribution_t::kAllCC>() {
 };
 // specialization for all NCpi0 blocks
 template <>
-void LookupTable::cache_realbins<distribution_t::kAllNCpi0>() {
+void LookupTable::cache_realbins<kAllNCpi0>() {
   this->template cache_realbins<
                    kNC0pNpPpi0,
                    kNCXpPpi0,
@@ -234,8 +228,6 @@ void LookupTable::cache_realbins<distribution_t::kAllNCpi0>() {
                    kNCXpPpi0CosThetaPi0
                   >();
 };
-
-
 
 // helper classes for various wirecell measurements
 template <distribution_t D, distribution_t... Ds>
