@@ -72,7 +72,7 @@ struct e_array {
 
   // check if arguments is within the array of edges (low and high edges alternating)
   template <typename... Args>
-  bool is_within(Args&& ... values) {
+  bool is_within(Args&& ... values) const {
     std::array<double, sizeof...(values)> v_a({static_cast<double>(values)...});
     if(sizeof...(values) > N) return false;
     int ret = 1;

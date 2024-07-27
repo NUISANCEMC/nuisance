@@ -130,6 +130,7 @@ void MicroBooNE_NCpi0_XSec_nu<D, Ds...>::FillEventVariables(FitEvent *customEven
     FitParticle* proton = customEvent->GetHMFSParticle(2212);
     Kp = proton->KE()*MeV2GeV;
   }
+  int Channel0pNp = (Kp >= 0.035);
 
   int curr_bin = 0;
   // loop over our blocks
@@ -137,7 +138,6 @@ void MicroBooNE_NCpi0_XSec_nu<D, Ds...>::FillEventVariables(FitEvent *customEven
     distribution_t dist = *it;
     int nblockbins = fTable.get_nbins(dist);
     int localbin = -1;
-    int Channel0pNp = (Kp >= 0.035);
 
     switch(dist){
       case kNC0pNpPpi0:

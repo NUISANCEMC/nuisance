@@ -165,7 +165,7 @@ void MicroBooNE_CC1Mu0pNp_XSec_nu<D, Ds...>::FillEventVariables(FitEvent *custom
   }
   // last bin contains everything beyond 3 protons
   if(NProton > 3) NProton = 3;
-
+  int Channel0pNp = (ProtonKE >= 0.035);
 
   int curr_bin = 0;
   // loop over our blocks
@@ -173,7 +173,6 @@ void MicroBooNE_CC1Mu0pNp_XSec_nu<D, Ds...>::FillEventVariables(FitEvent *custom
     distribution_t dist = *it;
     int nblockbins = fTable.get_nbins(dist);
     int localbin = -1;
-    int Channel0pNp = (ProtonKE >= 0.035);
 
     switch(dist){
       case kCC0pNpEMu:
