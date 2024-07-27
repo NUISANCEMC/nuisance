@@ -702,6 +702,10 @@ void Measurement1D::FinaliseMeasurement() {
     NUIS_LOG(SAM, "Loaded mask histogram: " << fSettings.GetS("maskhist")
                                             << " from "
                                             << fSettings.GetS("maskfile"));
+
+    // Apply masking by setting masked data bins to zero
+    PlotUtils::MaskBins(fDataHist, fMaskHist);
+
   } else if (fIsMask) { // Setup bin masks using sample name
 
     std::string curname = fName;
