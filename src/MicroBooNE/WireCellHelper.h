@@ -161,6 +161,7 @@ public:
   // require atleast one input D
   template <distribution_t D, distribution_t... Ds>
   void cache_realbins() {
+    if(!f_bins.size()) this->delete_cache();
     f_dists = dists_t{D, Ds...};
 
     std::string line;
@@ -198,6 +199,14 @@ public:
                                 lo_vars[1], hi_vars[1],
                                 lo_vars[2], hi_vars[2]});
     } // eof
+  }
+  // delete the cache
+  void delete_cache() {
+      f_bins.clear();
+      f_dists.clear();
+      f_nbins.clear();
+      f_ndims.clear();
+      f_widths.clear();
   }
 };
 // specialize it for all CC blocks (doesn't include CCinc 3D because that's separate)
