@@ -736,6 +736,9 @@ TH2D *PlotUtils::GetDecompCovarPlot(TMatrixDSym *cov, std::string name) {
 }
 
 TH1D *PlotUtils::GetTH1DFromRootFile(std::string file, std::string name) {
+
+  TDirectory *ogd = gDirectory;
+
   if (name.empty()) {
     std::vector<std::string> tempfile = GeneralUtils::ParseToStr(file, ";");
     file = tempfile[0];
@@ -751,9 +754,12 @@ TH1D *PlotUtils::GetTH1DFromRootFile(std::string file, std::string name) {
 
   rootHistFile->Close();
 
+  if(ogd){
+    gDirectory = ogd;
+  }
+
   return tempHist;
 }
-
 TH2D *PlotUtils::GetTH2DFromRootFile(std::string file, std::string name) {
   if (name.empty()) {
     std::vector<std::string> tempfile = GeneralUtils::ParseToStr(file, ";");

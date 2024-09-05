@@ -234,12 +234,23 @@ if [ -z "${NEVENTS}" ]; then
   exit 1
 fi
 
+FLUX_NEED_BINPW="TRUE"
+if [ "${VERB}" == "NuWro" ] || [ "${VERB}" == "NEUT" ]; then
+  FLUX_NEED_BINPW="FALSE"
+fi
+
 if [ -z "${FLUX_DESCRIPTOR}" ] && [ ! -z "${EXPERIMENT}" ]; then
-  if ! nuis-flux ${EXPERIMENT} -M ${BEAM_MODE} -P ${PROBE} &> /dev/null; then
+
+  PW_ARG=
+  if [ "${FLUX_NEED_BINPW}" == "FALSE" ]; then
+    PW_ARG=-c
+  fi
+
+  if ! nuis-flux ${EXPERIMENT} -M ${BEAM_MODE} -P ${PROBE} ${PW_ARG} &> /dev/null; then
     echo "[ERROR]: ${NUIS_BREADCRUMBS} -- nuis flux could not find a flux descriptor for: Experiment: ${EXPERIMENT}, Probe: ${PROBE}, Beam Mode: ${BEAM_MODE}"
     exit 1
   fi
-  FLUX_DESCRIPTOR=$(NUIS_CLID_DEBUG= nuis-flux ${EXPERIMENT} -M ${BEAM_MODE} -P ${PROBE})
+  FLUX_DESCRIPTOR=$(NUIS_CLID_DEBUG= nuis-flux ${EXPERIMENT} -M ${BEAM_MODE} -P ${PROBE} ${PW_ARG})
 fi
 
 if [ -z "${FLUX_DESCRIPTOR}" ]; then

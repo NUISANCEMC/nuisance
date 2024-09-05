@@ -70,6 +70,8 @@ public:
   inline int GetTargetZ (void) const { return fTargetZ; };
   /// Get Event Total Cross-section
   inline int GetTotCrs  (void) const { return fTotCrs;  };
+  /// Return True Resonance ID (only works for GENIE)
+  inline int GetResCode (void) const { return fResCode; };
 
   /// Is Event Charged Current?
   inline bool IsCC() const { if (abs(this->probe_pdg) == 11) return false; return (abs(Mode) <= 30); };
@@ -233,6 +235,51 @@ public:
     return rtnindex;
   };
 
+  // --- Second highest Momentum Search Functions --- //
+  /// Returns the Index of the second highest momentum particle given a pdg and state.
+  /// If no state is given all states are considered, but that will just return the
+  /// momentum of the beam in most cases so is not advised.
+  int  GetSHMParticleIndex (int const pdg = 0, int const state = -1) const;
+
+  template <size_t N>
+  inline int GetSHMParticleIndex (int const (&pdgs)[N], int const state = -1) const {
+
+    double leadmom = -999.9;
+    int leadrtnindex = -1;
+
+    double recoilmom = -999.9;
+    int recoilrtnindex = -1;
+
+    for (size_t i = 0; i < N; ++i) {
+      // Use ParticleMom as doesn't require Particle Mem alloc
+      int pindex = GetSHMParticleIndex(pdgs[i], state);
+      if (pindex != -1){
+	double leadmomnew = GetParticleMom2(pindex);
+	if (leadmomnew > leadmom) {
+
+	  recoilrtnindex = leadrtnindex;
+	  recoilmom = leadmomnew;
+
+	  leadrtnindex = pindex;
+	  leadmom = leadmomnew;
+
+	}
+
+	if (leadmomnew < leadmom && leadmomnew > recoilmom) {
+
+	  recoilrtnindex = i;
+	  recoilmom = leadmomnew;
+
+	}
+
+
+      }
+    }
+
+    if (recoilrtnindex == -1) { recoilrtnindex = leadrtnindex; }
+    return recoilrtnindex;
+  };
+
   /// Returns the highest momentum particle given a pdg and state.
   /// If no state is given all states are considered, but that will just return the
   /// momentum of the beam in most cases so is not advised.
@@ -243,6 +290,16 @@ public:
   template <size_t N>
   inline FitParticle* GetHMParticle(int const (&pdgs)[N], int const state) {
     return GetParticle(GetHMParticleIndex(pdgs, state));
+  };
+
+  /// Returns the second highest momentum particle given a pdg and state.
+  inline FitParticle* GetSHMParticle(int const pdg = 0, int const state = -1) {
+    return GetParticle( GetSHMParticleIndex(pdg, state) );
+  }
+
+  template <size_t N>
+  inline FitParticle* GetSHMParticle(int const (&pdgs)[N], int const state) {
+    return GetParticle(GetSHMParticleIndex(pdgs, state));
   };
 
 
@@ -436,9 +493,19 @@ public:
   inline FitParticle* GetHMFSParticle(int const pdg) {
     return GetHMParticle(pdg, kFinalState);
   };
+
+  inline FitParticle* GetSHMFSParticle(int const pdg) {
+    return GetSHMParticle(pdg, kFinalState);
+  };
+
   template <size_t N>
   inline FitParticle* GetHMFSParticle(int const (&pdgs)[N]) {
     return GetHMParticle(pdgs, kFinalState);
+  };
+
+  template <size_t N>
+  inline FitParticle* GetSHMFSParticle(int const (&pdgs)[N]) {
+    return GetSHMParticle(pdgs, kFinalState);
   };
 
   inline int GetHMFSParticleIndex(int const pdg) const {
@@ -629,6 +696,7 @@ public:
   bool fBound;
   int fDistance;
   int fTargetPDG;
+  int fResCode; 
 
   // Reduced Particle Stack
   UInt_t kMaxParticles;

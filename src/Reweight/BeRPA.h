@@ -58,7 +58,7 @@
 // =====================
 
 // Calculates the absolute eRPA for given Q2, BERNSTEIN STYLE
-inline double const calcRPA(const double Q2, const double A, const double B, const double D, const double E, const double U = 1.20) {
+inline double calcRPA(const double Q2, const double A, const double B, const double D, const double E, const double U = 1.20) {
 
   // Callum's eye-balled nominals
   // A = 0.6

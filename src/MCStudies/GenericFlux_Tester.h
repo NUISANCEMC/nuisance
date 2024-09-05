@@ -95,12 +95,19 @@ public:
   float bjorken_y;
   float q0_true;
   float q3_true;
+  float Emiss;
+  float Emiss_preFSI;
+  TVector3 pmiss;
+  TVector3 pmiss_preFSI;
   float Erecoil_true;
   float Erecoil_charged;
   float Erecoil_minerva;
 
   // Interaction mode
   int Mode;
+
+  // Res ID (for GENIE only)
+  int ResCode;
 
   // Particle counters
   int Nparticles;

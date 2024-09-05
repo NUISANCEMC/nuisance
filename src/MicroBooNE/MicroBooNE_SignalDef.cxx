@@ -23,6 +23,8 @@
 namespace SignalDef {
   namespace MicroBooNE {
 
+    //----------------------------------------//
+
 bool isCC1MuNp(FitEvent* event, double EnuMin, double EnuMax) {
   // Check CC inclusive
   if (!SignalDef::isCCINC(event, 14, EnuMin, EnuMax)) return false;
@@ -108,6 +110,98 @@ bool isCC1ENp(FitEvent* event, double EnuMin, double EnuMax) {
   return true;
 }
 
+    //----------------------------------------//
+
+bool isCC1Mu2p(FitEvent* event, double EnuMin, double EnuMax) {
+  // Check CC inclusive
+  if (!SignalDef::isCCINC(event, 14, EnuMin, EnuMax)) return false;
+
+  // Veto events which don't have exactly 1 FS muon
+  if (event->NumFSMuon() != 1) return false;
+
+  // Muon momentum range
+  if (event->GetHMFSParticle(13)->fP.Vect().Mag() < 100) return false;
+  if (event->GetHMFSParticle(13)->fP.Vect().Mag() > 1200) return false;
+
+  // Check the existence of at least 2 protons in the final state
+  int NFSProtons = event->NumFSParticle(2212);
+  if (NFSProtons < 2) return false;
+
+  int ProtonCounter = 0;
+  std::vector<int> ProtonIndices = event->GetAllFSProtonIndices();
+
+  for (int i = 0; i < NFSProtons; i++) {
+
+    double mom = event->GetParticleMom( ProtonIndices.at(i) );
+    if (mom > 300 && mom < 1000) { ProtonCounter++; }
+
+  }
+
+  if (ProtonCounter != 2) { return false; }
+
+  // Reject events with neutral pions of any momenta
+  if (event->NumFSParticle(111) != 0) return false;
+
+  // Reject events with positively charged pions above 65 MeV/c
+  if (event->NumFSParticle(211) != 0) {
+    double ppiplus = event->GetHMFSParticle(211)->fP.Vect().Mag();
+    if (ppiplus > 65) { return false; }
+  }
+
+  // Reject events with negatively charged pions above 65 MeV/c
+  if (event->NumFSParticle(-211) != 0) {
+    double ppiminus = event->GetHMFSParticle(-211)->fP.Vect().Mag();
+    if (ppiminus > 65) { return false; }
+  }
+
+  return true;
+}
+
+    //----------------------------------------//
+
+std::vector<FitParticle*> GetCC1Mu1pProtonsInPS(FitEvent* event){
+  std::vector<FitParticle*> protons_in_ps;
+  for (auto proton : event->GetAllFSParticle(2212)) {
+    double mom = proton->p();
+    if (mom > 300 && mom < 1000) { protons_in_ps.push_back(proton); }
+  }
+  return protons_in_ps;
+}
+
+bool isCC1Mu1p(FitEvent* event, double EnuMin, double EnuMax) {
+  // Check CC inclusive
+  if (!SignalDef::isCCINC(event, 14, EnuMin, EnuMax)) return false;
+
+  // Veto events which don't have exactly 1 FS muon
+  if (event->NumFSMuon() != 1) return false;
+
+  // Muon momentum range
+  auto mu_mom = event->GetHMFSParticle(13)->p();
+  if ((mu_mom < 100) || (mu_mom > 1200)) return false;
+
+  // Check for only a single proton in the momentum PS
+  if (GetCC1Mu1pProtonsInPS(event).size() != 1) { return false; }
+
+  // Reject events with neutral pions of any momenta
+  if (event->NumFSParticle(111) != 0) return false;
+
+  // Reject events with positively charged pions above 70 MeV/c
+  if (event->NumFSParticle(211) != 0) {
+    double ppiplus = event->GetHMFSParticle(211)->p();
+    if (ppiplus > 70) { return false; }
+  }
+
+  // Reject events with negatively charged pions above 70 MeV/c
+  if (event->NumFSParticle(-211) != 0) {
+    double ppiminus = event->GetHMFSParticle(-211)->p();
+    if (ppiminus > 70) { return false; }
+  }
+
+  return true;
+}
+
+    //----------------------------------------//
+
+
   }  // namespace MicroBooNE
 }  // namespace SignalDef
-

@@ -17,19 +17,19 @@
  *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 #include "GENIEInputHandler.h"
-
+#include "InteractionModes.h"
 #ifdef GENIE3_API_ENABLED
-#include "Framework/GHEP/GHepParticle.h"
-#include "Framework/ParticleData/PDGUtils.h"
-#include "Framework/GHEP/GHepUtils.h"
 #include "Framework/Conventions/Units.h"
+#include "Framework/GHEP/GHepParticle.h"
+#include "Framework/GHEP/GHepUtils.h"
 #include "Framework/Messenger/Messenger.h"
+#include "Framework/ParticleData/PDGUtils.h"
 #else
-#include "GHEP/GHepParticle.h"
-#include "PDG/PDGUtils.h"
-#include "GHEP/GHepUtils.h"
 #include "Conventions/Units.h"
+#include "GHEP/GHepParticle.h"
+#include "GHEP/GHepUtils.h"
 #include "Messenger/Messenger.h"
+#include "PDG/PDGUtils.h"
 #endif
 
 #include "InputUtils.h"
@@ -92,28 +92,37 @@ bool GENIEInputHandler::IsPrimary(GHepParticle *p) {
 
   // If initial state nucleon, or nucleon target, it is definintely primary!
   if (p->Status() == genie::kIStInitialState ||
-      p->Status() == genie::kIStNucleonTarget)  return true;
+      p->Status() == genie::kIStNucleonTarget)
+    return true;
 
   // Reject intermediate resonant state or pre-DIS state
-  if (p->Status() == genie::kIStDISPreFragmHadronicState || // DIS before fragmentation
-      p->Status() == genie::kIStPreDecayResonantState || // pre decay resonance state
+  if (p->Status() ==
+          genie::kIStDISPreFragmHadronicState || // DIS before fragmentation
+      p->Status() ==
+          genie::kIStPreDecayResonantState || // pre decay resonance state
       p->Status() == genie::kIStIntermediateState || // intermediate state
-      p->Status() == genie::kIStDecayedState || // Decayed state
-      p->Status() == genie::kIStUndefined) return false; // undefined state
+      p->Status() == genie::kIStDecayedState ||      // Decayed state
+      p->Status() == genie::kIStUndefined)
+    return false; // undefined state
 
   // Check if the mother is the neutrino or IS nucleon
-  if (p->FirstMother() < 2) return true;
+  if (p->FirstMother() < 2)
+    return true;
 
   // We've now filtered off intermediate states and obvious initial states
 
-  // Loop over this particle's mothers, grandmothers, and so on cleaning out intermediate particles
-  // Set the starting particle to be our particle
+  // Loop over this particle's mothers, grandmothers, and so on cleaning out
+  // intermediate particles Set the starting particle to be our particle
   GHepParticle *mother = fGenieGHep->Particle(p->FirstMother());
   while (mother->FirstMother() > 1) {
-    // It could be that the mother's status is actually a decayed state linked back to the vertex
+    // It could be that the mother's status is actually a decayed state linked
+    // back to the vertex
     if (mother->Status() == genie::kIStDecayedState || // A decayed state
-        mother->Status() == genie::kIStDISPreFragmHadronicState || // A DIS state before fragmentation
-        mother->Status() == genie::kIStPreDecayResonantState ) {  // A pre-decay resonant state
+        mother->Status() ==
+            genie::kIStDISPreFragmHadronicState || // A DIS state before
+                                                   // fragmentation
+        mother->Status() ==
+            genie::kIStPreDecayResonantState) { // A pre-decay resonant state
       mother = fGenieGHep->Particle(mother->FirstMother());
     } else { // If not, move out of the loop
       break;
@@ -122,22 +131,25 @@ bool GENIEInputHandler::IsPrimary(GHepParticle *p) {
 
   // Then do a simple check of mother is associated with the primary
   int MotherID = mother->FirstMother();
-  if (MotherID > 2) return false;
 
-  // Finally, this should mean that our partcile is marked for transport through the nucleus
-  // Could also be interactions of free proton
-  if (p->Status() == genie::kIStHadronInTheNucleus ||  // Then require the particle to be paseed to FSI
-      (p->Status() == genie::kIStStableFinalState && // Can also have interaction on free proton
+  // Finally, this should mean that our partcile is marked for transport through
+  // the nucleus Could also be interactions of free proton
+  if (p->Status() ==
+          genie::kIStHadronInTheNucleus || // Then require the particle to be
+                                           // paseed to FSI
+      (p->Status() ==
+           genie::kIStStableFinalState && // Can also have interaction on free
+                                          // proton
        fGenieGHep->Summary()->InitState().TgtPtr()->A() == 1 &&
-       fGenieGHep->Summary()->InitState().TgtPtr()->Z() == 1) ) {
+       fGenieGHep->Summary()->InitState().TgtPtr()->Z() == 1)) {
     return true;
-  } 
+  }
 
   return false;
 }
 
 GENIEInputHandler::GENIEInputHandler(std::string const &handle,
-    std::string const &rawinputs) {
+                                     std::string const &rawinputs) {
   NUIS_LOG(SAM, "Creating GENIEInputHandler : " << handle);
 
   // Plz no shouting
@@ -177,10 +189,10 @@ GENIEInputHandler::GENIEInputHandler(std::string const &handle,
       NUIS_ERR(FTL, "Input File Contents: " << inputs[inp_it]);
       inp_file->ls();
       NUIS_ABORT("GENIE FILE doesn't contain flux/xsec info."
-          << std::endl
-          << "Try running the app PrepareGENIE first on :"
-          << inputs[inp_it] << std::endl
-          << "$ PrepareGENIE -h");
+                 << std::endl
+                 << "Try running the app PrepareGENIE first on :"
+                 << inputs[inp_it] << std::endl
+                 << "$ PrepareGENIE -h");
     }
 
     // Get N Events
@@ -194,7 +206,7 @@ GENIEInputHandler::GENIEInputHandler(std::string const &handle,
     int nevents = genietree->GetEntries();
     if (nevents <= 0) {
       NUIS_ABORT("Trying to a TTree with "
-          << nevents << " to TChain from : " << inputs[inp_it]);
+                 << nevents << " to TChain from : " << inputs[inp_it]);
     }
 
     // Register input to form flux/event rate hists
@@ -251,7 +263,7 @@ void GENIEInputHandler::RemoveCache() {
 }
 
 FitEvent *GENIEInputHandler::GetNuisanceEvent(const UInt_t ent,
-    const bool lightweight) {
+                                              const bool lightweight) {
   UInt_t entry = ent + fSkip;
   if (entry >= (UInt_t)fNEvents)
     return NULL;
@@ -303,12 +315,40 @@ FitEvent *GENIEInputHandler::GetNuisanceEvent(const UInt_t ent,
 
   // Setup Input scaling for joint inputs
   fNUISANCEEvent->InputWeight = GetInputWeight(entry);
+#ifdef nusystematics_ENABLED
+  fNUISANCEEvent->input_handler = this;
+  fNUISANCEEvent->input_handler_itree_ent = entry;
+#endif
 
   return fNUISANCEEvent;
 }
 
+systtools::event_unit_response_w_cv_t *
+GENIEInputHandler::nusystematics_GetCachedResponse(Long64_t itree_ent) {
+  // ev index 5
+  // response_cache[5] is the 6th event. So have cached if response_cache.size()
+  // > 5
+  if (response_has_cached.size() <= itree_ent) {
+    return nullptr;
+  }
+  return response_has_cached[itree_ent] ? &response_cache[itree_ent] : nullptr;
+}
+void GENIEInputHandler::nusystematics_CacheResponse(
+    Long64_t itree_ent, systtools::event_unit_response_w_cv_t &&er) {
+  // ev index 5
+  // response_cache[5] is the 6th event. So need more space if
+  // response_cache.size()
+  // <= 5
+  if (response_cache.size() <= itree_ent) {
+    response_cache.resize(itree_ent+1);
+    response_has_cached.resize(itree_ent+1);
+  }
+  response_cache[itree_ent] = std::move(er);
+  response_has_cached[itree_ent] = true;
+}
+
 int GENIEInputHandler::GetGENIEParticleStatus(genie::GHepParticle *p,
-    int mode) {
+                                              int mode) {
   /*
      kIStUndefined                  = -1,
      kIStInitialState               =  0,   / generator-level initial state /
@@ -330,42 +370,46 @@ int GENIEInputHandler::GetGENIEParticleStatus(genie::GHepParticle *p,
 
   int state = kUndefinedState;
   switch (p->Status()) {
-    case genie::kIStNucleonTarget:
-    case genie::kIStInitialState:
-    case genie::kIStCorrelatedNucleon:
-    case genie::kIStNucleonClusterTarget:
+  case genie::kIStNucleonTarget:
+  case genie::kIStInitialState:
+  case genie::kIStCorrelatedNucleon:
+  case genie::kIStNucleonClusterTarget:
+    state = kInitialState;
+    break;
+
+  case genie::kIStStableFinalState:
+    state = kFinalState;
+    break;
+
+  case genie::kIStHadronInTheNucleus:
+    if (abs(mode) == 2)
       state = kInitialState;
-      break;
-
-    case genie::kIStStableFinalState:
-      state = kFinalState;
-      break;
-
-    case genie::kIStHadronInTheNucleus:
-      if (abs(mode) == 2)
-        state = kInitialState;
-      else
-        state = kFSIState;
-      break;
-
-    case genie::kIStPreDecayResonantState:
-    case genie::kIStDISPreFragmHadronicState:
-    case genie::kIStIntermediateState:
+    else
       state = kFSIState;
-      break;
+    break;
 
-    case genie::kIStFinalStateNuclearRemnant:
-    case genie::kIStUndefined:
-    case genie::kIStDecayedState:
-    default:
-      break;
+  case genie::kIStPreDecayResonantState:
+  case genie::kIStDISPreFragmHadronicState:
+  case genie::kIStIntermediateState:
+    state = kFSIState;
+    break;
+
+  case genie::kIStFinalStateNuclearRemnant:
+  case genie::kIStUndefined:
+  case genie::kIStDecayedState:
+  default:
+    break;
   }
 
   // Flag to remove nuclear part in genie
   if (kRemoveNuclearParticles) {
-    if (p->Pdg() > 1000000 && 
+    if (p->Pdg() > 1000000 &&
         pdg::IsNeutronOrProton(
-          fGenieGHep->Summary()->InitState().TgtPtr()->HitNucPdg())) { // Check that it isn't coherent! Want to keep initial state if so
+            fGenieGHep->Summary()
+                ->InitState()
+                .TgtPtr()
+                ->HitNucPdg())) { // Check that it isn't coherent! Want to keep
+                                  // initial state if so
       if (state == kInitialState)
         state = kNuclearInitial;
       else if (state == kFinalState)
@@ -378,44 +422,42 @@ int GENIEInputHandler::GetGENIEParticleStatus(genie::GHepParticle *p,
 
 int GENIEInputHandler::ConvertGENIEReactionCode(GHepRecord *gheprec) {
 
-  // I randomly picked 53 here because NEUT doesn't have an appropriate mode...
   if (gheprec->Summary()->ProcInfo().IsNuElectronElastic()){
-    if (pdg::IsNeutrino(gheprec->Summary()->InitState().ProbePdg())) return 53;
-    else return -53;
+    if (pdg::IsNeutrino(gheprec->Summary()->InitState().ProbePdg())) return InputHandler::kNuElectronElastic;
+    else return -InputHandler::kNuElectronElastic;
   }
 
-  // And the same story for 54
   if (gheprec->Summary()->ProcInfo().IsIMDAnnihilation() || gheprec->Summary()->ProcInfo().IsInverseMuDecay()){
-    if (pdg::IsNeutrino(gheprec->Summary()->InitState().ProbePdg())) return 54;
-    else return -54;
+    if (pdg::IsNeutrino(gheprec->Summary()->InitState().ProbePdg())) return InputHandler::kInvMuonDecay;
+    else return -InputHandler::kInvMuonDecay;
   }
 
   // Electron Scattering
   if (gheprec->Summary()->ProcInfo().IsEM()) {
     if (gheprec->Summary()->InitState().ProbePdg() == 11) {
       if (gheprec->Summary()->ProcInfo().IsQuasiElastic())
-        return 1;
+        return InputHandler::kCCQE;
       else if (gheprec->Summary()->ProcInfo().IsMEC())
-        return 2;
+        return InputHandler::kCC2p2h;
       else if (gheprec->Summary()->ProcInfo().IsResonant())
-        return 13;
+        return InputHandler::kCC1piponn;
       else if (gheprec->Summary()->ProcInfo().IsDeepInelastic())
-        return 26;
+        return InputHandler::kCCDIS;
       else {
         NUIS_ERR(WRN,
-            "Unknown GENIE Electron Scattering Mode!"
-            << std::endl
-            << "ScatteringTypeId = "
-            << gheprec->Summary()->ProcInfo().ScatteringTypeId() << " "
-            << "InteractionTypeId = "
-            << gheprec->Summary()->ProcInfo().InteractionTypeId()
-            << std::endl
-            << genie::ScatteringType::AsString(
-              gheprec->Summary()->ProcInfo().ScatteringTypeId())
-            << " "
-            << genie::InteractionType::AsString(
-              gheprec->Summary()->ProcInfo().InteractionTypeId())
-            << " " << gheprec->Summary()->ProcInfo().IsMEC());
+                 "Unknown GENIE Electron Scattering Mode!"
+                     << std::endl
+                     << "ScatteringTypeId = "
+                     << gheprec->Summary()->ProcInfo().ScatteringTypeId() << " "
+                     << "InteractionTypeId = "
+                     << gheprec->Summary()->ProcInfo().InteractionTypeId()
+                     << std::endl
+                     << genie::ScatteringType::AsString(
+                            gheprec->Summary()->ProcInfo().ScatteringTypeId())
+                     << " "
+                     << genie::InteractionType::AsString(
+                            gheprec->Summary()->ProcInfo().InteractionTypeId())
+                     << " " << gheprec->Summary()->ProcInfo().IsMEC());
         return 0;
       }
     }
@@ -425,15 +467,15 @@ int GENIEInputHandler::ConvertGENIEReactionCode(GHepRecord *gheprec) {
     // CC MEC
     if (gheprec->Summary()->ProcInfo().IsMEC()) {
       if (pdg::IsNeutrino(gheprec->Summary()->InitState().ProbePdg()))
-        return 2;
+        return InputHandler::kCC2p2h;
       else if (pdg::IsAntiNeutrino(gheprec->Summary()->InitState().ProbePdg()))
-        return -2;
+        return -InputHandler::kCC2p2h;
 #ifdef GENIE3_API_ENABLED
     } else if (gheprec->Summary()->ProcInfo().IsDiffractive()) {
       if (pdg::IsNeutrino(gheprec->Summary()->InitState().ProbePdg()))
-        return 15;
+        return InputHandler::kCCDiffSPP;
       else if (pdg::IsAntiNeutrino(gheprec->Summary()->InitState().ProbePdg()))
-        return -15;
+        return -InputHandler::kCCDiffSPP;
 #endif
       // CC OTHER
     } else {
@@ -445,15 +487,15 @@ int GENIEInputHandler::ConvertGENIEReactionCode(GHepRecord *gheprec) {
     // NC MEC
     if (gheprec->Summary()->ProcInfo().IsMEC()) {
       if (pdg::IsNeutrino(gheprec->Summary()->InitState().ProbePdg()))
-        return 32;
+        return InputHandler::kNC2p2h;
       else if (pdg::IsAntiNeutrino(gheprec->Summary()->InitState().ProbePdg()))
-        return -32;
+        return -InputHandler::kNC2p2h;
 #ifdef GENIE3_API_ENABLED
     } else if (gheprec->Summary()->ProcInfo().IsDiffractive()) {
       if (pdg::IsNeutrino(gheprec->Summary()->InitState().ProbePdg()))
-        return 35;
+        return InputHandler::kNCDiffSPP;
       else if (pdg::IsAntiNeutrino(gheprec->Summary()->InitState().ProbePdg()))
-        return -35;
+        return -InputHandler::kNCDiffSPP;
 #endif
       // NC OTHER
     } else {
@@ -481,6 +523,10 @@ void GENIEInputHandler::CalcNUISANCEKinematics() {
 
   // Convert GENIE Reaction Code
   fNUISANCEEvent->Mode = ConvertGENIEReactionCode(fGenieGHep);
+
+  // Get the resonance ID Code
+  fNUISANCEEvent->fResCode = fGenieGHep->Summary()->ExclTagPtr()->Resonance();
+
 
   if (!fNUISANCEEvent->Mode) {
     NUIS_ERR(WRN, "Failed to determine mode for GENIE event: ");
@@ -534,9 +580,9 @@ void GENIEInputHandler::CalcNUISANCEKinematics() {
   // Depends on if we scattered off a free or bound nucleon
   if (!IsFree) {
     fNUISANCEEvent->fTargetA =
-      TargetUtils::GetTargetAFromPDG(fNUISANCEEvent->fTargetPDG);
+        TargetUtils::GetTargetAFromPDG(fNUISANCEEvent->fTargetPDG);
     fNUISANCEEvent->fTargetZ =
-      TargetUtils::GetTargetZFromPDG(fNUISANCEEvent->fTargetPDG);
+        TargetUtils::GetTargetZFromPDG(fNUISANCEEvent->fTargetPDG);
     fNUISANCEEvent->fTargetH = 0;
   } else {
     // If free proton scattering
@@ -558,7 +604,7 @@ void GENIEInputHandler::CalcNUISANCEKinematics() {
   }
   fNUISANCEEvent->fBound = !IsFree;
   fNUISANCEEvent->InputWeight =
-    1.0; //(1E+38 / genie::units::cm2) * fGenieGHep->XSec();
+      1.0; //(1E+38 / genie::units::cm2) * fGenieGHep->XSec();
 
   // Get N Particle Stack
   unsigned int npart = fGenieGHep->GetEntries();

@@ -672,6 +672,7 @@ double COHBrandon::CalcWeight(BaseFitEvt* evt) {
   if (!proc_info.IsCoherent()) return 1.0;
   #endif
 
+
   // WEIGHT CALCULATIONS -------------
   double w = 1.0;
   double pionE = -999.9;

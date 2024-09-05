@@ -29,6 +29,7 @@ enum InteractionModes {
   kCC1piponp = 11,
   kCC1pi0onn = 12,
   kCC1piponn = 13,
+  kCCDiffSPP = 15,
   kCCCoherent = 16,
   kCC1gamma = 17,
   kCCmultipi = 21,
@@ -39,6 +40,7 @@ enum InteractionModes {
   kNC1pi0onp = 32,
   kNC1pimonn = 33,
   kNC1piponp = 34,
+  kNCDiffSPP = 35,
   kNCCoherent = 36,
   kNC1gamman = 38,
   kNC1gammap = 39,
@@ -50,7 +52,9 @@ enum InteractionModes {
   kNCDIS = 46,
   kNCELonp = 51,
   kNCELonn = 52,
-  kNC2p2h = 53
+  kNC2p2h = 53,
+  kNuElectronElastic = 54,
+  kInvMuonDecay = 55
 };
 }
 

@@ -18,7 +18,6 @@
 ################################################################################
 
 set(Logger_Impl_Files
-  PythiaQuiet.f
   FitLogger.cxx
   Initialiser.cxx
 )
@@ -28,12 +27,14 @@ set(Logger_Hdr_Files
   Initialiser.h
 )
 
+add_library(PythiaQuiet SHARED PythiaQuiet.f)
+
 add_library(Logger SHARED ${Logger_Impl_Files})
-target_link_libraries(Logger CoreIncludes ROOT::ROOT)
+target_link_libraries(Logger CoreIncludes ROOT::ROOT PythiaQuiet)
 
 install(TARGETS Logger DESTINATION lib)
 set_target_properties(Logger PROPERTIES PUBLIC_HEADER "${Logger_Hdr_Files}")
 
-install(TARGETS Logger
+install(TARGETS Logger PythiaQuiet
   LIBRARY DESTINATION lib
   PUBLIC_HEADER DESTINATION include)

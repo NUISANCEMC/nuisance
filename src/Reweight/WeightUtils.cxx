@@ -387,6 +387,7 @@ int FitBase::GetDialEnum(int type, std::string const &name) {
 #else
     this_enum = Reweight::kNoTypeFound; // Not enabled
 #endif
+    break;
   }
   case kMODENORM: {
     size_t us_pos = name.find_first_of('_');

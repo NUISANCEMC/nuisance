@@ -20,7 +20,17 @@ set(MicroBooNE_Impl_Files
   MicroBooNE_CCInc_XSec_2DPcos_nu.cxx
   MicroBooNE_CC1MuNp_XSec_1D_nu.cxx
   MicroBooNE_CC1ENp_XSec_1D_nu.cxx
+  MicroBooNE_CC1Mu2p_XSec_1D_nu.cxx
+  MicroBooNE_CC1Mu1p_XSec_1D_nu.cxx
   MicroBooNE_SignalDef.cxx
+)
+
+set(MicroBooNE_Hdr_Files
+  MicroBooNE_CCInc_XSec_2DPcos_nu.h
+  MicroBooNE_CC1MuNp_XSec_1D_nu.h
+  MicroBooNE_CC1Mu2p_XSec_1D_nu.h
+  MicroBooNE_CC1Mu1p_XSec_1D_nu.h
+  MicroBooNE_SignalDef.h
 )
 
 add_library(MicroBooNE SHARED ${MicroBooNE_Impl_Files})
