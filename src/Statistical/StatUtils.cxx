@@ -108,7 +108,8 @@ Double_t StatUtils::GetChi2FromDiag(TH2D *data, TH2D *mc, TH2I *map,
 //*******************************************************************
 Double_t StatUtils::GetChi2FromCov(TH1D *data, TH1D *mc, TMatrixDSym *invcov,
                                    TH1I *mask, double data_scale,
-                                   double covar_scale, TH1D *outchi2perbin) {
+                                   double covar_scale, TH1D *outchi2perbin,
+                                   bool SkipEmptyBin) {
   //*******************************************************************
 
   static bool first = true;
@@ -184,9 +185,13 @@ Double_t StatUtils::GetChi2FromCov(TH1D *data, TH1D *mc, TMatrixDSym *invcov,
                         << calc_data->GetXaxis()->GetBinLowEdge(j + 1) << " -- "
                         << calc_data->GetXaxis()->GetBinUpEdge(j + 1) << "].");
 
-      if (((calc_data->GetBinContent(i + 1) != 0) &&
-           (calc_mc->GetBinContent(i + 1) != 0)) &&
-          ((*calc_cov)(i, j) != 0)) {
+      bool SkipThisEntry = false;
+      if( (*calc_cov)(i, j) == 0 ) SkipThisEntry = true;
+      if( SkipEmptyBin && 
+          ( (calc_data->GetBinContent(i + 1) == 0) || 
+            (calc_mc->GetBinContent(i + 1) == 0) ) ) SkipThisEntry = true;
+
+      if(!SkipThisEntry){
 
         NUIS_LOG(DEB, "[CHI2]\t\t Chi2 contribution (i,j) = (" << i << "," << j
                                                                << ")");
