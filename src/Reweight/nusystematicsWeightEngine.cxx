@@ -17,6 +17,7 @@
  *******************************************************************************/
 
 #include "nusystematicsWeightEngine.h"
+#include "GENIEInputHandler.h"
 
 #include <limits>
 #include <string>
@@ -57,7 +58,8 @@ int nusystematicsWeightEngine::ConvDial(std::string name) {
     NUIS_ABORT("nusystematicsWeightEngine passed dial: "
                << name << " that it does not understand.");
   }
-  NUIS_LOG(FIT, "Added NuSyst param, " << name << " with ID: " << DUNErwt.GetHeaderId(name));
+  NUIS_LOG(FIT, "Added NuSyst param, "
+                    << name << " with ID: " << DUNErwt.GetHeaderId(name));
   return DUNErwt.GetHeaderId(name);
 }
 
@@ -152,11 +154,23 @@ bool nusystematicsWeightEngine::NeedsEventReWeight() {
 }
 
 double nusystematicsWeightEngine::CalcWeight(BaseFitEvt *evt) {
-  systtools::event_unit_response_w_cv_t responses =
-      DUNErwt.GetEventVariationAndCVResponse(*evt->genie_event->event);
+
+  systtools::event_unit_response_w_cv_t *responses;
+
+  if (evt->input_handler) {
+    auto cached_responses = evt->input_handler->nusystematics_GetCachedResponse(
+        evt->input_handler_itree_ent);
+    if (!cached_responses) {
+      evt->input_handler->nusystematics_CacheResponse(
+          evt->input_handler_itree_ent,
+          DUNErwt.GetEventVariationAndCVResponse(*evt->genie_event->event));
+    }
+    responses = evt->input_handler->nusystematics_GetCachedResponse(
+        evt->input_handler_itree_ent);
+  }
 
   double weight = 1;
-  for (auto const &resp : responses) {
+  for (auto const &resp : *responses) {
     if (!DUNErwt.IsWeightResponse(resp.pid)) {
       continue;
     }
@@ -165,13 +179,21 @@ double nusystematicsWeightEngine::CalcWeight(BaseFitEvt *evt) {
     } else { // This is very inefficient for fitting, as it recalculates the
              // spline every time.
 
-      //this is a completely backwards way of doing this loop, but the whole thing is broken anyway.
-      size_t index = GetParamContainerIndex(EnabledParams, resp.pid);
-      if(index != systtools::kParamUnhandled<size_t>){
-      weight *= (resp.CV_response *
-                 DUNErwt.GetParameterResponse(resp.pid, EnabledParams[index].val,
-                                              systtools::event_unit_response_t{
-                                                  {resp.pid, resp.responses}}));
+      // if a given dial is a Correction, just use the CVCorrection
+      if( DUNErwt.GetHeader(resp.pid).isCorrection ){
+        weight *= resp.CV_response;
+      }
+      else{
+        // this is a completely backwards way of doing this loop, but the whole
+        // thing is broken anyway.
+        size_t index = GetParamContainerIndex(EnabledParams, resp.pid);
+        if (index != systtools::kParamUnhandled<size_t>) {
+          weight *=
+              (resp.CV_response *
+               DUNErwt.GetParameterResponse(
+                   resp.pid, EnabledParams[index].val,
+                   systtools::event_unit_response_t{{resp.pid, resp.responses}}));
+        }
       }
     }
   }

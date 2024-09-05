@@ -72,6 +72,7 @@ public:
   bool SaveSignalFlags;
 
   int Mode;
+  int GENIEResCode;
   bool cc;
   int PDGnu;
   int tgt;
@@ -85,6 +86,10 @@ public:
   float Q2;
   float q0;
   float q3;
+  float Emiss;
+  TVector3 pmiss;
+  float Emiss_preFSI;
+  TVector3 pmiss_preFSI;
   float Enu_QE;
   float Enu_true;
   float Q2_QE;
@@ -92,7 +97,8 @@ public:
   float W;
   float x;
   float y;
-  float Eav;
+  float Erecoil_minerva;
+  float Erecoil_charged;
   float EavAlt;
   float dalphat;
   float W_genie;

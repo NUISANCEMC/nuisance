@@ -19,10 +19,25 @@
 set(MicroBooNE_Impl_Files
   MicroBooNE_CCInc_XSec_2DPcos_nu.cxx
   MicroBooNE_CC1MuNp_XSec_1D_nu.cxx
+  MicroBooNE_CC1Mu2p_XSec_1D_nu.cxx
+  MicroBooNE_CC1Mu1p_XSec_1D_nu.cxx
   MicroBooNE_SignalDef.cxx
 )
 
-add_library(MicroBooNE SHARED ${MicroBooNE_Impl_Files})
-target_link_libraries(MicroBooNE CoreIncludes)
+set(MicroBooNE_Hdr_Files
+  MicroBooNE_CCInc_XSec_2DPcos_nu.h
+  MicroBooNE_CC1MuNp_XSec_1D_nu.h
+  MicroBooNE_CC1Mu2p_XSec_1D_nu.h
+  MicroBooNE_CC1Mu1p_XSec_1D_nu.h
+  MicroBooNE_SignalDef.h
+)
 
-install(TARGETS MicroBooNE DESTINATION lib)
+add_library(MicroBooNE SHARED ${MicroBooNE_Impl_Files})
+target_link_libraries(MicroBooNE FrameworkLibraries CoreIncludes)
+
+install(TARGETS MicroBooNE
+    EXPORT nuisance-targets
+    LIBRARY DESTINATION lib/
+    PUBLIC_HEADER DESTINATION include)
+
+add_library(NUIS::MicroBooNE ALIAS MicroBooNE)

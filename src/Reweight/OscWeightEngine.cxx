@@ -275,7 +275,7 @@ double OscWeightEngine::CalcWeight(double ENu, int PDGNu, int TargetPDGNu) {
     } else {
       pmt = 2;
       prob_weight =
-          bp.GetVacuumProb(NuType, TargetPDGNu, ENu * 1E-3, LengthParam);
+          bp.GetVacuumProb(NuType, TargetPDGNu, ENu, LengthParam);
     }
   }
 #ifdef DEBUG_OSC_WE

@@ -34,5 +34,8 @@ install(TARGETS Config DESTINATION lib)
 set_target_properties(Config PROPERTIES PUBLIC_HEADER "${Config_Hdr_Files}")
 
 install(TARGETS Config
-  LIBRARY DESTINATION lib
-  PUBLIC_HEADER DESTINATION include)
+    EXPORT nuisance-targets
+    LIBRARY DESTINATION lib/
+    PUBLIC_HEADER DESTINATION include)
+
+add_library(NUIS::Config ALIAS Config)

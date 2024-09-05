@@ -25,6 +25,11 @@ set(FNAL_Impl_Files
 )
 
 add_library(FNAL SHARED ${FNAL_Impl_Files})
-target_link_libraries(FNAL CoreIncludes)
+target_link_libraries(FNAL FrameworkLibraries CoreIncludes)
 
-install(TARGETS FNAL DESTINATION lib)
+install(TARGETS FNAL
+    EXPORT nuisance-targets
+    LIBRARY DESTINATION lib/
+    PUBLIC_HEADER DESTINATION include)
+
+add_library(NUIS::FNAL ALIAS FNAL)

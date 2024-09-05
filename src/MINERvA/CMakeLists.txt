@@ -99,6 +99,14 @@ set(MINERvA_Impl_Files
 )
 
 add_library(MINERvA SHARED ${MINERvA_Impl_Files})
-target_link_libraries(MINERvA CoreIncludes)
+target_link_libraries(MINERvA FrameworkLibraries CoreIncludes)
 
-install(TARGETS MINERvA DESTINATION lib)
+set_target_properties(MINERvA PROPERTIES PUBLIC_HEADER "MINERvA_SignalDef.h")
+
+install(TARGETS MINERvA
+    EXPORT nuisance-targets
+    LIBRARY DESTINATION lib/
+    PUBLIC_HEADER DESTINATION include)
+
+add_library(NUIS::MINERvA ALIAS MINERvA)
+

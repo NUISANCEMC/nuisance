@@ -47,7 +47,8 @@ if (T2KReWeight_ENABLED)
     set_target_properties(NUISANCET2KReWeight PROPERTIES 
       INTERFACE_COMPILE_OPTIONS "-DT2KReWeight_ENABLED"
       INTERFACE_LINK_LIBRARIES T2KReWeight::All)
-
+    install(TARGETS NUISANCET2KReWeight
+      EXPORT nuisance-targets)
     target_link_libraries(GeneratorCompileDependencies INTERFACE NUISANCET2KReWeight)
   endif()
 
@@ -90,15 +91,15 @@ if (nusystematics_ENABLED)
     CPMAddPackage(
       NAME nusystematics
       GIT_TAG develop
-      GITHUB_REPOSITORY luketpickering/nusystematics
+      GITHUB_REPOSITORY NuSystematics/nusystematics
     )
   else()
-    find_package(nusystematics 23.06)
+    find_package(nusystematics 2.0.1)
   endif()
 
   if(NOT TARGET nusyst::all)
     if(nusystematics_REQUIRED)
-      cmessage(FATAL_ERROR "nusystematics was explicitly enabled but target nusyst::all was not declared after running find_package(nusystematics 23.06).")
+      cmessage(FATAL_ERROR "nusystematics was explicitly enabled but target nusyst::all was not declared after running find_package(nusystematics 2.0.1).")
     endif()
     SET(nusystematics_ENABLED FALSE)
   else()
@@ -107,7 +108,8 @@ if (nusystematics_ENABLED)
     set_target_properties(NUISANCEnusystematics PROPERTIES 
       INTERFACE_COMPILE_OPTIONS "-Dnusystematics_ENABLED"
       INTERFACE_LINK_LIBRARIES nusyst::all)
-
+    install(TARGETS NUISANCEnusystematics
+      EXPORT nuisance-targets)
     target_link_libraries(GeneratorCompileDependencies INTERFACE NUISANCEnusystematics)
   endif()
   
@@ -141,14 +143,15 @@ if (NEUT_ENABLED)
     set_target_properties(NUISANCENEUT PROPERTIES 
       INTERFACE_COMPILE_OPTIONS "${NUISANCENEUT_COMPILE_OPTIONS}"
       INTERFACE_LINK_LIBRARIES NEUT::All)
-
+    install(TARGETS NUISANCENEUT
+      EXPORT nuisance-targets)
     target_link_libraries(GeneratorCompileDependencies INTERFACE NUISANCENEUT)
   endif()
 
 endif()
 
 if (GENIE_ENABLED)
-  find_package(GENIE)
+  find_package(GENIE 3.0.0)
   if(NOT GENIE_FOUND)
     if(GENIE_REQUIRED)
       cmessage(FATAL_ERROR "GENIE was explicitly enabled but cannot be found.")
@@ -178,7 +181,8 @@ if (GENIE_ENABLED)
     set_target_properties(NUISANCEGENIE PROPERTIES 
       INTERFACE_COMPILE_OPTIONS "${NUISANCEGENIE_COMPILE_OPTIONS}"
       INTERFACE_LINK_LIBRARIES GENIE::All)
-
+    install(TARGETS NUISANCEGENIE
+      EXPORT nuisance-targets)
     target_link_libraries(GeneratorCompileDependencies INTERFACE NUISANCEGENIE)
   endif()
 
@@ -200,23 +204,36 @@ if (NuWro_ENABLED)
 endif()
 
 if (Prob3plusplus_ENABLED)
-  find_package(Prob3plusplus)
+  
+  CPMFindPackage(
+      NAME Prob3plusplus
+      VERSION 3.10.4
+      GITHUB_REPOSITORY rogerwendell/Prob3plusplus
+      GIT_TAG main
+  )
 
-  if(NOT Prob3plusplus_FOUND)
-    if(Prob3plusplus_REQUIRED)
-      cmessage(FATAL_ERROR "Prob3plusplus was explicitly enabled but cannot be found.")
+  SET(Prob3plusplus_ENABLED TRUE)
+  if(NOT TARGET Prob3plusplus::All)
+    if(TARGET Prob3plusplus)
+      add_library(Prob3plusplus::All ALIAS Prob3plusplus)
+    else()
+      if(Prob3plusplus_REQUIRED)
+        cmessage(FATAL_ERROR "Prob3plusplus was explicitly enabled but cannot be found.")
+      else()
+        SET(Prob3plusplus_ENABLED FALSE)
+      endif()
     endif()
-    SET(Prob3plusplus_ENABLED FALSE)
-  else()
-    SET(Prob3plusplus_ENABLED TRUE)
+  endif()
+
+  if(Prob3plusplus_ENABLED)
     add_library(NUISANCEProb3plusplus INTERFACE)
     set_target_properties(NUISANCEProb3plusplus PROPERTIES 
       INTERFACE_COMPILE_OPTIONS "-DProb3plusplus_ENABLED"
       INTERFACE_LINK_LIBRARIES Prob3plusplus::All)
-
     target_link_libraries(GeneratorCompileDependencies INTERFACE NUISANCEProb3plusplus)
+    install(TARGETS NUISANCEProb3plusplus
+      EXPORT nuisance-targets)
   endif()
-  
 endif()
 
 string(FIND "${CMAKE_SHARED_LINKER_FLAGS}" "-Wl,--no-undefined" NOUNDEF_INDEX)
@@ -227,7 +244,7 @@ endif()
 
 if (NuHepMC_ENABLED)
   set(NuHepMC_ENABLED TRUE)
-  CPMAddPackage(
+  CPMFindPackage(
     NAME NuHepMC_CPPUtils
     GIT_TAG main
     GIT_REPOSITORY "https://github.com/NuHepMC/cpputils.git"
@@ -235,4 +252,8 @@ if (NuHepMC_ENABLED)
   )
   target_compile_definitions(GeneratorCompileDependencies INTERFACE NuHepMC_ENABLED)
   target_link_libraries(GeneratorCompileDependencies INTERFACE NuHepMC::CPPUtils)
+  target_compile_options(GeneratorCompileDependencies INTERFACE -Wno-unused-parameter -Wno-unused-but-set-variable)
 endif()
+
+install(TARGETS GeneratorCompileDependencies
+    EXPORT nuisance-targets)

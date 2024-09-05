@@ -21,6 +21,11 @@ set(K2K_Impl_Files
   K2K_NC1pi0_Evt_1Dppi0_nu.cxx
 )
 add_library(K2K SHARED ${K2K_Impl_Files})
-target_link_libraries(K2K CoreIncludes)
+target_link_libraries(K2K FrameworkLibraries CoreIncludes)
 
-install(TARGETS K2K DESTINATION lib)
+install(TARGETS K2K
+    EXPORT nuisance-targets
+    LIBRARY DESTINATION lib/
+    PUBLIC_HEADER DESTINATION include)
+
+add_library(NUIS::K2K ALIAS K2K)

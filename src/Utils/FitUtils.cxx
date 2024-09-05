@@ -626,6 +626,155 @@ double FitUtils::GetErecoil_CHARGED(FitEvent *event) {
   return Erecoil;
 }
 
+//DIRTy variables - Emiss and pmiss
+TVector3 FitUtils::GetPmiss(FitEvent *event, bool preFSI) {
+  //pmiss_vect is the vector difference between the neutrino momentum and the sum of final state particles momenta
+  //initialize to neutrino momentum
+  TVector3 pmiss_vect = event->GetNeutrinoIn()->P3();
+  //std::cout << "in pmiss - neutirno momentum " << pmiss_vect.Mag()<< std::endl;
+  // Get sum of momenta for all final state particles
+  TVector3 Sum_of_momenta(0, 0, 0);
+  for (unsigned int i = 3; i < event->Npart(); i++) {
+    // //if calculated with pre-fsi info, skip is particle is not at primary vertex, esle only final state
+    if (preFSI){
+      if (!event->fPrimaryVertex[i])
+        continue;
+    }
+    else {
+      if (!event->PartInfo(i)->fIsAlive)
+        continue;
+      if (event->PartInfo(i)->fNEUTStatusCode != 0)
+        continue;
+    }
+    //skip nuclear remnant
+    if (abs(event->PartInfo(i)->fPID)>10000)
+      continue;
+    //std::cout << "Found a " << event->PartInfo(i)->fPID << std::endl;
+    Sum_of_momenta+=event->PartInfo(i)->P3();
+    //std::cout << "in pmiss - other part mom " << event->PartInfo(i)->P3().Mag() << std::endl;
+  }
+
+  pmiss_vect -= Sum_of_momenta;
+  //std::cout << "Sum_of_momenta is " << Sum_of_momenta.Mag() << std::endl;
+  
+  // Return in GeV
+  return pmiss_vect * 0.001;
+}
+
+double FitUtils::GetEmiss(FitEvent *event, bool preFSI) {
+
+  /*==================!!!!!!!!!!!!!!!!!!!!!!!!!!!!=======================//
+  Beware, this is not an exact calculation. The following approximations are made 
+
+  - neutrons and protons have the same mass
+  - The binding energy for the remnant nucleus is taken as (number of nucleons in remnant)/(number of nucleons in target)*binding energy of target
+  - Binding energies are taken from GENIE tables
+
+  This is fine at first order for DIRT2 ground state validations. If you care about MeV level effects, you might want to change this function or not use it
+  ==================!!!!!!!!!!!!!!!!!!!!!!!!!!!!=======================*/
+  double Emiss = -999;
+  double pmiss;
+  if (preFSI) pmiss = GetPmiss(event, 1).Mag();
+  else pmiss = GetPmiss(event).Mag();
+
+  std::map<int, double> bindingEnergies;
+
+  bindingEnergies.insert(std::pair(1000030060, 17.0)); //Li6   
+  bindingEnergies.insert(std::pair(1000060120, 25.0)); //C12   
+  bindingEnergies.insert(std::pair(1000080160, 27.0)); //O16   
+  bindingEnergies.insert(std::pair(1000120240, 32.0)); //Mg24  
+  bindingEnergies.insert(std::pair(1000180400, 29.5)); //Ar40  
+  bindingEnergies.insert(std::pair(1000200400, 28.0)); //Ca40  
+  bindingEnergies.insert(std::pair(1000220480, 30.0)); //Ti48    
+  bindingEnergies.insert(std::pair(1000260560, 36.0)); //Fe56  
+  bindingEnergies.insert(std::pair(1000280580, 36.0)); //Ni58  
+  bindingEnergies.insert(std::pair(1000822080, 44.0)); //Pb208 
+
+  
+  int n_tgt_nucleons = event->fTargetA;
+  int n_rem_nucleons = -1;
+  int tgt_pdg = event->fTargetPDG;
+  int evt_mode = event->GetMode();
+  int n_int_nucleons = 0;
+  if(abs(evt_mode) == 2){ //for 2p2h subtract 2 nucleons
+    n_int_nucleons = 2;
+  }
+  else n_int_nucleons = 1; //for the rest subtract just one
+  double M_tgt = -999;
+  double M_rem = -999;
+  double mass_nucleon = (PhysConst::mass_neutron + PhysConst::mass_proton)/2.*1000;
+  if (tgt_pdg == 1000010010) {
+    M_tgt = mass_nucleon;
+    M_rem = 0;
+  }
+  else {
+    M_tgt = n_tgt_nucleons*mass_nucleon - bindingEnergies[tgt_pdg];
+    M_rem = M_tgt - mass_nucleon*n_int_nucleons + (1 - (double)n_int_nucleons/n_tgt_nucleons)*bindingEnergies[tgt_pdg];
+  }
+
+  double Trem = sqrt(pmiss*pmiss + M_rem*M_rem)-M_rem;
+
+  double Ehad = 0;
+
+  for (unsigned int i = 3; i < event->Npart(); i++) {
+    //if calculated with pre-fsi info, skip is particle is not at primary vertex, esle only final state
+    if (preFSI){
+      if (!event->fPrimaryVertex[i])
+        continue;
+    }
+    else {
+      if (!event->PartInfo(i)->fIsAlive)
+        continue;
+      if (event->PartInfo(i)->fNEUTStatusCode != 0)
+        continue;
+    }
+    //skip nuclear remnant
+    if (abs(event->PartInfo(i)->fPID)>10000)
+      continue;
+    // Skip Lepton
+    if (abs(event->PartInfo(i)->fPID) == abs(event->PartInfo(0)->fPID) - 1)
+      continue;
+
+    //add kinetic energy of proton or neutron
+    if (event->PartInfo(i)->fPID == 2112 || event->PartInfo(i)->fPID == 2212){
+      Ehad+=FitUtils::T(event->PartInfo(i)->fP)*1000;
+      //std::cout << "proto/neutronKE  " << FitUtils::T(event->PartInfo(i)->fP)*1000 << std::endl;
+    }
+    //add total energy of other particles 
+    else {
+      Ehad+=event->PartInfo(i)->fP.E();
+      //std::cout << "other particles E " << event->PartInfo(i)->fP.E() << std::endl;
+    }
+  }
+
+  double q0_true = event->GetBeamPart()->fP.E();
+  if (event->IsCC() && event->GetHMFSParticle(event->GetBeamPartPDG() + ((event->GetBeamPartPDG() < 0) ? 1 : -1))){
+    q0_true -= event->GetHMFSParticle(event->GetBeamPartPDG() + ((event->GetBeamPartPDG() < 0) ? 1 : -1))->fP.E();
+  } else if (event->GetHMFSParticle(event->GetBeamPartPDG())) {
+    q0_true -= event->GetHMFSParticle(event->GetBeamPartPDG())->fP.E();
+  }
+  
+  // Convert in GeV
+  Emiss = 0.001 * (q0_true - Ehad - Trem);
+
+  ///debugging
+  /*std::cout << "Mode is " << evt_mode << std::endl;
+  std::cout << "Target mass is " << M_tgt << std::endl;
+  std::cout << "Target nucleons is " << n_tgt_nucleons << std::endl;
+  std::cout << "Interacting nucleons is " << n_int_nucleons << std::endl;
+  std::cout << "Remnant mass is " << M_rem << std::endl;
+  std::cout << "pmiss is " << pmiss << std::endl;
+  std::cout << "q0_true is " << q0_true << std::endl;
+  std::cout << "Ehad is " << Ehad << std::endl;
+  std::cout << "Trem is " << Trem << std::endl;
+  std::cout << "Emiss is " << Emiss << std::endl;
+  std::cout << "==========================" << std::endl;*/
+
+  return Emiss;
+
+}
+
+
 // MOVE TO MINERVA Utils!
 double FitUtils::GetErecoil_MINERvA_LowRecoil(FitEvent *event) {
   // Get total energy of hadronic system.

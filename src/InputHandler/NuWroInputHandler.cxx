@@ -136,6 +136,7 @@ FitEvent *NuWroInputHandler::GetNuisanceEvent(const UInt_t ent,
 
   // Read Entry from TTree to fill NEUT Vect in BaseFitEvt;
   fNuWroTree->GetEntry(entry);
+  fNUISANCEEvent->fNuwroEvent = fNuWroEvent;
 
   // Run NUISANCE Vector Filler
   if (!lightweight) {
@@ -191,7 +192,7 @@ int NuWroInputHandler::ConvertNuwroMode(event *e) {
   }
 
   // Pion production
-  if (e->flag.res) {
+  if (e->flag.res || e->flag.res_delta) {
 
     int npions = event1_nof(e, pion_pdg) + event1_nof(e, pion_plus_pdg) +
       event1_nof(e, pion_minus_pdg);

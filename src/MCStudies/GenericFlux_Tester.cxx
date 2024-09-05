@@ -108,6 +108,7 @@ void GenericFlux_Tester::AddEventVariablesToTree() {
 
   NUIS_LOG(SAM, "Adding Event Variables");
   eventVariables->Branch("Mode", &Mode, "Mode/I");
+  eventVariables->Branch("ResCode", &ResCode, "ResCode/I");
 
   eventVariables->Branch("PDGnu", &PDGnu, "PDGnu/I");
   eventVariables->Branch("Enu_true", &Enu_true, "Enu_true/F");
@@ -170,6 +171,10 @@ void GenericFlux_Tester::AddEventVariablesToTree() {
   eventVariables->Branch("Q2_true", &Q2_true, "Q2_true/F");
   eventVariables->Branch("q0_true", &q0_true, "q0_true/F");
   eventVariables->Branch("q3_true", &q3_true, "q3_true/F");
+  eventVariables->Branch("Emiss", &Emiss, "Emiss/F");
+  eventVariables->Branch("pmiss", &pmiss);
+  eventVariables->Branch("Emiss_preFSI", &Emiss_preFSI, "Emiss_preFSI/F");
+  eventVariables->Branch("pmiss_preFSI", &pmiss_preFSI);
 
   eventVariables->Branch("Enu_QE", &Enu_QE, "Enu_QE/F");
   eventVariables->Branch("Q2_QE", &Q2_QE, "Q2_QE/F");
@@ -240,7 +245,7 @@ void GenericFlux_Tester::ResetVariables() {
   Enu_true = Enu_QE = __BAD_FLOAT__;
 
   // Reset auxillaries
-  Q2_true = Q2_QE = W_nuc_rest = bjorken_x = bjorken_y = q0_true = q3_true =
+  Q2_true = Q2_QE = W_nuc_rest = bjorken_x = bjorken_y = q0_true = q3_true = Emiss = Emiss_preFSI = 
       Erecoil_true = Erecoil_charged = Erecoil_minerva = __BAD_FLOAT__;
 
   // Reset particle counters
@@ -272,6 +277,9 @@ void GenericFlux_Tester::ResetVariables() {
       CosPpipPprot = CosPpipPneut = CosPpipPpim = CosPpipPpi0 = CosPpimPprot =
           CosPpimPneut = CosPpimPpi0 = CosPi0Pprot = CosPi0Pneut =
               CosPprotPneut = __BAD_FLOAT__;
+  // Reset pmiss
+  pmiss.SetXYZ(-999., -999., -999.);
+  pmiss_preFSI.SetXYZ(-999., -999., -999.);
 }
 
 //********************************************************************
@@ -287,6 +295,7 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
 
   // Function used to extract any variables of interest to the event
   Mode = event->Mode;
+  ResCode = event->fResCode;
 
   // Reset the highest momentum variables
   float proton_highmom = __BAD_FLOAT__;
@@ -354,6 +363,12 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
 
       q0_true = (part_4mom - (*nu_4mom)).E();
       q3_true = (part_4mom - (*nu_4mom)).Vect().Mag();
+
+      Emiss = FitUtils::GetEmiss(event);
+      pmiss = FitUtils::GetPmiss(event);
+
+      Emiss_preFSI = FitUtils::GetEmiss(event, 1);
+      pmiss_preFSI = FitUtils::GetPmiss(event, 1);
 
       // Get W_true with assumption of initial state nucleon at rest
       float m_n = (float)PhysConst::mass_proton * 1000.;

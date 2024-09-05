@@ -1,13 +1,19 @@
 #include "NuHepMCInputHandler.h"
 
-#include "NuHepMC/CrossSectionUtils.hxx"
 #include "NuHepMC/EventUtils.hxx"
+#include "NuHepMC/FATXUtils.hxx"
 #include "NuHepMC/ReaderUtils.hxx"
+
+// Leave this at the top to enable features detected at build time in headers in
+// HepMC3
+#include "NuHepMC/HepMC3Features.hxx"
 
 #include "HepMC3/Print.h"
 #include "HepMC3/ReaderFactory.h"
 
 #include <stdexcept>
+
+using namespace NuHepMC::CrossSection::Units;
 
 NuHepMCInputHandler::~NuHepMCInputHandler() {}
 
@@ -44,38 +50,51 @@ NuHepMCInputHandler::NuHepMCInputHandler(std::string const &handle,
 
   fFilename = inputs[0];
 
-  double fatx_cm2 = NuHepMC::CrossSection::GetFATX(
-      fFilename, NuHepMC::CrossSection::Units::XSUnits::cm2_ten38,
-      NuHepMC::CrossSection::Units::XSTargetScale::PerTargetMolecularNucleon);
-
-  std::cout << "NuHepMCInputHandler: FATX = " << fatx_cm2 << std::endl;
-
-  auto rdr = HepMC3::deduce_reader(fFilename);
-  if (!rdr) {
+  fReader = HepMC3::deduce_reader(fFilename);
+  if (!fReader) {
     NUIS_ABORT("Failed to instantiate HepMC3::Reader from " << fFilename);
   }
   HepMC3::GenEvent evt;
   fNEvents = 0;
-  while (!rdr->failed()) {
-    rdr->read_event(evt);
-    if (!fNEvents) {
-      fToMeV = NuHepMC::Event::ToMeVFactor(evt);
-    }
-    if (!rdr->failed()) {
-      fNEvents++;
-    } else {
+
+  double to_cm2_nuc = 1;
+
+  std::shared_ptr<NuHepMC::FATX::Accumulator> fatx_acc;
+  while (!fReader->failed()) {
+    fReader->read_event(evt);
+    if (fReader->failed()) {
       break;
     }
+
+    if (!fNEvents) {
+      fToMeV = NuHepMC::Event::ToMeVFactor(evt);
+      frun_info = evt.run_info();
+      fatx_acc = NuHepMC::FATX::MakeAccumulator(frun_info);
+      to_cm2_nuc = GetRescaleFactor(
+          evt, pb_PerAtom,
+          Unit{Scale::cm2_ten38, TargetScale::PerTargetNucleon});
+    }
+
+    fatx_acc->process(evt);
+    fNEvents++;
   }
+  fsumevw = fatx_acc->sumweights();
+
+  std::cout << "NuHepMC NormInfo: { fatx = " << fatx_acc->fatx()
+            << " pb/A = " << fatx_acc->fatx() * to_cm2_nuc
+            << " cm^2/N, sumw = " << fsumevw
+            << ", nevents = " << fatx_acc->events() << " } " << std::endl;
   // Dupe the FATX
   fEventHist = new TH1D("eventhist", "eventhist", 10, 0.0, 10.0);
-  fEventHist->SetBinContent(5, fatx_cm2);
+  fEventHist->SetBinContent(5, fatx_acc->fatx() * to_cm2_nuc);
   fFluxHist = new TH1D("fluxhist", "fluxhist", 10, 0.0, 10.0);
   fFluxHist->SetBinContent(5, 1);
 
   fNUISANCEEvent = new FitEvent();
   fNUISANCEEvent->HardReset();
   fBaseEvent = static_cast<BaseFitEvt *>(fNUISANCEEvent);
+
+  fReader = HepMC3::deduce_reader(fFilename);
 };
 
 FitEvent *NuHepMCInputHandler::GetNuisanceEvent(const UInt_t entry, bool) {
@@ -111,6 +130,9 @@ FitEvent *NuHepMCInputHandler::GetNuisanceEvent(const UInt_t entry, bool) {
   } else {
     fNUISANCEEvent->InputWeight = 1.0;
   }
+
+  fNUISANCEEvent->InputWeight *=
+      fHepMC3Evt.weights()[0] * double(fNEvents) / fsumevw;
 
   // Run NUISANCE Vector Filler
   CalcNUISANCEKinematics();

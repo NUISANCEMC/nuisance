@@ -361,6 +361,18 @@ void GiBUUNativeInputHandler::CalcNUISANCEKinematics() {
 
     double dist = sqrt((*fGiReader->x)[i]*(*fGiReader->x)[i] + (*fGiReader->y)[i]*(*fGiReader->y)[i] + (*fGiReader->z)[i]*(*fGiReader->z)[i]);
 
+    // If the particle is still within the nucleus, it's not final state
+    // Not that this depends on the nucleus, and too few time steps could cause an issue
+    // 6 fm is Ulrich's guess for Argon (and will be fine for smaller nuclei)
+    // Note that hydrogen is an exception because of how the timesteps work
+   
+    if(dist<6) {
+     
+	std::cout<<"Dropping Particle in Neucleus"<<std::end;
+	continue;
+
+    }
+
     // Set State
     evt->fParticleState[curpart] = CheckGiBUUParticleStatus((*fGiReader->E)[i], (*fGiReader->pdg)[i], dist, evt->fTargetA);
     // Mom

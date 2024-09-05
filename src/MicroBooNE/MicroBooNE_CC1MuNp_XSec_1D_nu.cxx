@@ -79,10 +79,10 @@ MicroBooNE_CC1MuNp_XSec_1D_nu::MicroBooNE_CC1MuNp_XSec_1D_nu(nuiskey samplekey) 
   // Load data ---------------------------------------------------------
   std::string inputFile = FitPar::GetDataBase() + "/MicroBooNE/CC1MuNp/CCNp_data_MC_cov_dataRelease.root";
   SetDataFromRootFile(inputFile, "DataXsec_" + objSuffix);
-  ScaleData(1E-38);
+  ScaleData(40.0*1E-38);
 
   // ScaleFactor for DiffXSec/cm2/Nucleus
-  fScaleFactor = GetEventHistogram()->Integral("width") / fNEvents * 1E-38 / TotalIntegratedFlux();
+  fScaleFactor = 40.0*GetEventHistogram()->Integral("width") / fNEvents * 1E-38 / TotalIntegratedFlux(); //per nucleus
 
   SetCovarFromRootFile(inputFile, "CovarianceMatrix_" + objSuffix);
 

@@ -12,6 +12,7 @@
 class NuHepMCInputHandler : public InputHandlerBase {
 public:
 
+  NuHepMCInputHandler(){}
 	NuHepMCInputHandler(std::string const& handle, std::string const& rawinputs);
 	~NuHepMCInputHandler();
 
@@ -31,4 +32,5 @@ public:
   HepMC3::GenEvent fHepMC3Evt;
   std::string fFilename;
   double fToMeV;
+  double fsumevw;
 };

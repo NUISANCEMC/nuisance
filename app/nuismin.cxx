@@ -136,6 +136,7 @@ int main(int argc, char *argv[]) {
     NUIS_ERR(WRN, "Minimizer Failed (error state = " << status << ")");
   }
   NUIS_LOG(FIT, "-------------------------------------");
-
+  
+  delete min;
   return status;
 }
