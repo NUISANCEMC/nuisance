@@ -368,7 +368,7 @@ void GiBUUNativeInputHandler::CalcNUISANCEKinematics() {
    
     if(dist<6) {
      
-	std::cout<<"Dropping Particle in Neucleus"<<std::endl;
+	std::cout<<"Dropping Particle in Nucleus"<<std::endl;
 	continue;
 
     }

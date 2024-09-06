@@ -202,7 +202,6 @@ while [[ ${#} -gt 0 ]]; do
     --flat)
       FLATTREE="true"
       echo "[OPT]: ${NUIS_BREADCRUMBS} -- Will produce Nuisance flat-tree"
-      shift # past argument
       ;;
 
     *) # unknown option
