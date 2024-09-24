@@ -52,6 +52,64 @@ bool isCC1MuNp(FitEvent* event, double EnuMin, double EnuMax) {
   return false;
 }
 
+bool isCC1ENp(FitEvent* event, double EnuMin, double EnuMax) {
+  bool Verbose = false;
+
+  // ==============================================================================================================================
+  // Check CC inclusive
+  if (!SignalDef::isCCINC(event, 12, EnuMin, EnuMax)) return false;
+
+  // ==============================================================================================================================
+  // Veto events which don't have exactly 1 FS electron
+  /*
+  if (event->NumFSElectron() != 1) {
+    if (Verbose) {std::cout << "DB: ElectronCut failed" << std::endl;}
+    return false;
+  }
+  */
+
+  // ==============================================================================================================================
+  // Veto events which don't have 1 or more FS protons that have kinetic energy > 40MeV
+  std::vector<FitParticle*> ProtonParticles = event->GetAllFSProton();
+
+  double ProtonKEThreshold = 40.0;
+  uint nProtonsWithKEAboveThreshold = 0;
+  for (uint i=0;i<ProtonParticles.size();i++) {
+    if (ProtonParticles[i]->KE()>=ProtonKEThreshold) {
+      nProtonsWithKEAboveThreshold += 1;
+    }
+  }
+  if (nProtonsWithKEAboveThreshold == 0) return false;
+
+  // ==============================================================================================================================
+  // Veto events with any charged pions that have kinetic energy > 40MeV
+  std::vector<FitParticle*> PiPlusParticles = event->GetAllFSPiPlus();
+  std::vector<FitParticle*> PiMinusParticles = event->GetAllFSPiMinus();
+
+  std::vector<FitParticle*> ChargedPionParticles;
+  for (uint i=0;i<PiPlusParticles.size();i++) {ChargedPionParticles.push_back(PiPlusParticles[i]);}
+  for (uint i=0;i<PiMinusParticles.size();i++) {ChargedPionParticles.push_back(PiMinusParticles[i]);}
+
+  double ChargedPionKEThreshold = 40.0;
+  uint nChargedPionsWithKEAboveThreshold = 0;
+  for (uint i=0;i<ChargedPionParticles.size();i++) {
+    if (ChargedPionParticles[i]->KE()>=ChargedPionKEThreshold) {
+      nChargedPionsWithKEAboveThreshold += 1;
+    }
+  }
+  if (nChargedPionsWithKEAboveThreshold != 0) return false;
+
+  // ==============================================================================================================================
+  // Veto events with any neutral pions
+  std::vector<FitParticle*> PiZeroParticles = event->GetAllFSPiZero();
+  uint nNeutralPions = PiZeroParticles.size();
+  if (nNeutralPions != 0) return false;
+
+  // ==============================================================================================================================
+  // Events which have not yet failed the selection are defined as CC1ENP (N>=1)
+  return true;
+}
+
     //----------------------------------------//
 
 bool isCC1Mu2p(FitEvent* event, double EnuMin, double EnuMax) {

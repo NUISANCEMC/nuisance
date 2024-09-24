@@ -32,6 +32,7 @@ namespace SignalDef {
  */
 bool isCC1MuNp(FitEvent* event, double EnuMin, double EnuMax);
 
+bool isCC1ENp(FitEvent* event, double EnuMin, double EnuMax);
 /**
  * numu CC with 1 muon (0.1 < Pmu < 1.2 GeV/c), 2 protons (0.3 < Pp < 1 GeV/c), no neutral pions (any momenta), and no charged pions above 65 MeV/c [any number of neutrons is allowed].
  *
@@ -46,7 +47,6 @@ bool isCC1Mu2p(FitEvent* event, double EnuMin, double EnuMax);
  */
 bool isCC1Mu1p(FitEvent* event, double EnuMin, double EnuMax);
 std::vector<FitParticle*> GetCC1Mu1pProtonsInPS(FitEvent* event);
-
 
   }  // namespace MicroBooNE
 }  // namespace SignalDef
