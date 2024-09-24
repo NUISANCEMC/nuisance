@@ -1104,10 +1104,9 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
     }  else if (!name.compare("MicroBooNE_CC1ENp_XSec_1DElecEnergy_nu") ||
 		 !name.compare("MicroBooNE_CC1ENp_XSec_1DOpeningAngle_nu") ||
 		 !name.compare("MicroBooNE_CC1ENp_XSec_1DTrueVisibleEnergy_nu")) {
-	return (new MicroBooNE_CC1ENp_XSec_1D_nu(samplekey));else if (!name.compare(
-                   "MicroBooNE_CC1Mu2p_XSec_1DOpening_Angle_Protons_Lab_nu") ||
-               !name.compare(
-                   "MicroBooNE_CC1Mu2p_XSec_1DOpening_Angle_Mu_Both_nu") ||
+	return (new MicroBooNE_CC1ENp_XSec_1D_nu(samplekey));
+    }  else if (!name.compare("MicroBooNE_CC1Mu2p_XSec_1DOpening_Angle_Protons_Lab_nu") ||
+               !name.compare("MicroBooNE_CC1Mu2p_XSec_1DOpening_Angle_Mu_Both_nu") ||
                !name.compare("MicroBooNE_CC1Mu2p_XSec_1DDeltaPT_nu")) {
       return (new MicroBooNE_CC1Mu2p_XSec_1D_nu(samplekey));
     }  else if (!name.compare("MicroBooNE_CC1ENp_XSec_1DElecEnergy_nu") ||

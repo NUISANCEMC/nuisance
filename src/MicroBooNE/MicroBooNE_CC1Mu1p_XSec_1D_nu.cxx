@@ -21,7 +21,6 @@
 #include "MicroBooNE_SignalDef.h"
 #include "TH1D.h"
 #include "TH2D.h"
-#include <Eigen/Dense>
 
 //********************************************************************
 MicroBooNE_CC1Mu1p_XSec_1D_nu::MicroBooNE_CC1Mu1p_XSec_1D_nu(
