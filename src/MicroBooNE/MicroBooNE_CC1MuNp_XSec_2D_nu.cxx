@@ -190,6 +190,13 @@ MicroBooNE_CC1MuNp_XSec_2D_nu
     fSettings.GetFullTitles().c_str() );
   fMCFine->Reset();
 
+  // Set up the MC modes histogram
+  fMCHist_Modes = new TrueModeStack( (fSettings.GetName() + "_MODES").c_str(),
+    "True Channels", fMCHist );
+  fMCHist_Modes->SetTitleX( fDataHist->GetXaxis()->GetTitle() );
+  fMCHist_Modes->SetTitleY( fDataHist->GetYaxis()->GetTitle() );
+  this->SetAutoProcessTH1( fMCHist_Modes, kCMD_Reset, kCMD_Norm, kCMD_Write );
+
   //this->FinaliseMeasurement();
 }
 
