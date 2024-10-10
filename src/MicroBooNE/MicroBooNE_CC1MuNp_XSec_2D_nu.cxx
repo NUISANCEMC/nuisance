@@ -394,21 +394,22 @@ void MicroBooNE_CC1MuNp_XSec_2D_nu::ConvertEventRates() {
   // Do the standard conversion
   Measurement1D::ConvertEventRates();
 
-  // Build a column vector using the predicted cross sections
-  int num_bins = fMCHist->GetNbinsX();
-  TMatrixD pred( num_bins, 1 );
-  for ( int b = 0; b < num_bins; ++b ) {
-    pred( b, 0 ) = fMCHist->GetBinContent( b + 1 );
-  }
+  // TODO: Restore use of A_C once you make sure you aren't double-counting it
+  //// Build a column vector using the predicted cross sections
+  //int num_bins = fMCHist->GetNbinsX();
+  //TMatrixD pred( num_bins, 1 );
+  //for ( int b = 0; b < num_bins; ++b ) {
+  //  pred( b, 0 ) = fMCHist->GetBinContent( b + 1 );
+  //}
 
-  // Apply the additional smearing matrix to create a new prediction
-  TMatrixD new_pred( *fAddSmear, TMatrixD::kMult, pred );
+  //// Apply the additional smearing matrix to create a new prediction
+  //TMatrixD new_pred( *fAddSmear, TMatrixD::kMult, pred );
 
-  // Update the MC prediction histogram with the smeared version
-  for ( int b = 0; b < num_bins; ++b ) {
-    double xsec = new_pred( b, 0 );
-    fMCHist->SetBinContent( b + 1, xsec );
-  }
+  //// Update the MC prediction histogram with the smeared version
+  //for ( int b = 0; b < num_bins; ++b ) {
+  //  double xsec = new_pred( b, 0 );
+  //  fMCHist->SetBinContent( b + 1, xsec );
+  //}
 }
 
 double MicroBooNE_CC1MuNp_XSec_2D_nu::GetLikelihood() {
