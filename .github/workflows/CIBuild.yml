@@ -6,8 +6,6 @@ name: Build CI
 on:
   pull_request:
     branches: [ main ]
-  push:
-    branches: [feature_CICD]
 
 permissions:
   contents: read
