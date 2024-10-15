@@ -1,0 +1,36 @@
+# Check if Nuisance compiles correctly
+
+name: Build CI
+
+# The events that trigger the workflow
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [feature_CICD]
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false  # KS: Prevents cancellation of remaining jobs if one fails
+      matrix:
+        include:
+          - os: Alma9
+            file: Doc/DockerFiles/Alma9/Dockerfile
+            tag: alma9latest
+
+    name: Build CI ${{ matrix.os }}
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Log in to GitHub Container Registry
+      run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+    - name: Build the Docker image
+      run: docker build . --file ${{ matrix.file }} --tag ghcr.io/nuisancemc/nuisance:${{ matrix.tag }} --build-arg NUISANCE_VERSION="${{ github.head_ref }}"
