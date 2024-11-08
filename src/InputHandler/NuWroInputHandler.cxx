@@ -430,15 +430,18 @@ void NuWroInputHandler::Print(){
 	   << "\t\t|->      anty = " << fNuWroEvent->flag.anty << std::endl
 	   << "\t\t|-> res_delta = " << fNuWroEvent->flag.res_delta << std::endl
 	   << "\t\t|->      npi+ = " << event1_nof(fNuWroEvent, 211) << std::endl
-	   << "\t\t|->      npi+ = " << event1_nof(fNuWroEvent, 211) << std::endl
            << "\t\t|->      npi- = " << event1_nof(fNuWroEvent, -211) << std::endl
            << "\t\t|->      npi0 = " << event1_nof(fNuWroEvent, 111) << std::endl
            << "\t\t|->      neta = " << event1_nof(fNuWroEvent, 221) << std::endl
            << "\t\t|->       nK+ = " << event1_nof(fNuWroEvent, 321) << std::endl
            << "\t\t|->       nK0 = " << event1_nof(fNuWroEvent, 311) << std::endl
-           << "\t\t|->    nlamda = " << event1_nof(fNuWroEvent, 3122) << std::endl
+           << "\t\t|->   nlambda = " << event1_nof(fNuWroEvent, 3122) << std::endl
+	   << "\t\t|->   nsigma+ = " << event1_nof(fNuWroEvent, 3222) << std::endl
+           << "\t\t|->   nsigma- = " << event1_nof(fNuWroEvent, 3112) << std::endl
+	   << "\t\t|->   nsigma0 = " << event1_nof(fNuWroEvent, 3212) << std::endl	
            << "\t\t|->   nproton = " << event1_nof(fNuWroEvent, 2212) << std::endl
-           << "\t\t|->  nneutron = " << event1_nof(fNuWroEvent, 2112));
+           << "\t\t|->  nneutron = " << event1_nof(fNuWroEvent, 2112) << std::endl
+           << "\t\t|->         W = " << fNuWroEvent->W());
 }
 
 #endif
