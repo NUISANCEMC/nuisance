@@ -23,7 +23,7 @@
 /// Global Enum to define generator type being read with FitEvent
 /// Have to define kNORM as if its a generator for the time being.
 enum generator_event_type {
-  kUNKNOWN = 999,
+  kNUIS_UNKNOWN = 999,
   kNEUT = 0,
   kNIWG = 1,
   kNuWro = 2,
@@ -71,8 +71,8 @@ enum InputType {
 inline std::ostream& operator<<(std::ostream& os,
                                 generator_event_type const& gs) {
   switch (gs) {
-  case kUNKNOWN: {
-    return os << "kUNKNOWN";
+  case kNUIS_UNKNOWN: {
+    return os << "kNUIS_UNKNOWN";
   }
   case kNEUT: {
     return os << "kNEUT";
@@ -113,7 +113,7 @@ inline std::ostream& operator<<(std::ostream& os,
   case kHISTO: {
     return os << "kHISTO";
   }
-  default: { return os << "kUNKNOWN"; }
+  default: { return os << "kNUIS_UNKNOWN"; }
   }
 }
 
