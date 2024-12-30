@@ -162,3 +162,9 @@ install(FILES
     ${CMAKE_CURRENT_BINARY_DIR}/NUISANCEConfigVersion.cmake
     ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/FindNOvARwgt.cmake
   DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/cmake/NUISANCE)
+
+# Add Simple Python Binding through CPPYY
+install(FILES 
+    ${CMAKE_CURRENT_SOURCE_DIR}/python/pyNUISANCE2/__init__.py
+    ${CMAKE_CURRENT_SOURCE_DIR}/python/pyNUISANCE2/dummy-sample.root
+  DESTINATION ${CMAKE_INSTALL_PREFIX}/python/pyNUISANCE2/)

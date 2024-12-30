@@ -264,6 +264,7 @@ public:
     return std::vector<MeasurementBase*>(1, this);
   }
 
+  
 
   void SetAutoProcessTH1(TH1* hist,  int c1 = -1,
                          int c2 = -1, int c3 = -1,
@@ -296,6 +297,9 @@ public:
   // - Check flux shape if suggested one given.
   // - Return MeasurementList (returns )
 
+  // Helper functions for auto processing in pyNUISANCE
+  SampleSettings* GetSettings(){ return &fSettings; };
+  MeasurementVariableBox* GetVariableBox(){ return fEventVariables; };
 
 protected:
   // Minimum and maximum energies

@@ -42,6 +42,7 @@ set(Reweight_Hdr_Files
   NUISANCEWeightEngine.h
   NUISANCEWeightCalcs.h
   weightRPA.h
+  BeRPA.h
 )
 
 if(GENIEReWeight_ENABLED)

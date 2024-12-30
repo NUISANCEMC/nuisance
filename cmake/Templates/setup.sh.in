@@ -71,6 +71,31 @@ function add_to_LD_LIBRARY_PATH () {
 
 fi
 
+
+if ! type add_to_PYTHONPATH &> /dev/null; then
+
+function add_to_PYTHONPATH () {
+  for d; do
+
+    d=$(cd -- "$d" && { pwd -P || pwd; }) 2>/dev/null  # canonicalize symbolic links
+    if [ -z "$d" ]; then continue; fi  # skip nonexistent directory
+
+    if [ "$d" == "/usr/lib" ] || [ "$d" == "/usr/lib64" ] || [ "$d" == "/usr/local/lib" ] || [ "$d" == "/usr/local/lib64" ]; then
+      case ":$PYTHONPATH:" in
+        *":$d:"*) :;;
+        *) export PYTHONPATH=$PYTHONPATH:$d;;
+      esac
+    else
+      case ":$PYTHONPATH:" in
+        *":$d:"*) :;;
+        *) export PYTHONPATH=$d:$PYTHONPATH;;
+      esac
+    fi
+  done
+}
+
+fi
+
 if ! type is_in_PATH &> /dev/null; then
 
 function is_in_PATH () {
@@ -91,4 +116,6 @@ add_to_LD_LIBRARY_PATH "${NUISANCE}/lib"
 if [ -e "${NUISANCE}/lib64" ]; then 
   add_to_LD_LIBRARY_PATH "${NUISANCE}/lib64"
 fi
+
+add_to_PYTHONPATH "${NUISANCE}/python"
 
