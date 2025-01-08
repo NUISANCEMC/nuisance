@@ -145,12 +145,100 @@ bool isCC1pip_MINERvA_2017(FitEvent *event, double EnuMin, double EnuMax) {
   TLorentzVector pnu = event->GetHMISParticle(14)->fP;
   TLorentzVector pmu = event->GetHMFSParticle(13)->fP;
 
+  // TODO Test
+  double th_nu_mu = FitUtils::th(pmu, pnu) * 180. / M_PI;
+  if (th_nu_mu >= 20)
+    return false;
+
   // Extract Hadronic Mass
   // This time it's Wrec, not Wtrue
   double hadMass = FitUtils::Wrec(pnu, pmu);
   // Cut on 2017 data is still 1.4 GeV
   if (hadMass > 1400.0)
     return false;
+
+  return true;
+};
+
+bool isNukeCC1pip_MINERvA(FitEvent *event, double EnuMin, double EnuMax) {
+
+  if (!isCCINC(event, 14, EnuMin, EnuMax))
+    return false;
+
+  // Allow pi+
+  int piPDG[] = {211};
+  int nLeptons = event->NumFSLeptons();
+
+  int nPip = event->NumFSParticle(211);
+
+  // Count particles
+  int genie_n_photons = 0;
+  int genie_n_mesons = 0;
+  for (unsigned int i = 0; i < event->NParticles(); ++i) {
+    FitParticle *p = event->GetParticle(i);
+    if (p->Status() != kFinalState)
+      continue;
+    int pdg = p->fPID;
+    double energy = p->fP.E();
+    if (pdg == 22 && energy > 10.0) {
+      genie_n_photons++;
+    }
+    else if (abs(pdg) == 211 || //pi+-
+             pdg == 111 ||  // pi0
+             abs(pdg) == 321 || // K-
+             abs(pdg) == 323 || // K*+-
+             pdg == 130 || // KL0
+             pdg == 310 || // KS0
+             pdg == 311 || // K0
+             pdg == 313 || // K*0
+             abs(pdg) == 221 || // eta
+             abs(pdg) == 331 // eta' (958)
+             ) {
+      genie_n_mesons++;
+    }
+
+  }
+
+  // Check that the desired pion exists and is the only meson
+  if (nPip != 1 || genie_n_mesons!= 1)
+    return false;
+  if (genie_n_photons != 0 )
+    return false;
+
+  // Check that there is only one final state lepton
+  if (nLeptons != 1)
+    return false;
+
+  TLorentzVector Pnu = event->GetHMISParticle(14)->fP;
+  TLorentzVector Pmu = event->GetHMFSParticle(13)->fP;
+  TLorentzVector Ppip = event->GetHMFSParticle(PhysConst::pdg_charged_pions)->fP;
+
+  // 1.5 < pmu < 20 GeV/c
+  double pmu = Pmu.Vect().Mag()/1.E3; // GeV
+  if( pmu < 1.5 ) return false;
+  if( pmu > 20. ) return false;
+
+  // thmu<13degree
+  double th_nu_mu = FitUtils::th(Pmu, Pnu) * 180. / M_PI;
+  if (th_nu_mu >= 13.) return false;
+
+  // 35 < Tpi < 350 MeV
+  double Tpi = (Ppip.E() - Ppip.Mag()); // MeV
+  if( Tpi < 35. ) return false;
+  if( Tpi > 350. ) return false;
+
+  // Extract Hadronic Mass
+  // The factor of 1000 is necessary for downstream functions
+  float m_n = (float)PhysConst::mass_proton * 1000.;
+  // q
+  float Q2_true = -1 * (Pmu - Pnu).Mag2();
+  // Ehad
+  float Enu_true = Pnu.E();
+  float ELep = Pmu.E();
+  float E_had = Enu_true - ELep;
+  // W_exp
+  float W_exp = sqrt( -Q2_true + 2 * m_n * (Enu_true - ELep) + m_n * m_n );
+  if (W_exp > 1400.) return false;
 
   return true;
 };
