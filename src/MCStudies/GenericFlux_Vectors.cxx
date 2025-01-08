@@ -114,7 +114,10 @@ void GenericFlux_Vectors::AddEventVariablesToTree() {
   NUIS_LOG(SAM, "Adding Event Variables");
 
   eventVariables->Branch("Mode", &Mode, "Mode/I");
+  // Add only for GENIE
+#ifdef GENIE_ENABLED
   eventVariables->Branch("GENIEResCode", &GENIEResCode, "GENIEResCode/I");
+#endif
   eventVariables->Branch("cc", &cc, "cc/B");
   eventVariables->Branch("PDGnu", &PDGnu, "PDGnu/I");
   eventVariables->Branch("Enu_true", &Enu_true, "Enu_true/F");
@@ -204,7 +207,9 @@ void GenericFlux_Vectors::FillEventVariables(FitEvent *event) {
 
   // Now fill the information
   Mode = event->Mode;
+#ifdef GENIE_ENABLED
   GENIEResCode = event->fResCode;
+#endif
   cc = event->IsCC();
 
   // Get the incoming neutrino and outgoing lepton
@@ -368,7 +373,10 @@ void GenericFlux_Vectors::ResetVariables() {
   cc = false;
 
   // Reset all Function used to extract any variables of interest to the event
-  Mode = GENIEResCode = PDGnu = tgt = tgta = tgtz = PDGLep = 0;
+  Mode = PDGnu = tgt = tgta = tgtz = PDGLep = 0;
+#ifdef GENIE_ENABLED
+  GENIEResCode = Mode;
+#endif
 
   Enu_true = ELep = CosLep = Q2 = q0 = q3 = Enu_QE = Q2_QE = W_nuc_rest = W =
       x = y = Erecoil_minerva = Erecoil_charged = EavAlt = CosThetaAdler = PhiAdler = Emiss = Emiss_preFSI = -999.9;

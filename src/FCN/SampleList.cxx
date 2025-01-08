@@ -182,6 +182,7 @@
 #include "MicroBooNE_CC1Mu1p_XSec_1D_nu.h"
 #include "MicroBooNE_CC1Mu2p_XSec_1D_nu.h"
 #include "MicroBooNE_CC1MuNp_XSec_1D_nu.h"
+#include "MicroBooNE_CC1ENp_XSec_1D_nu.h"
 #include "MicroBooNE_CCInc_XSec_2DPcos_nu.h"
 #endif
 
@@ -1101,13 +1102,19 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
                !name.compare("MicroBooNE_CC1MuNp_XSec_1Dcosp_nu") ||
                !name.compare("MicroBooNE_CC1MuNp_XSec_1Dthetamup_nu")) {
       return (new MicroBooNE_CC1MuNp_XSec_1D_nu(samplekey));
-    } else if (!name.compare(
-                   "MicroBooNE_CC1Mu2p_XSec_1DOpening_Angle_Protons_Lab_nu") ||
-               !name.compare(
-                   "MicroBooNE_CC1Mu2p_XSec_1DOpening_Angle_Mu_Both_nu") ||
+    }  else if (!name.compare("MicroBooNE_CC1ENp_XSec_1DElecEnergy_nu") ||
+		 !name.compare("MicroBooNE_CC1ENp_XSec_1DOpeningAngle_nu") ||
+		 !name.compare("MicroBooNE_CC1ENp_XSec_1DTrueVisibleEnergy_nu")) {
+	return (new MicroBooNE_CC1ENp_XSec_1D_nu(samplekey));
+    }  else if (!name.compare("MicroBooNE_CC1Mu2p_XSec_1DOpening_Angle_Protons_Lab_nu") ||
+               !name.compare("MicroBooNE_CC1Mu2p_XSec_1DOpening_Angle_Mu_Both_nu") ||
                !name.compare("MicroBooNE_CC1Mu2p_XSec_1DDeltaPT_nu")) {
       return (new MicroBooNE_CC1Mu2p_XSec_1D_nu(samplekey));
-    } else if (!name.compare("MicroBooNE_CC1Mu1p_XSec_1DDeltaPT_nu") ||
+    }  else if (!name.compare("MicroBooNE_CC1ENp_XSec_1DElecEnergy_nu") ||
+		 !name.compare("MicroBooNE_CC1ENp_XSec_1DOpeningAngle_nu") ||
+		 !name.compare("MicroBooNE_CC1ENp_XSec_1DTrueVisibleEnergy_nu")) {
+	return (new MicroBooNE_CC1ENp_XSec_1D_nu(samplekey));
+  } else if (!name.compare("MicroBooNE_CC1Mu1p_XSec_1DDeltaPT_nu") ||
                !name.compare("MicroBooNE_CC1Mu1p_XSec_1DDeltaAlphaT_nu") ||
                !name.compare("MicroBooNE_CC1Mu1p_XSec_1DDeltaPhiT_nu") ||
                !name.compare("MicroBooNE_CC1Mu1p_XSec_1DMuonCosTheta_nu") ||

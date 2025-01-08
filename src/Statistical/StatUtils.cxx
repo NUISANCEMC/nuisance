@@ -1225,7 +1225,7 @@ void StatUtils::SetDataErrorFromCov(TH1D *DataHist, TMatrixDSym *cov,
   }
 
   // Set bin errors form cov diag
-  // Check if the errors are set
+  // Check first if the errors are set on the data histogram
   bool ErrorsSet = false;
   for (int i = 0; i < DataHist->GetNbinsX(); i++) {
     if (ErrorsSet == true)
@@ -1234,7 +1234,7 @@ void StatUtils::SetDataErrorFromCov(TH1D *DataHist, TMatrixDSym *cov,
       ErrorsSet = true;
   }
 
-  // Now loop over
+  // Now loop over and check
   if (ErrorsSet && ErrorCheck) {
     for (int i = 0; i < DataHist->GetNbinsX(); i++) {
       double DataHisterr = DataHist->GetBinError(i + 1);

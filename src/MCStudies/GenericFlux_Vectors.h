@@ -72,7 +72,9 @@ public:
   bool SaveSignalFlags;
 
   int Mode;
+#ifdef GENIE_ENABLED
   int GENIEResCode;
+#endif
   bool cc;
   int PDGnu;
   int tgt;
