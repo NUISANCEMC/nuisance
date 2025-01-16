@@ -57,8 +57,8 @@ void MINERvA_CC0pinp_STV_XSec_1D_nu::SetupDataSettings() {
   std::string distdescript;
 
   // Data release is a single file
-  std::string rootfile = "MINERvA_1805.05486.root";
-
+  //std::string rootfile = "MINERvA_1805.05486.root";
+  std::string rootfile = "MINERvA_DataRelease_Updated.root";
   fMin = -999;
   fMax = 999;
 
@@ -153,7 +153,8 @@ void MINERvA_CC0pinp_STV_XSec_1D_nu::SetupDataSettings() {
 
   std::string filename =
       GeneralUtils::GetTopLevelDir() +
-      "/data/MINERvA/CC0pi/CC0pi_STV/MINERvA_1805.05486.root";
+      "/data/MINERvA/CC0pi/CC0pi_STV/MINERvA_DataRelease_Updated.root";
+      //"/data/MINERvA/CC0pi/CC0pi_STV/MINERvA_1805.05486.root";
   // Specify the data
   fSettings.SetDataInput(filename + ";" + dataname);
   // And the correlations
@@ -216,6 +217,7 @@ void MINERvA_CC0pinp_STV_XSec_1D_nu::SetDataFromRootFile(std::string filename) {
   //********************************************************************
   std::vector<std::string> tempfile = GeneralUtils::ParseToStr(filename, ";");
   TFile *File = new TFile(tempfile[0].c_str(), "READ");
+  std::cout<<"(JMcK) Filename: "<<tempfile[0]<<std::endl;
   // First object is the data
   TH1D *temp = (TH1D *)(((TList *)(File->Get(tempfile[1].c_str())))->At(0));
 
