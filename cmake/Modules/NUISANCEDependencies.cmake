@@ -119,7 +119,8 @@ endif()
 #### libraries are more likely to be in a useful order
 
 if (NEUT_ENABLED)
-  include(NEUT)
+  #include(NEUT)
+  find_package(NEUT)
 
   if(NOT NEUT_FOUND)
     if(NEUT_REQUIRED)
@@ -142,6 +143,12 @@ if (NEUT_ENABLED)
       if(NEUT_VERSION VERSION_LESS 5.5.0)
         LIST(APPEND NUISANCENEUT_COMPILE_OPTIONS -DNEUTReWeight_LEGACY_API_ENABLED)
         SET(NEUTReWeight_LEGACY_API_ENABLED TRUE)
+      elseif(NEUT_VERSION VERSION_LESS 6.0.0)
+        LIST(APPEND NUISANCENEUT_COMPILE_OPTIONS -DNEUTReWeight_V5_API_ENABLED)
+        SET(NEUTReWeight_V5_API_ENABLED TRUE)
+      else()
+         LIST(APPEND NUISANCENEUT_COMPILE_OPTIONS -DNEUTReWeight_V6_API_ENABLED)
+         SET(NEUTReWeight_V6_API_ENABLED TRUE)
       endif()
     endif()
 

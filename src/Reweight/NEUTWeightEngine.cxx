@@ -4,20 +4,29 @@
 #include "NReWeight.h"
 #include "NReWeightFactory.h"
 
+#ifdef NEUTReWeight_V6_API_ENABLED
+#include "NEUTROOTReader.h"
+#endif
+
+
 #include "WeightUtils.h"
 
 NEUTWeightEngine::NEUTWeightEngine(std::string name) {
 
+std::cout << "MAKING NEUT WEIGHT ENGINE" << std::endl;
   std::string neut_card = FitPar::Config().GetParS("NEUT_CARD");
   if (!neut_card.size()) {
     NUIS_ABORT(
         "[ERROR]: When using NEUTReWeight must set NEUT_CARD config option.");
   }
   // No need to vomit the contents of the card file all over my screen
+  #ifndef NEUTReWeight_V6_API_ENABLED
   StopTalking();
+  #endif
   neut::CommonBlockIFace::Initialize(neut_card);
+  #ifndef NEUTReWeight_V6_API_ENABLED
   StartTalking();
-
+  #endif
   fNeutRW = neut::rew::MakeNReWeightInstance();
   fCalcName = name;
 };
@@ -88,7 +97,12 @@ double NEUTWeightEngine::CalcWeight(BaseFitEvt *evt) {
   // Hush now
   StopTalking();
 
+  #ifdef NEUTReWeight_V6_API_ENABLED
+  NEUTROOT::ReadEvent(evt->fNeutVect);
+  #else
   neut::CommonBlockIFace::Get().ReadVect(evt->fNeutVect);
+  #endif
+
   rw_weight = fNeutRW->CalcWeight();
   // Speak Now
   StartTalking();
