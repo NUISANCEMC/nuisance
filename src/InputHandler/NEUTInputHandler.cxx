@@ -1,4 +1,6 @@
 #include "NEUTInputHandler.h"
+
+#ifdef NEUT_LEGACY_API
 #include "InputUtils.h"
 
 #include "PlotUtils.h"
@@ -18,6 +20,18 @@
 #include "vcworkC.h"
 
 #include "posinnucC.h"
+
+#else
+// NEUT 6 Requirements
+#include "InputUtils.h"
+#include "PlotUtils.h"
+#include "TTreePerfStats.h"
+#include "fsihist.h"
+#include "necard.h"
+#include "neutpart.h"
+#include "neutrootTreeSingleton.h"
+#include "neutvect.h"
+#endif
 
 #ifdef NEUT_NUCFSI_ENABLED
 #include "neutnucfsistep.h"
