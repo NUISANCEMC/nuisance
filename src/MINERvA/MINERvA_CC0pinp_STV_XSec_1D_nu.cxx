@@ -217,7 +217,6 @@ void MINERvA_CC0pinp_STV_XSec_1D_nu::SetDataFromRootFile(std::string filename) {
   //********************************************************************
   std::vector<std::string> tempfile = GeneralUtils::ParseToStr(filename, ";");
   TFile *File = new TFile(tempfile[0].c_str(), "READ");
-  std::cout<<"(JMcK) Filename: "<<tempfile[0]<<std::endl;
   // First object is the data
   TH1D *temp = (TH1D *)(((TList *)(File->Get(tempfile[1].c_str())))->At(0));
 
