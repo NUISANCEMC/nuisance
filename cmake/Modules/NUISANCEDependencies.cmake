@@ -135,6 +135,7 @@ if (NEUT_ENABLED)
     if(NEUT_VERSION VERSION_LESS 6.0.0)
         LIST(APPEND NUISANCENEUT_COMPILE_OPTIONS -DNEUT_LEGACY_API_ENABLED)
         SET(NEUT_LEGACY_API_ENABLED TRUE)
+        target_compile_definitions(GeneratorCompileDependencies INTERFACE NEUT_LEGACY_API)
     endif()
 
     if(NEUTReWeight_ENABLED)
