@@ -54,6 +54,8 @@ public:
 
   DataDistribution fDist;
 
+  bool OldData;
+
   // For truncating
   double fMin;
   double fMax;

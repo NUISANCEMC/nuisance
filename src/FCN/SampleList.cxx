@@ -1172,7 +1172,16 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
                  !name.compare("MINERvA_CC0pinp_STV_XSec_1Dpnreco_nu") ||
                  !name.compare("MINERvA_CC0pinp_STV_XSec_1Ddalphat_nu") ||
                  !name.compare("MINERvA_CC0pinp_STV_XSec_1Ddpt_nu") ||
-                 !name.compare("MINERvA_CC0pinp_STV_XSec_1Ddphit_nu")) {
+                 !name.compare("MINERvA_CC0pinp_STV_XSec_1Ddphit_nu") ||
+                 // Using the old data release
+                 !name.compare("MINERvA_CC0pinp_STV_XSec_1Dpmu_nu_original") ||
+                 !name.compare("MINERvA_CC0pinp_STV_XSec_1Dthmu_nu_original") ||
+                 !name.compare("MINERvA_CC0pinp_STV_XSec_1Dpprot_nu_original") ||
+                 !name.compare("MINERvA_CC0pinp_STV_XSec_1Dthprot_nu_original") ||
+                 !name.compare("MINERvA_CC0pinp_STV_XSec_1Dpnreco_nu_original") ||
+                 !name.compare("MINERvA_CC0pinp_STV_XSec_1Ddalphat_nu_original") ||
+                 !name.compare("MINERvA_CC0pinp_STV_XSec_1Ddpt_nu_original") ||
+                 !name.compare("MINERvA_CC0pinp_STV_XSec_1Ddphit_nu_original")) {
         return (new MINERvA_CC0pinp_STV_XSec_1D_nu(samplekey));
 
       } else if (!name.compare("MINERvA_CC0pi_XSec_1DQ2_nu_proton")) {
