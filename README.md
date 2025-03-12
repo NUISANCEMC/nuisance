@@ -1,14 +1,21 @@
 # NUISANCE
 
-Core Authors:
-   Luke Pickering,
-   Callum Wilkinson,
-   Clarence Wret,
-   Patrick Stowell
+For more information, such as tutorials, use cases, references etc, see the [NUISANCE web page](https://nuisance.hepforge.org).
 
-Previous Core Authors: Ryan Terri
+Core authors (alphabetical):
+   Luke Pickering (STFC, RAL),
+   Patrick Stowell (Sheffield),
+   Callum Wilkinson (Lawrence Berkeley National Laboratory),
+   Clarence Wret (Imperial College)
 
-Contact: (luke[dot]pickering[at]rhul[dot]ac[dot]uk, cwilkinson[at]lbl[dot]gov, c[dot]wret[at]rochester[dot]edu)
+Previous core authors: Ryan Terri (Queen Mary, University of London)
+
+Contact:
+[slack](https://nuisance-xsec.slack.com)
+[Luke Pickering](mailto:luke.pickering@stfc.ac.uk)
+[Patrick Stowell](mailto:p.stowell@sheffield.ac.uk)
+[Callum Wilkinson](mailto:cwilkinson@lbl.gov)
+[Clarence Wret](mailto:clarence.wret@imperial.ac.uk)
 
 ### Compilation
 
@@ -54,5 +61,4 @@ NUISANCE will build `nusystematics` for you if you configure with `-Dnusystemati
 ### Running Fits
     Whilst running fits is relatively quick and simple, there are now a large range of possible options. Doxygen Documentation is being added to the $NUISANCE/doc/html folder.
     Refer thre for guidance on how to properly formulate a card file.
-
 
