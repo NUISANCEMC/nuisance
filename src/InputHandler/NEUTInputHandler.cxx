@@ -1,6 +1,6 @@
 #include "NEUTInputHandler.h"
 
-#ifdef NEUT_LEGACY_API
+#ifdef NEUT_LEGACY_API_ENABLED
 #include "InputUtils.h"
 
 #include "PlotUtils.h"
