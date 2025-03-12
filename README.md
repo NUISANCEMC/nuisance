@@ -1,4 +1,5 @@
-# NUISANCE
+# <img src="https://nuisance.hepforge.org/images/nuisancelogo.png" alt="NUISANCE logo" width="35px"> NUISANCE
+
 
 For more information, such as tutorials, use cases, references etc, see the [NUISANCE web page](https://nuisance.hepforge.org).
 You can get in touch with us on [our slack](https://nuisance-xsec.slack.com).
