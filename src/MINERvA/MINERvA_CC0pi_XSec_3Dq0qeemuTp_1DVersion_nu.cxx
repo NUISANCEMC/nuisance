@@ -62,12 +62,7 @@ MINERvA_CC0pi_XSec_3Dq0qeemuTp_1DVersion_nu::MINERvA_CC0pi_XSec_3Dq0qeemuTp_1DVe
   // ScaleFactor for energy-dependent (as opposed to flux-averaged)
   // total cross section (cm^2 / nucleon)
 
-  std::cout << "GetEventHistogram()->Integral(\"width\") = " << GetEventHistogram()->Integral("width") << std::endl;
-  std::cout << "fNEvents = " << fNEvents << std::endl;
-  std::cout << "this->TotalIntegratedFlux() = " << this->TotalIntegratedFlux() << std::endl;
-
   fScaleFactor = (GetEventHistogram()->Integral("width") * 1E-38 / (fNEvents + 0.)) / this->TotalIntegratedFlux();
-  std::cout << "fScaleFactor = " << fScaleFactor << std::endl;
 
   // Plot Setup -------------------------------------------------------
   SetDataFromRootFile( fSettings.GetDataInput(), "q0qeemusumtp_data_cross_section_with_total_unc_1D" );
@@ -110,7 +105,6 @@ void MINERvA_CC0pi_XSec_3Dq0qeemuTp_1DVersion_nu::FillEventVariables( FitEvent* 
 
   //==== Note) fXVar is the bin index for a given (Sum Tp, q_{0}^{QE}, E_mu)
   fXVar = GetBinIndexFromKinamatics(sum, q0qe, emu);
-  //std::cout << "sum = " << sum << ", q0qe = " << q0qe << ", emu = " << emu << " -> fXVar = " << fXVar << std::endl;
 
 }
 
