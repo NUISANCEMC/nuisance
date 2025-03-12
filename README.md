@@ -1,7 +1,15 @@
 # <img src="https://nuisance.hepforge.org/images/nuisancelogo.png" alt="NUISANCE logo" width="35px"> NUISANCE
 
+NUISANCE compares neutrino interaction generators to each other and to published data. You can use it to better understand the differences, strengths and weaknesses of the generators, evaluate their performance against data, study which measurements may best expose generator weaknesses, make generator-agnostic flat trees to study specific event topologies across multiple generators, and much more.
+
+The framework is discussed and documented in [JINST 12 P01016](https://doi.org/10.1088/1748-0221/12/01/P01016) ([arXiv:1612.07393](https://arxiv.org/abs/1612.07393)).
 
 For more information, such as tutorials, use cases, references etc, see the [NUISANCE web page](https://nuisance.hepforge.org).
+
+For a full list of samples implemented in NUISANCE, see [this list](https://nuisance.hepforge.org/nuisancesamples.html).
+
+For a flavour of what NUISANCE comparisons might look like, see [our interactive comparisons](https://nuisance.hepforge.org/interactive/draw_nuiscomp.html).
+
 You can get in touch with us on [our slack](https://nuisance-xsec.slack.com).
 
 Core authors (alphabetical):<br/>
