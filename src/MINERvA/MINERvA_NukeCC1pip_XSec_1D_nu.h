@@ -21,29 +21,28 @@
 #define MINERvA_NukeCC1pip_XSec_1D_NU_H_SEEN
 
 #include "Measurement1D.h"
-#include <regex>
 
 class MINERvA_NukeCC1pip_XSec_1D_nu : public Measurement1D {
 
 public:
 
   enum target {
-    CH,
-    C,
-    H2O,
-    Fe,
-    Pb,
+    kCH,
+    kC,
+    kH2O,
+    kFe,
+    kPb,
   };
 
   enum distribution {
-    kpmu,
-    kthmu,
-    kplmu,
-    kptmu,
+    kPmu,
+    kThmu,
+    kPlmu,
+    kPtmu,
     kQ2,
     kWexp,
     kTpi,
-    kthpi,
+    kThpi,
   };
 
   MINERvA_NukeCC1pip_XSec_1D_nu(nuiskey samplekey);
