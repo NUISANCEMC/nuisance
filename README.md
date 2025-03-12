@@ -3,7 +3,7 @@
 For more information, such as tutorials, use cases, references etc, see the [NUISANCE web page](https://nuisance.hepforge.org).
 You can get in touch with us on [our slack](https://nuisance-xsec.slack.com).
 
-Core authors (alphabetical):
+Core authors (alphabetical):<br/>
   [Luke Pickering](mailto:luke.pickering@stfc.ac.uk) (STFC, RAL) <br/>
   [Patrick Stowell](mailto:p.stowell@sheffield.ac.uk) (Sheffield) <br/>
   [Callum Wilkinson](mailto:cwilkinson@lbl.gov) (Lawrence Berkeley National Laboratory) <br/>
