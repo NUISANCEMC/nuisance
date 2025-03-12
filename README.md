@@ -11,6 +11,15 @@ Core authors (alphabetical):<br/>
 
 Previous core authors: Ryan Terri (Queen Mary, University of London)
 
+### Contributing
+We welcome contributions from across the field, for instance adding new measurements made by experiments, extending generator use cases, adding new variables to the flat-trees, and so on.
+
+Just branch or fork the repository, make your contributions there, and submit a pull request on this main repository, and we'll take a look. 
+
+If you have any questions, or we're slow with responding to your PR, feel free to ping us on [our slack](https://nuisance-xsec.slack.com).
+
+Thanks for your contribution!
+
 ### Compilation
 
 The following instructions should be used to build the fitter after checking out.
