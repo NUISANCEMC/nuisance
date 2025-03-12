@@ -671,8 +671,6 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
   std::string type = samplekey.GetS("type");
   std::string fkdt = "";
 
-  std::regex pattern_MINERvA_NukeCC1pip_1D("MINERvA_NukeCC1pip_(.*?)_XSec_1D(.*?)_nu");
-  std::smatch matches_MINERvA_NukeCC1pip_1D;
 
   /*
      ANL CCQE Samples
@@ -1400,6 +1398,7 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
         return (new MINERvA_CCCOHPI_XSec_joint(samplekey));
       } else if (!name.compare("MINERvA_CCCOHPI_XSec_1DQ2_joint")) {
         return (new MINERvA_CCCOHPI_XSec_joint(samplekey));
+
       } else if (!name.compare("MINERvA_NukeCC0pi_CH_XSec_2D_nu")) {
         return (new MINERvA_NukeCC0pi_CH_XSec_2D_nu(samplekey));
       } else if (!name.compare("MINERvA_NukeCC0pi_C_XSec_2D_nu")) {
@@ -1410,6 +1409,7 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
         return (new MINERvA_NukeCC0pi_Fe_XSec_2D_nu(samplekey));
       } else if (!name.compare("MINERvA_NukeCC0pi_Pb_XSec_2D_nu")) {
         return (new MINERvA_NukeCC0pi_Pb_XSec_2D_nu(samplekey));
+
       } else if (!name.compare("MINERvA_NukeCC0pi_CH_C_Flux_XSec_2D_nu")) {
         return (new MINERvA_NukeCC0pi_CH_C_Flux_XSec_2D_nu(samplekey));
       } else if (!name.compare("MINERvA_NukeCC0pi_CH_H2O_Flux_XSec_2D_nu")) {
@@ -1418,7 +1418,47 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
         return (new MINERvA_NukeCC0pi_CH_Fe_Flux_XSec_2D_nu(samplekey));
       } else if (!name.compare("MINERvA_NukeCC0pi_CH_Pb_Flux_XSec_2D_nu")) {
         return (new MINERvA_NukeCC0pi_CH_Pb_Flux_XSec_2D_nu(samplekey));
-      } else if ( std::regex_search(name, matches_MINERvA_NukeCC1pip_1D, pattern_MINERvA_NukeCC1pip_1D) && matches_MINERvA_NukeCC1pip_1D.size() == 3 ){
+
+      } else if ( !name.compare("MINERvA_NukeCC1pip_CH_XSec_1Dpmu_nu")  ||
+                  !name.compare("MINERvA_NukeCC1pip_CH_XSec_1Dthmu_nu") ||
+                  !name.compare("MINERvA_NukeCC1pip_CH_XSec_1Dplmu_nu") ||
+                  !name.compare("MINERvA_NukeCC1pip_CH_XSec_1Dptmu_nu") ||
+                  !name.compare("MINERvA_NukeCC1pip_CH_XSec_1DQ2_nu")   ||
+                  !name.compare("MINERvA_NukeCC1pip_CH_XSec_1DWexp_nu") ||
+                  !name.compare("MINERvA_NukeCC1pip_CH_XSec_1DTpi_nu")  ||
+                  !name.compare("MINERvA_NukeCC1pip_CH_XSec_1Dthpi_nu") ||
+                  !name.compare("MINERvA_NukeCC1pip_C_XSec_1Dpmu_nu")  ||
+                  !name.compare("MINERvA_NukeCC1pip_C_XSec_1Dthmu_nu") ||
+                  !name.compare("MINERvA_NukeCC1pip_C_XSec_1Dplmu_nu") ||
+                  !name.compare("MINERvA_NukeCC1pip_C_XSec_1Dptmu_nu") ||
+                  !name.compare("MINERvA_NukeCC1pip_C_XSec_1DQ2_nu")   ||
+                  !name.compare("MINERvA_NukeCC1pip_C_XSec_1DWexp_nu") ||
+                  !name.compare("MINERvA_NukeCC1pip_C_XSec_1DTpi_nu")  ||
+                  !name.compare("MINERvA_NukeCC1pip_C_XSec_1Dthpi_nu") ||
+                  !name.compare("MINERvA_NukeCC1pip_H2O_XSec_1Dpmu_nu")  ||
+                  !name.compare("MINERvA_NukeCC1pip_H2O_XSec_1Dthmu_nu") ||
+                  !name.compare("MINERvA_NukeCC1pip_H2O_XSec_1Dplmu_nu") ||
+                  !name.compare("MINERvA_NukeCC1pip_H2O_XSec_1Dptmu_nu") ||
+                  !name.compare("MINERvA_NukeCC1pip_H2O_XSec_1DQ2_nu")   ||
+                  !name.compare("MINERvA_NukeCC1pip_H2O_XSec_1DWexp_nu") ||
+                  !name.compare("MINERvA_NukeCC1pip_H2O_XSec_1DTpi_nu")  ||
+                  !name.compare("MINERvA_NukeCC1pip_H2O_XSec_1Dthpi_nu") ||
+                  !name.compare("MINERvA_NukeCC1pip_Pb_XSec_1Dpmu_nu")  ||
+                  !name.compare("MINERvA_NukeCC1pip_Pb_XSec_1Dthmu_nu") ||
+                  !name.compare("MINERvA_NukeCC1pip_Pb_XSec_1Dplmu_nu") ||
+                  !name.compare("MINERvA_NukeCC1pip_Pb_XSec_1Dptmu_nu") ||
+                  !name.compare("MINERvA_NukeCC1pip_Pb_XSec_1DQ2_nu")   ||
+                  !name.compare("MINERvA_NukeCC1pip_Pb_XSec_1DWexp_nu") ||
+                  !name.compare("MINERvA_NukeCC1pip_Pb_XSec_1DTpi_nu")  ||
+                  !name.compare("MINERvA_NukeCC1pip_Pb_XSec_1Dthpi_nu") ||
+                  !name.compare("MINERvA_NukeCC1pip_Fe_XSec_1Dpmu_nu")  ||
+                  !name.compare("MINERvA_NukeCC1pip_Fe_XSec_1Dthmu_nu") ||
+                  !name.compare("MINERvA_NukeCC1pip_Fe_XSec_1Dplmu_nu") ||
+                  !name.compare("MINERvA_NukeCC1pip_Fe_XSec_1Dptmu_nu") ||
+                  !name.compare("MINERvA_NukeCC1pip_Fe_XSec_1DQ2_nu")   ||
+                  !name.compare("MINERvA_NukeCC1pip_Fe_XSec_1DWexp_nu") ||
+                  !name.compare("MINERvA_NukeCC1pip_Fe_XSec_1DTpi_nu")  ||
+                  !name.compare("MINERvA_NukeCC1pip_Fe_XSec_1Dthpi_nu")) {
         return (new MINERvA_NukeCC1pip_XSec_1D_nu(samplekey));
 
         /*
