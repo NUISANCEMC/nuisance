@@ -57,8 +57,8 @@ void MINERvA_CC0pinp_STV_XSec_1D_nu::SetupDataSettings() {
   std::string distdescript;
 
   // Data release is a single file
-  std::string rootfile = "MINERvA_1805.05486.root";
-
+  //std::string rootfile = "MINERvA_1805.05486.root";
+  std::string rootfile = "MINERvA_DataRelease_Updated.root";
   fMin = -999;
   fMax = 999;
 
@@ -153,7 +153,8 @@ void MINERvA_CC0pinp_STV_XSec_1D_nu::SetupDataSettings() {
 
   std::string filename =
       GeneralUtils::GetTopLevelDir() +
-      "/data/MINERvA/CC0pi/CC0pi_STV/MINERvA_1805.05486.root";
+      "/data/MINERvA/CC0pi/CC0pi_STV/MINERvA_DataRelease_Updated.root";
+      //"/data/MINERvA/CC0pi/CC0pi_STV/MINERvA_1805.05486.root";
   // Specify the data
   fSettings.SetDataInput(filename + ";" + dataname);
   // And the correlations
