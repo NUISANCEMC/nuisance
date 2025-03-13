@@ -575,8 +575,6 @@ public:
   /// OLD FUNCTION
   // virtual THStack GetModeStack(void);
 
-protected:
-
   // Data
   TH1D* fDataHist;  ///< default data histogram
   TH1D* fDataOrig;  ///< histogram to store original data before throws.

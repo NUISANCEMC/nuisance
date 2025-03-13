@@ -602,17 +602,16 @@ void Measurement1D::FinaliseMeasurement() {
     fDecomp = StatUtils::GetDecomp(fFullCovar);
   }
 
-  // Push the diagonals of fFullCovar onto the data histogram
-  // Comment this out until the covariance/data scaling is consistent!
+  // Push the diagonals of fFullCovar onto the data histogram, and check that they are consisntent
+  // This is a useful check for inconsistent data releases, or inconsistent covariance matrix units, or simply wrong data releases...
+  // Assumes that the covariance matrix should be scaled by 1E-38
   StatUtils::SetDataErrorFromCov(fDataHist, fFullCovar, 1E-38);
   
   // If shape only, set covar and fDecomp using the shape-only matrix (if set)
   if (fIsShape && fShapeCovar && FitPar::Config().GetParB("UseShapeCovar")) {
-    if (covar)
-      delete covar;
+    if (covar) delete covar;
     covar = StatUtils::GetInvert(fShapeCovar, true);
-    if (fDecomp)
-      delete fDecomp;
+    if (fDecomp) delete fDecomp;
     fDecomp = StatUtils::GetDecomp(fFullCovar);
 
     fUseShapeNormDecomp = FitPar::Config().GetParB("UseShapeNormDecomp");
@@ -625,18 +624,15 @@ void Measurement1D::FinaliseMeasurement() {
           fNormError += (*fFullCovar)[i][j];
         }
       }
-
       NUIS_LOG(SAM, "Sample: " << fName
                                << ", using shape/norm decomp with norm error: "
                                << fNormError);
     }
-
   }
 
-  // ***** NS covar modifications *****
+  // ***** norm-shape (NS) covariance modifications *****
 
   fIsNS = FitPar::Config().GetParB("UseNormShapeCovariance");
-	
   if (fIsNS) {
     if (covar)
       delete covar;
@@ -648,9 +644,7 @@ void Measurement1D::FinaliseMeasurement() {
 
     covar = StatUtils::GetInvert(fNSCovar);
     fInvNormalCovar = StatUtils::GetInvert(fFullCovar);
-
   }	
-
   // ***** end NS covar modifications *****
 
 

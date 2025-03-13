@@ -79,12 +79,22 @@ MicroBooNE_CC1MuNp_XSec_1D_nu::MicroBooNE_CC1MuNp_XSec_1D_nu(nuiskey samplekey) 
   // Load data ---------------------------------------------------------
   std::string inputFile = FitPar::GetDataBase() + "/MicroBooNE/CC1MuNp/CCNp_data_MC_cov_dataRelease.root";
   SetDataFromRootFile(inputFile, "DataXsec_" + objSuffix);
+  // Strangely, the data release is in xsec/nucleon but the paper is in xsec/40Ar nucleus, so scale up by 40 (number of nucleons in 40Ar)
   ScaleData(40.0*1E-38);
 
   // ScaleFactor for DiffXSec/cm2/Nucleus
   fScaleFactor = 40.0*GetEventHistogram()->Integral("width") / fNEvents * 1E-38 / TotalIntegratedFlux(); //per nucleus
 
   SetCovarFromRootFile(inputFile, "CovarianceMatrix_" + objSuffix);
+  // Need to scale to account for the 40Ar here too, which was previously missed
+  for (int i = 0; i < fFullCovar->GetNrows(); ++i) {
+    for (int j = 0; j < fFullCovar->GetNcols(); ++j) {
+      (*fFullCovar)(i,j) *= 40*40;
+    }
+  }
+  covar = StatUtils::GetInvert(fFullCovar, true);
+  fDecomp = StatUtils::GetDecomp(fFullCovar);
+
 
   TFile* inputRootFile = TFile::Open(inputFile.c_str());
   assert(inputRootFile && inputRootFile->IsOpen());

@@ -22,6 +22,14 @@
 
 #include "Measurement1D.h"
 
+/*
+  Authors: Adrian Orea (v1 2017)
+           Clarence Wret (v2 2018)
+
+  Ref:
+  Phys.Rev.D 99 (2019) 1, 012004 (arxiv:1811.02774[hep-ex])
+*/
+
 //********************************************************************  
 class MINERvA_CC0pi_XSec_1D_2018_nu : public Measurement1D {
 //********************************************************************  

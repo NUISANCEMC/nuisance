@@ -1,0 +1,8 @@
+- Phys.Rev.Lett. 131 (2023) 1, 011801
+- https://arxiv.org/pdf/1606.07127.pdf
+- Data release: https://minerva.fnal.gov/nuclear-target-charged-current-pi-production-data-release-page/
+- "Table_Var_Xsec.csv": original file from the data release
+- "MakeTextFiles.py": Reads "Table_Var_Xsec.csv" and convert it to nuisance-readable file
+  - NukeCC1pip_<Target>_<Variable>.txt : data file
+  - NukeCC1pip_<Target>_<Variable>_cov_(stat/syst).txt : Stat./Syst.-only covariance
+  - Then I added stat and syst to obtain NukeCC1pip_<Target>_<Variable>_cov_total.txt: Nuisance assumes covariance to be in unit of 1E-38
