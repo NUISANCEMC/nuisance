@@ -73,4 +73,3 @@ NUISANCE will build `nusystematics` for you if you configure with `-Dnusystemati
 ### Running Fits
     Whilst running fits is relatively quick and simple, there are now a large range of possible options. Doxygen Documentation is being added to the $NUISANCE/doc/html folder.
     Refer thre for guidance on how to properly formulate a card file.
-
