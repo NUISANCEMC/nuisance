@@ -39,7 +39,7 @@ set(MINERvA_Impl_Files
 
   MINERvA_CC1pi0_XSec_1D_nu.cxx
 
-  MINERvA_CC1pi0Np_XSec_1DSTV_nu.cxx
+  MINERvA_CCNpi0Mp_XSec_1DSTV_nu.cxx
 
   MINERvA_CC1pip_XSec_1DTpi_20deg_nu.cxx
   MINERvA_CC1pip_XSec_1DTpi_nu.cxx

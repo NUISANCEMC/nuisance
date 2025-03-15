@@ -17,9 +17,9 @@
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 #include "MINERvA_SignalDef.h"
-#include "MINERvA_CC1pi0Np_XSec_1DSTV_nu.h"
+#include "MINERvA_CCNpi0Mp_XSec_1DSTV_nu.h"
 
-// Implementation of 2020 MINERvA numu CC1pi0 STV
+// Implementation of 2020 MINERvA numu CCNpi0Mp STV
 // arxiv:2002.05812 hep-ex
 // Phys.Rev.D 102 (2020) 7, 072007, Phys.Rev.D 110 (2024) 5, 059903 (erratum)
 // D. Coplowe's (Oxford) thesis says 1.5 < Emu < 20 (https://lss.fnal.gov/archive/thesis/2000/fermilab-thesis-2018-38.pdf)
@@ -27,15 +27,15 @@
 // Final state is 1mu-, 1p, 1pi0, X, where X is N possible addtional protons and neutral pions, but not other mesons; so basically CCNpi0Mp where N and M > 0
 
 //********************************************************************
-void MINERvA_CC1pi0Np_XSec_1DSTV_nu::SetupDataSettings(){
+void MINERvA_CCNpi0Mp_XSec_1DSTV_nu::SetupDataSettings(){
 //********************************************************************
 
   // Set Distribution
   // See header file for enum and some descriptions
   std::string name = fSettings.GetS("name");
-  if      (!name.compare("MINERvA_CC1pi0Np_XSec_1DdaT_nu"))  fDist = kdaT;
-  else if (!name.compare("MINERvA_CC1pi0Np_XSec_1DdpTT_nu")) fDist= kdpTT;
-  else if (!name.compare("MINERvA_CC1pi0Np_XSec_1DpN_nu"))   fDist= kpN;
+  if      (!name.compare("MINERvA_CCNpi0Mp_XSec_1DdaT_nu"))  fDist = kdaT;
+  else if (!name.compare("MINERvA_CCNpi0Mp_XSec_1DdpTT_nu")) fDist = kdpTT;
+  else if (!name.compare("MINERvA_CCNpi0Mp_XSec_1DpN_nu"))   fDist = kpN;
 
   // All the data is in the same file, but are inside different TLists
   std::string dataname = "";
@@ -44,7 +44,6 @@ void MINERvA_CC1pi0Np_XSec_1DSTV_nu::SetupDataSettings(){
 
   // Load up the data
   switch (fDist) {
-
     case (kdaT):
       {
       dataname = "dalphat";
@@ -66,7 +65,7 @@ void MINERvA_CC1pi0Np_XSec_1DSTV_nu::SetupDataSettings(){
       dataname = "neutronmomentum";
       titles    = "MINERvA CCN#pi^{0}Mp;" \
                   "p_{N} (MeV/c);" \
-                  "d#sigma/d#delta p_{N} (cm^{2}/nucleon/(MeV/c))";
+                  "d#sigma/dp_{N} (cm^{2}/nucleon/(MeV/c))";
       break;
       }
     default:
@@ -77,11 +76,11 @@ void MINERvA_CC1pi0Np_XSec_1DSTV_nu::SetupDataSettings(){
   std::string descrip =  distdescript + \
                          "Target: CH \n"				       \
                          "Flux: MINERvA Forward Horn Current numu ONLY \n"  \
-                         "Signal: Any event with 1mu-, Npi0, Mp (N,M>0), with \n" \
-                         "#theta_{#mu,#nu}<25 degrees \n"                 \
+                         "Signal: Any event with 1mu-, N pi0, M p (N,M>0), with \n" \
+                         "#theta_{#mu,#nu} < 25 degrees \n"             \
                          "1.5 < p_{#mu} < 20 GeV/c \n"                  \
-                         "450 < p_{p} MeV/c \n"
-                         "Ref: arxiv:2002.05812 hep-ex" \
+                         "450 < p_{p} MeV/c \n"                         \
+                         "Ref: arxiv:2002.05812 hep-ex"                 \
                          "Phys.Rev.D 102 (2020) 7, 072007, Phys.Rev.D 110 (2024) 5, 059903 (erratum)" \
                          "D. Coplowe's (Oxford) thesis (https://lss.fnal.gov/archive/thesis/2000/fermilab-thesis-2018-38.pdf)";
 
@@ -101,8 +100,7 @@ void MINERvA_CC1pi0Np_XSec_1DSTV_nu::SetupDataSettings(){
   // Data is always zero entry
   fDataHist = (TH1D*)li->At(0);
   fDataHist->SetDirectory(0);
-  //fDataHist->SetNameTitle((fSettings.GetName() + "_data").c_str(), (fSettings.GetFullTitles()).c_str());
-  fDataHist->SetName((fSettings.GetName() + "_data").c_str());
+  fDataHist->SetNameTitle((fSettings.GetName() + "_data").c_str(), (fSettings.GetFullTitles()).c_str());
   // Covariance matrix is always 2 entry
   TMatrixD *tempmat = (TMatrixD*)(li->At(2)->Clone());
   // The first and last entry in the cov matrix is empty... basically just padding
@@ -119,10 +117,11 @@ void MINERvA_CC1pi0Np_XSec_1DSTV_nu::SetupDataSettings(){
 
   covar = StatUtils::GetInvert(fFullCovar, true);
   fDecomp = StatUtils::GetDecomp(fFullCovar);
+
 }
 
 //********************************************************************
-MINERvA_CC1pi0Np_XSec_1DSTV_nu::MINERvA_CC1pi0Np_XSec_1DSTV_nu(nuiskey samplekey) {
+MINERvA_CCNpi0Mp_XSec_1DSTV_nu::MINERvA_CCNpi0Mp_XSec_1DSTV_nu(nuiskey samplekey) {
   //********************************************************************
 
   // Define Sample Settings common to all data distributions
@@ -143,7 +142,7 @@ MINERvA_CC1pi0Np_XSec_1DSTV_nu::MINERvA_CC1pi0Np_XSec_1DSTV_nu(nuiskey samplekey
 };
 
 //********************************************************************
-void MINERvA_CC1pi0Np_XSec_1DSTV_nu::FillEventVariables(FitEvent *event) {
+void MINERvA_CCNpi0Mp_XSec_1DSTV_nu::FillEventVariables(FitEvent *event) {
   //********************************************************************
 
   // Basically the same as the T2K measurement, but look for pi0 and proton
@@ -219,7 +218,7 @@ void MINERvA_CC1pi0Np_XSec_1DSTV_nu::FillEventVariables(FitEvent *event) {
 };
 
 //********************************************************************
-bool MINERvA_CC1pi0Np_XSec_1DSTV_nu::isSignal(FitEvent *event) {
+bool MINERvA_CCNpi0Mp_XSec_1DSTV_nu::isSignal(FitEvent *event) {
   //********************************************************************
   return SignalDef::isCCNpi0Mp_MINERvA_STV(event);
 }
