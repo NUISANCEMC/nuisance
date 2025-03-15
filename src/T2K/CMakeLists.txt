@@ -39,6 +39,8 @@ set(T2K_Impl_Files
   T2K_CC1pip_CH_XSec_1DAdlerPhi_nu.cxx
   T2K_CC1pip_CH_XSec_1DCosThAdler_nu.cxx
 
+  T2K_CC1pipNp_CH_XSec_1DSTV_nu.cxx
+
   T2K_CCCOH_C12_XSec_1DEnu_nu.cxx
 
   T2K_CC1pip_H2O_XSec_1DEnuDelta_nu.cxx

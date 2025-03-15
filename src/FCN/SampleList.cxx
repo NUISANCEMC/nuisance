@@ -321,6 +321,9 @@
 #include "T2K_CC1pip_CH_XSec_1Dthpi_nu.h"
 #include "T2K_CC1pip_CH_XSec_2Dpmucosmu_nu.h"
 
+// T2K CC1pi+1p on CH STV
+#include "T2K_CC1pipNp_CH_XSec_1DSTV_nu.h"
+
 // T2K CCCOH (single bin)
 #include "T2K_CCCOH_C12_XSec_1DEnu_nu.h"
 
@@ -1548,6 +1551,11 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
 
       } else if (!name.compare("T2K_CCCOH_C12_XSec_1DEnu_nu")) {
         return (new T2K_CCCOH_C12_XSec_1DEnu_nu(samplekey));
+
+      } else if ( !name.compare("T2K_CC1pipNp_CH_XSec_1DdaT_nu") ||
+                  !name.compare("T2K_CC1pipNp_CH_XSec_1DdpTT_nu") ||
+                  !name.compare("T2K_CC1pipNp_CH_XSec_1DpN_nu") ) {
+        return (new T2K_CC1pipNp_CH_XSec_1DSTV_nu(samplekey));
 
         /*
           T2K CC1pi+ H2O samples

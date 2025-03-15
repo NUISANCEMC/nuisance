@@ -473,7 +473,9 @@ void Measurement1D::SetCholDecompFromRootFile(std::string covfile,
   delete trans;
 }
 
+//********************************************************************
 void Measurement1D::SetShapeCovar() {
+//********************************************************************
 
   // Return if this is missing any pre-requisites
   if (!fFullCovar)
@@ -481,7 +483,7 @@ void Measurement1D::SetShapeCovar() {
   if (!fDataHist)
     return;
 
-  // Also return if it's bloody stupid under the circumstances
+  // Also return if just have a diagonal matrix (basically, no covariance)
   if (fIsDiag)
     return;
 
@@ -2014,8 +2016,6 @@ void Measurement1D::SetCovarFromDataFile(std::string covarFile,
   TDecompChol LUChol = TDecompChol(*fDecomp);
   LUChol.Decompose();
   fDecomp = new TMatrixDSym(dim, LU.GetU().GetMatrixArray(), "");
-
-  return;
 };
 
 // //********************************************************************

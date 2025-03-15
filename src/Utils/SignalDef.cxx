@@ -181,7 +181,7 @@ bool SignalDef::isCCWithFS(FitEvent *event, int nuPDG, std::vector<int> pdgs,
 }
 
 // Require one meson, one charged lepton, AND specify the only other final state particle
-// This is only suitable for bubble chambers. Types specified in the arguments
+// This is suitable for bubble chambers, or CC1pi+1p for instance. Types specified in the arguments
 bool SignalDef::isCC1pi3Prong(FitEvent *event, int nuPDG, int piPDG,
 			      int thirdPDG, double EnuMin, double EnuMax){
 
