@@ -47,19 +47,25 @@ void MINERvA_CC1pi0Np_XSec_1DSTV_nu::SetupDataSettings(){
     case (kdaT):
       {
       dataname = "dalphat";
-      titles    = "CCN#pi^{0}Np;T_{#pi} (GeV);d#sigma/dT_{#pi} (cm^{2}/nucleon/GeV)";
+      titles    = "MINERvA CCN#pi^{0}Mp;" \
+                  "#delta#alpha_{T} (degrees);" \
+                  "d#sigma/d#delta#alpha_{T} (cm^{2}/nucleon/degree)";
       break;
       }
     case (kdpTT):
       {
       dataname = "dpTT";
-      titles    = "CC1#pi^{0};#theta_{#pi} (degrees); d#sigma/d#theta_{#pi} (cm^{2}/nucleon/degree)";
+      titles    = "MINERvA CCN#pi^{0}Mp;" \
+                  "#delta p_{TT} (MeV/c);" \
+                  "d#sigma/d#delta p_{TT} (cm^{2}/nucleon/(MeV/c))";
       break;
       }
     case (kpN):
       {
       dataname = "neutronmomentum";
-      titles    = "CC1#pi^{0};p_{#mu} (GeV);d#sigma/dp_{#mu} (cm^{2}/nucleon/GeV)";
+      titles    = "MINERvA CCN#pi^{0}Mp;" \
+                  "p_{N} (MeV/c);" \
+                  "d#sigma/d#delta p_{N} (cm^{2}/nucleon/(MeV/c))";
       break;
       }
     default:
@@ -70,14 +76,16 @@ void MINERvA_CC1pi0Np_XSec_1DSTV_nu::SetupDataSettings(){
   std::string descrip =  distdescript + \
                          "Target: CH \n"				       \
                          "Flux: MINERvA Forward Horn Current numu ONLY \n"  \
-                         "Signal: Any event with 1 muon with #theta_{#mu,#nu}<25#degree, and 1pi0 in FS, no mesons, any nucleon(s). W < 1.8" \
-                         "Alt Signal: Add in requirement of 1 proton with 100 MeV and sometimes W < 1.4";
+                         "Signal: Any event with 1mu-, Npi0, Mp (N,M>0), with \n" \
+                         "#theta_{#mu,#nu}<25 degrees \n"                 \
+                         "1.5 < p_{#mu} < 20 GeV/c \n"                  \
+                         "450 < p_{p} MeV/c \n";
 
   fSettings.SetDescription(descrip);
 
-  fSettings.SetTitle(  GeneralUtils::ParseToStr(titles,";")[0] );
-  fSettings.SetXTitle( GeneralUtils::ParseToStr(titles,";")[1] );
-  fSettings.SetYTitle( GeneralUtils::ParseToStr(titles,";")[2] );
+  fSettings.SetTitle( GeneralUtils::ParseToStr(titles,";")[0]);
+  fSettings.SetXTitle(GeneralUtils::ParseToStr(titles,";")[1]);
+  fSettings.SetYTitle(GeneralUtils::ParseToStr(titles,";")[2]);
 
   // Specify the data
   fSettings.SetDataInput( GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pi0Np/SupplementalMaterial2.root");
@@ -92,9 +100,21 @@ void MINERvA_CC1pi0Np_XSec_1DSTV_nu::SetupDataSettings(){
   //fDataHist->SetNameTitle((fSettings.GetName() + "_data").c_str(), (fSettings.GetFullTitles()).c_str());
   fDataHist->SetName((fSettings.GetName() + "_data").c_str());
   // Covariance matrix is always 2 entry
-  TMatrixD *cov = (TMatrixD*)(li->At(2)->Clone());
+  TMatrixD *tempmat = (TMatrixD*)(li->At(2)->Clone());
+  // The first and last entry in the cov matrix is empty... basically just padding
+  TMatrixDSym *newmat = new TMatrixDSym(tempmat->GetNrows()-2);
+  for (int i = 0; i < newmat->GetNrows(); i++) {
+    for (int j = 0; j < newmat->GetNrows(); j++) {
+      (*newmat)(i, j) = (*tempmat)(i+1, j+1)*1E76; // Scale by 1E76 to get into NUISANCE units
+    }
+  }
+  delete tempmat;
+  fFullCovar = newmat;
   input->Close();
   delete input;
+
+  covar = StatUtils::GetInvert(fFullCovar, true);
+  fDecomp = StatUtils::GetDecomp(fFullCovar);
 }
 
 //********************************************************************
@@ -134,7 +154,7 @@ void MINERvA_CC1pi0Np_XSec_1DSTV_nu::FillEventVariables(FitEvent *event) {
   TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
   TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
   TLorentzVector Ppi0 = event->GetHMFSParticle(111)->fP;
-  TLorentzVector Pp = event->GetHMFSParticle(2212)->fP;
+  TLorentzVector Pp   = event->GetHMFSParticle(2212)->fP;
 
   // Make the z vector (cross between nu and mu vectors)
   // Make it unit length
@@ -142,8 +162,6 @@ void MINERvA_CC1pi0Np_XSec_1DSTV_nu::FillEventVariables(FitEvent *event) {
 
   // first make projection along neutrino direction
   double plmu = Pmu.Vect().Dot(  Pnu.Vect().Unit());
-  double plpi = Ppi0.Vect().Dot( Pnu.Vect().Unit());
-  double plp = Pp.Vect().Dot(    Pnu.Vect().Unit());
   // Hadronic projection (proton and pion)
   double plhad = (Ppi0.Vect()+Pp.Vect()).Dot(Pnu.Vect().Unit());
 
