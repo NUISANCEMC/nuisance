@@ -45,22 +45,37 @@ void T2K_CC1pipNp_CH_XSec_1DSTV_nu::SetupData() {
   else if (!name.compare("T2K_CC1pipNp_CH_XSec_1DpN_nu"))   fDist = kpN;
 
   // Define what files to use from the dist
-  std::string datafile = "";
-  std::string corrfile = "";
   std::string titles = "";
   std::string distdescript = "";
 
-  // Load up the data
+  // Specify the data, depending on distribution
+  std::string datalocation = GeneralUtils::GetTopLevelDir()+"/data/T2K/CC1pipNp_STV/";
+
   switch (fDist) {
     case (kdaT):
-      titles    = "CC1#pi^{+}1p;T_{#pi} (GeV);d#sigma/dT_{#pi} (cm^{2}/nucleon/GeV)";
+      {
+      datalocation += "xsec_daT.root";
+      titles    = "T2K CC1#pi^{+}Np;" \
+                  "#delta#alpha_{T} (degrees);" \
+                  "d#sigma/d#delta#alpha_{T} (cm^{2}/nucleon/degree)";
       break;
+      }
     case (kdpTT):
-      titles    = "CC1#pi^{+}1p;#theta_{#pi} (degrees); d#sigma/d#theta_{#pi} (cm^{2}/nucleon/degree)";
+      {
+      datalocation += "xsec_dpTT.root";
+      titles    = "T2K CC1#pi^{+}Np;" \
+                  "#delta p_{TT} (MeV/c);" \
+                  "d#sigma/d#delta p_{TT} (cm^{2}/nucleon/(MeV/c))";
       break;
+      }
     case (kpN):
-      titles    = "CC1#pi^{+}1p;p_{#mu} (GeV);d#sigma/dp_{#mu} (cm^{2}/nucleon/GeV)";
+      {
+      datalocation += "xsec_pN.root";
+      titles    = "T2K CC1#pi^{+}Np;" \
+                  "p_{N} (MeV/c);" \
+                  "d#sigma/d#delta p_{N} (cm^{2}/nucleon/(MeV/c))";
       break;
+      }
     default:
       NUIS_ABORT("Unknown Analysis Distribution : " << fDist);
   }
@@ -80,22 +95,13 @@ void T2K_CC1pipNp_CH_XSec_1DSTV_nu::SetupData() {
                          "450 < p_{p} < 1200 MeV/c \n";
 
   fSettings.SetDescription(descrip);
-  // Specify the data, depending on distribution
-  std::string datalocation = GeneralUtils::GetTopLevelDir()+"/data/T2K/CC1pipNp_STV/";
-  if (fDist == kdaT) {
-    datalocation += "xsec_daT.root";
-  } else if (fDist == kdpTT) {
-    datalocation += "xsec_dpTT.root";
-  } else if (fDist == kpN) {
-    datalocation += "xsec_pN.root";
-  }
 
   fSettings.SetDataInput(datalocation);
   fSettings.SetCovarInput(datalocation);
 
-  //fSettings.SetTitle(  GeneralUtils::ParseToStr(titles,";")[0] );
-  //fSettings.SetXTitle( GeneralUtils::ParseToStr(titles,";")[1] );
-  //fSettings.SetYTitle( GeneralUtils::ParseToStr(titles,";")[2] );
+  fSettings.SetTitle(  GeneralUtils::ParseToStr(titles,";")[0] );
+  fSettings.SetXTitle( GeneralUtils::ParseToStr(titles,";")[1] );
+  fSettings.SetYTitle( GeneralUtils::ParseToStr(titles,";")[2] );
 
   return;
 }
