@@ -248,7 +248,7 @@
 #include "MINERvA_CC1pi0_XSec_1D_nu.h"
 
 // MINERvA CC1pi0 neutrino STV
-#include "MINERvA_CC1pi0Np_XSec_1DSTV_nu.h"
+#include "MINERvA_CCNpi0Mp_XSec_1DSTV_nu.h"
 
 // MINERvA CCINC
 #include "MINERvA_CCinc_XSec_1DEnu_ratio.h"
@@ -1350,10 +1350,10 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
                  !name.compare("MINERvA_CC1pi0_XSec_1DPhiAdler_nu")) {
         return (new MINERvA_CC1pi0_XSec_1D_nu(samplekey));
 
-      } else if ( !name.compare("MINERvA_CC1pi0Np_XSec_1DdaT_nu") ||
-                  !name.compare("MINERvA_CC1pi0Np_XSec_1DdpTT_nu") ||
-                  !name.compare("MINERvA_CC1pi0Np_XSec_1DpN_nu")) {
-        return (new MINERvA_CC1pi0Np_XSec_1DSTV_nu(samplekey));
+      } else if ( !name.compare("MINERvA_CCNpi0Mp_XSec_1DdaT_nu") ||
+                  !name.compare("MINERvA_CCNpi0Mp_XSec_1DdpTT_nu") ||
+                  !name.compare("MINERvA_CCNpi0Mp_XSec_1DpN_nu")) {
+        return (new MINERvA_CCNpi0Mp_XSec_1DSTV_nu(samplekey));
         /*
           CCINC
         */

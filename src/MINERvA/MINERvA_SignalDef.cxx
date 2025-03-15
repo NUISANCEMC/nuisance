@@ -770,11 +770,13 @@ bool isCCNpi0Mp_MINERvA_STV(FitEvent *event) {
   // No cuts on pi0
   // There is no upper limit on the momentum cuts for protons
   // Variables are constructed using the highest momentum particles
+  // D. Coplowe's (Oxford) thesis says 1.5 < Emu < 20 (https://lss.fnal.gov/archive/thesis/2000/fermilab-thesis-2018-38.pdf)
 
   // Somewhat custom signal definition, so can't use existing ones
   // Check number of pi0
   int nPi0 = event->NumFSParticle(111);
   if (nPi0 == 0) return false;
+  //if (nPi0 != 1) return false;
   // All mesons must be pi0
   int nMesons = event->NumFSMesons();
   if (nMesons != nPi0) return false;
@@ -796,9 +798,10 @@ bool isCCNpi0Mp_MINERvA_STV(FitEvent *event) {
 
   TLorentzVector Pmu = event->GetHMFSParticle(13)->fP;
   // 1.5 to 20 GeV/c cut on muon
+  // 25 degree cut relative neutrino direction
   if (Pmu.Vect().Mag() < 1500  ||
       Pmu.Vect().Mag() > 20000 ||
-      Pmu.Vect().Angle(Nu->fP.Vect()) > 25.*M_PI/180.) {
+      Pmu.Vect().Angle(Nu->fP.Vect())*180./M_PI > 25) {
     return false;
   }
 

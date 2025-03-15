@@ -73,7 +73,7 @@ void T2K_CC1pipNp_CH_XSec_1DSTV_nu::SetupData() {
       datalocation += "xsec_pN.root";
       titles    = "T2K CC1#pi^{+}Np;" \
                   "p_{N} (MeV/c);" \
-                  "d#sigma/d#delta p_{N} (cm^{2}/nucleon/(MeV/c))";
+                  "d#sigma/dp_{N} (cm^{2}/nucleon/(MeV/c))";
       break;
       }
     default:
@@ -92,7 +92,10 @@ void T2K_CC1pipNp_CH_XSec_1DSTV_nu::SetupData() {
                          "#theta_{#mu,p}<70 degrees \n"                   \
                          "250 < p_{#mu} < 7000 MeV/c \n"                  \
                          "150 < p_{#pi} < 1200 MeV/c \n"                  \
-                         "450 < p_{p} < 1200 MeV/c \n";
+                         "450 < p_{p} < 1200 MeV/c \n"                    \
+                         "Ref: Phys. Rev. D 103, 112009 \n"               \
+                         "arXiv:2102.03346 [hep-ex] \n"                   \
+                         "https://t2k-experiment.org/results/2021_tki_numucc1pinp/";
 
   fSettings.SetDescription(descrip);
 

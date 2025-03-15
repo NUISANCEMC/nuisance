@@ -17,15 +17,15 @@
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 
-#ifndef MINERVA_CC1PI0NP_XSEC_1DSTV_NU_H_SEEN
-#define MINERVA_CC1PI0NP_XSEC_1DSTV_NU_H_SEEN
+#ifndef MINERVA_CCNPI0MP_XSEC_1DSTV_NU_H_SEEN
+#define MINERVA_CCNPI0MP_XSEC_1DSTV_NU_H_SEEN
 
 #include "Measurement1D.h"
 
-class MINERvA_CC1pi0Np_XSec_1DSTV_nu : public Measurement1D {
+class MINERvA_CCNpi0Mp_XSec_1DSTV_nu : public Measurement1D {
 public:
-  MINERvA_CC1pi0Np_XSec_1DSTV_nu(nuiskey samplekey);
-  virtual ~MINERvA_CC1pi0Np_XSec_1DSTV_nu() {};
+  MINERvA_CCNpi0Mp_XSec_1DSTV_nu(nuiskey samplekey);
+  virtual ~MINERvA_CCNpi0Mp_XSec_1DSTV_nu() {};
 
   void SetupDataSettings();
   void FillEventVariables(FitEvent *event);
