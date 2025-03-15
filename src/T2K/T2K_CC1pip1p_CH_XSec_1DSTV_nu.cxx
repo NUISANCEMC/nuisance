@@ -50,25 +50,15 @@ void T2K_CC1pip1p_CH_XSec_1DSTV_nu::SetupData() {
 
   // Load up the data
   switch (fDist) {
-
     case (kdaT):
-      datafile  = "data/XSec_Table_pi0_KE_xsec.csv";
-      corrfile = "corr/Correlation_Table_pi0_KE_xsec.csv";
-      titles    = "CC1#pi^{0};T_{#pi} (GeV);d#sigma/dT_{#pi} (cm^{2}/nucleon/GeV)";
+      titles    = "CC1#pi^{+}1p;T_{#pi} (GeV);d#sigma/dT_{#pi} (cm^{2}/nucleon/GeV)";
       break;
-
     case (kdpTT):
-      datafile  = "data/XSec_Table_pi0_theta_xsec.csv";
-      corrfile = "corr/Correlation_Table_pi0_theta_xsec.csv";
-      titles    = "CC1#pi^{0};#theta_{#pi} (degrees); d#sigma/d#theta_{#pi} (cm^{2}/nucleon/degree)";
+      titles    = "CC1#pi^{+}1p;#theta_{#pi} (degrees); d#sigma/d#theta_{#pi} (cm^{2}/nucleon/degree)";
       break;
-
     case (kpN):
-      datafile  = "data/XSec_Table_muon_P_xsec.csv";
-      corrfile = "corr/Correlation_Table_muon_P_xsec.csv";
-      titles    = "CC1#pi^{0};p_{#mu} (GeV);d#sigma/dp_{#mu} (cm^{2}/nucleon/GeV)";
+      titles    = "CC1#pi^{+}1p;p_{#mu} (GeV);d#sigma/dp_{#mu} (cm^{2}/nucleon/GeV)";
       break;
-
     default:
       NUIS_ABORT("Unknown Analysis Distribution : " << fDist);
   }
@@ -101,9 +91,9 @@ void T2K_CC1pip1p_CH_XSec_1DSTV_nu::SetupData() {
   fSettings.SetDataInput(datalocation);
   fSettings.SetCovarInput(datalocation);
 
-  fSettings.SetTitle(  GeneralUtils::ParseToStr(titles,";")[0] );
-  fSettings.SetXTitle( GeneralUtils::ParseToStr(titles,";")[1] );
-  fSettings.SetYTitle( GeneralUtils::ParseToStr(titles,";")[2] );
+  //fSettings.SetTitle(  GeneralUtils::ParseToStr(titles,";")[0] );
+  //fSettings.SetXTitle( GeneralUtils::ParseToStr(titles,";")[1] );
+  //fSettings.SetYTitle( GeneralUtils::ParseToStr(titles,";")[2] );
 
   return;
 }
@@ -155,16 +145,15 @@ void T2K_CC1pip1p_CH_XSec_1DSTV_nu::FillEventVariables(FitEvent *event) {
   TLorentzVector Ppip = event->GetHMFSParticle(211)->fP;
 
   // Proton is a bit trickier (allows for multiple protons)
-  std::vector<FitParticle*> protons = event->GetAllProton();
+  std::vector<FitParticle*> protons = event->GetAllFSProton();
   const double protlo = 450;
   const double prothi = 1200;
-  int nprot = 0;
+  const double angular = 70.*M_PI/180.; // 70 degree cut
   int protindex = 0;
   for (int i = 0; i < protons.size(); ++i) {
     if (protons[i]->fP.Vect().Mag() > protlo &&
         protons[i]->fP.Vect().Mag() < prothi &&
-        protons[i]->fP.Vect().Angle(Pnu.Vect()) > 70) {
-      nprot;
+        protons[i]->fP.Vect().Angle(Pnu.Vect()) < angular) {
       if (protindex == 0) {
         protindex = i;
       } else if (protons[i]->fP.Vect().Mag() > 
@@ -175,17 +164,62 @@ void T2K_CC1pip1p_CH_XSec_1DSTV_nu::FillEventVariables(FitEvent *event) {
   }
   TLorentzVector Pp = protons[protindex]->fP;
 
+  // Make the z vector (cross between nu and mu vectors)
+  // Make it unit length
+  TVector3 z = (Pnu.Vect().Cross(Pmu.Vect())).Unit();
+
+  // first make projection along neutrino direction
+  double dplmu = Pmu.Vect().Dot(  Pnu.Vect().Unit());
+  double dplpi = Ppip.Vect().Dot( Pnu.Vect().Unit());
+  double dplp = Pp.Vect().Dot(    Pnu.Vect().Unit());
+  // Hadronic projection (proton and pion)
+  double dplhad = (Ppip.Vect()+Pp.Vect()).Dot(Pnu.Vect().Unit());
+
+  // dptmu is 
+  TVector3 dptmuvec = Pmu.Vect() - dplmu*(Pnu.Vect().Unit());
+  // Hadron vector
+  TVector3 dpthadvec = (Ppip.Vect()+Pp.Vect())-dplhad*(Pnu.Vect().Unit());
+  //TVector3 dptpivec = Ppip.Vect() - dplpi*z;
+  //TVector3 dptpvec = Pp.Vect() - dplp*z;
+  //TVector3 dptvec = dptmuvec + dptpivec + dptpvec;
+  TVector3 dptvec = dptmuvec + dpthadvec;
+
   // Fill the variables depending on the enums
   switch (fDist) {
     case kdaT:
-      fXVar = 0;
+      {
+      fXVar = acos((-1*dptmuvec.Dot(dptvec))/(dptmuvec.Mag()*dptvec.Mag()))*180/M_PI;
       break;
+      }
     case kdpTT:
-      fXVar = 0;
+      {
+      // Project the pion three vector
+      double ptt_pi = Ppip.Vect().Dot(z);
+      // And the proton
+      double ptt_p = Pp.Vect().Dot(z);
+      double dptt = ptt_pi+ptt_p;
+      fXVar = dptt;
       break;
+      }
+
     case kpN:
-      fXVar = 0;
+      {
+      // Get some of the logitudinal
+      double pmul = Pmu.Vect().Dot(Pnu.Vect().Unit());
+      double ppil = Ppip.Vect().Dot(Pnu.Vect().Unit());
+      double ppl = Pp.Vect().Dot(Pnu.Vect().Unit());
+      const double eps = 26.1; // MeV, mean proton excitation energy in Carbon
+      const double mn = PhysConst::mass_neutron*1E3; // neutron mass
+      const double mp = PhysConst::mass_proton*1E3;  // proton mass
+      const double MA = 6*mn+6*mp-92.16;  // target mass (E is from PhysRevC.95.065501)
+      const double MAP = MA-mn+27.13; // remnant mass, but... binding energy?
+      const double temp = MA+pmul+ppil+ppl-Pmu.E()-Ppip.E()-Pp.E();
+      double pl = 0.5*temp;
+      pl -= 0.5*(dptvec.Mag2()+MAP*MAP)/temp;
+      double pn = sqrt(dptvec.Mag2()+pl*pl);
+      fXVar = pn;
       break;
+      }
     default:
       NUIS_ABORT("DIST NOT FOUND : " << fDist);
       break;

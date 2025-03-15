@@ -328,42 +328,38 @@ bool isT2K_CC0pi_1bin(FitEvent *event, double EnuMin, double EnuMax) {
 // T2K CC1pi+1p 
 bool isT2K_CC1pip1p_STV(FitEvent *event) {
 
-  // Let's just get all particles...
-  std::vector<FitParticle*> particles = event->GetAllFSParticle(0);
-  std::vector<FitParticle*> particles2 = event->GetAllFSProton();
-  if (particles2.size() == 0) return false;
+  // Check that it's CC1pi
+  if (!isCC1pi(event, 14, 211, 0, 100)) return false;
 
-  //std::cout << particles.size() << std::endl;
-  //std::cout << particles2.size() << std::endl;
+  // Get the protons
+  std::vector<FitParticle*> protons = event->GetAllFSProton();
+  if (protons.size() == 0) return false;
+
   // Get the neutrino to do the direction
   FitParticle* Nu = event->GetNeutrinoIn();
-
-  //std::cout << Nu->PDG() << std::endl;
-  if (Nu->PDG() != 14) return false;
 
   const double protlo = 450;
   const double prothi = 1200;
   int nprot = 0;
   int protindex = 0;
 
-  int npip = 0;
-  int piindex = 0;
+  //int npip = 0;
+  //int piindex = 0;
   const double pilo = 150;
   const double pihi = 1200;
 
-  int nmu = 0;
-  int muindex = 0;
+  //int nmu = 0;
+  //int muindex = 0;
   const double mulo = 250;
   const double muhi = 7000;
 
-  const double angular = 70*M_PI/180; // 70 degree cut
-  for (int i = 0; i < particles.size(); ++i) {
-
+  const double angular = 70.*M_PI/180.; // 70 degree cut
+  for (int i = 0; i < protons.size(); ++i) {
     // First check protons in range
-    if (particles[i]->PDG() == 2212 && 
-        particles[i]->fP.Vect().Mag() > protlo && 
-        particles[i]->fP.Vect().Mag() < prothi &&
-        particles[i]->fP.Vect().Angle(Nu->fP.Vect()) < angular) {
+    //if (protons[i]->PDG() == 2212 && 
+    if (protons[i]->fP.Vect().Mag() > protlo && 
+        protons[i]->fP.Vect().Mag() < prothi &&
+        protons[i]->fP.Vect().Angle(Nu->fP.Vect()) < angular) {
 
       nprot++;
       // If we haven't seen a proton yet, save it
@@ -371,12 +367,13 @@ bool isT2K_CC1pip1p_STV(FitEvent *event) {
         protindex = i;
         // If we have seen a proton, check if this proton has higher momentum
         // If so, save it
-      } else if ( particles[i]->fP.Vect().Mag() > 
-          particles[protindex]->fP.Vect().Mag()) {
+      } else if ( protons[i]->fP.Vect().Mag() > 
+          protons[protindex]->fP.Vect().Mag()) {
         protindex = i;
       }
     }
 
+    /*
     // Not clear here if it asks for a single pion within threshold
     // or if it asks that the highest momentum pion is within threshold
     else if (particles[i]->PDG() == 211 &&
@@ -395,15 +392,32 @@ bool isT2K_CC1pip1p_STV(FitEvent *event) {
       nmu++;
       muindex = i;
     }
+    */
+  } // end loop over protons particles
 
-  } // end loop over particles
-
-  // Have more than one proton in range
+  // Need to have more than one proton in range
   if (nprot == 0) return false;
+
+  // Check the muon
+  TLorentzVector pmu = event->GetHMFSParticle(13)->fP;
+  if (pmu.Vect().Mag() < mulo || 
+      pmu.Vect().Mag() > muhi ||
+      pmu.Vect().Angle(Nu->fP.Vect()) > angular) {
+    return false;
+  }
+
+  // Check the charged pion
+  TLorentzVector ppi = event->GetHMFSParticle(211)->fP;
+  if (ppi.Vect().Mag() < pilo || 
+      ppi.Vect().Mag() > pihi ||
+      ppi.Vect().Angle(Nu->fP.Vect()) > angular) {
+    return false;
+  }
+
   // Have exactly one pion in range
-  if (npip != 1) return false;
+  //if (npip != 1) return false;
   // And exactly one muon in range
-  if (nmu != 1) return false;
+  //if (nmu != 1) return false;
 
   return true;
 }
