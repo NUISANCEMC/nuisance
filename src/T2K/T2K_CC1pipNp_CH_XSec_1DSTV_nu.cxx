@@ -86,7 +86,7 @@ void T2K_CC1pipNp_CH_XSec_1DSTV_nu::SetupData() {
   std::string descrip =  distdescript +                                   \
                          "Target: CH \n"                                  \
                          "Flux: T2K Forward Horn Current numu ONLY \n"    \
-                         "Signal: Any event with 1mu-, 1pi+, 1p, with \n" \
+                         "Signal: Any event with 1mu-, 1pi+, Np (N>0), with \n" \
                          "#theta_{#mu,#nu}<70 degrees \n"                 \
                          "#theta_{#mu,#pi}<70 degrees \n"                 \
                          "#theta_{#mu,p}<70 degrees \n"                   \
