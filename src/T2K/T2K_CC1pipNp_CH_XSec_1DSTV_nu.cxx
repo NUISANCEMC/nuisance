@@ -73,7 +73,7 @@ void T2K_CC1pipNp_CH_XSec_1DSTV_nu::SetupData() {
       datalocation += "xsec_pN.root";
       titles    = "T2K CC1#pi^{+}Np;" \
                   "p_{N} (MeV/c);" \
-                  "d#sigma/d#delta p_{N} (cm^{2}/nucleon/(MeV/c))";
+                  "d#sigma/dp_{N} (cm^{2}/nucleon/(MeV/c))";
       break;
       }
     default:
