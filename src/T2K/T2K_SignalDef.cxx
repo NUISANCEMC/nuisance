@@ -326,7 +326,7 @@ bool isT2K_CC0pi_1bin(FitEvent *event, double EnuMin, double EnuMax) {
 }
 
 // T2K CC1pi+1p 
-bool isT2K_CC1pip1p_STV(FitEvent *event) {
+bool isT2K_CC1pipNp_STV(FitEvent *event) {
 
   // Check that it's CC1pi, no energy cuts
   if (!isCC1pi(event, 14, 211, 0, 100)) return false;

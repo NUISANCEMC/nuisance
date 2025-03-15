@@ -17,7 +17,7 @@
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 #include "T2K_SignalDef.h"
-#include "T2K_CC1pip1p_CH_XSec_1DSTV_nu.h"
+#include "T2K_CC1pipNp_CH_XSec_1DSTV_nu.h"
 
 /*
 Phys. Rev. D 103, 112009
@@ -34,15 +34,15 @@ For T2K collaborators: TN 383
 */
 
 //********************************************************************
-void T2K_CC1pip1p_CH_XSec_1DSTV_nu::SetupData() {
+void T2K_CC1pipNp_CH_XSec_1DSTV_nu::SetupData() {
 //********************************************************************
 
   // Set data distribution and covariance matrix
   // See header file for enum and some descriptions
   std::string name = fSettings.GetS("name");
-  if      (!name.compare("T2K_CC1pip1p_CH_XSec_1DdaT_nu"))  fDist = kdaT;
-  else if (!name.compare("T2K_CC1pip1p_CH_XSec_1DdpTT_nu")) fDist = kdpTT;
-  else if (!name.compare("T2K_CC1pip1p_CH_XSec_1DpN_nu"))   fDist = kpN;
+  if      (!name.compare("T2K_CC1pipNp_CH_XSec_1DdaT_nu"))  fDist = kdaT;
+  else if (!name.compare("T2K_CC1pipNp_CH_XSec_1DdpTT_nu")) fDist = kdpTT;
+  else if (!name.compare("T2K_CC1pipNp_CH_XSec_1DpN_nu"))   fDist = kpN;
 
   // Define what files to use from the dist
   std::string datafile = "";
@@ -81,7 +81,7 @@ void T2K_CC1pip1p_CH_XSec_1DSTV_nu::SetupData() {
 
   fSettings.SetDescription(descrip);
   // Specify the data, depending on distribution
-  std::string datalocation = GeneralUtils::GetTopLevelDir()+"/data/T2K/CC1pip1p_STV/";
+  std::string datalocation = GeneralUtils::GetTopLevelDir()+"/data/T2K/CC1pipNp_STV/";
   if (fDist == kdaT) {
     datalocation += "xsec_daT.root";
   } else if (fDist == kdpTT) {
@@ -101,7 +101,7 @@ void T2K_CC1pip1p_CH_XSec_1DSTV_nu::SetupData() {
 }
 
 //********************************************************************
-T2K_CC1pip1p_CH_XSec_1DSTV_nu::T2K_CC1pip1p_CH_XSec_1DSTV_nu(nuiskey samplekey) {
+T2K_CC1pipNp_CH_XSec_1DSTV_nu::T2K_CC1pipNp_CH_XSec_1DSTV_nu(nuiskey samplekey) {
   //********************************************************************
 
   // Define Sample Settings common to all data distributions
@@ -134,7 +134,7 @@ T2K_CC1pip1p_CH_XSec_1DSTV_nu::T2K_CC1pip1p_CH_XSec_1DSTV_nu(nuiskey samplekey) 
 };
 
 //********************************************************************
-void T2K_CC1pip1p_CH_XSec_1DSTV_nu::FillEventVariables(FitEvent *event) {
+void T2K_CC1pipNp_CH_XSec_1DSTV_nu::FillEventVariables(FitEvent *event) {
   //********************************************************************
 
   fXVar = -999.9;
@@ -230,8 +230,8 @@ void T2K_CC1pip1p_CH_XSec_1DSTV_nu::FillEventVariables(FitEvent *event) {
 };
 
 //********************************************************************
-bool T2K_CC1pip1p_CH_XSec_1DSTV_nu::isSignal(FitEvent *event) {
+bool T2K_CC1pipNp_CH_XSec_1DSTV_nu::isSignal(FitEvent *event) {
   //********************************************************************
-  return SignalDef::isT2K_CC1pip1p_STV(event);
+  return SignalDef::isT2K_CC1pipNp_STV(event);
 }
 
