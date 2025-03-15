@@ -22,6 +22,7 @@
 // Implementation of 2020 MINERvA numu CC1pi0 STV
 // arxiv:2002.05812 hep-ex
 // Phys.Rev.D 102 (2020) 7, 072007, Phys.Rev.D 110 (2024) 5, 059903 (erratum)
+// D. Coplowe's (Oxford) thesis says 1.5 < Emu < 20 (https://lss.fnal.gov/archive/thesis/2000/fermilab-thesis-2018-38.pdf)
 // clarence.wret@imperial.ac.uk
 // Final state is 1mu-, 1p, 1pi0, X, where X is N possible addtional protons and neutral pions, but not other mesons; so basically CCNpi0Mp where N and M > 0
 
@@ -79,7 +80,10 @@ void MINERvA_CC1pi0Np_XSec_1DSTV_nu::SetupDataSettings(){
                          "Signal: Any event with 1mu-, Npi0, Mp (N,M>0), with \n" \
                          "#theta_{#mu,#nu}<25 degrees \n"                 \
                          "1.5 < p_{#mu} < 20 GeV/c \n"                  \
-                         "450 < p_{p} MeV/c \n";
+                         "450 < p_{p} MeV/c \n"
+                         "Ref: arxiv:2002.05812 hep-ex" \
+                         "Phys.Rev.D 102 (2020) 7, 072007, Phys.Rev.D 110 (2024) 5, 059903 (erratum)" \
+                         "D. Coplowe's (Oxford) thesis (https://lss.fnal.gov/archive/thesis/2000/fermilab-thesis-2018-38.pdf)";
 
   fSettings.SetDescription(descrip);
 
