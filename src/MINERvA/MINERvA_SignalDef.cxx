@@ -759,5 +759,54 @@ bool isNukeCC0piNp_MINERvA_STV(FitEvent *event, double EnuMin, double EnuMax) {
   return true;
 }
 
+// Signal definition for MINERvA CCNpi0Mp STV
+bool isCCNpi0Mp_MINERvA_STV(FitEvent *event) {
+
+  // 1 muon
+  // At least 1 proton
+  // At least 1 pi0
+  // Highest momentum proton needs to be above 0.45 GeV/c
+  // Muon needs to be between 1.5 and 20 GeV/c, and thetamu < 25 degrees
+  // No cuts on pi0
+  // There is no upper limit on the momentum cuts for protons
+  // Variables are constructed using the highest momentum particles
+
+  // Somewhat custom signal definition, so can't use existing ones
+  // Check number of pi0
+  int nPi0 = event->NumFSParticle(111);
+  if (nPi0 == 0) return false;
+  // All mesons must be pi0
+  int nMesons = event->NumFSMesons();
+  if (nMesons != nPi0) return false;
+
+  // Check protons
+  std::vector<FitParticle*> protons = event->GetAllFSProton();
+  if (protons.size() == 0) return false;
+
+  // Check leptons
+  int nLeptons = event->NumFSLeptons();
+  if (nLeptons != 1) return false;
+  // Check the lepton is a muon
+  int nMu = event->NumFSParticle(13);
+  if (nMu != 1) return false;
+
+  // Get the neutrino to do the direction, and check the PDG code
+  FitParticle* Nu = event->GetNeutrinoIn();
+  if (Nu->PDG() != 14) return false;
+
+  TLorentzVector Pmu = event->GetHMFSParticle(13)->fP;
+  // 1.5 to 20 GeV/c cut on muon
+  if (Pmu.Vect().Mag() < 1500  ||
+      Pmu.Vect().Mag() > 20000 ||
+      Pmu.Vect().Angle(Nu->fP.Vect()) > 25.*M_PI/180.) {
+    return false;
+  }
+
+  TLorentzVector Pp = event->GetHMFSParticle(2212)->fP;
+  // 450 MeV/c cut on proton
+  if (Pp.Vect().Mag() < 450) return false;
+
+  return true;
+}
 
 } // namespace SignalDef

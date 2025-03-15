@@ -125,6 +125,8 @@ namespace SignalDef {
   bool isNukeCC0pi_MINERvAPTPZ(FitEvent *event, double EnuMin, double EnuMax);
   bool isNukeCC0piNp_MINERvA_STV(FitEvent *event, double EnuMin, double EnuMax);
 
+  bool isCCNpi0Mp_MINERvA_STV(FitEvent *event);
+
 }
 
 #endif
