@@ -29,6 +29,8 @@ Cuts on particle acceptance:
 mu-:  250 MeV/c - 7000 MeV/c, theta < 70 degrees
 pi+:  150 MeV/c - 1200 MeV/c, theta < 70 degrees
 p:    450 MeV/c - 1200 MeV/c, theta < 70 degrees
+
+For T2K collaborators: TN 383
 */
 
 //********************************************************************
@@ -116,13 +118,16 @@ T2K_CC1pip1p_CH_XSec_1DSTV_nu::T2K_CC1pip1p_CH_XSec_1DSTV_nu(nuiskey samplekey) 
   SetDataFromRootFile(fSettings.GetDataInput(), "xsec_best_fit");
 
   // This measurement gives us a correlation matrix, so should set it up as such
-  SetCorrelationFromRootFile(fSettings.GetCovarInput(), "xsec_cov");
+  // Correlation matrix comes in absolute units
+  SetCovarFromDataFile(fSettings.GetCovarInput(), "xsec_cov", true);
+
+  // The data histogram doesn't have errors on, so set from diagonal
+  StatUtils::SetDataErrorFromCov(fDataHist, fFullCovar, 1E-38, false);
 
   // Scaling Setup ---------------------------------------------------
   // ScaleFactor automatically setup for DiffXSec/cm2/Nucleon
   fScaleFactor = (GetEventHistogram()->Integral("width") * 1E-38) /
                  double(fNEvents) / TotalIntegratedFlux("width");
-
 
   // Final setup  ---------------------------------------------------
   FinaliseMeasurement();
@@ -169,31 +174,29 @@ void T2K_CC1pip1p_CH_XSec_1DSTV_nu::FillEventVariables(FitEvent *event) {
   TVector3 z = (Pnu.Vect().Cross(Pmu.Vect())).Unit();
 
   // first make projection along neutrino direction
-  double dplmu = Pmu.Vect().Dot(  Pnu.Vect().Unit());
-  double dplpi = Ppip.Vect().Dot( Pnu.Vect().Unit());
-  double dplp = Pp.Vect().Dot(    Pnu.Vect().Unit());
+  double plmu = Pmu.Vect().Dot(  Pnu.Vect().Unit());
+  double plpi = Ppip.Vect().Dot( Pnu.Vect().Unit());
+  double plp = Pp.Vect().Dot(    Pnu.Vect().Unit());
   // Hadronic projection (proton and pion)
-  double dplhad = (Ppip.Vect()+Pp.Vect()).Dot(Pnu.Vect().Unit());
+  double plhad = (Ppip.Vect()+Pp.Vect()).Dot(Pnu.Vect().Unit());
 
-  // dptmu is 
-  TVector3 dptmuvec = Pmu.Vect() - dplmu*(Pnu.Vect().Unit());
-  // Hadron vector
-  TVector3 dpthadvec = (Ppip.Vect()+Pp.Vect())-dplhad*(Pnu.Vect().Unit());
-  //TVector3 dptpivec = Ppip.Vect() - dplpi*z;
-  //TVector3 dptpvec = Pp.Vect() - dplp*z;
-  //TVector3 dptvec = dptmuvec + dptpivec + dptpvec;
-  TVector3 dptvec = dptmuvec + dpthadvec;
+  // Muon vector in the non-neutrino direction
+  TVector3 ptmuvec = Pmu.Vect() - plmu*(Pnu.Vect().Unit());
+  // Hadron vector in the non-neutrino direction
+  TVector3 pthadvec = (Ppip.Vect()+Pp.Vect())-plhad*(Pnu.Vect().Unit());
+  // Sum
+  TVector3 ptvec = ptmuvec + pthadvec;
 
   // Fill the variables depending on the enums
   switch (fDist) {
     case kdaT:
       {
-      fXVar = acos((-1*dptmuvec.Dot(dptvec))/(dptmuvec.Mag()*dptvec.Mag()))*180/M_PI;
+      fXVar = acos((-1*ptmuvec.Dot(ptvec))/(ptmuvec.Mag()*ptvec.Mag()))*180./M_PI;
       break;
       }
     case kdpTT:
       {
-      // Project the pion three vector
+      // Project the pion three vector along the z direction
       double ptt_pi = Ppip.Vect().Dot(z);
       // And the proton
       double ptt_p = Pp.Vect().Dot(z);
@@ -201,22 +204,21 @@ void T2K_CC1pip1p_CH_XSec_1DSTV_nu::FillEventVariables(FitEvent *event) {
       fXVar = dptt;
       break;
       }
-
     case kpN:
       {
-      // Get some of the logitudinal
+      // Get the longitudinal (neutrino direction) projection
       double pmul = Pmu.Vect().Dot(Pnu.Vect().Unit());
       double ppil = Ppip.Vect().Dot(Pnu.Vect().Unit());
       double ppl = Pp.Vect().Dot(Pnu.Vect().Unit());
-      const double eps = 26.1; // MeV, mean proton excitation energy in Carbon
+      const double eps = 26.1; // MeV, mean proton excitation energy in Carbon, table 8 of arxiv 1801.07975
       const double mn = PhysConst::mass_neutron*1E3; // neutron mass
       const double mp = PhysConst::mass_proton*1E3;  // proton mass
       const double MA = 6*mn+6*mp-92.16;  // target mass (E is from PhysRevC.95.065501)
-      const double MAP = MA-mn+27.13; // remnant mass, but... binding energy?
+      const double MAP = MA-mn+27.13; // remnant mass, but... binding energy?, but MINERvA paper say 28.7 MeV...
       const double temp = MA+pmul+ppil+ppl-Pmu.E()-Ppip.E()-Pp.E();
       double pl = 0.5*temp;
-      pl -= 0.5*(dptvec.Mag2()+MAP*MAP)/temp;
-      double pn = sqrt(dptvec.Mag2()+pl*pl);
+      pl -= 0.5*(ptvec.Mag2()+MAP*MAP)/temp;
+      double pn = sqrt(ptvec.Mag2()+pl*pl);
       fXVar = pn;
       break;
       }
