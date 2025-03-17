@@ -18,8 +18,8 @@
 *******************************************************************************/
 /*
   Author :  Clarence Wret 2022
-            Embargoed data release so not including for now
             MINERvA xsec on H in anti-neutrino ME era
+            Nature 614 (2023) 7946, 48-53
             See Tejin Cai (Rochester) PhD thesis for full information
 */
 
@@ -40,8 +40,11 @@ void MINERvA_CC0pi_XSec_1DQ2_antinu_H::SetupDataSettings() {
   std::string ybinning = basedir;
 
   std::string distdescript = "MINERvA_CC0pi_XSec_1DQ2_antinu_H sample";
+  // The edited data files just contain; low Q2, xsec, stat+sys
   std::string datafile = basedir+"xsec_mod_acc.csv";
   std::string covfile = basedir+"cov_tot.csv";
+  //std::string datafile = basedir+"xsec_mod_acc_hack.csv";
+  //std::string covfile = basedir+"cov_tot_hack.csv";
   std::string titles    = "MINERvA CC0#pi #bar{#nu}_{#mu} Q^{2} H;Q^{2} (GeV^{2}); d#sigma/dQ^{2} (cm^{2}/(GeV^{2})/nucleon)";
 
   fScaleFactor  = (GetEventHistogram()->Integral("width") * 1E-38 / (fNEvents + 0.)) / this->TotalIntegratedFlux();
