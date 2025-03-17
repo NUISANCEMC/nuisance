@@ -794,6 +794,29 @@ bool GaussianModeCorr::IsHandled(int rwenum) {
 
 // Radcorr weight calculator
 RadCorrQ2::RadCorrQ2() {
+
+  // Setup numu objects
+  SetupNuMu();
+  // Setup nue objects
+  SetupNuE();
+  // Set up the final graphs
+  SetupGraphs();
+
+  // Default the lepton mass to be something silly
+  leptonmass = -999;
+  nutype = NuType::kNuMu;
+  // Setup assuming numu
+  SetNuType(nutype);
+
+  drawcmd = ""; // Use linear interpolation
+
+  // Tolerance of Q2 in GeV2
+  Q2tol = 1E-2;
+
+  // Has the setup been sanity checked?
+  Checked = false;
+}
+
   // Input files for the splines
   TFile *fInputs[kNumuBar];
 
