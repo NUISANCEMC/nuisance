@@ -48,6 +48,14 @@ void MINERvA_CC0pi_XSec_2D_antinu::SetupDataSettings() {
   else if      (!name.compare("MINERvA_CC0pi_XSec_2DQ2QEEnuQE_antinu")) fDist = kQ2QEEnuQE;
   else if      (!name.compare("MINERvA_CC0pi_XSec_2DQ2QEEnuTrue_antinu")) fDist = kQ2QEEnuTrue;
 
+  // Find if this is ME or LE (assume LE)
+  if (name.find("MINERvA_CC0pi_XSec_2D") != std::string::npos &&
+      name.find("_ME_") != std::string::npos) {
+    IsME = true;
+  } else {
+    IsME = false;
+  }
+
   // Define what files to use from the dist
   std::string basedir = "MINERvA/CC0pi_2D_antinu/";
   std::string datafile = basedir;
@@ -64,13 +72,13 @@ void MINERvA_CC0pi_XSec_2D_antinu::SetupDataSettings() {
       distdescript = "MINERvA_CC0pi_XSec_2Dptpz_antinu sample";
       if (IsME) {
         datafile += "data_release_pzpt.root";
-        titles    = "MINERvA CC0#pi #bar{#nu}_{#mu} p_{z} p_{t};p_{z} (GeV);p_{t} (GeV);d^{2}#sigma/dp_{z}dp_{t} (cm^{2}/GeV^{2}/nucleon)";
+        titles    = "MINERvA CC0#pi ME #bar{#nu}_{#mu} p_{z} p_{t};p_{z} (GeV);p_{t} (GeV);d^{2}#sigma/dp_{z}dp_{t} (cm^{2}/GeV^{2}/nucleon)";
       } else {
         datafile  += "cross_sections_muonpz_muonpt_lowangleqelike_minerva_2d.csv";
         covfile   += "cross_sections_muonpz_muonpt_lowangleqelike_minerva_covariance.csv";
         xbinning  += "cross_sections_muonpt_lowangleqelike_minerva_intmuonpz_bins_1d.csv";
         ybinning  += "cross_sections_muonpz_lowangleqelike_minerva_intmuonpt_bins_1d.csv";
-        titles    = "MINERvA CC0#pi #bar{#nu}_{#mu} p_{t} p_{z};p_{t} (GeV);p_{z} (GeV);d^{2}#sigma/dp_{t}dp_{z} (cm^{2}/GeV^{2}/nucleon)";
+        titles    = "MINERvA CC0#pi LE #bar{#nu}_{#mu} p_{t} p_{z};p_{t} (GeV);p_{z} (GeV);d^{2}#sigma/dp_{t}dp_{z} (cm^{2}/GeV^{2}/nucleon)";
       }
       fScaleFactor  = (GetEventHistogram()->Integral("width") * 1E-38 / (fNEvents + 0.)) / this->TotalIntegratedFlux();
       break;
@@ -151,7 +159,7 @@ void MINERvA_CC0pi_XSec_2D_antinu::SetupDataSettings() {
 MINERvA_CC0pi_XSec_2D_antinu::MINERvA_CC0pi_XSec_2D_antinu(nuiskey samplekey) {
   //********************************************************************
 
-  IsME = false;
+  IsME = true;
 
   fSettings = LoadSampleSettings(samplekey);
   fSettings.SetAllowedTypes("FIX,FREE,SHAPE/FULL,DIAG/MASK", "FIX/FULL");
@@ -188,6 +196,7 @@ void MINERvA_CC0pi_XSec_2D_antinu::FillEventVariables(FitEvent *event) {
         // pz is muon momentum projected onto the neutrino direction
         Double_t pz = Pmu.Vect().Dot(Pnu.Vect()*(1.0/Pnu.Vect().Mag()))/1.E3;
 
+        // Funnily, x and y-axis are flipped 
         if (IsME) {
           fYVar = pt;
           fXVar = pz;

@@ -20,6 +20,7 @@
 /*
   Authors: Adrian Orea (v1 2017)
            Clarence Wret (v2 2018)
+           ME added in about 2022
 */
 
 #include "MINERvA_CC0pi_XSec_2D_nu.h"
@@ -28,6 +29,17 @@
 //********************************************************************
 void MINERvA_CC0pi_XSec_2D_nu::SetupDataSettings() {
   //********************************************************************
+
+  // Set Distribution
+  // See header file for enum and some descriptions
+  std::string name = fSettings.GetS("name");
+  // Find if this is ME or LE (assume LE)
+  if (name.find("MINERvA_CC0pi_XSec_2D") != std::string::npos &&
+      name.find("_ME_") != std::string::npos) {
+    IsME = true;
+  } else {
+    IsME = false;
+  }
 
   // Define what files to use from the dist
   std::string datafile = "";
@@ -205,6 +217,15 @@ void MINERvA_CC0pi_XSec_2D_nu::FillEventVariables(FitEvent *event) {
 //********************************************************************
 bool MINERvA_CC0pi_XSec_2D_nu::isSignal(FitEvent *event) {
   //********************************************************************
+  // Checking to see if there is a Muon
+  if (event->NumFSParticle(13) == 0) return false;
+  // Check outgoing muon is at least 1.5 GeV in ME
+  if (IsME) {
+    TLorentzVector Pmu = event->GetHMFSParticle(13)->fP;
+    if (Pmu.Vect().Mag() < 1.5) return false;
+  }
+
+  // Otherwise the signal definition is the same for LE and ME
   return SignalDef::isCC0pi_MINERvAPTPZ(event, 14, EnuMin, EnuMax);
 };
 
