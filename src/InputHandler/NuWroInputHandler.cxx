@@ -241,6 +241,14 @@ int NuWroInputHandler::ConvertNuwroMode(event *e) {
 	    return 31*nu_nubar;
 	}
       }
+
+      // For the hybrid model, it's possible to have a resonant event that doesn't fit the above definitions
+      // These tend to be high-W events which create weird nucleon/pion pairs
+      // For want of a better solution, and because these are SIS-y, I'm called these DIS
+      if (e->flag.cc)
+	return 26*nu_nubar;
+      else
+	return 46*nu_nubar;
     }
     
     // Eta production
@@ -285,6 +293,11 @@ int NuWroInputHandler::ConvertNuwroMode(event *e) {
       return 46*nu_nubar;
   } 
 
+  // This is QE hyperon production
+  // There is a specific flag (e->flag.hyp), but I don't want to make this version dependent
+  // For want of a better plan, I'm following the GENIE approach of calling this QE
+  if (e->dyn == 10) return 1*nu_nubar;
+  
   // Lepton-lepton scattering
   // This does have a flag (e->flag.lep), but this should avoid version dependence...
   if (e->dyn == 12) return InputHandler::kNuElectronElastic*nu_nubar;
