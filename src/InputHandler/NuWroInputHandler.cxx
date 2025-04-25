@@ -1,4 +1,5 @@
 #ifdef NuWro_ENABLED
+#include "InteractionModes.h"
 #include "NuWroInputHandler.h"
 #include "InputUtils.h"
 
@@ -284,6 +285,10 @@ int NuWroInputHandler::ConvertNuwroMode(event *e) {
       return 46*nu_nubar;
   } 
 
+  // Lepton-lepton scattering
+  // This does have a flag (e->flag.lep), but this should avoid version dependence...
+  if (e->dyn == 12) return InputHandler::kNuElectronElastic*nu_nubar;
+  
   // If we got here, something is wrong, see what happened...
   NUIS_ERR(WRN, "Unable to interpret NuWro event, dumping info...");
   Print();
