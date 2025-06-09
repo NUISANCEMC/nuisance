@@ -22,6 +22,11 @@
 
 #include "Measurement1D.h"
 
+/*
+ A. Bercellie et al. "Simultaneous measurement of muon neutrino νμ charged-current single π+ production in CH, C, H2O, Fe, and Pb targets in MINERvA", Phys.Rev.Lett. 131 (2023) 1, 011801
+ arXiv:2209.07852
+ Data release page: https://minerva.fnal.gov/nuclear-target-charged-current-pi-production-data-release-page/
+*/
 class MINERvA_NukeCC1pip_XSec_1D_nu : public Measurement1D {
 
 public:
