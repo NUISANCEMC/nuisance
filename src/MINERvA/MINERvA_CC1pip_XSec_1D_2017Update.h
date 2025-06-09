@@ -27,6 +27,8 @@
 
   It is somewhat confusing, but this "2017Update" version was never published by MINERvA in a journal (although it was intended to), and contained important updates and fixes to the 2014 measurement, including a flux constrained by neutrino-electron scattering data. So *please use this data*; it is recommended by MINERvA.
 
+  It is also the only data there is from MINERvA on CC1pi+/- in muon related kinematics; the first publication (Publication 3 below) only had Tpi and thpi.
+
   See the data release page here: https://minerva.fnal.gov/pion-data-release-page/
   I'm reproducing the text from that website here, in case it goes offline. I'll put my own comments in hard brackets [].
   {
