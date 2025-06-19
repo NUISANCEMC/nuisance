@@ -250,6 +250,8 @@ endif()
 
 if (NuHepMC_ENABLED)
   set(NuHepMC_ENABLED TRUE)
+  find_package(Protobuf 2.6 QUIET)
+  find_package(HepMC3 3.0 REQUIRED)
   CPMFindPackage(
     NAME NuHepMC_CPPUtils
     GIT_TAG main
