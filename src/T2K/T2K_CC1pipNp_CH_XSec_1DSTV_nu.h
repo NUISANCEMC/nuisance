@@ -6,7 +6,9 @@
 class T2K_CC1pipNp_CH_XSec_1DSTV_nu : public Measurement1D {
   public:
     T2K_CC1pipNp_CH_XSec_1DSTV_nu (nuiskey samplekey);
-    virtual ~T2K_CC1pipNp_CH_XSec_1DSTV_nu () {};
+    virtual ~T2K_CC1pipNp_CH_XSec_1DSTV_nu () {
+      delete random;
+    };
 
     void FillEventVariables(FitEvent *event);
     bool isSignal(FitEvent *event);
@@ -15,6 +17,7 @@ class T2K_CC1pipNp_CH_XSec_1DSTV_nu : public Measurement1D {
   private:
     enum Dists { kdaT, kdpTT, kpN };
     Dists fDist;
+    TRandom3 *random;
 };
 
 #endif

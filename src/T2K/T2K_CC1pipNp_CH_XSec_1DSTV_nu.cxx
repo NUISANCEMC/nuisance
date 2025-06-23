@@ -140,6 +140,9 @@ T2K_CC1pipNp_CH_XSec_1DSTV_nu::T2K_CC1pipNp_CH_XSec_1DSTV_nu(nuiskey samplekey) 
 
   // Final setup  ---------------------------------------------------
   FinaliseMeasurement();
+
+  // Set the random number used to throw dalphaT for hydrogen interactions
+  random = new TRandom3(1337);
 };
 
 //********************************************************************
@@ -200,7 +203,12 @@ void T2K_CC1pipNp_CH_XSec_1DSTV_nu::FillEventVariables(FitEvent *event) {
   switch (fDist) {
     case kdaT:
       {
+      // dpTT is zero for hydrogen interactions, so dalphaT is difficult to define for these interactions
+      // Paper prescribes a flat distribution for hydrogen interactions, see https://github.com/NUISANCEMC/nuisance/issues/92 (issue 92 in NUISANCE github)
+      // So the correct thing to do is to check if interaction was on hydrogen, and make random throw
       fXVar = acos((-1*ptmuvec.Dot(ptvec))/(ptmuvec.Mag()*ptvec.Mag()))*180./M_PI;
+      // This won't work for GiBUU, for now
+      if (!event->fBound) fXVar = random->Uniform(0, 180);
       break;
       }
     case kdpTT:
