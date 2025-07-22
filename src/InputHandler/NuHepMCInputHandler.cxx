@@ -57,8 +57,6 @@ NuHepMCInputHandler::NuHepMCInputHandler(std::string const &handle,
   HepMC3::GenEvent evt;
   fNEvents = 0;
 
-  double to_cm2_nuc = 1;
-
   std::shared_ptr<NuHepMC::FATX::Accumulator> fatx_acc;
   while (!fReader->failed()) {
     fReader->read_event(evt);
@@ -70,9 +68,6 @@ NuHepMCInputHandler::NuHepMCInputHandler(std::string const &handle,
       fToMeV = NuHepMC::Event::ToMeVFactor(evt);
       frun_info = evt.run_info();
       fatx_acc = NuHepMC::FATX::MakeAccumulator(frun_info);
-      to_cm2_nuc = GetRescaleFactor(
-          evt, pb_PerAtom,
-          Unit{Scale::cm2_ten38, TargetScale::PerTargetNucleon});
     }
 
     fatx_acc->process(evt);
@@ -80,13 +75,17 @@ NuHepMCInputHandler::NuHepMCInputHandler(std::string const &handle,
   }
   fsumevw = fatx_acc->sumweights();
 
-  std::cout << "NuHepMC NormInfo: { fatx = " << fatx_acc->fatx()
-            << " pb/A = " << fatx_acc->fatx() * to_cm2_nuc
-            << " cm^2/N, sumw = " << fsumevw
-            << ", nevents = " << fatx_acc->events() << " } " << std::endl;
+  std::cout
+      << "NuHepMC NormInfo: { fatx = "
+      << fatx_acc->fatx(Unit{Scale::pb, TargetScale::PerAtom})
+      << " pb/A = "
+      << fatx_acc->fatx(Unit{Scale::cm2_ten38, TargetScale::PerNucleon})
+      << " cm^2/N, sumw = " << fsumevw << ", nevents = " << fatx_acc->events()
+      << " } " << std::endl;
   // Dupe the FATX
   fEventHist = new TH1D("eventhist", "eventhist", 10, 0.0, 10.0);
-  fEventHist->SetBinContent(5, fatx_acc->fatx() * to_cm2_nuc);
+  fEventHist->SetBinContent(
+      5, fatx_acc->fatx(Unit{Scale::cm2_ten38, TargetScale::PerNucleon}));
   fFluxHist = new TH1D("fluxhist", "fluxhist", 10, 0.0, 10.0);
   fFluxHist->SetBinContent(5, 1);
 

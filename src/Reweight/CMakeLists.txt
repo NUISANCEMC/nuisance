@@ -106,6 +106,7 @@ endif()
 add_library(Reweight STATIC ${Reweight_Impl_Files})
 target_link_libraries(Reweight GeneratorCompileDependencies CoreIncludes ROOT::ROOT)
 set_target_properties(Reweight PROPERTIES PUBLIC_HEADER "${Reweight_Hdr_Files}")
+target_compile_options(Reweight PRIVATE -fPIC)
 
 install(TARGETS Reweight
     EXPORT nuisance-targets

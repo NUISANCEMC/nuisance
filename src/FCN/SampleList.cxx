@@ -182,6 +182,7 @@
 #include "MicroBooNE_CC1Mu1p_XSec_1D_nu.h"
 #include "MicroBooNE_CC1Mu2p_XSec_1D_nu.h"
 #include "MicroBooNE_CC1MuNp_XSec_1D_nu.h"
+#include "MicroBooNE_CC1ENp_XSec_1D_nu.h"
 #include "MicroBooNE_CCInc_XSec_2DPcos_nu.h"
 #include "MicroBooNE_CC1Mu0pNp_XSec_nu.h"
 #include "MicroBooNE_CC1Mu3DInc_XSec_nu.h"
@@ -249,6 +250,9 @@
 // MINERvA CC1pi0 neutrino
 #include "MINERvA_CC1pi0_XSec_1D_nu.h"
 
+// MINERvA CC1pi0 neutrino STV
+#include "MINERvA_CCNpi0Mp_XSec_1DSTV_nu.h"
+
 // MINERvA CCINC
 #include "MINERvA_CCinc_XSec_1DEnu_ratio.h"
 #include "MINERvA_CCinc_XSec_1Dx_ratio.h"
@@ -274,6 +278,9 @@
 
 // MINERvA Nuke CC0pi muon 2d
 #include "MINERvA_NukeCC0pi_XSec_2D_nu.h"
+// MINERvA Nuke CC1pip 1d
+#include "MINERvA_NukeCC1pip_XSec_1D_nu.h"
+
 #endif
 
 #ifdef T2K_ENABLED
@@ -319,6 +326,9 @@
 #include "T2K_CC1pip_CH_XSec_1Dthmupi_nu.h"
 #include "T2K_CC1pip_CH_XSec_1Dthpi_nu.h"
 #include "T2K_CC1pip_CH_XSec_2Dpmucosmu_nu.h"
+
+// T2K CC1pi+1p on CH STV
+#include "T2K_CC1pipNp_CH_XSec_1DSTV_nu.h"
 
 // T2K CCCOH (single bin)
 #include "T2K_CCCOH_C12_XSec_1DEnu_nu.h"
@@ -669,6 +679,7 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
   std::string file = samplekey.GetS("input");
   std::string type = samplekey.GetS("type");
   std::string fkdt = "";
+
 
   /*
      ANL CCQE Samples
@@ -1104,13 +1115,19 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
                !name.compare("MicroBooNE_CC1MuNp_XSec_1Dcosp_nu") ||
                !name.compare("MicroBooNE_CC1MuNp_XSec_1Dthetamup_nu")) {
       return (new MicroBooNE_CC1MuNp_XSec_1D_nu(samplekey));
-    } else if (!name.compare(
-                   "MicroBooNE_CC1Mu2p_XSec_1DOpening_Angle_Protons_Lab_nu") ||
-               !name.compare(
-                   "MicroBooNE_CC1Mu2p_XSec_1DOpening_Angle_Mu_Both_nu") ||
+    }  else if (!name.compare("MicroBooNE_CC1ENp_XSec_1DElecEnergy_nu") ||
+		 !name.compare("MicroBooNE_CC1ENp_XSec_1DOpeningAngle_nu") ||
+		 !name.compare("MicroBooNE_CC1ENp_XSec_1DTrueVisibleEnergy_nu")) {
+	return (new MicroBooNE_CC1ENp_XSec_1D_nu(samplekey));
+    }  else if (!name.compare("MicroBooNE_CC1Mu2p_XSec_1DOpening_Angle_Protons_Lab_nu") ||
+               !name.compare("MicroBooNE_CC1Mu2p_XSec_1DOpening_Angle_Mu_Both_nu") ||
                !name.compare("MicroBooNE_CC1Mu2p_XSec_1DDeltaPT_nu")) {
       return (new MicroBooNE_CC1Mu2p_XSec_1D_nu(samplekey));
-    } else if (!name.compare("MicroBooNE_CC1Mu1p_XSec_1DDeltaPT_nu") ||
+    }  else if (!name.compare("MicroBooNE_CC1ENp_XSec_1DElecEnergy_nu") ||
+		 !name.compare("MicroBooNE_CC1ENp_XSec_1DOpeningAngle_nu") ||
+		 !name.compare("MicroBooNE_CC1ENp_XSec_1DTrueVisibleEnergy_nu")) {
+	return (new MicroBooNE_CC1ENp_XSec_1D_nu(samplekey));
+  } else if (!name.compare("MicroBooNE_CC1Mu1p_XSec_1DDeltaPT_nu") ||
                !name.compare("MicroBooNE_CC1Mu1p_XSec_1DDeltaAlphaT_nu") ||
                !name.compare("MicroBooNE_CC1Mu1p_XSec_1DDeltaPhiT_nu") ||
                !name.compare("MicroBooNE_CC1Mu1p_XSec_1DMuonCosTheta_nu") ||
@@ -1209,7 +1226,16 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
                  !name.compare("MINERvA_CC0pinp_STV_XSec_1Dpnreco_nu") ||
                  !name.compare("MINERvA_CC0pinp_STV_XSec_1Ddalphat_nu") ||
                  !name.compare("MINERvA_CC0pinp_STV_XSec_1Ddpt_nu") ||
-                 !name.compare("MINERvA_CC0pinp_STV_XSec_1Ddphit_nu")) {
+                 !name.compare("MINERvA_CC0pinp_STV_XSec_1Ddphit_nu") ||
+                 // Using the old data release
+                 !name.compare("MINERvA_CC0pinp_STV_XSec_1Dpmu_nu_original") ||
+                 !name.compare("MINERvA_CC0pinp_STV_XSec_1Dthmu_nu_original") ||
+                 !name.compare("MINERvA_CC0pinp_STV_XSec_1Dpprot_nu_original") ||
+                 !name.compare("MINERvA_CC0pinp_STV_XSec_1Dthprot_nu_original") ||
+                 !name.compare("MINERvA_CC0pinp_STV_XSec_1Dpnreco_nu_original") ||
+                 !name.compare("MINERvA_CC0pinp_STV_XSec_1Ddalphat_nu_original") ||
+                 !name.compare("MINERvA_CC0pinp_STV_XSec_1Ddpt_nu_original") ||
+                 !name.compare("MINERvA_CC0pinp_STV_XSec_1Ddphit_nu_original")) {
         return (new MINERvA_CC0pinp_STV_XSec_1D_nu(samplekey));
 
       } else if (!name.compare("MINERvA_CC0pi_XSec_1DQ2_nu_proton")) {
@@ -1331,15 +1357,12 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
         /*
           MINERvA CC1pi0 anti-nu
         */
-        // Done
       } else if (!name.compare("MINERvA_CC1pi0_XSec_1Dth_antinu") ||
                  !name.compare("MINERvA_CC1pi0_XSec_1Dth_antinu_2015") ||
                  !name.compare("MINERvA_CC1pi0_XSec_1Dth_antinu_2016") ||
                  !name.compare("MINERvA_CC1pi0_XSec_1Dth_antinu_fluxcorr") ||
-                 !name.compare(
-                     "MINERvA_CC1pi0_XSec_1Dth_antinu_2015_fluxcorr") ||
-                 !name.compare(
-                     "MINERvA_CC1pi0_XSec_1Dth_antinu_2016_fluxcorr")) {
+                 !name.compare("MINERvA_CC1pi0_XSec_1Dth_antinu_2015_fluxcorr") ||
+                 !name.compare("MINERvA_CC1pi0_XSec_1Dth_antinu_2016_fluxcorr")) {
         return (new MINERvA_CC1pi0_XSec_1Dth_antinu(samplekey));
 
       } else if (!name.compare("MINERvA_CC1pi0_XSec_1Dppi0_antinu") ||
@@ -1349,19 +1372,15 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
       } else if (!name.compare("MINERvA_CC1pi0_XSec_1DTpi0_antinu")) {
         return (new MINERvA_CC1pi0_XSec_1DTpi0_antinu(samplekey));
 
-        // Done
       } else if (!name.compare("MINERvA_CC1pi0_XSec_1DQ2_antinu")) {
         return (new MINERvA_CC1pi0_XSec_1DQ2_antinu(samplekey));
 
-        // Done
       } else if (!name.compare("MINERvA_CC1pi0_XSec_1Dthmu_antinu")) {
         return (new MINERvA_CC1pi0_XSec_1Dthmu_antinu(samplekey));
 
-        // Done
       } else if (!name.compare("MINERvA_CC1pi0_XSec_1Dpmu_antinu")) {
         return (new MINERvA_CC1pi0_XSec_1Dpmu_antinu(samplekey));
 
-        // Done
       } else if (!name.compare("MINERvA_CC1pi0_XSec_1DEnu_antinu")) {
         return (new MINERvA_CC1pi0_XSec_1DEnu_antinu(samplekey));
 
@@ -1379,6 +1398,10 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
                  !name.compare("MINERvA_CC1pi0_XSec_1DPhiAdler_nu")) {
         return (new MINERvA_CC1pi0_XSec_1D_nu(samplekey));
 
+      } else if ( !name.compare("MINERvA_CCNpi0Mp_XSec_1DdaT_nu") ||
+                  !name.compare("MINERvA_CCNpi0Mp_XSec_1DdpTT_nu") ||
+                  !name.compare("MINERvA_CCNpi0Mp_XSec_1DpN_nu")) {
+        return (new MINERvA_CCNpi0Mp_XSec_1DSTV_nu(samplekey));
         /*
           CCINC
         */
@@ -1435,6 +1458,7 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
         return (new MINERvA_CCCOHPI_XSec_joint(samplekey));
       } else if (!name.compare("MINERvA_CCCOHPI_XSec_1DQ2_joint")) {
         return (new MINERvA_CCCOHPI_XSec_joint(samplekey));
+
       } else if (!name.compare("MINERvA_NukeCC0pi_CH_XSec_2D_nu")) {
         return (new MINERvA_NukeCC0pi_CH_XSec_2D_nu(samplekey));
       } else if (!name.compare("MINERvA_NukeCC0pi_C_XSec_2D_nu")) {
@@ -1445,6 +1469,7 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
         return (new MINERvA_NukeCC0pi_Fe_XSec_2D_nu(samplekey));
       } else if (!name.compare("MINERvA_NukeCC0pi_Pb_XSec_2D_nu")) {
         return (new MINERvA_NukeCC0pi_Pb_XSec_2D_nu(samplekey));
+
       } else if (!name.compare("MINERvA_NukeCC0pi_CH_C_Flux_XSec_2D_nu")) {
         return (new MINERvA_NukeCC0pi_CH_C_Flux_XSec_2D_nu(samplekey));
       } else if (!name.compare("MINERvA_NukeCC0pi_CH_H2O_Flux_XSec_2D_nu")) {
@@ -1453,6 +1478,48 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
         return (new MINERvA_NukeCC0pi_CH_Fe_Flux_XSec_2D_nu(samplekey));
       } else if (!name.compare("MINERvA_NukeCC0pi_CH_Pb_Flux_XSec_2D_nu")) {
         return (new MINERvA_NukeCC0pi_CH_Pb_Flux_XSec_2D_nu(samplekey));
+
+      } else if ( !name.compare("MINERvA_NukeCC1pip_CH_XSec_1Dpmu_nu")  ||
+                  !name.compare("MINERvA_NukeCC1pip_CH_XSec_1Dthmu_nu") ||
+                  !name.compare("MINERvA_NukeCC1pip_CH_XSec_1Dplmu_nu") ||
+                  !name.compare("MINERvA_NukeCC1pip_CH_XSec_1Dptmu_nu") ||
+                  !name.compare("MINERvA_NukeCC1pip_CH_XSec_1DQ2_nu")   ||
+                  !name.compare("MINERvA_NukeCC1pip_CH_XSec_1DWexp_nu") ||
+                  !name.compare("MINERvA_NukeCC1pip_CH_XSec_1DTpi_nu")  ||
+                  !name.compare("MINERvA_NukeCC1pip_CH_XSec_1Dthpi_nu") ||
+                  !name.compare("MINERvA_NukeCC1pip_C_XSec_1Dpmu_nu")  ||
+                  !name.compare("MINERvA_NukeCC1pip_C_XSec_1Dthmu_nu") ||
+                  !name.compare("MINERvA_NukeCC1pip_C_XSec_1Dplmu_nu") ||
+                  !name.compare("MINERvA_NukeCC1pip_C_XSec_1Dptmu_nu") ||
+                  !name.compare("MINERvA_NukeCC1pip_C_XSec_1DQ2_nu")   ||
+                  !name.compare("MINERvA_NukeCC1pip_C_XSec_1DWexp_nu") ||
+                  !name.compare("MINERvA_NukeCC1pip_C_XSec_1DTpi_nu")  ||
+                  !name.compare("MINERvA_NukeCC1pip_C_XSec_1Dthpi_nu") ||
+                  !name.compare("MINERvA_NukeCC1pip_H2O_XSec_1Dpmu_nu")  ||
+                  !name.compare("MINERvA_NukeCC1pip_H2O_XSec_1Dthmu_nu") ||
+                  !name.compare("MINERvA_NukeCC1pip_H2O_XSec_1Dplmu_nu") ||
+                  !name.compare("MINERvA_NukeCC1pip_H2O_XSec_1Dptmu_nu") ||
+                  !name.compare("MINERvA_NukeCC1pip_H2O_XSec_1DQ2_nu")   ||
+                  !name.compare("MINERvA_NukeCC1pip_H2O_XSec_1DWexp_nu") ||
+                  !name.compare("MINERvA_NukeCC1pip_H2O_XSec_1DTpi_nu")  ||
+                  !name.compare("MINERvA_NukeCC1pip_H2O_XSec_1Dthpi_nu") ||
+                  !name.compare("MINERvA_NukeCC1pip_Pb_XSec_1Dpmu_nu")  ||
+                  !name.compare("MINERvA_NukeCC1pip_Pb_XSec_1Dthmu_nu") ||
+                  !name.compare("MINERvA_NukeCC1pip_Pb_XSec_1Dplmu_nu") ||
+                  !name.compare("MINERvA_NukeCC1pip_Pb_XSec_1Dptmu_nu") ||
+                  !name.compare("MINERvA_NukeCC1pip_Pb_XSec_1DQ2_nu")   ||
+                  !name.compare("MINERvA_NukeCC1pip_Pb_XSec_1DWexp_nu") ||
+                  !name.compare("MINERvA_NukeCC1pip_Pb_XSec_1DTpi_nu")  ||
+                  !name.compare("MINERvA_NukeCC1pip_Pb_XSec_1Dthpi_nu") ||
+                  !name.compare("MINERvA_NukeCC1pip_Fe_XSec_1Dpmu_nu")  ||
+                  !name.compare("MINERvA_NukeCC1pip_Fe_XSec_1Dthmu_nu") ||
+                  !name.compare("MINERvA_NukeCC1pip_Fe_XSec_1Dplmu_nu") ||
+                  !name.compare("MINERvA_NukeCC1pip_Fe_XSec_1Dptmu_nu") ||
+                  !name.compare("MINERvA_NukeCC1pip_Fe_XSec_1DQ2_nu")   ||
+                  !name.compare("MINERvA_NukeCC1pip_Fe_XSec_1DWexp_nu") ||
+                  !name.compare("MINERvA_NukeCC1pip_Fe_XSec_1DTpi_nu")  ||
+                  !name.compare("MINERvA_NukeCC1pip_Fe_XSec_1Dthpi_nu")) {
+        return (new MINERvA_NukeCC1pip_XSec_1D_nu(samplekey));
 
         /*
         T2K Samples
@@ -1532,6 +1599,11 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
 
       } else if (!name.compare("T2K_CCCOH_C12_XSec_1DEnu_nu")) {
         return (new T2K_CCCOH_C12_XSec_1DEnu_nu(samplekey));
+
+      } else if ( !name.compare("T2K_CC1pipNp_CH_XSec_1DdaT_nu") ||
+                  !name.compare("T2K_CC1pipNp_CH_XSec_1DdpTT_nu") ||
+                  !name.compare("T2K_CC1pipNp_CH_XSec_1DpN_nu") ) {
+        return (new T2K_CC1pipNp_CH_XSec_1DSTV_nu(samplekey));
 
         /*
           T2K CC1pi+ H2O samples

@@ -20,6 +20,9 @@
 /*
   Authors: Adrian Orea (v1 2017)
            Clarence Wret (v2 2018)
+
+  Ref:
+  Phys.Rev.D 99 (2019) 1, 012004 (arxiv:1811.02774[hep-ex])
 */
 
 #include "MINERvA_CC0pi_XSec_1D_2018_nu.h"
@@ -77,7 +80,7 @@ void MINERvA_CC0pi_XSec_1D_2018_nu::SetupDataSettings() {
     datafile = "MINERvA/CC0pi_1D/FixedBinWidthPub/cov_enuqe_qelike.root";
     corrfile = "MINERvA/CC0pi_1D/FixedBinWidthPub/cov_enuqe_qelike.root";
     titles = "MINERvA CC0#pi #nu_{#mu} E_{#nu}^{QE}; E_{#nu}^{QE} "
-             "(GeV);d#sigma/dE_{#nu}^{QE} (cm^{2}/GeV/nucleon)";
+             "(GeV);#sigma(E_{#nu}^{QE}) (cm^{2}/GeV/nucleon)";
     distdescript = "MINERvA_CC0pi_XSec_1DEnuQE_nu sample";
     histname = "enuqe_cross_section";
     break;
@@ -93,7 +96,9 @@ void MINERvA_CC0pi_XSec_1D_2018_nu::SetupDataSettings() {
   std::string descrip = distdescript + "\n"
                                        "Target: CH \n"
                                        "Flux: MINERvA Low Energy FHC numu  \n"
-                                       "Signal: CC-0pi \n";
+                                       "Signal: CC-0pi \n"
+                                       "Ref.: Phys.Rev.D 99 (2019) 1, 012004 (arxiv:1811.02774[hep-ex])\n";
+
   fSettings.SetDescription(descrip);
 
   // The input ROOT file

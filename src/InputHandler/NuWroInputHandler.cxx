@@ -1,4 +1,5 @@
 #ifdef NuWro_ENABLED
+#include "InteractionModes.h"
 #include "NuWroInputHandler.h"
 #include "InputUtils.h"
 
@@ -240,6 +241,14 @@ int NuWroInputHandler::ConvertNuwroMode(event *e) {
 	    return 31*nu_nubar;
 	}
       }
+
+      // For the hybrid model, it's possible to have a resonant event that doesn't fit the above definitions
+      // These tend to be high-W events which create weird nucleon/pion pairs
+      // For want of a better solution, and because these are SIS-y, I'm called these DIS
+      if (e->flag.cc)
+	return 26*nu_nubar;
+      else
+	return 46*nu_nubar;
     }
     
     // Eta production
@@ -284,6 +293,15 @@ int NuWroInputHandler::ConvertNuwroMode(event *e) {
       return 46*nu_nubar;
   } 
 
+  // This is QE hyperon production
+  // There is a specific flag (e->flag.hyp), but I don't want to make this version dependent
+  // For want of a better plan, I'm following the GENIE approach of calling this QE
+  if (e->dyn == 10) return 1*nu_nubar;
+  
+  // Lepton-lepton scattering
+  // This does have a flag (e->flag.lep), but this should avoid version dependence...
+  if (e->dyn == 12) return InputHandler::kNuElectronElastic*nu_nubar;
+  
   // If we got here, something is wrong, see what happened...
   NUIS_ERR(WRN, "Unable to interpret NuWro event, dumping info...");
   Print();
@@ -430,15 +448,18 @@ void NuWroInputHandler::Print(){
 	   << "\t\t|->      anty = " << fNuWroEvent->flag.anty << std::endl
 	   << "\t\t|-> res_delta = " << fNuWroEvent->flag.res_delta << std::endl
 	   << "\t\t|->      npi+ = " << event1_nof(fNuWroEvent, 211) << std::endl
-	   << "\t\t|->      npi+ = " << event1_nof(fNuWroEvent, 211) << std::endl
            << "\t\t|->      npi- = " << event1_nof(fNuWroEvent, -211) << std::endl
            << "\t\t|->      npi0 = " << event1_nof(fNuWroEvent, 111) << std::endl
            << "\t\t|->      neta = " << event1_nof(fNuWroEvent, 221) << std::endl
            << "\t\t|->       nK+ = " << event1_nof(fNuWroEvent, 321) << std::endl
            << "\t\t|->       nK0 = " << event1_nof(fNuWroEvent, 311) << std::endl
-           << "\t\t|->    nlamda = " << event1_nof(fNuWroEvent, 3122) << std::endl
+           << "\t\t|->   nlambda = " << event1_nof(fNuWroEvent, 3122) << std::endl
+	   << "\t\t|->   nsigma+ = " << event1_nof(fNuWroEvent, 3222) << std::endl
+           << "\t\t|->   nsigma- = " << event1_nof(fNuWroEvent, 3112) << std::endl
+	   << "\t\t|->   nsigma0 = " << event1_nof(fNuWroEvent, 3212) << std::endl	
            << "\t\t|->   nproton = " << event1_nof(fNuWroEvent, 2212) << std::endl
-           << "\t\t|->  nneutron = " << event1_nof(fNuWroEvent, 2112));
+           << "\t\t|->  nneutron = " << event1_nof(fNuWroEvent, 2112) << std::endl
+           << "\t\t|->         W = " << fNuWroEvent->W());
 }
 
 #endif

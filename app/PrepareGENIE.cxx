@@ -643,7 +643,10 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
     // Fill total event hist
     eventhist->Fill(neu->E());
 
-    if (i % (nevt / 20) == 0) {
+    int countwidth = nevt / 20;
+    countwidth = (countwidth >= 1) ? countwidth : 1;
+
+    if (i % countwidth == 0) {
       NUIS_LOG(FIT, "Processed "
           << i << "/" << nevt << " GENIE events (E: " << neu->E()
           << " GeV, xsec: " << xsec << " E-38 cm^2/nucleon)");

@@ -21,6 +21,11 @@
 #define MINERVA_CC1PIP_XSEC_1DTPI_NU_H_SEEN
 
 #include "Measurement1D.h"
+/*
+  From “Charged Pion Production in nu_mu Interactions on Hydrocarbon at ⟨E_nu⟩= 4.0 GeV” Phys. Rev. D 92, 092008 (2015)
+  Superceded by "MINERvA_CC1pip_XSec_1D_2017Update.h". See that header file for more information
+*/
+
 
 class MINERvA_CC1pip_XSec_1DTpi_nu : public Measurement1D {
 public:

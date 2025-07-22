@@ -58,7 +58,6 @@ MINERvA_CCCOHPI_XSec_1DEpi_nu::MINERvA_CCCOHPI_XSec_1DEpi_nu(nuiskey samplekey) 
 
   // Final setup  ---------------------------------------------------
   FinaliseMeasurement();
-  std::cout << "MINERvA_CCCOHPI_XSec_1DEpi_nu.cxx : Data Integral = " << fDataHist->Integral() << std::endl;
 };
 
 

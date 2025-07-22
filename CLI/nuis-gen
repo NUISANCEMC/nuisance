@@ -21,6 +21,7 @@ function nuis_gen_help {
   echo -e "\t  -P|--probe <numu|nue|numubar|nuebar> : Set probe particle. If -e is used, this is also passed to \'nuis flux\'."
   echo -e "\t  -o|--output-file <output.root>       : defaults to <GENERATOR>.<probe>.<flux_file>.<flux_hist>.<seed>.evts.root"
   echo -e "\t  --seed <int>                         : Integer to use as random seed. Defaults to \${RANDOM}"
+  echo -e "\t  --flat                               : Produce Nuisance flat-tree"
   echo -e ""
 }
 
@@ -71,6 +72,8 @@ FLUX_DESCRIPTOR=""
 FLUX_MeV="off"
 
 SEED=
+
+FLATTREE="false"
 
 FORWARDED_ARGS=()
 
@@ -196,6 +199,11 @@ while [[ ${#} -gt 0 ]]; do
       shift # past argument
       ;;
 
+    --flat)
+      FLATTREE="true"
+      echo "[OPT]: ${NUIS_BREADCRUMBS} -- Will produce Nuisance flat-tree"
+      ;;
+
     *) # unknown option
       FORWARDED_ARGS+=("${key}")
       ;;
@@ -317,3 +325,8 @@ NUIS_BREADCRUMBS=${NUIS_BREADCRUMBS} \
   FLUX_MeV=${FLUX_MeV} \
   SEED=${SEED} \
   ${COMMAND}-${VERB} "${FORWARDED_ARGS[@]}"
+
+
+if [ ${FLATTREE} == "true" ]; then
+  nuisflat -f GenericVectors -i ${VERB}:${OUTPUT_FILENAME} -o ${OUTPUT_FILENAME/.root/_NUISFLAT.root}
+fi

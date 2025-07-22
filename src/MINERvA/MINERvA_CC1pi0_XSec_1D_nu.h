@@ -36,11 +36,6 @@ public:
   bool isSignal(FitEvent *event);
   
   private:
-  int fDist;
-
-  double WexpCut;
-  double ProtonCut;
-  
   // The enums for the different distributions
   // P.S. the order __IS__ important: after Wexp we require a proton and impose other cuts
   enum DataDistribution {
@@ -69,6 +64,10 @@ public:
     kPhiAdler
   } CC1pi0_DataDistributions;
 
+  DataDistribution fDist;
+
+  double WexpCut;
+  double ProtonCut;
 };
 
 #endif

@@ -71,7 +71,8 @@ Double_t GetChi2FromDiag(TH2D *data, TH2D *mc, TH2I *map = NULL,
 //! Get Chi2 using an inverted covariance for the data
 Double_t GetChi2FromCov(TH1D *data, TH1D *mc, TMatrixDSym *invcov,
                         TH1I *mask = NULL, double data_scale = 1,
-                        double covar_scale = 1E76, TH1D *outchi2perbin = NULL);
+                        double covar_scale = 1E76, TH1D *outchi2perbin = NULL,
+                        bool SkipEmptyBin=true);
 
 //! Get Chi2 using an inverted covariance for the data
 //! Plots converted to 1D histograms before using 1D calculation.

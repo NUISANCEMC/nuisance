@@ -18,11 +18,10 @@
  *******************************************************************************/
 
 // Implementation of 2018 MINERvA numu CC0pi STV analysis
-// arxiv 1805.05486.pdf
-// Clarence Wret
-// cwret@fnal.gov
-// Stephen Dolan
-// Stephen.Dolan@llr.in2p3.fr
+// Phys. Rev. Lett. 121, 022504 (2018) (arxiv 1805.05486.pdf)
+// Data release was updated in Phys. Rev. D 101, 092001 (2020)
+// Clarence Wret (cwret@fnal.gov)
+// Stephen Dolan (Stephen.Dolan@llr.in2p3.fr)
 
 #include "MINERvA_CC0pinp_STV_XSec_1D_nu.h"
 #include "MINERvA_SignalDef.h"
@@ -34,6 +33,17 @@ void MINERvA_CC0pinp_STV_XSec_1D_nu::SetupDataSettings() {
   // Set Distribution
   // See header file for enum and some descriptions
   std::string name = fSettings.GetS("name");
+  // Check if user wants the original data release or not (default to not using)
+  // Was updated in [T. Cai Phys. Rev. D 101, 092001 (2020)]
+  if (name.find("_nu_original") != std::string::npos) {
+    OldData = true;
+  } else {
+    OldData = false;
+  }
+
+  // Change name afterwards
+  if (OldData) name = name.substr(0, name.find("_original"));
+
   if (!name.compare("MINERvA_CC0pinp_STV_XSec_1Dpmu_nu"))
     fDist = kMuonMom;
   else if (!name.compare("MINERvA_CC0pinp_STV_XSec_1Dthmu_nu"))
@@ -51,13 +61,11 @@ void MINERvA_CC0pinp_STV_XSec_1D_nu::SetupDataSettings() {
   else if (!name.compare("MINERvA_CC0pinp_STV_XSec_1Ddphit_nu"))
     fDist = kDphiT;
 
+
   // Location of data, correlation matrices and the titles
   std::string titles = "MINERvA_CC0pinp_STV_XSec_1D";
   std::string foldername;
   std::string distdescript;
-
-  // Data release is a single file
-  std::string rootfile = "MINERvA_1805.05486.root";
 
   fMin = -999;
   fMax = 999;
@@ -148,12 +156,24 @@ void MINERvA_CC0pinp_STV_XSec_1D_nu::SetupDataSettings() {
                         "theta_mu < 20 degrees\n"
                         "0.45GeV < p_prot < 1.2 GeV\n"
                         "theta_prot < 70 degrees\n"
-                        "arXiv 1805.05486";
+                        "Phys. Rev. Lett. 121, 022504 (2018) (arxiv 1805.05486.pdf)\n";
+  if (OldData) {
+    descrip += "Original data [Phys. Rev. Lett. 121, 022504 (2018)]";
+  } else {
+    descrip += "New data [Phys. Rev. D 101, 092001 (2020)]";
+  }
   fSettings.SetDescription(descrip);
 
+  // Check name and set filename accordingly
+  // Data release is a single file
+  std::string rootfile = "MINERvA_DataRelease_Updated.root";
+  if (OldData) {
+    rootfile = "MINERvA_1805.05486.root";
+  }
   std::string filename =
       GeneralUtils::GetTopLevelDir() +
-      "/data/MINERvA/CC0pi/CC0pi_STV/MINERvA_1805.05486.root";
+      "/data/MINERvA/CC0pi/CC0pi_STV/" + rootfile;
+
   // Specify the data
   fSettings.SetDataInput(filename + ";" + dataname);
   // And the correlations

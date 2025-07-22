@@ -51,6 +51,8 @@ bool isT2K_CC0pi_STV(FitEvent *event, double EnuMin, double EnuMax);
 bool isT2K_CC0pi_1bin(FitEvent *event, double EnuMin, double EnuMax);
 bool isT2K_CC0pi_ifk(FitEvent *event, double EnuMin, double EnuMax);
 bool isT2K_CC0piAnuP0D(FitEvent *event, double EnuMin, double EnuMax); // TN328
+
+bool isT2K_CC1pipNp_STV(FitEvent *event);
 } // namespace SignalDef
 
 #endif

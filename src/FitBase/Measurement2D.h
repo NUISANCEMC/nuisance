@@ -546,7 +546,6 @@ public:
   //! fDecomposition
   virtual void SetCovarMatrixFromChol(std::string covarFile, int dim);
 
-protected:
   // The data histograms
   TH2D *fDataHist;   //!< default data histogram (use in chi2 calculations)
   TH2D *fDataOrig;   //!< histogram to store original data before throws.

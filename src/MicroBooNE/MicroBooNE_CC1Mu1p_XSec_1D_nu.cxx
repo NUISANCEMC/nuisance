@@ -29,7 +29,6 @@ MicroBooNE_CC1Mu1p_XSec_1D_nu::MicroBooNE_CC1Mu1p_XSec_1D_nu(
   //********************************************************************
   fSettings = LoadSampleSettings(samplekey);
 
-  std::cout << "enetered fileMicroBooNE_CC1Mu1p_XSec_1D_nu.cc" << std::endl;
   std::string name = fSettings.GetS("name");
   std::string objSuffix;
 
@@ -94,7 +93,6 @@ MicroBooNE_CC1Mu1p_XSec_1D_nu::MicroBooNE_CC1Mu1p_XSec_1D_nu(
                                "Target: Ar\n"
                                "Flux: BNB FHC numu\n"
                                "Signal: CC1Mu1p\n";
-  std::cout << "string description: " << descrip << std::endl;
   fSettings.SetDescription(descrip);
   fSettings.SetTitle(name);
   fSettings.SetAllowedTypes("FULL,DIAG/FREE,SHAPE,FIX/SYSTCOV/STATCOV",
@@ -194,14 +192,11 @@ void MicroBooNE_CC1Mu1p_XSec_1D_nu::FillEventVariables(FitEvent *event) {
                    TMath::Power(ProtonMass_GeV, 2.);                 // GeV^2
   double MuonEnergy = (event->GetHMFSParticle(13)->fP.E()) / 1000.0; // GeV/c
                                                                      // Abi
-  // std::cout<<"MuonEnergy"<<MuonEnergy<<std::endl;
   double ProtonEnergy = signal_proton.E() / 1000.0; // GeV/c Abi;
-  // std::cout<<"ProtonEnergy"<<ProtonEnergy<<std::endl;
   double ProtonKE = ProtonEnergy - ProtonMass_GeV;
 
   // ECal energy reconstruction
   double ECal = ((MuonEnergy) + (ProtonKE) + BE); // GeV
-  // std::cout<<"ECal"<<ECal<<std::endl;
   //  QE Energy Reconstruction
 
   double EQENum = 2 * (NeutronMass_GeV - BE) * MuonEnergy -
@@ -244,7 +239,6 @@ void MicroBooNE_CC1Mu1p_XSec_1D_nu::FillEventVariables(FitEvent *event) {
   // code
   double DeltaPtx = DeltaPT * TMath::Sin(DeltaAlphaT); // changed by Abi
                                                        // 06/12/23
-  // std::cout<< "Ptx is :"<<DeltaPtx<< "------------------------"<<std::endl;
   double Pty = -(vpmuT).Dot(vSumT) / vpmuT.Mag();
 
   double DeltaPty = DeltaPT * TMath::Sin(DeltaAlphaT); // changed by Abi
