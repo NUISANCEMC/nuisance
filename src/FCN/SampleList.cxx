@@ -108,7 +108,7 @@
 #ifdef FNAL_ENABLED
 // FNAL CCQE
 #include "FNAL_CCQE_Evt_1DQ2_nu.h"
-//#include "FNAL_CCQE_XSec_1DEnu_nu.h"
+#include "FNAL_CCQE_XSec_1DEnu_nu.h"
 // FNAL CC1ppip
 #include "FNAL_CC1ppip_Evt_1DQ2_nu.h"
 #include "FNAL_CC1ppip_XSec_1DEnu_nu.h"
@@ -209,7 +209,7 @@
 // #include "MINERvA_CC0pi_XSec_3DptpzTp_nu.h"
 #include "MINERvA_CC0pi_XSec_3DptpzTp_1DVersion_nu.h"
 #include "MINERvA_CC0pi_XSec_3Dq0qeemuTp_1DVersion_nu.h"
-//#include "MINERvA_CC0pi_XSec_1DQ2_antinu_H.h"
+#include "MINERvA_CC0pi_XSec_1DQ2_antinu_H.h"
 
 // 2018 MINERvA CC0pi 2D antinu
 #include "MINERvA_CC0pi_XSec_2D_antinu.h"
@@ -1724,7 +1724,9 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
                   }
 #endif
                   else {
-                    NUIS_ABORT("Error: No such sample: " << name << std::endl);
+                    NUIS_ERR(FTL, "Error: No such sample: " << name << std::endl);
+                    NUIS_ERR(FTL, "Check which samples are available by running the script in $NUISANCE/scripts/nuissamples");
+                    throw;
                   }
 
   // Return NULL if no sample loaded.

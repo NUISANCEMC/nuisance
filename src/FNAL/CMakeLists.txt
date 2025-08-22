@@ -21,6 +21,7 @@ set(FNAL_Impl_Files
   FNAL_CC1ppip_XSec_1DEnu_nu.cxx
   FNAL_CC1ppip_XSec_1DQ2_nu.cxx
   FNAL_CCQE_Evt_1DQ2_nu.cxx
+  FNAL_CCQE_XSec_1DEnu_nu.cxx
   FNAL_CC1ppim_XSec_1DEnu_antinu.cxx
 )
 
