@@ -42,7 +42,10 @@ MINERvA_CCNpip_XSec_1DTpi_nu::MINERvA_CCNpip_XSec_1DTpi_nu(nuiskey samplekey) {
   fSettings.DefineAllowedSpecies("numu");
 
   fFullPhaseSpace = !fSettings.Found("name", "_20deg");
+  // If using 2015 data, it is recommended to use the flux correction of 11%
+  // The 2016 data has this correction included (and if you compare the data, it's different by about 11%)
   fFluxCorrection = fSettings.Found("name", "fluxcorr");
+  // There's a 2015 and a 2016 version of this measurement
   fUpdatedData = !fSettings.Found("name", "2015");
   fSettings.SetTitle("MINERvA_CCNpip_XSec_1DTpi_nu");
 

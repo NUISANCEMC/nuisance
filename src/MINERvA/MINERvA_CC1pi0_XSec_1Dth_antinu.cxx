@@ -40,12 +40,13 @@ MINERvA_CC1pi0_XSec_1Dth_antinu::MINERvA_CC1pi0_XSec_1Dth_antinu(nuiskey samplek
   fSettings.SetAllowedTypes("FIX,FREE,SHAPE/DIAG,FULL/NORM/MASK", "FIX/FULL");
   fSettings.SetEnuRange(1.5, 10.0);
   fSettings.DefineAllowedTargets("C,H");
+  // Default to updated data unless specified
   fUpdatedData = !fSettings.Found("name", "2015");
   fFluxCorrection = fSettings.Found("name","fluxcorr");
   
   // CCQELike plot information
   fSettings.SetTitle("MINERvA_CC1pi0_XSec_1Dth_antinu");
-  fSettings.DefineAllowedSpecies("numu");
+  fSettings.DefineAllowedSpecies("numubar");
 
   FinaliseSampleSettings();
 
@@ -56,6 +57,7 @@ MINERvA_CC1pi0_XSec_1Dth_antinu::MINERvA_CC1pi0_XSec_1Dth_antinu(nuiskey samplek
   // Plot Setup -------------------------------------------------------
   if (fUpdatedData) {
 
+    // Updated data has a hadronic mass cut of 1.8 GeV/c2
     hadMassCut = 1800;
     fIsDiag = false;
 
@@ -69,9 +71,7 @@ MINERvA_CC1pi0_XSec_1Dth_antinu::MINERvA_CC1pi0_XSec_1Dth_antinu(nuiskey samplek
 
     SetCorrelationFromTextFile(GeneralUtils::GetTopLevelDir() + "/data/MINERvA/CC1pi0/2016/anu-cc1pi0-correlation-pion-angle.csv");
     SetShapeCovar();
-
   } else {
-
     // Although the covariance is given for MINERvA CC1pi0 nubar from 2015, it doesn't Cholesky decompose, hinting at something bad
     // I've tried adding small numbers to the diagonal but it still didn't work and the chi2s are crazy
     fIsDiag = true;
@@ -81,8 +81,6 @@ MINERvA_CC1pi0_XSec_1Dth_antinu::MINERvA_CC1pi0_XSec_1Dth_antinu(nuiskey samplek
 
     SetDataFromTextFile(GeneralUtils::GetTopLevelDir() + "/data/MINERvA/CC1pi0/2015/ccpi0_th.csv");
     SetCovarFromDiagonal();
-
-
   } // end special treatment depending on release year
 
 
