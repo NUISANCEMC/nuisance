@@ -29,6 +29,7 @@ set(BEBC_Impl_Files
   BEBC_CC1ppip_XSec_1DEnu_nu.cxx
   BEBC_CC1ppip_XSec_1DQ2_nu.cxx
   BEBC_CCQE_XSec_1DQ2_nu.cxx
+  BEBC_CCQE_XSec_1DEnu_nu.cxx
 )
 
 add_library(BEBC SHARED ${BEBC_Impl_Files})

@@ -17,28 +17,32 @@
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 
-#ifndef BEBC_CCQE_XSEC_1DQ2_NU_H_SEEN
-#define BEBC_CCQE_XSEC_1DQ2_NU_H_SEEN
+#ifndef FNAL_CCQE_XSec_1DENU_NU_H_SEEN
+#define FNAL_CCQE_XSec_1DENU_NU_H_SEEN
 
 #include "Measurement1D.h"
 #include "CustomVariableBoxes.h"
 
 //********************************************************************
-class BEBC_CCQE_XSec_1DQ2_nu : public Measurement1D {
+class FNAL_CCQE_XSec_1DEnu_nu : public Measurement1D {
 //********************************************************************
-public:
-  
-  BEBC_CCQE_XSec_1DQ2_nu(nuiskey samplekey);
-  virtual ~BEBC_CCQE_XSec_1DQ2_nu() {}; 
-  
-  /// \brief Fill Q2QE Event Information
-  void FillEventVariables(FitEvent *event);       
 
-  /// \brief Selection only true CCQE
-  bool isSignal(FitEvent *event);    
+public:
+
+  FNAL_CCQE_XSec_1DEnu_nu(nuiskey samplekey);
+  virtual ~FNAL_CCQE_XSec_1DEnu_nu() {};
+  
+  /// \brief Get Q2 assuming QE
+  void FillEventVariables(FitEvent *event);
+
+  /// \brief Get True CCQE
+  bool isSignal(FitEvent *event);
 
   /// \brief Fill main histograms and correction histograms             
   void FillHistograms();
+
+  /// \brief scale the MC Hist and correction histograms
+  void ScaleEvents();
 
   /// \brief Use Q2 Box to save correction info
   inline Q2VariableBox1D* GetQ2Box(){ return static_cast<Q2VariableBox1D*>(GetBox()); };
@@ -52,6 +56,8 @@ public:
   TH1D* CorrectionHist; ///< Correction factor
   TH1D* fMCHist_NoCorr; ///< Uncorrected fMCHist
 
-};
-  
+  double ThetaMu;
+  double q2qe;
+
+};  
 #endif

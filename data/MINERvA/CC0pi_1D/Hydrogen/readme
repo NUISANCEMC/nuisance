@@ -1,0 +1,7 @@
+xsec.csv
+--> Edited to xsec_mod_acc.csv to calculate total error (sys+stat)--> put in format low Q2, xsec, total error
+--> Also add 6.0 0.0 0.0 to show last bin edge
+cov_tot.csv
+--> Taken as raw
+
+Other files are just to test

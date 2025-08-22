@@ -17,17 +17,15 @@
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 
-#include "FNAL_CCQE_Evt_1DQ2_nu.h"
+#include "BEBC_CCQE_XSec_1DEnu_nu.h"
 
-// From Physical Review D, Volume 28, Number 3, 1 August 1983
-// Title: High-energy quasielastic nu_mu n -> mu^- p scattering in deuterium
 
 //********************************************************************
-FNAL_CCQE_Evt_1DQ2_nu::FNAL_CCQE_Evt_1DQ2_nu(nuiskey samplekey) {
+BEBC_CCQE_XSec_1DEnu_nu::BEBC_CCQE_XSec_1DEnu_nu(nuiskey samplekey) {
 //********************************************************************
 
   // Sample overview ---------------------------------------------------
-  std::string descrip = "FNAL_CCQE_Evt_1DQ2_nu sample. \n" \
+  std::string descrip = "BEBC_CCQE_XSec_1DEnu_nu sample. \n" \
                         "Target: D2 \n" \
                         "Flux:  \n" \
                         "Signal:  \n";
@@ -35,33 +33,34 @@ FNAL_CCQE_Evt_1DQ2_nu::FNAL_CCQE_Evt_1DQ2_nu(nuiskey samplekey) {
   // Setup common settings
   fSettings = LoadSampleSettings(samplekey);
   fSettings.SetDescription(descrip);
-  fSettings.SetXTitle("Q^{2} (GeV^{2})");
-  fSettings.SetYTitle("Number of events");
+  fSettings.SetXTitle("E_{#nu} (GeV)");
+  fSettings.SetYTitle("#sigma(E_{#nu}) (cm^{2}/nucleon)");
   fSettings.SetAllowedTypes("EVT/SHAPE/DIAG", "EVT/SHAPE/DIAG/Q2CORR/MASK");
-  fSettings.SetEnuRange(0.0, 600.0);
+  fSettings.SetEnuRange(0.0, 200.0);
   fSettings.DefineAllowedTargets("D,H");
 
   // plot information
-  fSettings.SetTitle("FNAL #nu_{#mu} CCQE");
+  fSettings.SetTitle("BEBC_CCQE_XSec_1DEnu_nu");
   fSettings.DefineAllowedSpecies("numu");
-  fSettings.SetDataInput(  FitPar::GetDataBase() + "FNAL/CCQE/FNAL_CCQE_Data_PRD29_436.root;FNAL_CCQE_Data_1DQ2");
-
+  fSettings.SetDataInput(  FitPar::GetDataBase() + "BEBC/CCQE/BEBC_CCQE_1DEnu.csv");
+   
   // is Q2 Correction applied
   applyQ2correction = fSettings.Found("type", "Q2CORR");
   if (applyQ2correction) {
-    fSettings.SetS("q2correction_file",  FitPar::GetDataBase() + "ANL/ANL_CCQE_Data_PRL31_844.root");
-    fSettings.SetS("q2correction_hist", "ANL_XSec_1DQ2_Correction");
+    fSettings.SetS("q2correction_file",  FitPar::GetDataBase() + "/data/ANL/ANL_CCQE_Data_PRL31_844.root");
+    fSettings.SetS("q2correction_hist", "ANL_XSec_1DEnu_Correction");
   }
 
   FinaliseSampleSettings();
 
   // Scaling Setup ---------------------------------------------------
-  // ScaleFactor for shape
-  fScaleFactor = 1.0;
+  // ScaleFactor automatically setup for DiffXSec/cm2/Nucleon
+  fScaleFactor =  GetEventHistogram()->Integral("width")*double(1E-38)/(double(fNEvents));
 
   // Plot Setup -------------------------------------------------------
-  SetDataFromRootFile( fSettings.GetDataInput() );
-  SetPoissonErrors();
+  SetDataFromTextFile( fSettings.GetDataInput() );
+  // Data is in units of 1E-38
+  fDataHist->Scale(1E-38);
   SetCovarFromDiagonal();
 
   // Correction Histogram
@@ -83,10 +82,11 @@ FNAL_CCQE_Evt_1DQ2_nu::FNAL_CCQE_Evt_1DQ2_nu(nuiskey samplekey) {
 
   // Final setup  ---------------------------------------------------
   FinaliseMeasurement();
+
 }
 
 //********************************************************************
-void FNAL_CCQE_Evt_1DQ2_nu::FillEventVariables(FitEvent * event) {
+void BEBC_CCQE_XSec_1DEnu_nu::FillEventVariables(FitEvent * event) {
 //********************************************************************
 
   if (event->NumFSParticle(13) == 0)
@@ -97,15 +97,14 @@ void FNAL_CCQE_Evt_1DQ2_nu::FillEventVariables(FitEvent * event) {
   TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
   TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
 
-  ThetaMu = Pnu.Vect().Angle(Pmu.Vect());
-  fXVar = FitUtils::Q2QErec(Pmu, cos(ThetaMu), 0., true);
+  fXVar = Pnu.E()/1E3;
 
-  GetQ2Box()->fQ2 = fXVar;
+  GetQ2Box()->fQ2 = -(Pnu-Pmu).Mag2();
   return;
 };
 
 //********************************************************************
-bool FNAL_CCQE_Evt_1DQ2_nu::isSignal(FitEvent * event) {
+bool BEBC_CCQE_XSec_1DEnu_nu::isSignal(FitEvent * event) {
 //********************************************************************
 
   if (!SignalDef::isCCQE(event, 14, EnuMin, EnuMax)) return false;
@@ -117,7 +116,7 @@ bool FNAL_CCQE_Evt_1DQ2_nu::isSignal(FitEvent * event) {
 };
 
 //********************************************************************
-void FNAL_CCQE_Evt_1DQ2_nu::FillHistograms() {
+void BEBC_CCQE_XSec_1DEnu_nu::FillHistograms() {
 //********************************************************************
 
   if (applyQ2correction) {
@@ -132,16 +131,3 @@ void FNAL_CCQE_Evt_1DQ2_nu::FillHistograms() {
 
 }
 
-//********************************************************************
-void FNAL_CCQE_Evt_1DQ2_nu::ScaleEvents() {
-//********************************************************************
-
-  Measurement1D::ScaleEvents();
-
-  // Flux unfold our extra histogram
-  if (applyQ2correction) {
-    if (fMCHist_NoCorr->Integral()) {
-      fMCHist_NoCorr->Scale(fDataHist->Integral() / fMCHist_NoCorr->Integral());
-    }
-  }
-}
