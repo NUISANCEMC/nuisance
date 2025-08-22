@@ -81,78 +81,80 @@ void ParserUtils::ParseArgument(std::vector<std::string>& args, std::string opt,
 }
 
 void ParserUtils::ParseArgument(std::vector<std::string>& args, std::string opt,
-                                std::vector<std::string>& val, bool required, bool duplicates) {
+    std::vector<std::string>& val, bool required, bool duplicates) {
 
-	while (std::find(args.begin(), args.end(), opt) != args.end()) {
-		std::string temp = "";
-		ParseArgument(args, opt, temp, required);
-		val.push_back(temp);
-	}
+  (void)duplicates;
+  while (std::find(args.begin(), args.end(), opt) != args.end()) {
+    std::string temp = "";
+    ParseArgument(args, opt, temp, required);
+    val.push_back(temp);
+  }
 
-	if (required and val.empty()) {
-	 NUIS_ABORT("No flag " << opt << " found in commands."
-		      << "This is required!");
-	}
+  if (required and val.empty()) {
+    NUIS_ABORT("No flag " << opt << " found in commands."
+        << "This is required!");
+  }
 }
 
 
 
 void ParserUtils::ParseSplitArgument(std::vector<std::string>& args, std::string opt,
-                                     std::string& val, bool required, bool duplicates) {
+    std::string& val, bool required, bool duplicates) {
 
-	int indexfound = -1;
-	std::string splitline = "";
-	int linecount = 0;
+  (void)duplicates;
+  (void)required;
 
-	for (size_t i = 0; i < args.size(); i++) {
-		if (args.empty()) break;
+  int indexfound = -1;
+  std::string splitline = "";
+  int linecount = 0;
+
+  for (size_t i = 0; i < args.size(); i++) {
+    if (args.empty()) break;
 
 
-		// Start saving
-		if (!(args[i]).compare(opt.c_str())) {
-			indexfound = i;
-			splitline = "";
-			continue;
-		}
+    // Start saving
+    if (!(args[i]).compare(opt.c_str())) {
+      indexfound = i;
+      splitline = "";
+      continue;
+    }
 
-		if (indexfound != -1) {
-			if (args[i][0] == '-') {
-				break;
-			}
+    if (indexfound != -1) {
+      if (args[i][0] == '-') {
+        break;
+      }
 
-			splitline += args[i] + " ";
-			linecount++;
-		}
-	}
+      splitline += args[i] + " ";
+      linecount++;
+    }
+  }
 
-	// Remove from vector
-	if (indexfound != -1) {
-		for (int i = indexfound; i <= indexfound + linecount; i++) {
-			args.erase(args.begin() + i);
-		}
-		val = splitline;
-	}
+  // Remove from vector
+  if (indexfound != -1) {
+    for (int i = indexfound; i <= indexfound + linecount; i++) {
+      args.erase(args.begin() + i);
+    }
+    val = splitline;
+  }
 }
 
 
 void ParserUtils::ParseSplitArgument(std::vector<std::string>& args, std::string opt,
-                                     std::vector<std::string>& val, bool required, bool duplicates) {
+    std::vector<std::string>& val, bool required, bool duplicates) {
 
-	//std::cout << "Starting split argument" << std::endl;
-	while (std::find(args.begin(), args.end(), opt) != args.end()) {
-		std::string temp = "";
-		ParseArgument(args, opt, temp, required, duplicates);
+  //std::cout << "Starting split argument" << std::endl;
+  while (std::find(args.begin(), args.end(), opt) != args.end()) {
+    std::string temp = "";
+    ParseArgument(args, opt, temp, required, duplicates);
 
-		val.push_back(temp);
-	}
+    val.push_back(temp);
+  }
 
-	if (required and val.empty()) {
-	 NUIS_ABORT( "No flag " << opt << " found in commands."
-		       << "This is required!");
-		throw;
-	}
-
-
+  if (required and val.empty()) {
+    NUIS_ABORT( "No flag " << opt << " found in commands."
+        << "This is required!");
+    throw;
+  }
 }
 
 
@@ -170,21 +172,21 @@ void ParserUtils::ParseSplitArgument(std::vector<std::string>& args, std::string
 
 void ParserUtils::ParseCounter(std::vector<std::string>& args, std::string opt, int& count) {
 
-	std::vector<int> indexlist;
+  std::vector<int> indexlist;
 
-	for (size_t i = 0; i < args.size(); i++) {
-		if (!(args[i]).compare( "+" + opt)) {
-			count++;
-			indexlist.push_back(i);
-		} else if (!(args[i]).compare( "-" + opt)) {
-			count--;
-			indexlist.push_back(i);
-		}
-	}
+  for (size_t i = 0; i < args.size(); i++) {
+    if (!(args[i]).compare( "+" + opt)) {
+      count++;
+      indexlist.push_back(i);
+    } else if (!(args[i]).compare( "-" + opt)) {
+      count--;
+      indexlist.push_back(i);
+    }
+  }
 
-	for (size_t i = 0; i < indexlist.size(); i++) {
-		args.erase(args.begin() + indexlist[i]);
-	}
+  for (size_t i = 0; i < indexlist.size(); i++) {
+    args.erase(args.begin() + indexlist[i]);
+  }
 }
 
 

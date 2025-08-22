@@ -147,8 +147,7 @@ double EnuCC1pi0rec(TLorentzVector pnu, TLorentzVector pmu,
                     TLorentzVector ppi0 = TLorentzVector(0, 0, 0, 0));
 
 /// Reconstruct Q2 from CCpi0 vectors and binding energy
-double Q2CC1pi0rec(TLorentzVector pnu, TLorentzVector pmu,
-                   TLorentzVector ppi0 = TLorentzVector(0, 0, 0, 0));
+double Q2CC1pi0rec(TLorentzVector pnu, TLorentzVector pmu);
 
 /*
   CC1pi+ MiniBooNE

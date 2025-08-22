@@ -29,9 +29,9 @@ class GeneratorInfoBase {
 public:
   inline GeneratorInfoBase(){};
   inline virtual ~GeneratorInfoBase(){};
-  inline virtual void AddBranchesToTree(TTree* tn){};
-  inline virtual void SetBranchesFromTree(TTree* tn){};
-  inline virtual void AllocateParticleStack(int stacksize){};
+  inline virtual void AddBranchesToTree(TTree* tn){(void)tn;};
+  inline virtual void SetBranchesFromTree(TTree* tn){(void)tn;};
+  inline virtual void AllocateParticleStack(int stacksize){(void)stacksize;};
   inline virtual void DeallocateParticleStack(){};
   inline virtual void Reset(){};
 };

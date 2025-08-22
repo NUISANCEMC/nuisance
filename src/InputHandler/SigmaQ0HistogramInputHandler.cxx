@@ -169,6 +169,7 @@ FitEvent *
 SigmaQ0HistogramInputHandler::GetNuisanceEvent(const UInt_t entry,
                                                const bool lightweight) {
 
+  (void)lightweight;
   // Catch too large entries
   if (entry >= (UInt_t)fNEvents)
     return NULL;

@@ -85,6 +85,8 @@ nuisconfig::~nuisconfig() {
 
 void nuisconfig::LoadSettings(std::string const &filename,
                               std::string const &state) {
+  (void)state;
+
   // Open file and see if its XML
   std::cout << "[ NUISANCE ]: Trying to parse file : " << filename;
   // StopTalking();
@@ -108,6 +110,7 @@ void nuisconfig::LoadXMLSettings(std::string const &filename,
   std::cout << "[ NUISANCE ]: Loading XML settings from : " << filename
             << std::endl;
 
+  (void)state;
   // Add new file to xml docs list
   fXMLDocs.push_back(fXML->ParseFile(filename.c_str(), 1000000));
 
@@ -176,6 +179,7 @@ void nuisconfig::LoadXMLSettings(std::string const &filename,
 
 void nuisconfig::LoadCardSettings(std::string const &filename,
                                   std::string const &state) {
+  (void)state;
   std::cout << "[ NUISANCE ]: Loading simple config from : " << filename << std::endl;
 
   // Build XML Config from the card file by parsing each line

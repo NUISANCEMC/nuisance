@@ -17,7 +17,7 @@ class LikelihoodWeightEngine : public WeightEngineBase {
 
 		void SetDialValue(int rwenum, double val);
 		void Reconfigure(bool silent = false);
-		inline double CalcWeight(BaseFitEvt* evt) {return 1.0;};
+		inline double CalcWeight(BaseFitEvt* evt) { (void)evt; return 1.0;};
 		inline bool NeedsEventReWeight(){ return false; };
 
 		double GetDialValue(std::string name);

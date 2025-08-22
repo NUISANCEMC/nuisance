@@ -107,6 +107,7 @@ bool SciBooNE_CCCOH_STOPFINAL_1DQ2_nu::isSignal(FitEvent *event){
 
 void SciBooNE_CCCOH_STOPFINAL_1DQ2_nu::FillExtraHistograms(MeasurementVariableBox* vars, double weight){
 
+  (void)vars;
   if (Signal){
     fMCStack->Fill(Mode, fXVar, weight);
     fPIDStack->Fill(this->mainTrack->fPID, fXVar, weight);

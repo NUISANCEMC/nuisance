@@ -525,7 +525,7 @@ void CSVDump1D(std::vector<TH1 *> MCs, TH1 *Data) {
     std::cout << R"(""")" << std::endl<< std::endl;
 }
 
-void Plot2D(std::vector<TH1 *> MC, TH1 *Data) {}
+void Plot2D(std::vector<TH1 *> MC, TH1 *Data) {(void)MC; (void)Data; }
 
 void PlotSingleHist() {
 

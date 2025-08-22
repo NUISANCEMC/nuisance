@@ -196,6 +196,7 @@ bool MiniBooNE_CCQE_XSec_1DQ2_antinu::isSignal(FitEvent *event) {
 
 void MiniBooNE_CCQE_XSec_1DQ2_antinu::FillExtraHistograms(
     MeasurementVariableBox *vars, double weight) {
+  (void)vars;
 
   // No Extra Hists if not ccqelike
   if (!fCCQElike or !Signal)

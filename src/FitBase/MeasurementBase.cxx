@@ -439,6 +439,9 @@ std::vector<TH1 *> MeasurementBase::GetXSecList() {
 void MeasurementBase::ProcessExtraHistograms(int cmd,
                                              MeasurementVariableBox *vars,
                                              double weight) {
+  (void)cmd;
+  (void)vars;
+  (void)weight;
   // This should be overriden if we have extra histograms!!!
   // Add a flag to tell user this...
   return;

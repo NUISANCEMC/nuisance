@@ -170,6 +170,7 @@ bool MiniBooNE_CCQE_XSec_1DQ2_nu::isSignal(FitEvent *event) {
 
 
 void MiniBooNE_CCQE_XSec_1DQ2_nu::FillExtraHistograms(MeasurementVariableBox* vars, double weight) {
+  (void)vars;
 
   // No Extra Hists if not ccqelike
   if (!ccqelike) return;

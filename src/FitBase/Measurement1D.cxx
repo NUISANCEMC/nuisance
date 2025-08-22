@@ -1654,6 +1654,8 @@ void Measurement1D::SetupMeasurement(std::string inputfile, std::string type,
                                      FitWeight *rw, std::string fkdt) {
   //********************************************************************
 
+  (void)fkdt;
+
   nuiskey samplekey = Config::CreateKey("sample");
   samplekey.Set("name", fName);
   samplekey.Set("type", type);

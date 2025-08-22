@@ -412,6 +412,8 @@ void PlotUtils::FluxUnfoldedScaling(TH2D *fMCHist, TH1D *fhist, TH1D *ehist,
 
 TH1D *PlotUtils::InterpolateFineHistogram(TH1D *hist, int res,
                                           std::string opt) {
+  (void)opt;
+
   int nbins = hist->GetNbinsX();
   double elow = hist->GetXaxis()->GetBinLowEdge(1);
   double ehigh = hist->GetXaxis()->GetBinLowEdge(nbins + 1);

@@ -716,6 +716,7 @@ void Smearceptance_Tester::FillEventVariables(FitEvent *event) {
 void Smearceptance_Tester::Write(std::string drawOpt) {
   //********************************************************************
 
+  (void)drawOpt;
   if (OutputSummaryTree) {
     // First save the TTree
     eventVariables->Write();

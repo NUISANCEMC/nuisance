@@ -6,6 +6,7 @@ void MeasurementVariableBox2D::Reset() {
 }
 
 void MeasurementVariableBox2D::FillBoxFromEvent(FitEvent* evt) {
+  (void)evt;
   return;
 }
 
@@ -18,28 +19,4 @@ MeasurementVariableBox* MeasurementVariableBox2D::CloneSignalBox() {
 
 void MeasurementVariableBox2D::Print() {
   std::cout << "Printing Empty BOX! " << std::endl;
-}
-
-double MeasurementVariableBox2D::GetX(){
-  return fX;
-}
-
-double MeasurementVariableBox2D::GetY(){
-  return fY;
-}
-
-double MeasurementVariableBox2D::GetZ(){
-  return -999.9;
-}
-
-int MeasurementVariableBox2D::GetMode(){
-  return 0;
-}
-
-void MeasurementVariableBox2D::SetX(double x){
-  fX = x;
-}
-
-void MeasurementVariableBox2D::SetY(double y){
-  fY = y;
 }

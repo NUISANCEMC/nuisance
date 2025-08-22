@@ -99,6 +99,8 @@ void NUISANCEWeightEngine::SetDialValue(std::string name, double val) {
 }
 
 void NUISANCEWeightEngine::Reconfigure(bool silent) {
+  (void)silent;
+
   for (size_t i = 0; i < fNUISANCEEnums.size(); i++) {
     // Is this parameter handled
     bool IsHandledSomewhere = false;

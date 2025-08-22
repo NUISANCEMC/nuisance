@@ -5,6 +5,7 @@
 GIBUUGeneratorInfo::~GIBUUGeneratorInfo() { DeallocateParticleStack(); }
 
 void GIBUUGeneratorInfo::AddBranchesToTree(TTree *tn) {
+  (void)tn;
   // tn->Branch("NEUTParticleN",          fNEUTParticleN, "NEUTParticleN/I");
   // tn->Branch("NEUTParticleStatusCode", fNEUTParticleStatusCode,
   // "NEUTParticleStatusCode[NEUTParticleN]/I");
@@ -13,12 +14,14 @@ void GIBUUGeneratorInfo::AddBranchesToTree(TTree *tn) {
 }
 
 void GIBUUGeneratorInfo::SetBranchesFromTree(TTree *tn) {
+  (void)tn;
   // tn->SetBranchAddress("NEUTParticleN",          &fNEUTParticleN );
   // tn->SetBranchAddress("NEUTParticleStatusCode", &fNEUTParticleStatusCode );
   // tn->SetBranchAddress("NEUTParticleAliveCode",  &fNEUTParticleAliveCode  );
 }
 
 void GIBUUGeneratorInfo::AllocateParticleStack(int stacksize) {
+  (void)stacksize;
   // fNEUTParticleN = 0;
   // fNEUTParticleStatusCode = new int[stacksize];
   // fNEUTParticleStatusCode = new int[stacksize];
@@ -30,6 +33,7 @@ void GIBUUGeneratorInfo::DeallocateParticleStack() {
 }
 
 void GIBUUGeneratorInfo::FillGeneratorInfo(GiBUUStdHepReader *nevent) {
+  (void)nevent;
   Reset();
   // for (int i = 0; i < nevent->Npart(); i++) {
   // fNEUTParticleStatusCode[i] = nevent->PartInfo(i)->fStatus;

@@ -140,6 +140,7 @@ void MCStudy_MuonValidation::FillEventVariables(FitEvent *event) {
 void MCStudy_MuonValidation::Write(std::string drawOpt) {
 //********************************************************************
 
+  (void)drawOpt;
   // Save the event ttree
   fEventTree->Write();
 

@@ -156,6 +156,7 @@ void TemplateMeas1D::FillEventVariables(FitEvent *event) {
 bool TemplateMeas1D::isSignal(FitEvent *event) {
   //********************************************************************
 
+  (void)event;
   // 2 Different Signal Definitions
   // if (ccqelike) return SignalDef::isCCQELike(event, 14, EnuMin, EnuMax);
   //  else return SignalDef::isCCQE(event, 14, EnuMin, EnuMax);

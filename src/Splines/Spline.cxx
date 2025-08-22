@@ -316,6 +316,7 @@ float Spline::Spline1DTSpline3(const Float_t *par) const {
 // 2D Functions
 // ----------------------------------------------
 float Spline::Spline2DPol(const Float_t *par, int n) const {
+  (void)n;
 
   float wx = (fVal[0] - fValMin[0]) / (fValMax[0] - fValMin[0]);
   float wy = (fVal[1] - fValMin[1]) / (fValMax[1] - fValMin[1]);

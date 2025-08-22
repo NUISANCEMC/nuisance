@@ -248,6 +248,7 @@ int SciBooNEUtils::isProton(FitParticle* track){
 
 // Function to return the MainTrk
 int SciBooNEUtils::GetMainTrack(FitEvent *event, TH2D *mupiHist, TH2D *protonHist, FitParticle*& mainTrk, double& weight, bool penetrated){
+  (void)penetrated;
 
   FitParticle *nu     = event->GetNeutrinoIn();
   int index           = 0;
@@ -375,6 +376,7 @@ double SciBooNEUtils::apply_smear(double central, double width){
 }
 
 double SciBooNEUtils::smear_p(FitParticle* track, double smear){
+  (void)smear;
   static TF1 *f1 = new TF1("f1", "gaus(0)+gaus(3)", -0.8, 0.8);
   static bool set_pars = false;
   if (!set_pars){
@@ -392,6 +394,7 @@ double SciBooNEUtils::smear_p(FitParticle* track, double smear){
 }
 
 double SciBooNEUtils::smear_th(FitParticle* track1, FitParticle* track2, double smear){
+  (void)smear;
   static TF1 *f1 = new TF1("f1", "gaus(0)+gaus(3)", -15, 15);
   static bool set_pars = false;
   if (!set_pars){
@@ -412,6 +415,7 @@ double SciBooNEUtils::smear_th(FitParticle* track1, FitParticle* track2, double 
 // NOTE: need to adapt this to allow for penetrating events...
 // Simpler, but gives the same results as in Hirade-san's thesis
 double SciBooNEUtils::CalcThetaPr(FitEvent *event, FitParticle *main, FitParticle *second, bool penetrated){
+  (void)penetrated;
   
   FitParticle *nu   = event->GetNeutrinoIn();
 

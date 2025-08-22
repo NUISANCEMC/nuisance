@@ -3,6 +3,7 @@ void MeasurementVariableBox::Reset() {
 }
 
 void MeasurementVariableBox::FillBoxFromEvent(FitEvent* evt) {
+  (void)evt;
   return;
 }
 

@@ -18,6 +18,8 @@ class HistoInputHandler : public InputHandlerBase {
   /// Returns NUISANCE Format Event from GiReader
   FitEvent* GetNuisanceEvent(const UInt_t entry,
                              const bool lightweight = false) {
+    (void)entry;
+    (void)lightweight;
     return NULL;
   }
 

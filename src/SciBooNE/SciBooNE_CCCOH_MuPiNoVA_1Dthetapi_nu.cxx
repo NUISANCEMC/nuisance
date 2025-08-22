@@ -101,6 +101,7 @@ bool SciBooNE_CCCOH_MuPiNoVA_1Dthetapi_nu::isSignal(FitEvent *event){
 
 
 void SciBooNE_CCCOH_MuPiNoVA_1Dthetapi_nu::FillExtraHistograms(MeasurementVariableBox* vars, double weight){
+  (void)vars;
 
   if (Signal){
     fMCStack->Fill(Mode, fXVar, weight);
