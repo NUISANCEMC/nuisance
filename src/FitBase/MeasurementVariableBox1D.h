@@ -18,10 +18,10 @@ public:
   virtual double GetZ();
   virtual int GetMode();
 
-  virtual void SetX(double x);
-  virtual void SetY(double y){};
-  virtual void SetZ(double z){};
-  virtual void SetMode(int m){};
+  virtual void SetX(double x) {fX = x;};
+  virtual void SetY(double y) {};
+  virtual void SetZ(double z) {};
+  virtual void SetMode(int m) {};
 
   double fX;
 

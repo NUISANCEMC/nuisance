@@ -34,7 +34,3 @@ int MeasurementVariableBox1D::GetMode(){
   return 0;
 }
 
-void MeasurementVariableBox1D::SetX(double x){
-  fX = x;
-}
-
