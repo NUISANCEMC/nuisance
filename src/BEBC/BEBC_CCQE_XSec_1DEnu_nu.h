@@ -17,19 +17,19 @@
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 
-#ifndef BEBC_CCQE_XSEC_1DQ2_NU_H_SEEN
-#define BEBC_CCQE_XSEC_1DQ2_NU_H_SEEN
+#ifndef BEBC_CCQE_XSEC_1DENU_NU_H_SEEN
+#define BEBC_CCQE_XSEC_1DENU_NU_H_SEEN
 
 #include "Measurement1D.h"
 #include "CustomVariableBoxes.h"
 
 //********************************************************************
-class BEBC_CCQE_XSec_1DQ2_nu : public Measurement1D {
+class BEBC_CCQE_XSec_1DEnu_nu : public Measurement1D {
 //********************************************************************
 public:
   
-  BEBC_CCQE_XSec_1DQ2_nu(nuiskey samplekey);
-  virtual ~BEBC_CCQE_XSec_1DQ2_nu() {}; 
+  BEBC_CCQE_XSec_1DEnu_nu(nuiskey samplekey);
+  virtual ~BEBC_CCQE_XSec_1DEnu_nu() {}; 
   
   /// \brief Fill Q2QE Event Information
   void FillEventVariables(FitEvent *event);       
