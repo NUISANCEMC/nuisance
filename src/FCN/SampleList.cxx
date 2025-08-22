@@ -930,8 +930,8 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
 #ifdef FNAL_ENABLED
       if (!name.compare("FNAL_CCQE_Evt_1DQ2_nu")) {
     return (new FNAL_CCQE_Evt_1DQ2_nu(samplekey));
-      //} else if (!name.compare("FNAL_CCQE_XSec_1DEnu_nu")) {
-    //return (new FNAL_CCQE_XSec_1DEnu_nu(samplekey));
+      } else if (!name.compare("FNAL_CCQE_XSec_1DEnu_nu")) {
+    return (new FNAL_CCQE_XSec_1DEnu_nu(samplekey));
     /*
       FNAL CC1ppip
     */
@@ -1238,8 +1238,8 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
           !name.compare("MINERvA_CC0pi_XSec_2DQ2QEEnuTrue_antinu")) {
         return (new MINERvA_CC0pi_XSec_2D_antinu(samplekey));
 
-      //} else if (!name.compare("MINERvA_CC0pi_XSec_1DQ2_antinu_H")) {
-        //return (new MINERvA_CC0pi_XSec_1DQ2_antinu_H(samplekey));
+      } else if (!name.compare("MINERvA_CC0pi_XSec_1DQ2_antinu_H")) {
+        return (new MINERvA_CC0pi_XSec_1DQ2_antinu_H(samplekey));
 
         /*
            CC1pi+
