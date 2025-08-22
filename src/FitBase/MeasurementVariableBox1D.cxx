@@ -5,6 +5,7 @@ void MeasurementVariableBox1D::Reset() {
 }
 
 void MeasurementVariableBox1D::FillBoxFromEvent(FitEvent* evt) {
+  (void)evt;
   return;
 }
 

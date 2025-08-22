@@ -715,6 +715,7 @@ void SystematicRoutines::SetupCovariance() {
 void SystematicRoutines::ThrowCovariance(bool uniformly) {
   //*************************************
 
+  (void)uniformly;
   // Set fThrownVals to all values in currentVals
   for (UInt_t i = 0; i < fParams.size(); i++) {
     std::string name = fParams.at(i);

@@ -58,18 +58,12 @@ class EventManager {
 
 namespace FitBase {
 
-  inline
-  EventManager& EvtManager(){ return EventManager::Get(); };
-  inline
-  FitWeight* GetRW(){ return EvtManager().GetRW(); };
-  inline
-  void SetRW(FitWeight* rw){ EvtManager().SetRW(rw); };
-  inline
-  int GetInputID(std::string infile){ return EvtManager().GetInputID(infile); };
-  inline
-  InputHandlerBase* GetInput(int infile){ return EvtManager().GetInput(infile); };
-  inline
-  InputHandlerBase* AddInput(std::string handle, std::string infile){ return EvtManager().AddInput(handle, infile); };
+  inline EventManager& EvtManager(){ return EventManager::Get(); };
+  inline FitWeight* GetRW(){ return EvtManager().GetRW(); };
+  inline void SetRW(FitWeight* rw){ EvtManager().SetRW(rw); };
+  inline int GetInputID(std::string infile){ return EvtManager().GetInputID(infile); };
+  inline InputHandlerBase* GetInput(int infile){ return EvtManager().GetInput(infile); };
+  inline InputHandlerBase* AddInput(std::string handle, std::string infile){ return EvtManager().AddInput(handle, infile); };
 
 
 }

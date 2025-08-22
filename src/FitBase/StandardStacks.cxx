@@ -477,6 +477,7 @@ bool TargetTypeStack::IncludeInStack(TH1 *hist) {
 // CC Topology Stack Functions
 CCTopologyStack::CCTopologyStack(std::string name, std::string title,
                                  TH1 *hist) {
+  (void)hist;
   fName = name;
   fTitle = title;
 

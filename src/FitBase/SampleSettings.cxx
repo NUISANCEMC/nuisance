@@ -78,6 +78,7 @@ void SampleSettings::Set(std::string name, std::string s) {
 
 
 void SampleSettings::DefineAllowedTargets(std::string targ) {
+  (void)targ;
   // fAllowedTargets = TargetUtils::ParseTargetsToIntVect(targ);
 };
 

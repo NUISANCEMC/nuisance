@@ -63,6 +63,8 @@ bool LOGGING(int level) {
 };
 
 int __GETLOG_LEVEL(int level, const char* filename, const char* funct) {
+  (void)funct;
+  (void)filename;
 #ifdef __DEBUG__
   int logfile = FitPar::Config().GetParI("logging." + std::string(filename));
   if (logfile >= DEB and logfile <= EVT) {

@@ -33,6 +33,8 @@ FitWeight* EventManager::GetRW() { return fRW; };
 InputHandlerBase* EventManager::GetInput(int infile) { return finputs[infile]; };
 
 FitEvent* EventManager::GetEvent(int infile, int i) {
+  (void)infile;
+  (void)i;
   /*
   finputs[infile]->ReadEvent(i);
   FitEvent* evtpt = finputs[infile]->GetEventPointer();
@@ -54,6 +56,8 @@ FitEvent* EventManager::GetEvent(int infile, int i) {
 }
 
 double EventManager::GetEventWeight(int infile, int i) {
+  (void)infile;
+  (void)i;
   /*
   if (!frwneeded[infile][i]) {
     return calc_rw[infile][i];

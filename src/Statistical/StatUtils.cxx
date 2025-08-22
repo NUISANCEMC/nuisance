@@ -704,6 +704,7 @@ TH1D *StatUtils::ThrowHistogram(TH1D *hist, TMatrixDSym *cov, bool throwdiag,
                                 TH1I *mask) {
   //*******************************************************************
 
+  (void)throwdiag;
   TH1D *calc_hist =
       (TH1D *)hist->Clone((std::string(hist->GetName()) + "_THROW").c_str());
   TMatrixDSym *calc_cov = (TMatrixDSym *)cov->Clone();

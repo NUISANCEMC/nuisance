@@ -89,6 +89,7 @@ std::vector<std::string> LoadCharToVectStr(int argc, char* argv[]);
 
 template <typename T, size_t N>
 size_t GetArraySize(const T (&data)[N]) {
+  (void)data;
   return N;
 }
 template <typename T>

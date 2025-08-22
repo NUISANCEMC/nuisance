@@ -77,5 +77,6 @@ double LikelihoodWeightEngine::GetDialValue(std::string name) {
 }
 
 void LikelihoodWeightEngine::Reconfigure(bool silent) {
+  (void)silent;
   // Empty placeholder incase we want print statements...
 }

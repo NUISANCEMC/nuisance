@@ -76,5 +76,6 @@ double SampleNormEngine::GetDialValue(std::string name) {
 }
 
 void SampleNormEngine::Reconfigure(bool silent) {
+  (void)silent;
   // Empty placeholder incase we want print statements...
 }

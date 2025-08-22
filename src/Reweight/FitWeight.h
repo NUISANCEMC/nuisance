@@ -11,7 +11,7 @@
 
 class FitWeight {
 public:
-  FitWeight(std::string name = "") {};
+  FitWeight(std::string name = "") {(void)name;};
 
   // Add a new RW engine given type
   void AddRWEngine(int rwtype);
@@ -38,7 +38,7 @@ public:
   bool DialIncluded(int rwenum);
 
   double CalcWeight(BaseFitEvt* evt);
-  bool HasRWDialChanged(const double* x) { return true; };
+  bool HasRWDialChanged(const double* x) { (void)x; return true; };
   // bool NeedsEventReWeight(const double* x);
 
   void SetAllDials(const double* x, int n);

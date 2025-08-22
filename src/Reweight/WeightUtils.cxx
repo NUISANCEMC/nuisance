@@ -442,6 +442,7 @@ int Reweight::NEUTEnumFromName(std::string const &name) {
   return neut::NSyst::DialFromString(name);
 #endif
 #else
+  (void)name;
   return Reweight::kGeneratorNotBuilt;
 #endif
 }
@@ -451,6 +452,7 @@ int Reweight::NIWGEnumFromName(std::string const &name) {
   int niwgenum = (int)niwg::rew::NIWGSyst::FromString(name);
   return (niwgenum != 0) ? niwgenum : Reweight::kNoDialFound;
 #else
+  (void)name;
   return Reweight::kGeneratorNotBuilt;
 #endif
 }
@@ -460,6 +462,7 @@ int Reweight::GENIEEnumFromName(std::string const &name) {
   int genieenum = (int)genie::rew::GSyst::FromString(name);
   return (genieenum > 0) ? genieenum : Reweight::kNoDialFound;
 #else
+  (void)name;
   return Reweight::kGeneratorNotBuilt;
 #endif
 }
@@ -484,6 +487,7 @@ int Reweight::T2KEnumFromName(std::string const &name) {
 #endif
   return (t2kenum > 0) ? t2kenum : Reweight::kNoDialFound;
 #else
+  (void)name;
   return Reweight::kGeneratorNotBuilt;
 #endif
 }
@@ -493,6 +497,7 @@ int Reweight::OscillationEnumFromName(std::string const &name) {
   int oscEnum = OscWeightEngine::SystEnumFromString(name);
   return (oscEnum > 0) ? oscEnum : Reweight::kNoDialFound;
 #else
+  (void)name;
   return Reweight::kGeneratorNotBuilt;
 #endif
 }

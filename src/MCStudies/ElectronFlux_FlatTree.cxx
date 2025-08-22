@@ -472,6 +472,7 @@ void ElectronFlux_FlatTree::FillEventVariables(FitEvent *event) {
 //********************************************************************
 void ElectronFlux_FlatTree::Write(std::string drawOpt) {
   //********************************************************************
+  (void)drawOpt;
 
   // First save the TTree
   eventVariables->Write();

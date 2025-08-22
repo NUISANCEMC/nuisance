@@ -474,7 +474,7 @@ void ElectronScattering_DurhamData::Write(std::string drawOpts) {
 
 double ElectronScattering_DurhamData::GetLikelihood() { return 0.0; }
 
-void ElectronScattering_DurhamData::SetFitOptions(std::string opt) { return; }
+void ElectronScattering_DurhamData::SetFitOptions(std::string opt) { (void)opt; return; }
 
 TH1D* ElectronScattering_DurhamData::GetMCHistogram(void) { return fMCHist; }
 

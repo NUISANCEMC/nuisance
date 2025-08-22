@@ -25,5 +25,5 @@ public:
   TH1D *GetEventHistogram() { return dummyh.get(); };
   TH1D *GetXSecHistogram() { return dummyh.get(); };
 
-  double GetInputWeight(const UInt_t entry) { return 1; }
+  double GetInputWeight(const UInt_t entry) { (void)entry; return 1; }
 };

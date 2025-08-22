@@ -520,6 +520,7 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
 void GenericFlux_Tester::Write(std::string drawOpt) {
   //********************************************************************
 
+  (void)drawOpt;
   // First save the TTree
   eventVariables->Write();
 

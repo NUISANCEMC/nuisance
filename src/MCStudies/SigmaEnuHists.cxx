@@ -221,6 +221,7 @@ void SigmaEnuHists::FillEventVariables(FitEvent *event) {
 };
 
 void SigmaEnuHists::Write(std::string drawOpt) {
+  (void)drawOpt;
   for (std::map<int, TH1D *>::iterator h = NEUTModeHists.begin();
        h != NEUTModeHists.end(); ++h) {
     PlotUtils::FluxUnfoldedScaling(h->second, GetFluxHistogram(),

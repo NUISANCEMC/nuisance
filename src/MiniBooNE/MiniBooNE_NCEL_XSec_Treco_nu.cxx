@@ -272,8 +272,8 @@ void MiniBooNE_NCEL_XSec_Treco_nu::SetResponseMatrix(std::string responseFile,
 
   // Response matrix: x axis is Ttrue, y axis is Treco
   this->response_mat = new TH2D((this->fName + "_RESPONSE_MATRIX").c_str(),
-                                (this->fName + this->fPlotTitles).c_str(), 50,
-                                0, 900, 51, arr_treco);
+                                (this->fName + this->fPlotTitles).c_str(), dim-1,
+                                0, 900, dim, arr_treco);
 
   if (response.is_open()) {
     NUIS_LOG(DEB, "Reading in the response matrix from file: " << responseFile);

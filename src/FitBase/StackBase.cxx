@@ -55,7 +55,7 @@ bool StackBase::IncludeInStack(TH1 *hist) {
   return true;
 }
 
-bool StackBase::IncludeInStack(int index) { return true; }
+bool StackBase::IncludeInStack(int index) { (void)index; return true; }
 
 void StackBase::SetupStack(TH1 *hist) {
   fTemplate = (TH1 *)hist->Clone(fName.c_str());
@@ -193,6 +193,8 @@ void StackBase::Add(TH1 *hist, double scale) {
 }
 
 void StackBase::Add(StackBase *hist, double scale) {
+
+  (void)scale;
 
   if (hist->GetType() != fType) {
     NUIS_ERR(WRN, "Trying to add two StackBases of different types!");

@@ -83,12 +83,14 @@ void SciBooNE_CCCOH_STOP_NTrks_nu::FillEventVariables(FitEvent *event){
 
 
 bool SciBooNE_CCCOH_STOP_NTrks_nu::isSignal(FitEvent *event){
+  (void)event;
 
   if (!this->mainTrack) return false;
   return true;
 };
 
 void SciBooNE_CCCOH_STOP_NTrks_nu::FillExtraHistograms(MeasurementVariableBox* vars, double weight){
+  (void)vars;
 
   if (Signal){
     fMCStack->Fill(Mode, fXVar, weight);

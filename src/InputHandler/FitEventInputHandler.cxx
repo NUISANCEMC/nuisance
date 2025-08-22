@@ -98,6 +98,7 @@ void FitEventInputHandler::RemoveCache() {
 
 FitEvent *FitEventInputHandler::GetNuisanceEvent(const UInt_t entry,
                                                  const bool lightweight) {
+  (void)lightweight;
   // Return NULL if out of bounds
   if (entry >= (UInt_t)fNEvents)
     return NULL;

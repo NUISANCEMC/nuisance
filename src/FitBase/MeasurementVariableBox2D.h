@@ -13,15 +13,15 @@ public:
   virtual MeasurementVariableBox* CloneSignalBox();
   virtual void Print();
 
-  virtual double GetX();
-  virtual double GetY();
-  virtual double GetZ();
-  virtual int GetMode();
+  virtual double GetX() {return fX;} ;
+  virtual double GetY() {return fY;} ;
+  virtual double GetZ() {return -999.9;};
+  virtual int GetMode() {return 0;};
 
-  virtual void SetX(double x);
-  virtual void SetY(double y);
-  virtual void SetZ(double z){};
-  virtual void SetMode(int m){};
+  virtual void SetX(double x) {fX=x;};
+  virtual void SetY(double y) {fY=y;};
+  virtual void SetZ(double z) {(void)z;};
+  virtual void SetMode(int m) {(void)m;};
 
   double fX, fY;
 

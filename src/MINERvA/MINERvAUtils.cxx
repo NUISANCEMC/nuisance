@@ -164,6 +164,7 @@ bool MINERvAUtils::PassesDistanceCut(FitParticle *beam, FitParticle *particle) {
 int MINERvAUtils::GetMainTrack(FitEvent *event, TH2D *effHist,
                                FitParticle *&mainTrk, double &weight,
                                bool penetrated) {
+  (void)penetrated;
 
   FitParticle *nu = event->GetNeutrinoIn();
   double highestMom = 0;

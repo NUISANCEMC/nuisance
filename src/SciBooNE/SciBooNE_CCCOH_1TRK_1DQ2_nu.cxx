@@ -86,12 +86,14 @@ void SciBooNE_CCCOH_1TRK_1DQ2_nu::FillEventVariables(FitEvent *event){
 
 
 bool SciBooNE_CCCOH_1TRK_1DQ2_nu::isSignal(FitEvent *event){
+  (void)event;
   if (!this->mainTrack) return false;
   if (this->nProtons+this->nPiMus != 0) return false;
   return true;
 };
 
 void SciBooNE_CCCOH_1TRK_1DQ2_nu::FillExtraHistograms(MeasurementVariableBox* vars, double weight){
+  (void)vars;
   
   if (Signal){
     fMCStack->Fill(Mode, fXVar, weight);

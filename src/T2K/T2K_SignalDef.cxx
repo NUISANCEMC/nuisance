@@ -361,7 +361,7 @@ bool isT2K_CC1pipNp_STV(FitEvent *event) {
   const double muhi = 7000;
 
   const double angular = 70.*M_PI/180.; // 70 degree cut
-  for (int i = 0; i < protons.size(); ++i) {
+  for (size_t i = 0; i < protons.size(); ++i) {
     // First check all the protons that are in range
     if (protons[i]->fP.Vect().Mag() > protlo && 
         protons[i]->fP.Vect().Mag() < prothi &&

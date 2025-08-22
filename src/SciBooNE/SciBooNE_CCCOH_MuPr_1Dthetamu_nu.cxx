@@ -85,6 +85,7 @@ void SciBooNE_CCCOH_MuPr_1Dthetamu_nu::FillEventVariables(FitEvent *event){
 
 
 bool SciBooNE_CCCOH_MuPr_1Dthetamu_nu::isSignal(FitEvent *event){
+  (void)event;
 
   if (!this->mainTrack) return false;
   if (this->nPiMus + this->nProtons != 1) return false;
@@ -99,6 +100,7 @@ bool SciBooNE_CCCOH_MuPr_1Dthetamu_nu::isSignal(FitEvent *event){
 
 
 void SciBooNE_CCCOH_MuPr_1Dthetamu_nu::FillExtraHistograms(MeasurementVariableBox* vars, double weight){
+  (void)vars;
 
   if (Signal){
     fMCStack->Fill(Mode, fXVar, weight);

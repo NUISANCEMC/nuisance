@@ -499,6 +499,7 @@ void GenericFlux_Vectors::AddSignalFlagsToTree() {
 
 void GenericFlux_Vectors::Write(std::string drawOpt) {
 
+  (void)drawOpt;
   // First save the TTree
   eventVariables->Write();
 

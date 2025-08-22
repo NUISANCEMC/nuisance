@@ -167,7 +167,7 @@ void T2K_CC1pipNp_CH_XSec_1DSTV_nu::FillEventVariables(FitEvent *event) {
   const double prothi = 1200;
   const double angular = 70.*M_PI/180.; // 70 degree cut
   int protindex = 0;
-  for (int i = 0; i < protons.size(); ++i) {
+  for (size_t i = 0; i < protons.size(); ++i) {
     if (protons[i]->fP.Vect().Mag() > protlo &&
         protons[i]->fP.Vect().Mag() < prothi &&
         protons[i]->fP.Vect().Angle(Pnu.Vect()) < angular) {

@@ -1804,6 +1804,7 @@ void Measurement2D::SetupMeasurement(std::string inputfile, std::string type,
                                      FitWeight *rw, std::string fkdt) {
   //********************************************************************
 
+  (void)fkdt;
   // Check if name contains Evt, indicating that it is a raw number of events
   // measurements and should thus be treated as once
   fIsRawEvents = false;

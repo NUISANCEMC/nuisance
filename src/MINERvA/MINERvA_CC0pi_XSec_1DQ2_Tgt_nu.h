@@ -47,9 +47,6 @@ public:
   ///\brief Determine Q2 from the leading proton
   void FillEventVariables(FitEvent *event);
 
-  ///\brief Calculate Extra Weight (Not necessary)
-  inline double CalcSampleWeight(FitEvent* event){ return 1.0; }
-
  private:
 
   TH1D* fCoplanarMCHist;   /// MC Coplanar Distribution

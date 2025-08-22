@@ -61,6 +61,7 @@ void SplineWeightEngine::SetDialValue(std::string name, double val) {
 }
 
 void SplineWeightEngine::Reconfigure(bool silent) {
+  (void)silent;
   for (size_t i = 0; i < fSingleNames.size(); i++) {
     fSplineValueMap[fSingleNames[i]] = fValues[i];
   }

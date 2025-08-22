@@ -244,6 +244,9 @@ void SplineWriter::FitSplinesForEvent(double *inputweights, float *coeff) {
 
 void SplineWriter::FitSplinesForEvent(TCanvas *fitcanvas, bool saveplot) {
 
+  (void)fitcanvas;
+  (void)saveplot;
+
   // Loop over splines
   //  int count = 0;
   int coeffcount = 0;
@@ -633,6 +636,7 @@ void SplineFCN::SaveAs(std::string name, const float *fx) {
 void SplineWriter::FitCoeff2DGraph(Spline *spl, int n, double *x, double *y,
                                    double *w, float *coeff, bool draw) {
 
+  (void)draw;
 #ifdef __USE_OPENMP__
 #pragma omp critical
 #endif
@@ -746,6 +750,12 @@ void SplineWriter::FitCoeffNDGraph(Spline *spl,
 
   // delete values;
   // delete minimizer;
+#else
+  (void)spl;
+  (void)v;
+  (void)w;
+  (void)coeff;
+  (void)draw;
 #endif
 }
 

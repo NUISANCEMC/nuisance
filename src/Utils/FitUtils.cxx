@@ -280,8 +280,7 @@ double FitUtils::EnuCC1pi0rec(TLorentzVector pnu, TLorentzVector pmu,
 //********************************************************************
 // Reconstruct Q2 for CC1pi0
 // Beware: uses true Enu, not reconstructed Enu
-double FitUtils::Q2CC1pi0rec(TLorentzVector pnu, TLorentzVector pmu,
-                             TLorentzVector ppi0) {
+double FitUtils::Q2CC1pi0rec(TLorentzVector pnu, TLorentzVector pmu) {
   //********************************************************************
 
   double E_mu = pmu.E() / 1000.;                 // energy of lepton in GeV

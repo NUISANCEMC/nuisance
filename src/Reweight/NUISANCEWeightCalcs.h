@@ -29,10 +29,10 @@ class NUISANCEWeightCalc {
     NUISANCEWeightCalc() {};
     virtual ~NUISANCEWeightCalc() {};
 
-    virtual double CalcWeight(BaseFitEvt* evt){return 1.0;};
-    virtual void SetDialValue(std::string name, double val){};
-    virtual void SetDialValue(int rwenum, double val){};
-    virtual bool IsHandled(int rwenum){return false;};
+    virtual double CalcWeight(BaseFitEvt* evt) = 0;
+    virtual void SetDialValue(std::string name, double val) = 0;
+    virtual void SetDialValue(int rwenum, double val) = 0;
+    virtual bool IsHandled(int rwenum) = 0;
 
     virtual void Print(){};
 

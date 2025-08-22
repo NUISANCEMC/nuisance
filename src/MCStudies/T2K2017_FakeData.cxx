@@ -180,6 +180,8 @@ void T2K2017_FakeData::FillEventVariables(FitEvent *event) {
 //********************************************************************
 void T2K2017_FakeData::Write(std::string drawOpt) {
 //********************************************************************
+  (void)drawOpt;
+
   if (fSaveEventTree) {
     fEventTree->Write();
   }

@@ -18,10 +18,10 @@ public:
   virtual double GetZ();
   virtual int GetMode();
 
-  virtual void SetX(double x){};
-  virtual void SetY(double y){};
-  virtual void SetZ(double z){};
-  virtual void SetMode(int m){};
+  virtual void SetX(double x){(void)x;};
+  virtual void SetY(double y){(void)y;};
+  virtual void SetZ(double z){(void)z;};
+  virtual void SetMode(int m){(void)m;};
 
   inline virtual void SetSampleWeight(double w){fSampleWeight = w;};
   inline virtual double GetSampleWeight(){return fSampleWeight;};

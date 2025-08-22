@@ -210,6 +210,7 @@ BaseFitEvt *InputHandlerBase::NextBaseEvent() {
 
 void InputHandlerBase::RegisterJointInput(std::string input, int n, TH1D *f,
                                           TH1D *e) {
+  (void)input;
   if (jointfluxinputs.size() == 0) {
     jointindexswitch = 0;
     fNEvents = 0;
@@ -224,15 +225,11 @@ void InputHandlerBase::RegisterJointInput(std::string input, int n, TH1D *f,
   fNEvents += n;
 
   // Add to the total flux/event hist
-  if (!fFluxHist)
-    fFluxHist = (TH1D *)f->Clone();
-  else
-    fFluxHist->Add(f);
+  if (!fFluxHist) fFluxHist = (TH1D *)f->Clone();
+  else fFluxHist->Add(f);
 
-  if (!fEventHist)
-    fEventHist = (TH1D *)e->Clone();
-  else
-    fEventHist->Add(e);
+  if (!fEventHist) fEventHist = (TH1D *)e->Clone();
+  else fEventHist->Add(e);
 }
 
 void InputHandlerBase::SetupJointInputs() {

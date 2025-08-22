@@ -844,6 +844,7 @@ TH2D ParamPull::GetDecompCovar() {
 void ParamPull::Write(std::string writeoptt) {
   //*******************************************************************************
 
+  (void)writeoptt;
   fDataHist->Write();
   fMCHist->Write();
   if (fLimitHist) {

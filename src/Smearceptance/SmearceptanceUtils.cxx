@@ -26,6 +26,9 @@
 namespace SmearceptanceUtils {
 
 double Smear1DProp(TH2D *mapping, double TrueProp, TRandom3 *rnjesus) {
+  (void)mapping;
+  (void)TrueProp;
+
   bool myrand = false;
   if (!rnjesus) {
     rnjesus = new TRandom3();

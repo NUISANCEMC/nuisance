@@ -405,6 +405,7 @@ void GiBUUNativeInputHandler::RegisterJointInput(std::string input, int process_
 						 int flavor_ID, int nnucleons, int n, 
 						 int nrequested, TH1D *f, TH1D *e){
 
+  (void)input;
   if (jointfluxinputs.size() == 0) {
     jointindexswitch = 0;
     fNEvents = 0;
