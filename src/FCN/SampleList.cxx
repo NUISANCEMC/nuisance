@@ -653,6 +653,8 @@ namespace SampleUtils {
 MeasurementBase *CreateSample(std::string name, std::string file,
                               std::string type, std::string fkdt,
                               FitWeight *rw) {
+  (void)fkdt;
+  (void)rw;
   nuiskey samplekey = Config::CreateKey("sample");
   samplekey.Set("name", name);
   samplekey.Set("input", file);
