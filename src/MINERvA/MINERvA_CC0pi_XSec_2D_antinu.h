@@ -50,6 +50,7 @@ class MINERvA_CC0pi_XSec_2D_antinu : public Measurement2D {
       kQ2QEEnuTrue
     };
     Distribution fDist;
+    bool IsME;
 };
 
 #endif
