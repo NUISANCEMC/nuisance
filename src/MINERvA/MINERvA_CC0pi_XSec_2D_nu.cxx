@@ -35,14 +35,14 @@ void MINERvA_CC0pi_XSec_2D_nu::SetupDataSettings() {
   std::string name = fSettings.GetS("name");
 
   // Has user requested LE or ME
-  IsME = true;
+  IsME = false;
   if (name.find("MINERvA_CC0pi_XSec_2D") != std::string::npos) {
     if (name.find("_ME_") != std::string::npos) IsME = true;
     else if (name.find("_LE_") != std::string::npos) IsME = true;
   }
 
   if (IsME) {
-    std::cout << "Medium energy implementation does not support covariance" << std::endl;
+    NUIS_ERR(FTL, "Medium energy implemention of " << name << " does not have a covariance matrix yet. Using diagonal errors for chi2 calculation");
   }
 
   // Define what files to use from the dist

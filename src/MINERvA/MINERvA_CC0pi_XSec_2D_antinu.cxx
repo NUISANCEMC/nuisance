@@ -41,26 +41,27 @@ void MINERvA_CC0pi_XSec_2D_antinu::SetupDataSettings() {
   // Set Distribution
   // See header file for enum and some descriptions
   std::string name = fSettings.GetS("name");
+  fDist = kInvalid;
 
   // Has user requested LE or ME
-  IsME = true;
+  IsME = false;
   if (name.find("MINERvA_CC0pi_XSec_2D") != std::string::npos) {
     if (name.find("_ME_") != std::string::npos) IsME = true;
-    else if (name.find("_LE_") != std::string::npos) IsME = true;
+    else if (name.find("_LE_") != std::string::npos) IsME = false;
   }
 
   if (IsME) {
-    std::cout << "Medium energy implementation does not support covariance" << std::endl;
+    NUIS_ERR(FTL, "Medium energy implemention of " << name << " does not have a covariance matrix yet. Using diagonal errors for chi2 calculation");
   }
 
   // We're lucky to have three different MINERvA CC0pi anti-numu 2D distributions, only for LE
-  if      (!name.compare("MINERvA_CC0pi_XSec_2Dptpz_antinu"))        fDist = kPtPz;
-  else if (!name.compare("MINERvA_CC0pi_XSec_2DQ2QEEnuQE_antinu"))   fDist = kQ2QEEnuQE;
-  else if (!name.compare("MINERvA_CC0pi_XSec_2DQ2QEEnuTrue_antinu")) fDist = kQ2QEEnuTrue;
+  if      (name.find("_2Dptpz_") != std::string::npos)        fDist = kPtPz;
+  else if (name.find("_2DQ2QEEnuQE_") != std::string::npos)   fDist = kQ2QEEnuQE;
+  else if (name.find("_2DQ2QEEnuTrue_") != std::string::npos) fDist = kQ2QEEnuTrue;
 
   if (IsME && fDist != kPtPz) {
     std::cerr << "Unsupported measurement for " << name << std::endl;
-    std::cerr << "ME implementation only available for ptpz, you chose " << fDist << std::endl;
+    std::cerr << "ME implementation only available for ptpz, you chose " << (int)fDist << std::endl;
     throw;
   }
 
@@ -110,6 +111,7 @@ void MINERvA_CC0pi_XSec_2D_antinu::SetupDataSettings() {
       distdescript = "MINERvA_CC0pi_XSec_2DQ2QEEnuTrue_antinu sample";
       fScaleFactor = GetEventHistogram()->Integral("width") * double(1E-38) / double(fNEvents);
       break;
+    case (kInvalid):
     default:
       NUIS_ABORT("Unknown Analysis Distribution : " << name);
   }

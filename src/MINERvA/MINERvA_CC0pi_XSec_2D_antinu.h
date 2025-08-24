@@ -47,7 +47,8 @@ class MINERvA_CC0pi_XSec_2D_antinu : public Measurement2D {
     enum Distribution {
       kPtPz, 
       kQ2QEEnuQE, 
-      kQ2QEEnuTrue
+      kQ2QEEnuTrue,
+      kInvalid
     };
     Distribution fDist;
     bool IsME;
