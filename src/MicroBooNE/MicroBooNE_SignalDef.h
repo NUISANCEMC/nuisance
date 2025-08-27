@@ -48,6 +48,13 @@ bool isCC1Mu2p(FitEvent* event, double EnuMin, double EnuMax);
 bool isCC1Mu1p(FitEvent* event, double EnuMin, double EnuMax);
 std::vector<FitParticle*> GetCC1Mu1pProtonsInPS(FitEvent* event);
 
+/**
+ * NCpi0 with 1 pi0 (0 < Ppi0 < 1.2 GeV/c).
+ *
+ * publication reference to be updated
+ */
+bool isNCpi0(FitEvent* event);
+
   }  // namespace MicroBooNE
 }  // namespace SignalDef
 
