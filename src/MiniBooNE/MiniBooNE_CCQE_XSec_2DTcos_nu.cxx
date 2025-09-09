@@ -26,9 +26,9 @@ MiniBooNE_CCQE_XSec_2DTcos_nu::MiniBooNE_CCQE_XSec_2DTcos_nu(nuiskey samplekey) 
 
   // Sample overview ---------------------------------------------------
   std::string descrip = "MiniBooNE_CCQE_XSec_2DTcos_nu sample. \n" \
-                        "Target: CH \n" \
-                        "Flux: MiniBooNE Forward Horn Current nue + nuebar \n" \
-                        "Signal: Any event with 1 electron, any nucleons, and no other FS particles \n";
+                        "Target: CH2 \n" \
+                        "Flux: MiniBooNE Forward Horn Current numu + numubar \n" \
+                        "Signal: Any event with 1 muon, any nucleons, and no other FS particles \n";
 
   // Setup common settings
   fSettings = LoadSampleSettings(samplekey);
