@@ -42,11 +42,17 @@ public:
 class TrueModeStack : public StackBase {
 public:
   /// Main constructor listing true mode categories.
+  TrueModeStack(std::string name, std::string title);
   TrueModeStack(std::string name, std::string title, TH1 *hist);
+  TrueModeStack(std::string name, std::string title, TH1 *hist, 
+    std::map<int, std::pair<std::string, std::string>> const &process_ids);
+
+  void AddMode(int mode, std::string name, std::string title, int linecolor = 1,
+               int linewidth = 1, int fillstyle = 1001);
 
   /// List to convert Modes to Index.
   /// Should be kept in sync with constructor.
-  static int ConvertModeToIndex(int mode);
+  int ConvertModeToIndex(int mode);
 
   /// Fill fromgiven mode integer
   void Fill(int mode, double x, double y = 1.0, double z = 1.0,
@@ -62,21 +68,15 @@ public:
   /// Extracts Mode from BaseFitEvt
   void Fill(BaseFitEvt *evt, double x, double y = 1.0, double z = 1.0,
             double weight = 1.0);
+
+  std::vector<int> fmodes;
 };
 
 /// True Mode NuNuBar stack, array of true channels split by nu/nubar
-class NuNuBarTrueModeStack : public StackBase {
+class NuNuBarTrueModeStack : public TrueModeStack {
 public:
   /// Main constructor listing true mode categories.
   NuNuBarTrueModeStack(std::string name, std::string title, TH1 *hist);
-
-  /// List to convert Modes to Index.
-  /// Should be kept in sync with constructor.
-  int ConvertModeToIndex(int mode);
-
-  /// Fill fromgiven mode integer
-  void Fill(int species, int mode, double x, double y = 1.0, double z = 1.0,
-            double weight = 1.0);
 };
 
 /// Species stack to look at contributions from multiple beam leptons

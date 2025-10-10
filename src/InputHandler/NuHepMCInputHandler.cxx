@@ -3,6 +3,7 @@
 #include "NuHepMC/EventUtils.hxx"
 #include "NuHepMC/FATXUtils.hxx"
 #include "NuHepMC/ReaderUtils.hxx"
+#include "NuHepMC/Reader.hxx"
 
 // Leave this at the top to enable features detected at build time in headers in
 // HepMC3
@@ -50,7 +51,7 @@ NuHepMCInputHandler::NuHepMCInputHandler(std::string const &handle,
 
   fFilename = inputs[0];
 
-  fReader = HepMC3::deduce_reader(fFilename);
+  fReader = std::make_unique<NuHepMC::Reader>(fFilename);
   if (!fReader) {
     NUIS_ABORT("Failed to instantiate HepMC3::Reader from " << fFilename);
   }
@@ -68,6 +69,7 @@ NuHepMCInputHandler::NuHepMCInputHandler(std::string const &handle,
       fToMeV = NuHepMC::Event::ToMeVFactor(evt);
       frun_info = evt.run_info();
       fatx_acc = NuHepMC::FATX::MakeAccumulator(frun_info);
+      fprocids = NuHepMC::GR8::ReadProcessIdDefinitions(frun_info);
     }
 
     fatx_acc->process(evt);

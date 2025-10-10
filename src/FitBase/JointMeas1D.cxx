@@ -18,6 +18,10 @@
  *******************************************************************************/
 #include "JointMeas1D.h"
 
+#ifdef NuHepMC_ENABLED
+#include "NuHepMCInputHandler.h"
+#endif
+
 //********************************************************************
 JointMeas1D::JointMeas1D(void) {
   //********************************************************************
@@ -124,8 +128,20 @@ void JointMeas1D::SetupDefaultHist() {
     SetBinMask(maskloc);
   }
 
-  fMCHist_Modes =
-      new TrueModeStack((fName + "_MODES").c_str(), ("True Channels"), fMCHist);
+#ifdef NuHepMC_ENABLED
+  auto nuhepmc_inputhandler = dynamic_cast<NuHepMCInputHandler *>(fInput);
+  if (nuhepmc_inputhandler) {
+    fMCHist_Modes =
+        new TrueModeStack((fName + "_MODES").c_str(), ("True Channels"),
+                          fMCHist, nuhepmc_inputhandler->fprocids);
+  } else {
+#endif
+    fMCHist_Modes = new TrueModeStack((fName + "_MODES").c_str(),
+                                      ("True Channels"), fMCHist);
+#ifdef NuHepMC_ENABLED
+  }
+#endif
+
   SetAutoProcessTH1(fMCHist_Modes);
 
   return;
