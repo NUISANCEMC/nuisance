@@ -63,6 +63,10 @@ private:
   Distribution fSlice;
   Distribution fDist;
 
+  std::vector<std::pair<double, double>> fSliceEdges;
+
+  void FillMCSlice(double x, double y, double w);
+
 };
 
 #endif

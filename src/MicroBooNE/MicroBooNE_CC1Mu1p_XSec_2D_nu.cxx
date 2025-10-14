@@ -211,6 +211,26 @@ void MicroBooNE_CC1Mu1p_XSec_2D_nu::FillEventVariables(FitEvent *event) {
 
 }
 
+void MicroBooNE_CC1Mu1p_XSec_2D_nu::FillHistograms() {
+  Measurement1D::FillHistograms();
+  if (Signal) {
+    fMCHist_Fine2D->Fill(fXVar, fYVar, Weight);
+    FillMCSlice(fXVar, fYVar, Weight);
+  }
+}
+
+void MicroBooNE_CCInc_XSec_2DPcos_nu::FillMCSlice(double x, double y,
+                                                  double w) {
+  int slice_id = 0
+  for (const auto& edge : fSliceEdges) {
+    if (y >= edge.first && y < edge.second) {
+      fMCHist_Slices[slice_id]->Fill(x, w);
+      break;
+    }
+    slice_id++;
+  }
+}
+
 void MicroBooNE_CC1Mu1p_XSec_2D_nu::ConvertEventRates() {
 
   // Apply Weiner-SVD additional smearing Ac
@@ -295,50 +315,53 @@ void MicroBooNE_CC1Mu1p_XSec_2D_nu::SetHistograms() {
   // Loop over slices (map keeps keys ordered)
   for (const auto& [slice, temp_data] : data_map) {
 
-      // Get number of bins in slice
-      int nbins_slice = temp_data->GetNbinsX();
+    // Store slice edge values
+    fSliceEdges.push_back(slice);
 
-      // Merge data histograms
-      for (int i = 1; i <= nbins_slice; ++i) {
-          double content = temp_data->GetBinContent(i);
-          double error   = temp_data->GetBinError(i);
-          fDataHist->SetBinContent(offset + i, content);
-          fDataHist->SetBinError(offset + i, error);
-      }
+    // Get number of bins in slice
+    int nbins_slice = temp_data->GetNbinsX();
 
-      // Add data histogram to slice
-      TString name  = Form("%s_data_Slice%lu", sample_name.c_str(), slice_id);
-      TString title = Form("%s_data_Slice%lu; p_{#mu}^{reco} (GeV);%s", 
-			                     sample_name.c_str(), slice_id, fSettings.GetYTitle().c_str());
-      temp_data->Sumw2();
-      temp_data->SetNameTitle(name, title);
-      fDataHist_Slices.push_back(temp_data);
+    // Merge data histograms
+    for (int i = 1; i <= nbins_slice; ++i) {
+        double content = temp_data->GetBinContent(i);
+        double error   = temp_data->GetBinError(i);
+        fDataHist->SetBinContent(offset + i, content);
+        fDataHist->SetBinError(offset + i, error);
+    }
 
-      // Add MC histogram to slice
-      fMCHist_Slices.push_back((TH1D *)temp_data->Clone());
-      name  = Form("%s_MC_Slice%lu", sample_name.c_str(), slice_id);
-      title = Form("%s_MC_Slice%lu; p_{#mu}^{reco} (GeV);%s",
-                   sample_name.c_str(), slice_id, fSettings.GetYTitle().c_str());
-      fMCHist_Slices[slice_id]->SetNameTitle(name, title);
-      fMCHist_Slices[slice_id]->Reset();
+    // Add data histogram to slice
+    TString name  = Form("%s_data_Slice%lu", sample_name.c_str(), slice_id);
+    TString title = Form("%s_data_Slice%lu; p_{#mu}^{reco} (GeV);%s", 
+                          sample_name.c_str(), slice_id, fSettings.GetYTitle().c_str());
+    temp_data->Sumw2();
+    temp_data->SetNameTitle(name, title);
+    fDataHist_Slices.push_back(temp_data);
 
-      // Fill 2D objects, guaranteed same key
-      auto temp_cov = cov_map.at(slice);
-      auto temp_smear = smear_map.at(slice);
-      for (int i = 0; i <= nbins_slice; ++i) {
-          for (int j = 0; j <= nbins_slice; ++j) {
-              int i_local = i + offset;
-              int j_local = j + offset;
-              (*fFullCovar)(i_local, j_local) = temp_cov->GetBinContent(i + 1, j + 1);
-              (*fSmearingMatrix)(i_local, j_local) = temp_smear->GetBinContent(i + 1, j + 1);
-          }
-      }
+    // Add MC histogram to slice
+    fMCHist_Slices.push_back((TH1D *)temp_data->Clone());
+    name  = Form("%s_MC_Slice%lu", sample_name.c_str(), slice_id);
+    title = Form("%s_MC_Slice%lu; p_{#mu}^{reco} (GeV);%s",
+                  sample_name.c_str(), slice_id, fSettings.GetYTitle().c_str());
+    fMCHist_Slices[slice_id]->SetNameTitle(name, title);
+    fMCHist_Slices[slice_id]->Reset();
 
-      SetAutoProcessTH1(fDataHist_Slices[slice_id], kCMD_Write);
-      SetAutoProcessTH1(fMCHist_Slices[slice_id]);
+    // Fill 2D objects, guaranteed same key
+    auto temp_cov = cov_map.at(slice);
+    auto temp_smear = smear_map.at(slice);
+    for (int i = 0; i <= nbins_slice; ++i) {
+        for (int j = 0; j <= nbins_slice; ++j) {
+            int i_local = i + offset;
+            int j_local = j + offset;
+            (*fFullCovar)(i_local, j_local) = temp_cov->GetBinContent(i + 1, j + 1);
+            (*fSmearingMatrix)(i_local, j_local) = temp_smear->GetBinContent(i + 1, j + 1);
+        }
+    }
 
-      slice_id++;
-      offset += nbins_slice;
+    SetAutoProcessTH1(fDataHist_Slices[slice_id], kCMD_Write);
+    SetAutoProcessTH1(fMCHist_Slices[slice_id]);
+
+    slice_id++;
+    offset += nbins_slice;
 
   }
 
