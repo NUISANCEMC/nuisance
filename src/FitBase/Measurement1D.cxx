@@ -1761,7 +1761,6 @@ void Measurement1D::SetupDefaultHist() {
 
     SetBinMask(maskloc);
   }
-
 #ifdef NuHepMC_ENABLED
     auto nuhepmc_inputhandler = dynamic_cast<NuHepMCInputHandler *>(fInput);
     if (nuhepmc_inputhandler) {
