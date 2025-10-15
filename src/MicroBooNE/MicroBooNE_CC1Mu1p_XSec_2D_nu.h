@@ -24,12 +24,63 @@
 
 #include <iostream>
 #include <fstream>
+#include <regex>
 
 class TH2D;
 
+class Slice {
+public:
+  // Constructor
+  Slice(std::string name, int id);
+  // Virtual destructor
+  ~Slice();
+  // Add single bin to slice
+  void AddBin(int global, double low, double high);
+  // Get slice name
+  inline std::string GetSliceName() const { return slice_name; };
+  // Get slice index
+  inline int GetSliceId() const { return slice_id; };
+  // Get slice edges
+  inline std::pair<double, double> GetSliceEdges() const { return slice_edges; };
+  inline double GetSliceWidth() const { return slice_edges.second - slice_edges.first; };
+  // Get global bin numbers for slice
+  inline int GetNumberBins() const { return global_bins.size(); };
+  inline std::vector<int> GetGlobalBins() const { return global_bins; };
+  // Get bin edges for slice (different formats)
+  inline std::vector<std::pair<double, double>> GetBins() const { return bin_edges; };
+  double* GetBinsForTH1() const;
+
+private:
+  std::string slice_name;
+  int slice_id;
+  std::pair<double, double> slice_edges;
+  std::vector<std::pair<double, double>> bin_edges;
+  std::vector<int> global_bins;
+
+};
+
+class BinScheme {
+public:
+  // Constructor
+  BinScheme();
+  // Virtual destructor
+  ~BinScheme();
+  // Add single bin to scheme
+  void AddBin(std::vector<std::string> bin_config);
+  void AddBin(std::string slice_name, int global, double low, double high);
+  // Get all slices
+  inline std::vector<Slice> GetSlices() { return slice_vec; };
+  // Get slice containing given global bin number
+  Slice GetSliceFromGlobal(int global);
+
+private:
+  int current_slice = 0;
+  std::vector<Slice> slice_vec;
+};
+
 class MicroBooNE_CC1Mu1p_XSec_2D_nu : public Measurement1D {
 public:
-  /// Basic Constructor.
+  /// Basic Constructor
   MicroBooNE_CC1Mu1p_XSec_2D_nu(nuiskey samplekey);
 
   /// Virtual Destructor
@@ -44,11 +95,13 @@ public:
   /// Fill kinematic distributions
   void FillEventVariables(FitEvent* customEvent);
 
+  void FillHistograms();
+
   /// Additional smearing matrix multiplication by Ac
   void ConvertEventRates();
 
-  /// Get slice infor from histogram name
-  std::pair<double, double> GetSlice(TString name);
+  /// Read bin configuration from file
+  void LoadBinScheme();
 
 private:
   enum Distribution { kDeltaPT=0, 
@@ -63,7 +116,7 @@ private:
   Distribution fSlice;
   Distribution fDist;
 
-  std::vector<std::pair<double, double>> fSliceEdges;
+  BinScheme fBinScheme;
 
   void FillMCSlice(double x, double y, double w);
 
