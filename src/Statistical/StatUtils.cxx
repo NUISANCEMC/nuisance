@@ -205,8 +205,8 @@ Double_t StatUtils::GetChi2FromCov(TH1D *data, TH1D *mc, TMatrixDSym *invcov,
 
       bool SkipThisEntry = false;
       if( (*calc_cov)(i, j) == 0 ) SkipThisEntry = true;
-      if( SkipEmptyBin &&
-          ( (calc_data->GetBinContent(i + 1) == 0) ||
+      if( SkipEmptyBin && 
+          ( (calc_data->GetBinContent(i + 1) == 0) || 
             (calc_mc->GetBinContent(i + 1) == 0) ) ) SkipThisEntry = true;
 
       if(!SkipThisEntry){
