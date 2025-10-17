@@ -202,6 +202,43 @@ bool isCC1Mu1p(FitEvent* event, double EnuMin, double EnuMax) {
 
     //----------------------------------------//
 
+bool isNueCC0pi(FitEvent* event, double EnuMin, double EnuMax) {
+  // Check CC inclusive
+  if (!SignalDef::isCCINC(event, 12, EnuMin, EnuMax)) return false;
+
+  // Veto events which don't have exactly 1 FS electron with KE > 30 MeV
+  double ElecKEThreshold = 30.0;
+  if (event->NumFSElectron() != 1 || (event->GetHMFSParticle(11)->KE() <= ElecKEThreshold)) return false;
+  
+  // Veto events with any charged pions with KE > 40 MeV
+  std::vector<FitParticle*> PiPlusParticles = event->GetAllFSPiPlus();
+  std::vector<FitParticle*> PiMinusParticles = event->GetAllFSPiMinus();
+
+  std::vector<FitParticle*> ChargedPionParticles;
+  for (uint i=0; i<PiPlusParticles.size(); i++) {ChargedPionParticles.push_back(PiPlusParticles[i]);}
+  for (uint i=0; i<PiMinusParticles.size(); i++) {ChargedPionParticles.push_back(PiMinusParticles[i]);}
+
+  double ChargedPionKEThreshold = 40.0 ; 
+  uint nChargedPionsWithKEAboveThreshold = 0;
+  for (uint i=0; i<ChargedPionParticles.size(); i++) {
+    if (ChargedPionParticles[i]->KE()>=ChargedPionKEThreshold) {
+      nChargedPionsWithKEAboveThreshold += 1;
+    }
+  }
+  
+  if (nChargedPionsWithKEAboveThreshold != 0) return false;
+
+  // Veto events with any neutral pions
+  std::vector<FitParticle*> PiZeroParticles = event->GetAllFSPiZero();
+  uint nNeutralPions = PiZeroParticles.size();
+  if (nNeutralPions != 0) return false;
+  
+  // Events that pass selection are NueCC0pi
+  // Proton cuts (1e0p0pi vs 1eNp0pi) will be done in Measurement file when filling event variables
+  return true;
+
+}
+
 
   }  // namespace MicroBooNE
 }  // namespace SignalDef
