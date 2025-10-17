@@ -1248,9 +1248,6 @@ void StatUtils::SetDataErrorFromCov(TH1D *DataHist, TMatrixDSym *cov,
                           << DataHist->GetXaxis()->GetBinLowEdge(i + 2) << ")");
         NUIS_ERR(WRN, "Data error: " << DataHisterr);
         NUIS_ERR(WRN, "Cov error:  " << coverr);
-        NUIS_ERR(WRN, "Scale:  " << scale);
-        NUIS_ERR(WRN, "Cov: " << (*cov)(i,i) );
-        NUIS_ERR(WRN, "sqrt(cov):  " << sqrt((*cov)(i, i)) );
       }
     }
     // Else blindly trust the covariance
