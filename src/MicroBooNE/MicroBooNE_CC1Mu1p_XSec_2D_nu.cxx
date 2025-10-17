@@ -135,6 +135,14 @@ void BinScheme::AddBin(std::string slice_name,
   slice_vec.push_back(new_slice);
 }
 
+int BinScheme::GetNumberBins() {
+  int nbins = 0;
+  for (auto& slice : slice_vec) {
+    nbins += slice.GetNumberBins();
+  }
+  return nbins;
+}
+
 Slice BinScheme::GetSliceFromGlobal(int global) {
   for (auto& slice : slice_vec) {
     std::vector<int> global_in_slice = slice.GetGlobalBins();
@@ -428,7 +436,6 @@ void MicroBooNE_CC1Mu1p_XSec_2D_nu::SetHistograms() {
       (*fSmearingMatrix)(i, j) = temp_smr->GetBinContent(i + 1, j + 1);
     }
   }
-  fDecomp = StatUtils::GetDecomp(fFullCovar);
 
   // Set fine-grained MC 2D hist
   fMCHist_Fine2D = new TH2D(Form("%s_MC_FINE_2D", sample_name.c_str()),
@@ -459,8 +466,9 @@ void MicroBooNE_CC1Mu1p_XSec_2D_nu::SetHistograms() {
       double error = fDataHist->GetBinError(global_bin);
       double width = temp_data->GetBinWidth(i); // width in slice hist only!
       // Compute new value
-      double new_content = content / width / slice_width;
-      double new_error = error / width / slice_width;
+      double scale_factor = 1.0 / width / slice_width;
+      double new_content = content * scale_factor;
+      double new_error = error * scale_factor;
       // Fill slice histogram
       temp_data->SetBinContent(i, new_content);
       temp_data->SetBinError(i, new_error);
@@ -486,6 +494,24 @@ void MicroBooNE_CC1Mu1p_XSec_2D_nu::SetHistograms() {
     slice_id++;
 
   }
+
+  // Update covariance matrix
+  for (int i = 0; i < fBinScheme.GetNumberBins(); ++i) {
+    Slice iSlice = fBinScheme.GetSliceFromGlobal(i+1);
+    int iLocal = i + 1 - iSlice.GetGlobalBins()[0] + 1;
+    double iBinWidth = fDataHist_Slices[iSlice.GetSliceId()]->GetBinWidth(iLocal);
+    double iSliceWidth = iSlice.GetSliceWidth();
+    for (int j = 0; j < fBinScheme.GetNumberBins(); ++j) {
+      Slice jSlice = fBinScheme.GetSliceFromGlobal(j+1);
+      int jLocal = j + 1 - jSlice.GetGlobalBins()[0] + 1;
+      double jBinWidth = fDataHist_Slices[jSlice.GetSliceId()]->GetBinWidth(jLocal);
+      double jSliceWidth = jSlice.GetSliceWidth();
+      double cov_scale_factor = 1.0 / iBinWidth / jBinWidth / iSliceWidth / jSliceWidth;
+      (*fFullCovar)(i, j) = (*fFullCovar)(i, j) * cov_scale_factor;
+    }
+  }
+
+  fDecomp = StatUtils::GetDecomp(fFullCovar);
 
 }
 

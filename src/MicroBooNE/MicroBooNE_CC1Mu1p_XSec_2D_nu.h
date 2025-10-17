@@ -70,6 +70,8 @@ public:
   void AddBin(std::string slice_name, int global, double low, double high);
   // Get all slices
   inline std::vector<Slice> GetSlices() { return slice_vec; };
+  // Get total number of bins
+  int GetNumberBins();
   // Get slice containing given global bin number
   Slice GetSliceFromGlobal(int global);
 
@@ -95,6 +97,7 @@ public:
   /// Fill kinematic distributions
   void FillEventVariables(FitEvent* customEvent);
 
+  // Read data histograms from file
   void FillHistograms();
 
   /// Additional smearing matrix multiplication by Ac
@@ -112,6 +115,7 @@ private:
   TH2D *fMCHist_Fine2D;
   TMatrixD* fSmearingMatrix;
 
+  // Input distribution information
   std::string fSuffix;
   Distribution fSlice;
   Distribution fDist;
