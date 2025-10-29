@@ -167,7 +167,37 @@ MicroBooNE_CC1Mu1p_XSec_2D_nu::MicroBooNE_CC1Mu1p_XSec_2D_nu(
     fSlice = kDeltaAlphaT;
     fSuffix = "SerialDeltaPT_DeltaAlphaT";
     fSettings.SetXTitle("#deltap_{T} (GeV/c)");
-    fSettings.SetYTitle("d^{2}#sigma/d#deltap_{T}d#delta#alpha_{T} (cm^{2}/(deg)/(GeV/c)/^{40}Ar)");
+    fSettings.SetYTitle("d^{2}#sigma/d#delta#alpha_{T}d#deltap_{T} (cm^{2}/(deg)/(GeV/c)/^{40}Ar)");
+  } else if (!name.compare("MicroBooNE_CC1Mu1p_XSec_2DDeltaPT_MuonCosTheta_nu")) {
+    fDist = kDeltaPT;
+    fSlice = kMuonCosTheta;
+    fSuffix = "SerialDeltaPT_MuonCosTheta";
+    fSettings.SetXTitle("#deltap_{T} (GeV/c)");
+    fSettings.SetYTitle("d^{2}#sigma/dcos#theta_{#mu}d#deltap_{T} (cm^{2}/(GeV/c)/^{40}Ar)");
+  } else if (!name.compare("MicroBooNE_CC1Mu1p_XSec_2DDeltaPT_ProtonCosTheta_nu")) {
+    fDist = kDeltaPT;
+    fSlice = kProtonCosTheta;
+    fSuffix = "SerialDeltaPT_ProtonCosTheta";
+    fSettings.SetXTitle("#deltap_{T} (GeV/c)");
+    fSettings.SetYTitle("d^{2}#sigma/dcos#theta_{p}d#deltap_{T} (cm^{2}/(GeV/c)/^{40}Ar)");
+  } else if (!name.compare("MicroBooNE_CC1Mu1p_XSec_2DDeltaAlphaT_DeltaPT_nu")) {
+    fDist = kDeltaAlphaT;
+    fSlice = kDeltaPT;
+    fSuffix = "SerialDeltaAlphaT_DeltaPT";
+    fSettings.SetXTitle("#delta#alpha_{T} (deg)");
+    fSettings.SetYTitle("d^{2}#sigma/d#deltap_{T}d#delta#alpha_{T} (cm^{2}/(GeV/c)/(deg)/^{40}Ar)");
+  } else if (!name.compare("MicroBooNE_CC1Mu1p_XSec_2DDeltaAlphaT_MuonCosTheta_nu")) {
+    fDist = kDeltaAlphaT;
+    fSlice = kMuonCosTheta;
+    fSuffix = "SerialDeltaAlphaT_MuonCosTheta";
+    fSettings.SetXTitle("#delta#alpha_{T} (deg)");
+    fSettings.SetYTitle("d^{2}#sigma/dcos#theta_{#mu}d#delta#alpha_{T} (cm^{2}/(deg)/^{40}Ar)");
+  } else if (!name.compare("MicroBooNE_CC1Mu1p_XSec_2DDeltaAlphaT_ProtonCosTheta_nu")) {
+    fDist = kDeltaAlphaT;
+    fSlice = kProtonCosTheta;
+    fSuffix = "SerialDeltaAlphaT_ProtonCosTheta";
+    fSettings.SetXTitle("#delta#alpha_{T} (deg)");
+    fSettings.SetYTitle("d^{2}#sigma/dcos#theta_{p}d#delta#alpha_{T} (cm^{2}/(deg)/^{40}Ar)");
   } else {
     NUIS_ABORT(
         "MicroBooNE_CC1Mu1p_XSec_2D_nu: Didn't get a valid name: " << name);
@@ -312,6 +342,36 @@ void MicroBooNE_CC1Mu1p_XSec_2D_nu::FillEventVariables(FitEvent *event) {
   else if (fDist == kDeltaAlphaT) {
     fXVar = DeltaAlphaT;
   }
+  else if (fDist == kDeltaPhiT) {
+    fXVar = DeltaPhiT;
+  }
+  else if (fDist == kMuonCosTheta) {
+    fXVar = MuonCosTheta;
+  }
+  else if (fDist == kProtonCosTheta) {
+    fXVar = ProtonCosTheta;
+  }
+  else if (fDist == kMuonMomentum) {
+    fXVar = MuonMomentum;
+  }
+  else if (fDist == kProtonMomentum) {
+    fXVar = ProtonMomentum;
+  }
+  else if (fDist == kDeltaPn) {
+    fXVar = DeltaPn;
+  }
+  else if (fDist == kDeltaPtx) {
+    fXVar = DeltaPtx;
+  }
+  else if (fDist == kDeltaPty) {
+    fXVar = DeltaPty;
+  }
+  else if (fDist == kECal) {
+    fXVar = ECal;
+  }
+  else if (fDist == kEQE) {
+    fXVar = EQE;
+  }
   else {
     NUIS_ABORT(
         "MicroBooNE_CC1Mu1p_XSec_2D_nu: Didn't get a valid distribution");
@@ -322,6 +382,36 @@ void MicroBooNE_CC1Mu1p_XSec_2D_nu::FillEventVariables(FitEvent *event) {
   }
   else if (fSlice == kDeltaAlphaT) {
     fYVar = DeltaAlphaT;
+  }
+  else if (fSlice == kDeltaPhiT) {
+    fYVar = DeltaPhiT;
+  }
+  else if (fSlice == kMuonCosTheta) {
+    fYVar = MuonCosTheta;
+  }
+  else if (fSlice == kProtonCosTheta) {
+    fYVar = ProtonCosTheta;
+  }
+  else if (fSlice == kMuonMomentum) {
+    fYVar = MuonMomentum;
+  }
+  else if (fSlice == kProtonMomentum) {
+    fYVar = ProtonMomentum;
+  }
+  else if (fSlice == kDeltaPn) {
+    fYVar = DeltaPn;
+  }
+  else if (fSlice == kDeltaPtx) {
+    fYVar = DeltaPtx;
+  }
+  else if (fSlice == kDeltaPty) {
+    fYVar = DeltaPty;
+  }
+  else if (fSlice == kECal) {
+    fYVar = ECal;
+  }
+  else if (fSlice == kEQE) {
+    fYVar = EQE;
   }
   else {
     NUIS_ABORT(
