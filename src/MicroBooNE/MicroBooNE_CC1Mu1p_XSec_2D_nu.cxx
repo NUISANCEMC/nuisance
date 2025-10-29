@@ -198,6 +198,36 @@ MicroBooNE_CC1Mu1p_XSec_2D_nu::MicroBooNE_CC1Mu1p_XSec_2D_nu(
     fSuffix = "SerialDeltaAlphaT_ProtonCosTheta";
     fSettings.SetXTitle("#delta#alpha_{T} (deg)");
     fSettings.SetYTitle("d^{2}#sigma/dcos#theta_{p}d#delta#alpha_{T} (cm^{2}/(deg)/^{40}Ar)");
+  } else if (!name.compare("MicroBooNE_CC1Mu1p_XSec_2DDeltaPhiT_DeltaPT_nu")) {
+    fDist = kDeltaPhiT;
+    fSlice = kDeltaPT;
+    fSuffix = "SerialDeltaPhiT_DeltaPT";
+    fSettings.SetXTitle("#delta#phi_{T} (deg)");
+    fSettings.SetYTitle("d^{2}#sigma/dcos#theta_{p}d#delta#phi_{T} (cm^{2}/(deg)/^{40}Ar)");
+  } else if (!name.compare("MicroBooNE_CC1Mu1p_XSec_2DDeltaPtx_DeltaPty_nu")) {
+    fDist = kDeltaPtx;
+    fSlice = kDeltaPty;
+    fSuffix = "SerialDeltaPtx_DeltaPty";
+    fSettings.SetXTitle("#deltap_{T,x} (GeV/c)");
+    fSettings.SetYTitle("d^{2}#sigma/d#deltap_{T,y}d#deltap_{T,x} (cm^{2}/(GeV/c)^{2}/^{40}Ar)");
+  } else if (!name.compare("MicroBooNE_CC1Mu1p_XSec_2DECal_DeltaPT_nu")) {
+    fDist = kECal;
+    fSlice = kDeltaPT;
+    fSuffix = "SerialECal_DeltaPT";
+    fSettings.SetXTitle("E^{cal} (GeV)");
+    fSettings.SetYTitle("d^{2}#sigma/d#deltap_{T}dE^{ecal} (cm^{2}/(GeV/c)/(GeV)/^{40}Ar)");
+  } else if (!name.compare("MicroBooNE_CC1Mu1p_XSec_2DECal_DeltaAlphaT_nu")) {
+    fDist = kECal;
+    fSlice = kDeltaAlphaT;
+    fSuffix = "SerialECal_DeltaAlphaT";
+    fSettings.SetXTitle("E^{cal} (GeV)");
+    fSettings.SetYTitle("d^{2}#sigma/d#delta#alpha_{T}dE^{ecal} (cm^{2}/(deg)/(GeV)/^{40}Ar)");
+  } else if (!name.compare("MicroBooNE_CC1Mu1p_XSec_2DECal_DeltaPty_nu")) {
+    fDist = kECal;
+    fSlice = kDeltaPty;
+    fSuffix = "SerialECal_DeltaPty";
+    fSettings.SetXTitle("E^{cal} (GeV)");
+    fSettings.SetYTitle("d^{2}#sigma/d#deltap_{T,y}dE^{ecal} (cm^{2}/(GeV/c)/(GeV)/^{40}Ar)");
   } else {
     NUIS_ABORT(
         "MicroBooNE_CC1Mu1p_XSec_2D_nu: Didn't get a valid name: " << name);
