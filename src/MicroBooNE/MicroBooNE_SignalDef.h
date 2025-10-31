@@ -50,12 +50,13 @@ std::vector<FitParticle*> GetCC1Mu1pProtonsInPS(FitEvent* event);
 
 /**
  * nue CC with 1 electron (KE_e > 30 MeV), no charged pions above KE_pi > 40 MeV, and no neutral pions. 
- * 1eNp0pi events w/ visible protons have KE_p >= 50 MeV
- * 1e0p0pi events w/o visible protons have KE_p < 50 MeV, E_e > 0.5 GeV, and cos theta_e > 0.6
+ * 1eNp0pi events w/ visible protons have KE_p >= 50 MeV : "isNueCC0piNp" signal fills E_e, cos th_e, and cos th_p
+ * 1e0p0pi events w/o visible protons have KE_p < 50 MeV, E_e > 0.5 GeV, and cos theta_e > 0.6 : "isNueCC0piProtonKE" signal fills KE_p
  *
  * Phys. Rev. D 106, L051102 DOI: https://doi.org/10.1103/PhysRevD.106.L051102
  */
-bool isNueCC0pi(FitEvent* event, double EnuMin, double EnuMax);
+bool isNueCC0piNp(FitEvent* event, double EnuMin, double EnuMax);
+bool isNueCC0piProtonKE(FitEvent* event, double EnuMin, double EnuMax);
 
   }  // namespace MicroBooNE
 }  // namespace SignalDef
