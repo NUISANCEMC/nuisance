@@ -14,8 +14,6 @@
 
 #include <stdexcept>
 
-using namespace NuHepMC::CrossSection::Units;
-
 NuHepMCInputHandler::~NuHepMCInputHandler() {}
 
 NuHepMCInputHandler::NuHepMCInputHandler(std::string const &handle,
@@ -79,15 +77,15 @@ NuHepMCInputHandler::NuHepMCInputHandler(std::string const &handle,
 
   std::cout
       << "NuHepMC NormInfo: { fatx = "
-      << fatx_acc->fatx(Unit{Scale::pb, TargetScale::PerAtom})
+      << fatx_acc->fatx(NuHepMC::CrossSection::Units::Unit{Scale::pb, TargetScale::PerAtom})
       << " pb/A = "
-      << fatx_acc->fatx(Unit{Scale::cm2_ten38, TargetScale::PerNucleon})
+      << fatx_acc->fatx(NuHepMC::CrossSection::Units::Unit{Scale::cm2_ten38, TargetScale::PerNucleon})
       << " cm^2/N, sumw = " << fsumevw << ", nevents = " << fatx_acc->events()
       << " } " << std::endl;
   // Dupe the FATX
   fEventHist = new TH1D("eventhist", "eventhist", 10, 0.0, 10.0);
   fEventHist->SetBinContent(
-      5, fatx_acc->fatx(Unit{Scale::cm2_ten38, TargetScale::PerNucleon}));
+      5, fatx_acc->fatx(NuHepMC::CrossSection::Units::Unit{Scale::cm2_ten38, TargetScale::PerNucleon}));
   fFluxHist = new TH1D("fluxhist", "fluxhist", 10, 0.0, 10.0);
   fFluxHist->SetBinContent(5, 1);
 
