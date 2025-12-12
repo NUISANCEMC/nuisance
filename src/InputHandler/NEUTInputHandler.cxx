@@ -304,6 +304,13 @@ int NEUTInputHandler::GetNeutParticleStatus(NeutPart *part) {
               abs(part->fPID) == 12)) {
     state = kFinalState;
 
+  } else if (part->fIsAlive && part->fPID == 22) {
+      state=kFinalState;
+  }
+    else if (part->fIsAlive && part->fStatus == 10){
+      state = kNuclearRemnant;
+
+
     // Warn if we still find alive particles without classifying them
   } else if (part->fIsAlive == true) {
     NUIS_ABORT("Undefined NEUT state "
