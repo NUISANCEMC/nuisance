@@ -20,6 +20,10 @@
 #include "Measurement2D.h"
 #include "TDecompChol.h"
 
+#ifdef NuHepMC_ENABLED
+#include "NuHepMCInputHandler.h"
+#endif
+
 //********************************************************************
 Measurement2D::Measurement2D(void) {
   //********************************************************************
@@ -694,8 +698,21 @@ void Measurement2D::FinaliseMeasurement() {
   // Search drawopts for possible types to include by default
   std::string drawopts = FitPar::Config().GetParS("drawopts");
   if (drawopts.find("MODES") != std::string::npos) {
-    fMCHist_Modes = new TrueModeStack((fSettings.GetName() + "_MODES").c_str(),
-				      ("True Channels"), fMCHist);
+
+#ifdef NuHepMC_ENABLED
+    auto nuhepmc_inputhandler = dynamic_cast<NuHepMCInputHandler *>(fInput);
+    if (nuhepmc_inputhandler) {
+      fMCHist_Modes = new TrueModeStack(
+          (fSettings.GetName() + "_MODES").c_str(), ("True Channels"), fMCHist,
+          nuhepmc_inputhandler->fprocids);
+    } else {
+#endif
+      fMCHist_Modes = new TrueModeStack(
+          (fSettings.GetName() + "_MODES").c_str(), ("True Channels"), fMCHist);
+#ifdef NuHepMC_ENABLED
+    }
+#endif
+
     fMCHist_Modes ->SetTitleX(fDataHist->GetXaxis()->GetTitle());
     fMCHist_Modes ->SetTitleY(fDataHist->GetYaxis()->GetTitle());
     fMCHist_Modes ->SetTitleZ(fDataHist->GetZaxis()->GetTitle());

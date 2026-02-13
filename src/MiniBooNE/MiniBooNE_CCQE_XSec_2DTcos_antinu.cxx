@@ -27,9 +27,9 @@ MiniBooNE_CCQE_XSec_2DTcos_antinu::MiniBooNE_CCQE_XSec_2DTcos_antinu(nuiskey sam
 
   // Sample overview ---------------------------------------------------
   std::string descrip = "MiniBooNE_CCQE_XSec_2DTcos_antinu sample. \n" \
-                        "Target: CH \n" \
-                        "Flux: MiniBooNE Forward Horn Current nue + nuebar \n" \
-                        "Signal: Any event with 1 electron, any nucleons, and no other FS particles \n";
+                        "Target: CH2 \n" \
+                        "Flux: MiniBooNE Forward Horn Current numu + numubar \n" \
+                        "Signal: Any event with 1 anti-muon, any nucleons, and no other FS particles \n";
 
   // Setup common settings
   fSettings = LoadSampleSettings(samplekey);

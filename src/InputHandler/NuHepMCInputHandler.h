@@ -33,4 +33,7 @@ public:
   std::string fFilename;
   double fToMeV;
   double fsumevw;
+
+  //holds the process id numbers and names for this input file
+  std::map<int, std::pair<std::string, std::string>> fprocids;
 };

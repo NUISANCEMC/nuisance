@@ -3,6 +3,7 @@
 #include "NuHepMC/EventUtils.hxx"
 #include "NuHepMC/FATXUtils.hxx"
 #include "NuHepMC/ReaderUtils.hxx"
+#include "NuHepMC/Reader.hxx"
 
 // Leave this at the top to enable features detected at build time in headers in
 // HepMC3
@@ -12,8 +13,6 @@
 #include "HepMC3/ReaderFactory.h"
 
 #include <stdexcept>
-
-using namespace NuHepMC::CrossSection::Units;
 
 NuHepMCInputHandler::~NuHepMCInputHandler() {}
 
@@ -50,7 +49,7 @@ NuHepMCInputHandler::NuHepMCInputHandler(std::string const &handle,
 
   fFilename = inputs[0];
 
-  fReader = HepMC3::deduce_reader(fFilename);
+  fReader = std::make_unique<NuHepMC::Reader>(fFilename);
   if (!fReader) {
     NUIS_ABORT("Failed to instantiate HepMC3::Reader from " << fFilename);
   }
@@ -68,6 +67,7 @@ NuHepMCInputHandler::NuHepMCInputHandler(std::string const &handle,
       fToMeV = NuHepMC::Event::ToMeVFactor(evt);
       frun_info = evt.run_info();
       fatx_acc = NuHepMC::FATX::MakeAccumulator(frun_info);
+      fprocids = NuHepMC::GR8::ReadProcessIdDefinitions(frun_info);
     }
 
     fatx_acc->process(evt);
@@ -77,15 +77,15 @@ NuHepMCInputHandler::NuHepMCInputHandler(std::string const &handle,
 
   std::cout
       << "NuHepMC NormInfo: { fatx = "
-      << fatx_acc->fatx(Unit{Scale::pb, TargetScale::PerAtom})
+      << fatx_acc->fatx(NuHepMC::CrossSection::Units::Unit{NuHepMC::CrossSection::Units::Scale::pb, NuHepMC::CrossSection::Units::TargetScale::PerAtom})
       << " pb/A = "
-      << fatx_acc->fatx(Unit{Scale::cm2_ten38, TargetScale::PerNucleon})
+      << fatx_acc->fatx(NuHepMC::CrossSection::Units::Unit{NuHepMC::CrossSection::Units::Scale::cm2_ten38, NuHepMC::CrossSection::Units::TargetScale::PerNucleon})
       << " cm^2/N, sumw = " << fsumevw << ", nevents = " << fatx_acc->events()
       << " } " << std::endl;
   // Dupe the FATX
   fEventHist = new TH1D("eventhist", "eventhist", 10, 0.0, 10.0);
   fEventHist->SetBinContent(
-      5, fatx_acc->fatx(Unit{Scale::cm2_ten38, TargetScale::PerNucleon}));
+      5, fatx_acc->fatx(NuHepMC::CrossSection::Units::Unit{NuHepMC::CrossSection::Units::Scale::cm2_ten38, NuHepMC::CrossSection::Units::TargetScale::PerNucleon}));
   fFluxHist = new TH1D("fluxhist", "fluxhist", 10, 0.0, 10.0);
   fFluxHist->SetBinContent(5, 1);
 

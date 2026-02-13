@@ -79,109 +79,102 @@ void FakeStack::Write() {
 }
 
 /// TrueModeStack Functions
-TrueModeStack::TrueModeStack(std::string name, std::string title, TH1 *hist) {
-  fName = name;
-  fTitle = title;
+TrueModeStack::TrueModeStack(std::string name, std::string title, TH1 *hist)
+    : TrueModeStack(name, title) {
+
+  TrueModeStack::AddMode(0, "UNDEFINED", "Undefined", kRed + 1, 2, 3000);
 
   // CC
-  AddMode(0, "CCQE", "CCQE", kBlue, 2, 1001);
-  AddMode(1, "CC2p2h", "2p2h", kRed, 2, 1001);
-  AddMode(2, "CC1piponp", "CC1#pi^{+} on p", kGreen, 2, 1001);
-  AddMode(3, "CC1pi0onn", "CC1#pi^{0} on n", kGreen + 3, 2, 1001);
-  AddMode(4, "CC1piponn", "CC1#pi^{+} on n", kGreen - 2, 2, 1001);
-  AddMode(5, "CCcoh", "CC coherent", kBlue, 2, 1001);
-  AddMode(6, "CC1gamma", "CC1#gamma", kMagenta, 2, 1001);
-  AddMode(7, "CCMultipi", "Multi #pi (1.3 < W < 2.0)", kYellow, 2, 1001);
-  AddMode(8, "CC1eta", "CC1#eta^{0} on n", kYellow - 2, 2, 1001);
-  AddMode(9, "CC1lamkp", "CC1#Lambda1K^{+}", kYellow - 6, 2, 1001);
-  AddMode(10, "CCDIS", "DIS (W > 2.0)", kRed, 2, 1001);
+  TrueModeStack::AddMode(1, "CCQE", "CCQE", kBlue, 2, 1001);
+  TrueModeStack::AddMode(2, "CC2p2h", "2p2h", kRed, 2, 1001);
+  TrueModeStack::AddMode(11, "CC1piponp", "CC1#pi^{+} on p", kGreen, 2, 1001);
+  TrueModeStack::AddMode(12, "CC1pi0onn", "CC1#pi^{0} on n", kGreen + 3, 2,
+                         1001);
+  TrueModeStack::AddMode(13, "CC1piponn", "CC1#pi^{+} on n", kGreen - 2, 2,
+                         1001);
+  TrueModeStack::AddMode(16, "CCcoh", "CC coherent", kBlue, 2, 1001);
+  TrueModeStack::AddMode(17, "CC1gamma", "CC1#gamma", kMagenta, 2, 1001);
+  TrueModeStack::AddMode(21, "CCMultipi", "Multi #pi (1.3 < W < 2.0)", kYellow,
+                         2, 1001);
+  TrueModeStack::AddMode(22, "CC1eta", "CC1#eta^{0} on n", kYellow - 2, 2,
+                         1001);
+  TrueModeStack::AddMode(23, "CC1lamkp", "CC1#Lambda1K^{+}", kYellow - 6, 2,
+                         1001);
+  TrueModeStack::AddMode(26, "CCDIS", "DIS (W > 2.0)", kRed, 2, 1001);
 
   // NC
-  AddMode(11, "NC1pi0onn", "NC1#pi^{0} on n", kBlue, 2, 3004);
-  AddMode(12, "NC1pi0onp", "NC1#pi^{0} on p", kBlue + 3, 2, 3004);
-  AddMode(13, "NC1pimonn", "NC1#pi^{-} on n", kBlue - 2, 2, 3004);
-  AddMode(14, "NC1piponp", "NC1#pi^{+} on p", kBlue - 8, 2, 3004);
-  AddMode(15, "NCcoh", "NC Coherent", kBlue + 8, 2, 3004);
-  AddMode(16, "NC1gammaonn", "NC1#gamma on n", kMagenta, 2, 3004);
-  AddMode(17, "NC1gammaonp", "NC1#gamma on p", kMagenta - 10, 2, 3004);
-  AddMode(18, "NCMultipi", "Multi #pi (1.3 < W < 2.0)", kBlue - 10, 2, 3004);
-  AddMode(19, "NC1etaonn", "NC1#eta^{0} on n", kYellow - 2, 2, 3004);
-  AddMode(20, "NC1etaonp", "NC1#eta^{0} on p", kYellow - 4, 2, 3004);
-  AddMode(21, "NC1kamk0", "NC1#Lambda1K^{0} on n", kYellow - 6, 2, 3004);
-  AddMode(22, "NC1lamkp", "NC1#Lambda1K^{+}", kYellow - 10, 2, 3004);
-  AddMode(23, "NCDIS", "DIS (W > 2.0)", kRed, 2, 3004);
-  AddMode(24, "NCELonp", "NCEL on p", kBlack, 2, 3004);
-  AddMode(25, "NCELonn", "NCEL on n", kGray, 2, 3004);
+  TrueModeStack::AddMode(31, "NC1pi0onn", "NC1#pi^{0} on n", kBlue, 2, 3004);
+  TrueModeStack::AddMode(32, "NC1pi0onp", "NC1#pi^{0} on p", kBlue + 3, 2,
+                         3004);
+  TrueModeStack::AddMode(33, "NC1pimonn", "NC1#pi^{-} on n", kBlue - 2, 2,
+                         3004);
+  TrueModeStack::AddMode(34, "NC1piponp", "NC1#pi^{+} on p", kBlue - 8, 2,
+                         3004);
+  TrueModeStack::AddMode(36, "NCcoh", "NC Coherent", kBlue + 8, 2, 3004);
+  TrueModeStack::AddMode(38, "NC1gammaonn", "NC1#gamma on n", kMagenta, 2,
+                         3004);
+  TrueModeStack::AddMode(39, "NC1gammaonp", "NC1#gamma on p", kMagenta - 10, 2,
+                         3004);
+  TrueModeStack::AddMode(41, "NCMultipi", "Multi #pi (1.3 < W < 2.0)",
+                         kBlue - 10, 2, 3004);
+  TrueModeStack::AddMode(42, "NC1etaonn", "NC1#eta^{0} on n", kYellow - 2, 2,
+                         3004);
+  TrueModeStack::AddMode(43, "NC1etaonp", "NC1#eta^{0} on p", kYellow - 4, 2,
+                         3004);
+  TrueModeStack::AddMode(44, "NC1kamk0", "NC1#Lambda1K^{0} on n", kYellow - 6,
+                         2, 3004);
+  TrueModeStack::AddMode(45, "NC1lamkp", "NC1#Lambda1K^{+}", kYellow - 10, 2,
+                         3004);
+  TrueModeStack::AddMode(46, "NCDIS", "DIS (W > 2.0)", kRed, 2, 3004);
+  TrueModeStack::AddMode(51, "NCELonp", "NCEL on p", kBlack, 2, 3004);
+  TrueModeStack::AddMode(52, "NCELonn", "NCEL on n", kGray, 2, 3004);
 
-  AddMode(26, "NC2p2h", "NC 2p2h", kRed + 1, 2, 3004);
-
-  // Undefined
-  AddMode(27, "UNDEFINED", "Undefined", kRed + 1, 2, 3000);
+  TrueModeStack::AddMode(53, "NC2p2h", "NC 2p2h", kRed + 1, 2, 3004);
 
   StackBase::SetupStack(hist);
 };
 
-int TrueModeStack::ConvertModeToIndex(int mode) {
-  // std::cout << "Converting Mode " << (mode) << std::endl;
-  switch (abs(mode)) {
-  case 1:
-    return 0; // CCQE
-  case 2:
-    return 1; // CC2p2h
-  case 11:
-    return 2; // CC1piponp
-  case 12:
-    return 3; // CC1pi0onn
-  case 13:
-    return 4; // CC1piponn
-  case 16:
-    return 5; // CCcoh
-  case 17:
-    return 6; // CC1gamma
-  case 21:
-    return 7; // CCMultipi
-  case 22:
-    return 8; // CC1eta
-  case 23:
-    return 9; // CC1lamkp
-  case 26:
-    return 10; // CCDIS
+TrueModeStack::TrueModeStack(std::string name, std::string title) {
+  fName = name;
+  fTitle = title;
+}
+/// TrueModeStack Functions
+TrueModeStack::TrueModeStack(
+    std::string name, std::string title, TH1 *hist,
+    std::map<int, std::pair<std::string, std::string> > const &process_ids)
+    : TrueModeStack(name, title) {
 
-  case 31:
-    return 11; // NC1pi0onn
-  case 32:
-    return 12; // NC1pi0onp
-  case 33:
-    return 13; // NC1pimonn
-  case 34:
-    return 14; // NC1piponp
-  case 36:
-    return 15; // NCcoh
-  case 38:
-    return 16; // NC1gammaonn
-  case 39:
-    return 17; // NC1gammaonp
-  case 41:
-    return 18; // NC Multipi
-  case 42:
-    return 19; // NC1etaonn
-  case 43:
-    return 20; // NC1etaonp
-  case 44:
-    return 21; // NC1kamk0
-  case 45:
-    return 22; // NC1lamkp
-  case 46:
-    return 23; // NCDIS
-  case 51:
-    return 24; // NCEL on p
-  case 52:
-    return 25; // NCEL on n
-  case 53:
-    return 26; // NC 2p2h
-  default:
-    return 27; // Undefined
+  TrueModeStack::AddMode(0, "UNDEFINED", "Undefined", kRed + 1, 2, 3000);
+
+  for (auto const &pid : process_ids) {
+    TrueModeStack::AddMode(pid.first, "process_id_" + std::to_string(pid.first),
+                           pid.second.first, kBlack, 1, 1001);
   }
+
+  StackBase::SetupStack(hist);
+};
+
+void TrueModeStack::AddMode(int mode, std::string name, std::string title,
+                            int linecolor, int linewidth, int fillstyle) {
+
+  auto mode_it = std::find(fmodes.begin(), fmodes.end(), mode);
+  if (mode_it != fmodes.end()) {
+    NUIS_ABORT(
+        "MODE: " << mode
+                 << ", added to TrueModeStack twice... this shouldn't happen.");
+  }
+
+  StackBase::AddMode(fmodes.size(), name, title, linecolor, linewidth,
+                     fillstyle);
+  fmodes.push_back(mode);
+}
+
+int TrueModeStack::ConvertModeToIndex(int mode) {
+  auto mode_it = std::find(fmodes.begin(), fmodes.end(), mode);
+  if (mode_it == fmodes.end()) {
+    return 0;
+  }
+  return std::distance(fmodes.begin(), mode_it);
 };
 
 void TrueModeStack::Fill(int mode, double x, double y, double z,
@@ -189,11 +182,13 @@ void TrueModeStack::Fill(int mode, double x, double y, double z,
   StackBase::FillStack(ConvertModeToIndex(mode), x, y, z, weight);
 };
 
-void TrueModeStack::SetBinContent(int mode, int binx, int biny, int binz, double content) {
+void TrueModeStack::SetBinContent(int mode, int binx, int biny, int binz,
+                                  double content) {
   StackBase::SetBinContentStack(ConvertModeToIndex(mode), binx, biny, binz,
                                 content);
 }
-void TrueModeStack::SetBinError(int mode, int binx, int biny, int binz, double error) {
+void TrueModeStack::SetBinError(int mode, int binx, int biny, int binz,
+                                double error) {
   StackBase::SetBinErrorStack(ConvertModeToIndex(mode), binx, biny, binz,
                               error);
 }
@@ -210,170 +205,117 @@ void TrueModeStack::Fill(BaseFitEvt *evt, double x, double y, double z,
 
 /// TrueModeStack Functions
 NuNuBarTrueModeStack::NuNuBarTrueModeStack(std::string name, std::string title,
-                                           TH1 *hist) {
-  fName = name;
-  fTitle = title;
+                                           TH1 *hist)
+    : TrueModeStack(name, title) {
+
+  TrueModeStack::AddMode(0, "UNDEFINED", "Undefined", kRed + 2, 2, 3000);
 
   // Neutrino
   // CC
-  AddMode(0, "NU_CCQE", "#nu CCQE", kBlue, 2, 1001);
-  AddMode(1, "NU_CC2p2h", "#nu 2p2h", kRed, 2, 1001);
-  AddMode(2, "NU_CC1piponp", "#nu CC1#pi^{+} on p", kGreen, 2, 1001);
-  AddMode(3, "NU_CC1pi0onn", "#nu CC1#pi^{0} on n", kGreen + 3, 2, 1001);
-  AddMode(4, "NU_CC1piponn", "#nu CC1#pi^{+} on n", kGreen - 2, 2, 1001);
-  AddMode(5, "NU_CCcoh", "#nu CC coherent", kBlue, 2, 1001);
-  AddMode(6, "NU_CC1gamma", "#nu CC1#gamma", kMagenta, 2, 1001);
-  AddMode(7, "NU_CCMultipi", "#nu Multi #pi (1.3 < W < 2.0)", kYellow, 2, 1001);
-  AddMode(8, "NU_CC1eta", "#nu CC1#eta^{0} on n", kYellow - 2, 2, 1001);
-  AddMode(9, "NU_CC1lamkp", "#nu CC1#Lambda1K^{+}", kYellow - 6, 2, 1001);
-  AddMode(10, "NU_CCDIS", "#nu DIS (W > 2.0)", kRed, 2, 1001);
+  TrueModeStack::AddMode(1, "NU_CCQE", "#nu CCQE", kBlue, 2, 1001);
+  TrueModeStack::AddMode(2, "NU_CC2p2h", "#nu 2p2h", kRed, 2, 1001);
+  TrueModeStack::AddMode(11, "NU_CC1piponp", "#nu CC1#pi^{+} on p", kGreen, 2,
+                         1001);
+  TrueModeStack::AddMode(12, "NU_CC1pi0onn", "#nu CC1#pi^{0} on n", kGreen + 3,
+                         2, 1001);
+  TrueModeStack::AddMode(13, "NU_CC1piponn", "#nu CC1#pi^{+} on n", kGreen - 2,
+                         2, 1001);
+  TrueModeStack::AddMode(16, "NU_CCcoh", "#nu CC coherent", kBlue, 2, 1001);
+  TrueModeStack::AddMode(17, "NU_CC1gamma", "#nu CC1#gamma", kMagenta, 2, 1001);
+  TrueModeStack::AddMode(21, "NU_CCMultipi", "#nu Multi #pi (1.3 < W < 2.0)",
+                         kYellow, 2, 1001);
+  TrueModeStack::AddMode(22, "NU_CC1eta", "#nu CC1#eta^{0} on n", kYellow - 2,
+                         2, 1001);
+  TrueModeStack::AddMode(23, "NU_CC1lamkp", "#nu CC1#Lambda1K^{+}", kYellow - 6,
+                         2, 1001);
+  TrueModeStack::AddMode(26, "NU_CCDIS", "#nu DIS (W > 2.0)", kRed, 2, 1001);
 
   // NC
-  AddMode(11, "NU_NC1pi0onn", "#nu NC1#pi^{0} on n", kBlue, 2, 3004);
-  AddMode(12, "NU_NC1pi0onp", "#nu NC1#pi^{0} on p", kBlue + 3, 2, 3004);
-  AddMode(13, "NU_NC1pimonn", "#nu NC1#pi^{-} on n", kBlue - 2, 2, 3004);
-  AddMode(14, "NU_NC1piponp", "#nu NC1#pi^{+} on p", kBlue - 8, 2, 3004);
-  AddMode(15, "NU_NCcoh", "#nu NC Coherent", kBlue + 8, 2, 3004);
-  AddMode(16, "NU_NC1gammaonn", "#nu NC1#gamma on n", kMagenta, 2, 3004);
-  AddMode(17, "NU_NC1gammaonp", "#nu NC1#gamma on p", kMagenta - 10, 2, 3004);
-  AddMode(18, "NU_NCMultipi", "#nu Multi #pi (1.3 < W < 2.0)", kBlue - 10, 2,
-          3004);
-  AddMode(19, "NU_NC1etaonn", "#nu NC1#eta^{0} on n", kYellow - 2, 2, 3004);
-  AddMode(20, "NU_NC1etaonp", "#nu NC1#eta^{0} on p", kYellow - 4, 2, 3004);
-  AddMode(21, "NU_NC1kamk0", "#nu NC1#Lambda1K^{0} on n", kYellow - 6, 2, 3004);
-  AddMode(22, "NU_NC1lamkp", "#nu NC1#Lambda1K^{+}", kYellow - 10, 2, 3004);
-  AddMode(23, "NU_NCDIS", "#nu DIS (W > 2.0)", kRed, 2, 3004);
-  AddMode(24, "NU_NCELonp", "#nu NCEL on p", kBlack, 2, 3004);
-  AddMode(25, "NU_NCELonn", "#nu NCEL on n", kGray, 2, 3004);
-
-  // Undefined
-  AddMode(26, "NU_UNDEFINED", "#nu Undefined", kRed + 2, 2, 3000);
+  TrueModeStack::AddMode(31, "NU_NC1pi0onn", "#nu NC1#pi^{0} on n", kBlue, 2,
+                         3004);
+  TrueModeStack::AddMode(32, "NU_NC1pi0onp", "#nu NC1#pi^{0} on p", kBlue + 3,
+                         2, 3004);
+  TrueModeStack::AddMode(33, "NU_NC1pimonn", "#nu NC1#pi^{-} on n", kBlue - 2,
+                         2, 3004);
+  TrueModeStack::AddMode(34, "NU_NC1piponp", "#nu NC1#pi^{+} on p", kBlue - 8,
+                         2, 3004);
+  TrueModeStack::AddMode(36, "NU_NCcoh", "#nu NC Coherent", kBlue + 8, 2, 3004);
+  TrueModeStack::AddMode(38, "NU_NC1gammaonn", "#nu NC1#gamma on n", kMagenta,
+                         2, 3004);
+  TrueModeStack::AddMode(39, "NU_NC1gammaonp", "#nu NC1#gamma on p",
+                         kMagenta - 10, 2, 3004);
+  TrueModeStack::AddMode(41, "NU_NCMultipi", "#nu Multi #pi (1.3 < W < 2.0)",
+                         kBlue - 10, 2, 3004);
+  TrueModeStack::AddMode(42, "NU_NC1etaonn", "#nu NC1#eta^{0} on n",
+                         kYellow - 2, 2, 3004);
+  TrueModeStack::AddMode(43, "NU_NC1etaonp", "#nu NC1#eta^{0} on p",
+                         kYellow - 4, 2, 3004);
+  TrueModeStack::AddMode(44, "NU_NC1kamk0", "#nu NC1#Lambda1K^{0} on n",
+                         kYellow - 6, 2, 3004);
+  TrueModeStack::AddMode(45, "NU_NC1lamkp", "#nu NC1#Lambda1K^{+}",
+                         kYellow - 10, 2, 3004);
+  TrueModeStack::AddMode(46, "NU_NCDIS", "#nu DIS (W > 2.0)", kRed, 2, 3004);
+  TrueModeStack::AddMode(51, "NU_NCELonp", "#nu NCEL on p", kBlack, 2, 3004);
+  TrueModeStack::AddMode(52, "NU_NCELonn", "#nu NCEL on n", kGray, 2, 3004);
 
   // CC
-  AddMode(27, "ANTINU_CCQE", "#bar{#nu} CCQE", kBlue, 2, 1001);
-  AddMode(28, "ANTINU_CC2p2h", "#bar{#nu} 2p2h", kRed, 2, 1001);
-  AddMode(29, "ANTINU_CC1piponp", "#bar{#nu} CC1#pi^{+} on p", kGreen, 2, 1001);
-  AddMode(30, "ANTINU_CC1pi0onn", "#bar{#nu} CC1#pi^{0} on n", kGreen + 3, 2,
-          1001);
-  AddMode(31, "ANTINU_CC1piponn", "#bar{#nu} CC1#pi^{+} on n", kGreen - 2, 2,
-          1001);
-  AddMode(32, "ANTINU_CCcoh", "#bar{#nu} CC coherent", kBlue, 2, 1001);
-  AddMode(33, "ANTINU_CC1gamma", "#bar{#nu} CC1#gamma", kMagenta, 2, 1001);
-  AddMode(34, "ANTINU_CCMultipi", "#bar{#nu} Multi #pi (1.3 < W < 2.0)",
-          kYellow, 2, 1001);
-  AddMode(35, "ANTINU_CC1eta", "#bar{#nu} CC1#eta^{0} on n", kYellow - 2, 2,
-          1001);
-  AddMode(36, "ANTINU_CC1lamkp", "#bar{#nu} CC1#Lambda1K^{+}", kYellow - 6, 2,
-          1001);
-  AddMode(37, "ANTINU_CCDIS", "#bar{#nu} DIS (W > 2.0)", kRed, 2, 1001);
+  TrueModeStack::AddMode(-1, "ANTINU_CCQE", "#bar{#nu} CCQE", kBlue, 2, 1001);
+  TrueModeStack::AddMode(-2, "ANTINU_CC2p2h", "#bar{#nu} 2p2h", kRed, 2, 1001);
+  TrueModeStack::AddMode(-11, "ANTINU_CC1piponp", "#bar{#nu} CC1#pi^{+} on p",
+                         kGreen, 2, 1001);
+  TrueModeStack::AddMode(-12, "ANTINU_CC1pi0onn", "#bar{#nu} CC1#pi^{0} on n",
+                         kGreen + 3, 2, 1001);
+  TrueModeStack::AddMode(-13, "ANTINU_CC1piponn", "#bar{#nu} CC1#pi^{+} on n",
+                         kGreen - 2, 2, 1001);
+  TrueModeStack::AddMode(-16, "ANTINU_CCcoh", "#bar{#nu} CC coherent", kBlue, 2,
+                         1001);
+  TrueModeStack::AddMode(-17, "ANTINU_CC1gamma", "#bar{#nu} CC1#gamma",
+                         kMagenta, 2, 1001);
+  TrueModeStack::AddMode(-21, "ANTINU_CCMultipi",
+                         "#bar{#nu} Multi #pi (1.3 < W < 2.0)", kYellow, 2,
+                         1001);
+  TrueModeStack::AddMode(-22, "ANTINU_CC1eta", "#bar{#nu} CC1#eta^{0} on n",
+                         kYellow - 2, 2, 1001);
+  TrueModeStack::AddMode(-23, "ANTINU_CC1lamkp", "#bar{#nu} CC1#Lambda1K^{+}",
+                         kYellow - 6, 2, 1001);
+  TrueModeStack::AddMode(-26, "ANTINU_CCDIS", "#bar{#nu} DIS (W > 2.0)", kRed,
+                         2, 1001);
 
   // NC
-  AddMode(38, "ANTINU_NC1pi0onn", "#bar{#nu} NC1#pi^{0} on n", kBlue, 2, 3004);
-  AddMode(39, "ANTINU_NC1pi0onp", "#bar{#nu} NC1#pi^{0} on p", kBlue + 3, 2,
-          3004);
-  AddMode(40, "ANTINU_NC1pimonn", "#bar{#nu} NC1#pi^{-} on n", kBlue - 2, 2,
-          3004);
-  AddMode(41, "ANTINU_NC1piponp", "#bar{#nu} NC1#pi^{+} on p", kBlue - 8, 2,
-          3004);
-  AddMode(42, "ANTINU_NCcoh", "#bar{#nu} NC Coherent", kBlue + 8, 2, 3004);
-  AddMode(43, "ANTINU_NC1gammaonn", "#bar{#nu} NC1#gamma on n", kMagenta, 2,
-          3004);
-  AddMode(44, "ANTINU_NC1gammaonp", "#bar{#nu} NC1#gamma on p", kMagenta - 10,
-          2, 3004);
-  AddMode(45, "ANTINU_NCMultipi", "#bar{#nu} Multi #pi (1.3 < W < 2.0)",
-          kBlue - 10, 2, 3004);
-  AddMode(46, "ANTINU_NC1etaonn", "#bar{#nu} NC1#eta^{0} on n", kYellow - 2, 2,
-          3004);
-  AddMode(47, "ANTINU_NC1etaonp", "#bar{#nu} NC1#eta^{0} on p", kYellow - 4, 2,
-          3004);
-  AddMode(48, "ANTINU_NC1kamk0", "#bar{#nu} NC1#Lambda1K^{0} on n", kYellow - 6,
-          2, 3004);
-  AddMode(49, "ANTINU_NC1lamkp", "#bar{#nu} NC1#Lambda1K^{+}", kYellow - 10, 2,
-          3004);
-  AddMode(50, "ANTINU_NCDIS", "#bar{#nu} DIS (W > 2.0)", kRed, 2, 3004);
-  AddMode(51, "ANTINU_NCELonp", "#bar{#nu} NCEL on p", kBlack, 2, 3004);
-  AddMode(52, "ANTINU_NCELonn", "#bar{#nu} NCEL on n", kGray, 2, 3004);
-
-  // Undefined
-  AddMode(53, "NU_UNDEFINED", "#bar{#nu} Undefined", kRed + 2, 2, 3000);
-
-  // Non Neutrino
-  AddMode(54, "UNDEFINED", "Non-#nu Undefined", kBlack, 2, 3000);
+  TrueModeStack::AddMode(-31, "ANTINU_NC1pi0onn", "#bar{#nu} NC1#pi^{0} on n",
+                         kBlue, 2, 3004);
+  TrueModeStack::AddMode(-32, "ANTINU_NC1pi0onp", "#bar{#nu} NC1#pi^{0} on p",
+                         kBlue + 3, 2, 3004);
+  TrueModeStack::AddMode(-33, "ANTINU_NC1pimonn", "#bar{#nu} NC1#pi^{-} on n",
+                         kBlue - 2, 2, 3004);
+  TrueModeStack::AddMode(-34, "ANTINU_NC1piponp", "#bar{#nu} NC1#pi^{+} on p",
+                         kBlue - 8, 2, 3004);
+  TrueModeStack::AddMode(-36, "ANTINU_NCcoh", "#bar{#nu} NC Coherent",
+                         kBlue + 8, 2, 3004);
+  TrueModeStack::AddMode(-38, "ANTINU_NC1gammaonn", "#bar{#nu} NC1#gamma on n",
+                         kMagenta, 2, 3004);
+  TrueModeStack::AddMode(-39, "ANTINU_NC1gammaonp", "#bar{#nu} NC1#gamma on p",
+                         kMagenta - 10, 2, 3004);
+  TrueModeStack::AddMode(-41, "ANTINU_NCMultipi",
+                         "#bar{#nu} Multi #pi (1.3 < W < 2.0)", kBlue - 10, 2,
+                         3004);
+  TrueModeStack::AddMode(-42, "ANTINU_NC1etaonn", "#bar{#nu} NC1#eta^{0} on n",
+                         kYellow - 2, 2, 3004);
+  TrueModeStack::AddMode(-43, "ANTINU_NC1etaonp", "#bar{#nu} NC1#eta^{0} on p",
+                         kYellow - 4, 2, 3004);
+  TrueModeStack::AddMode(-44, "ANTINU_NC1kamk0",
+                         "#bar{#nu} NC1#Lambda1K^{0} on n", kYellow - 6, 2,
+                         3004);
+  TrueModeStack::AddMode(-45, "ANTINU_NC1lamkp", "#bar{#nu} NC1#Lambda1K^{+}",
+                         kYellow - 10, 2, 3004);
+  TrueModeStack::AddMode(-46, "ANTINU_NCDIS", "#bar{#nu} DIS (W > 2.0)", kRed,
+                         2, 3004);
+  TrueModeStack::AddMode(-51, "ANTINU_NCELonp", "#bar{#nu} NCEL on p", kBlack,
+                         2, 3004);
+  TrueModeStack::AddMode(-52, "ANTINU_NCELonn", "#bar{#nu} NCEL on n", kGray, 2,
+                         3004);
 
   StackBase::SetupStack(hist);
-};
-
-int NuNuBarTrueModeStack::ConvertModeToIndex(int mode) {
-  switch (abs(mode)) {
-  case 1:
-    return 0; // CCQE
-  case 2:
-    return 1; // CC2p2h
-  case 11:
-    return 2; // CC1piponp
-  case 12:
-    return 3; // CC1pi0onn
-  case 13:
-    return 4; // CC1piponn
-  case 16:
-    return 5; // CCcoh
-  case 17:
-    return 6; // CC1gamma
-  case 21:
-    return 7; // CCMultipi
-  case 22:
-    return 8; // CC1eta
-  case 23:
-    return 9; // CC1lamkp
-  case 26:
-    return 10; // CCDIS
-
-  case 31:
-    return 11; // NC1pi0onn
-  case 32:
-    return 12; // NC1pi0onp
-  case 33:
-    return 13; // NC1pimonn
-  case 34:
-    return 14; // NC1piponp
-  case 36:
-    return 15; // NCcoh
-  case 38:
-    return 16; // NC1gammaonn
-  case 39:
-    return 17; // NC1gammaonp
-  case 41:
-    return 18; // NC Multipi
-  case 42:
-    return 19; // NC1etaonn
-  case 43:
-    return 20; // NC1etaonp
-  case 44:
-    return 21; // NC1kamk0
-  case 45:
-    return 22; // NC1lamkp
-  case 46:
-    return 23; // NCDIS
-  case 51:
-    return 24; // NCEL on p
-  case 52:
-    return 25; // NCEL on n
-  default:
-    return 26; // Undefined
-  }
-};
-
-void NuNuBarTrueModeStack::Fill(int species, int mode, double x, double y,
-                                double z, double weight) {
-  int modeindex = ConvertModeToIndex(mode);
-  int index = 54; // undefined
-
-  if (species == 12 or species == 14 or species == 16)
-    index = modeindex;
-  else if (species == -12 or species == -14 or species == -16)
-    index = modeindex + 27;
-
-  StackBase::FillStack(index, x, y, z, weight);
 };
 
 // Species Stack Functions
