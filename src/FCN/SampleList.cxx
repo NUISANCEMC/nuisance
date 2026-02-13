@@ -1262,7 +1262,9 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
         return (new MINERvA_CC0pi_XSec_1DQ2_TgtRatio_nu(samplekey));
 
         // Dan Ruterbories measurements of late 2018
-      } else if (!name.compare("MINERvA_CC0pi_XSec_2Dptpz_nu")) {
+      } else if ( !name.compare("MINERvA_CC0pi_XSec_2Dptpz_nu") ||
+                  !name.compare("MINERvA_CC0pi_XSec_2Dptpz_ME_nu") ||
+                  !name.compare("MINERvA_CC0pi_XSec_2Dptpz_LE_nu")) {
         return (new MINERvA_CC0pi_XSec_2D_nu(samplekey));
 
         // } else if (!name.compare("MINERvA_CC0pi_XSec_3DptpzTp_nu")) {
@@ -1283,7 +1285,13 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
         // C. Patrick's early 2018 measurements
       } else if (!name.compare("MINERvA_CC0pi_XSec_2Dptpz_antinu") ||
           !name.compare("MINERvA_CC0pi_XSec_2DQ2QEEnuQE_antinu") ||
-          !name.compare("MINERvA_CC0pi_XSec_2DQ2QEEnuTrue_antinu")) {
+          !name.compare("MINERvA_CC0pi_XSec_2DQ2QEEnuTrue_antinu") ||
+          // Medium energy
+          !name.compare("MINERvA_CC0pi_XSec_2Dptpz_ME_antinu") ||
+          // Low energy
+          !name.compare("MINERvA_CC0pi_XSec_2Dptpz_LE_antinu") ||
+          !name.compare("MINERvA_CC0pi_XSec_2DQ2QEEnuQE_LE_antinu") ||
+          !name.compare("MINERvA_CC0pi_XSec_2DQ2QEEnuTrue_LE_antinu")) {
         return (new MINERvA_CC0pi_XSec_2D_antinu(samplekey));
 
       } else if (!name.compare("MINERvA_CC0pi_XSec_1DQ2_antinu_H")) {

@@ -44,6 +44,7 @@ class MINERvA_CC0pi_XSec_2D_nu : public Measurement2D {
 
   // Set up settings based on distribution
   void SetupDataSettings();
+  bool IsME;
 
 };
 
