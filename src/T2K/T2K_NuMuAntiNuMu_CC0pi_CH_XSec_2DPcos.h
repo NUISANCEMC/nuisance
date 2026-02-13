@@ -53,6 +53,9 @@ public:
   TFile* fInputFile;
   std::vector<TH1D*> fMCHist_Slices;
   std::vector<TH1D*> fDataHist_Slices;
+  std::vector<TrueModeStack* > fMCHist_Slices_Mode;
+  std::vector<TH1D*> fMCHist_Slices_Fine;
+  std::vector<TrueModeStack* > fMCHist_Slices_Fine_Mode;
 
   double pmu, CosThetaMu;
   int NuPDG;
