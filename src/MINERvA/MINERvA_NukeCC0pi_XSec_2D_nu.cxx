@@ -44,24 +44,51 @@ void MINERvA_NukeCC0pi_XSec_2D_nu::_SetupDataSettings(measurement measurement) {
            "(GeV);d^{2}#sigma/dP_{T}dP_{||} (cm^{2}/GeV^{2}/nucleon)";
            
   switch (measurement) {
-    case ch: distdescript = "MINERvA_NukeCC0pi_CH_XSec_2D_nu sample"; 
-      histname = "absolute_xsec_ch"; covar_name = "absolute_xsec_ch_covariance"; break;
-    case carbon: distdescript = "MINERvA_NukeCC0pi_C_XSec_2D_nu sample"; 
-      histname = "absolute_xsec_carbon"; covar_name = "absolute_xsec_carbon_covariance"; break;
-    case h2o: distdescript = "MINERvA_NukeCC0pi_H2O_XSec_2D_nu sample"; 
-      histname = "absolute_xsec_water"; covar_name = "absolute_xsec_water_covariance"; break;
-    case fe: distdescript = "MINERvA_NukeCC0pi_Fe_XSec_2D_nu sample"; 
-      histname = "absolute_xsec_iron"; covar_name = "absolute_xsec_iron_covariance"; break;
-    case pb: distdescript = "MINERvA_NukeCC0pi_Pb_XSec_2D_nu sample"; 
-      histname = "absolute_xsec_lead"; covar_name = "absolute_xsec_lead_covariance"; break;
-    case ch_c_flux: distdescript = "MINERvA_NukeCC0pi_CH_C_Flux_XSec_2D_nu sample"; 
-      histname = "absolute_xsec_ch_carbon_flux"; covar_name = "absolute_xsec_ch_carbon_flux_covariance"; break;
-    case ch_h2o_flux: distdescript = "MINERvA_NukeCC0pi_CH_H2O_Flux_XSec_2D_nu sample"; 
-      histname = "absolute_xsec_ch_water_flux"; covar_name = "absolute_xsec_ch_water_flux_covariance"; break;
-    case ch_fe_flux: distdescript = "MINERvA_NukeCC0pi_CH_Fe_Flux_XSec_2D_nu sample"; 
-      histname = "absolute_xsec_ch_iron_flux"; covar_name = "absolute_xsec_ch_iron_flux_covariance"; break;
-    case ch_pb_flux: distdescript = "MINERvA_NukeCC0pi_CH_Pb_Flux_XSec_2D_nu sample"; 
-      histname = "absolute_xsec_ch_lead_flux"; covar_name = "absolute_xsec_ch_lead_flux_covariance"; break;
+    case ch:  
+              distdescript = "MINERvA_NukeCC0pi_CH_XSec_2D_nu sample"; 
+              histname = "absolute_xsec_ch";
+              covar_name = "absolute_xsec_ch_covariance"; 
+              break;
+    case carbon: 
+              distdescript = "MINERvA_NukeCC0pi_C_XSec_2D_nu sample"; 
+              histname = "absolute_xsec_carbon"; 
+              covar_name = "absolute_xsec_carbon_covariance"; 
+              break;
+    case h2o: 
+              distdescript = "MINERvA_NukeCC0pi_H2O_XSec_2D_nu sample"; 
+              histname = "absolute_xsec_water"; 
+              covar_name = "absolute_xsec_water_covariance"; 
+              break;
+    case fe: 
+              distdescript = "MINERvA_NukeCC0pi_Fe_XSec_2D_nu sample"; 
+              histname = "absolute_xsec_iron"; 
+              covar_name = "absolute_xsec_iron_covariance";
+              break;
+    case pb:  
+              distdescript = "MINERvA_NukeCC0pi_Pb_XSec_2D_nu sample"; 
+              histname = "absolute_xsec_lead"; 
+              covar_name = "absolute_xsec_lead_covariance"; 
+              break;
+    case ch_c_flux: 
+              distdescript = "MINERvA_NukeCC0pi_CH_C_Flux_XSec_2D_nu sample"; 
+              histname = "absolute_xsec_ch_carbon_flux"; 
+              covar_name = "absolute_xsec_ch_carbon_flux_covariance"; 
+              break;
+    case ch_h2o_flux: 
+              distdescript = "MINERvA_NukeCC0pi_CH_H2O_Flux_XSec_2D_nu sample"; 
+              histname = "absolute_xsec_ch_water_flux"; 
+              covar_name = "absolute_xsec_ch_water_flux_covariance"; 
+              break;
+    case ch_fe_flux: 
+              distdescript = "MINERvA_NukeCC0pi_CH_Fe_Flux_XSec_2D_nu sample"; 
+              histname = "absolute_xsec_ch_iron_flux"; 
+              covar_name = "absolute_xsec_ch_iron_flux_covariance"; 
+              break;
+    case ch_pb_flux: 
+              distdescript = "MINERvA_NukeCC0pi_CH_Pb_Flux_XSec_2D_nu sample"; 
+              histname = "absolute_xsec_ch_lead_flux"; 
+              covar_name = "absolute_xsec_ch_lead_flux_covariance"; 
+              break;
   }
 
   fSettings.SetTitle(GeneralUtils::ParseToStr(titles, ";")[0]);
