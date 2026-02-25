@@ -185,6 +185,8 @@
 #include "MicroBooNE_CC1Mu2p_XSec_1D_nu.h"
 #include "MicroBooNE_CC1MuNp_XSec_1D_nu.h"
 #include "MicroBooNE_CCInc_XSec_2DPcos_nu.h"
+#include "MicroBooNE_BNB_NueCC0piNp_2022_XSec_1D_nu.h"
+#include "MicroBooNE_BNB_NueCC0piProtonKE_2022_XSec_1D_nu.h"
 #endif
 
 #ifdef MINERvA_ENABLED
@@ -1137,6 +1139,14 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
                !name.compare("MicroBooNE_CC1Mu1p_XSec_1DECal_nu") ||
                !name.compare("MicroBooNE_CC1Mu1p_XSec_1DEQE_nu")) {
       return (new MicroBooNE_CC1Mu1p_XSec_1D_nu(samplekey));
+    } 
+      else if(!name.compare("MicroBooNE_BNB_NueCC0piNp_2022_XSec_1DElecCosTheta_nu") ||
+              !name.compare("MicroBooNE_BNB_NueCC0piNp_2022_XSec_1DElecEnergy_nu") ||
+              !name.compare("MicroBooNE_BNB_NueCC0piNp_2022_XSec_1DProtonCosTheta_nu")) {
+      return (new MicroBooNE_BNB_NueCC0piNp_2022_XSec_1D_nu(samplekey));
+    }
+      else if(!name.compare("MicroBooNE_BNB_NueCC0piProtonKE_2022_XSec_1DProtonKE_nu")) {
+      return (new MicroBooNE_BNB_NueCC0piProtonKE_2022_XSec_1D_nu(samplekey));
     } else
 
 #endif
