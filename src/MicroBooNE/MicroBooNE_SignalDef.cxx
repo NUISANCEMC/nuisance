@@ -52,64 +52,6 @@ bool isCC1MuNp(FitEvent* event, double EnuMin, double EnuMax) {
   return false;
 }
 
-bool isCC1ENp(FitEvent* event, double EnuMin, double EnuMax) {
-  bool Verbose = false;
-
-  // ==============================================================================================================================
-  // Check CC inclusive
-  if (!SignalDef::isCCINC(event, 12, EnuMin, EnuMax)) return false;
-
-  // ==============================================================================================================================
-  // Veto events which don't have exactly 1 FS electron
-  /*
-  if (event->NumFSElectron() != 1) {
-    if (Verbose) {std::cout << "DB: ElectronCut failed" << std::endl;}
-    return false;
-  }
-  */
-
-  // ==============================================================================================================================
-  // Veto events which don't have 1 or more FS protons that have kinetic energy > 40MeV
-  std::vector<FitParticle*> ProtonParticles = event->GetAllFSProton();
-
-  double ProtonKEThreshold = 40.0;
-  uint nProtonsWithKEAboveThreshold = 0;
-  for (uint i=0;i<ProtonParticles.size();i++) {
-    if (ProtonParticles[i]->KE()>=ProtonKEThreshold) {
-      nProtonsWithKEAboveThreshold += 1;
-    }
-  }
-  if (nProtonsWithKEAboveThreshold == 0) return false;
-
-  // ==============================================================================================================================
-  // Veto events with any charged pions that have kinetic energy > 40MeV
-  std::vector<FitParticle*> PiPlusParticles = event->GetAllFSPiPlus();
-  std::vector<FitParticle*> PiMinusParticles = event->GetAllFSPiMinus();
-
-  std::vector<FitParticle*> ChargedPionParticles;
-  for (uint i=0;i<PiPlusParticles.size();i++) {ChargedPionParticles.push_back(PiPlusParticles[i]);}
-  for (uint i=0;i<PiMinusParticles.size();i++) {ChargedPionParticles.push_back(PiMinusParticles[i]);}
-
-  double ChargedPionKEThreshold = 40.0;
-  uint nChargedPionsWithKEAboveThreshold = 0;
-  for (uint i=0;i<ChargedPionParticles.size();i++) {
-    if (ChargedPionParticles[i]->KE()>=ChargedPionKEThreshold) {
-      nChargedPionsWithKEAboveThreshold += 1;
-    }
-  }
-  if (nChargedPionsWithKEAboveThreshold != 0) return false;
-
-  // ==============================================================================================================================
-  // Veto events with any neutral pions
-  std::vector<FitParticle*> PiZeroParticles = event->GetAllFSPiZero();
-  uint nNeutralPions = PiZeroParticles.size();
-  if (nNeutralPions != 0) return false;
-
-  // ==============================================================================================================================
-  // Events which have not yet failed the selection are defined as CC1ENP (N>=1)
-  return true;
-}
-
     //----------------------------------------//
 
 bool isCC1Mu2p(FitEvent* event, double EnuMin, double EnuMax) {
@@ -255,6 +197,61 @@ bool isCC1mu2p0pi(FitEvent* event, double EnuMin, double EnuMax) {
 
   // ==============================================================================================================================
   // Events which have not yet failed the selection are defined as CC1mu2p0pi
+  return true;
+}
+
+bool isNueCC0piNp(FitEvent* event, double EnuMin, double EnuMax) {
+  // Check CC nue
+  if (!SignalDef::isCCINC(event, 12, EnuMin, EnuMax)) return false;
+
+  // Veto events which don't have exactly 1 FS electron
+  if (event->NumFSParticle(11) != 1 ) return false;
+
+  // Veto events where the electron doesn't have KE > 30 MeV
+  if (event->GetHMFSParticle(11)->KE() <= 30.0) return false;
+
+  // Veto events with neutral pions of any energy
+  if (event->NumFSParticle(111) != 0) return false;
+
+  // Veto events with charged pions with KE > 40MeV
+  if (event->NumFSParticle(211) != 0 && event->GetHMFSParticle(211)->KE() > 40.0) return false;
+  if (event->NumFSParticle(-211) != 0 && event->GetHMFSParticle(-211)->KE() > 40.0) return false;
+
+  // Np events must have at least 1 proton in FS with KE >= 50MeV
+  if (event->NumFSParticle(2212) == 0) return false;
+  if (event->GetHMFSParticle(2212)->KE() < 50.0) return false; 
+
+  // Events that pass selection are NueCC0piNp
+  return true;
+}
+
+bool isNueCC0piProtonKE(FitEvent* event, double EnuMin, double EnuMax) {
+  // Check CC nue
+  if (!SignalDef::isCCINC(event, 12, EnuMin, EnuMax)) return false;
+  
+  // Veto events which don't have exactly 1 FS electron
+  if (event->NumFSParticle(11) != 1 ) return false;
+  
+  // Veto events where the electron doesn't have KE > 30 MeV
+  if (event->GetHMFSParticle(11)->KE() <= 30.0) return false;
+  
+  // Veto events with neutral pions of any energy
+  if (event->NumFSParticle(111) != 0) return false;
+  
+  // Veto events with charged pions with KE > 40MeV
+  if (event->NumFSParticle(211) != 0 && event->GetHMFSParticle(211)->KE() > 40.0) return false;
+  if (event->NumFSParticle(-211) != 0 && event->GetHMFSParticle(-211)->KE() > 40.0) return false;
+
+  // Proton KE distribution includes Np and 0p events
+  // 0p events either have no final state proton or the leading proton has KE < 50MeV
+  if ((event->NumFSParticle(2212) != 0 && event->GetHMFSParticle(2212)->KE() < 50.) || event->NumFSParticle(2212) == 0 ) {
+    // additional phase space requirements on FS electron 
+    // Electron energy > 0.5 GeV and cos th_e > 0.6
+    TLorentzVector pe = event->GetHMFSParticle(11)->fP;
+    if (pe.E() <= 500. || pe.CosTheta() < 0.6 ) return false;
+  }
+  
+  // Events that pass selection are either NueCC0piNp or NueCC0pi0p
   return true;
 }
 

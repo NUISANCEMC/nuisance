@@ -16,20 +16,27 @@
 *    You should have received a copy of the GNU General Public License
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
-#ifndef MICROBOONE_CC1ENP_1D_NU_H_SEEN
-#define MICROBOONE_CC1ENP_1D_NU_H_SEEN
+
+// MicroBooNE BNB nue CC0pi https://doi.org/10.1103/PhysRevD.106.L051102
+// Considers 0p+Np measurement of ProtonKE
+
+#ifndef MICROBOONE_BNB_NUECC0PIPROTONKE_2022_1D_NU_H_SEEN
+#define MICROBOONE_BNB_NUECC0PIPROTONKE_2022_1D_NU_H_SEEN
 
 #include "Measurement1D.h"
 
+#include <iostream>
+#include <fstream>
+
 class TH2D;
 
-class MicroBooNE_CC1ENp_XSec_1D_nu : public Measurement1D {
+class MicroBooNE_BNB_NueCC0piProtonKE_2022_XSec_1D_nu : public Measurement1D {
 public:
   /// Basic Constructor.
-  MicroBooNE_CC1ENp_XSec_1D_nu(nuiskey samplekey);
+  MicroBooNE_BNB_NueCC0piProtonKE_2022_XSec_1D_nu(nuiskey samplekey);
 
   /// Virtual Destructor
-  ~MicroBooNE_CC1ENp_XSec_1D_nu() {};
+  ~MicroBooNE_BNB_NueCC0piProtonKE_2022_XSec_1D_nu() {};
 
   /// Apply signal definition
   bool isSignal(FitEvent* nvect);
@@ -37,15 +44,13 @@ public:
   /// Fill kinematic distributions
   void FillEventVariables(FitEvent* customEvent);
 
-  /// Smear and build 1D MC histogram from slices
+  /// Convert to xsec units
   void ConvertEventRates();
 
 private:
-  TMatrixD* fSmearingMatrix;
-
-  enum Distribution { kElecEnergy, kOpeningAngle, kTrueVisibleEnergy };
+  enum Distribution { kProtonKE }; 
   Distribution fDist;
+
 };
 
 #endif
-

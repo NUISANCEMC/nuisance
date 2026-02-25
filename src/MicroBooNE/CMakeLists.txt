@@ -19,9 +19,10 @@
 set(MicroBooNE_Impl_Files
   MicroBooNE_CCInc_XSec_2DPcos_nu.cxx
   MicroBooNE_CC1MuNp_XSec_1D_nu.cxx
-  MicroBooNE_CC1ENp_XSec_1D_nu.cxx
-  MicroBooNE_CC1Mu1p_XSec_1D_nu.cxx
   MicroBooNE_CC1mu2p0pi_XSec_1D_nu.cxx
+  MicroBooNE_CC1Mu1p_XSec_1D_nu.cxx
+  MicroBooNE_BNB_NueCC0piNp_2022_XSec_1D_nu.cxx
+  MicroBooNE_BNB_NueCC0piProtonKE_2022_XSec_1D_nu.cxx
   MicroBooNE_SignalDef.cxx
 )
 
@@ -30,6 +31,8 @@ set(MicroBooNE_Hdr_Files
   MicroBooNE_CC1MuNp_XSec_1D_nu.h
   MicroBooNE_CC1Mu1p_XSec_1D_nu.h
   MicroBooNE_CC1mu2p0pi_XSec_1D_nu.h
+  MicroBooNE_BNB_NueCC0piNp_2022_XSec_1D_nu.h
+  MicroBooNE_BNB_NueCC0piProtonKE_2022_XSec_1D_nu.h
   MicroBooNE_SignalDef.h
 )
 
