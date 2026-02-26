@@ -185,6 +185,9 @@
 #include "MicroBooNE_CC1Mu2p_XSec_1D_nu.h"
 #include "MicroBooNE_CC1MuNp_XSec_1D_nu.h"
 #include "MicroBooNE_CCInc_XSec_2DPcos_nu.h"
+#include "MicroBooNE_CC1Mu0pNp_XSec_nu.h"
+#include "MicroBooNE_CC1Mu3DInc_XSec_nu.h"
+#include "MicroBooNE_NCpi0_XSec_nu.h"
 #endif
 
 #ifdef MINERvA_ENABLED
@@ -1137,6 +1140,51 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
                !name.compare("MicroBooNE_CC1Mu1p_XSec_1DECal_nu") ||
                !name.compare("MicroBooNE_CC1Mu1p_XSec_1DEQE_nu")) {
       return (new MicroBooNE_CC1Mu1p_XSec_1D_nu(samplekey));
+    } else if (!name.compare("MicroBooNE_CC1Mu0pNp_XSec_EMu_nu")) {
+      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<kCC0pNpEMu>(samplekey));
+    } else if (!name.compare("MicroBooNE_CC1Mu0pNp_XSec_CosThetaMu_nu")) {
+      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<kCC0pNpCosThetaMu>(samplekey));
+    } else if (!name.compare("MicroBooNE_CC1Mu0pNp_XSec_ENu_nu")) {
+      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<kCC0pNpEnu>(samplekey));
+    } else if (!name.compare("MicroBooNE_CC1Mu0pNp_XSec_TransferEnergy_nu")) {
+      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<kCC0pNpTransferEnergy>(samplekey));
+    } else if (!name.compare("MicroBooNE_CC1Mu0pNp_XSec_AvailEnergy_nu")) {
+      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<kCC0pNpAvailEnergy>(samplekey));
+    } else if (!name.compare("MicroBooNE_CC1Mu0pNp_XSec_ProtonKE_nu")) {
+      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<kCCProtonKE>(samplekey));
+    } else if (!name.compare("MicroBooNE_CC1Mu0pNp_XSec_ProtonCosTheta_nu")) {
+      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<kCCProtonCosTheta>(samplekey));
+    } else if (!name.compare("MicroBooNE_CC1Mu0pNp_XSec_ProtonMult_nu")) {
+      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<kCCProtonMult>(samplekey));
+    } else if (!name.compare("MicroBooNE_CC1Mu0pNp_XSec_EMuCosThetaMu_nu")) {
+      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<kCC0pNpEMuCosThetaMu>(samplekey));
+    } else if (!name.compare("MicroBooNE_CC1Mu0pNp_XSec_ProtonKECosTheta_nu")) {
+      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<kCCNpProtonKECosTheta>(samplekey));
+    } else if (!name.compare("MicroBooNE_CC1Mu0pNp_XSec_XpEMu_nu")) {
+      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<kCCXpEMu>(samplekey));
+    } else if (!name.compare("MicroBooNE_CC1Mu0pNp_XSec_XpCosThetaMu_nu")) {
+      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<kCCXpCosThetaMu>(samplekey));
+    } else if (!name.compare("MicroBooNE_CC1Mu0pNp_XSec_XpEMuCosThetaMu_nu")) {
+      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<kCCXpEMuCosThetaMu>(samplekey));
+    } else if (!name.compare("MicroBooNE_CC1Mu0pNp_XSec_XpAvailEnergyCosThetaMuEMu_nu")) {
+      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<kCCXpAvailEnergyCosThetaMuEMu>(samplekey));
+    } else if (!name.compare("MicroBooNE_CC1Mu0pNp_XSec_All_nu")) {
+      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<kAllCC>(samplekey));
+    } else if (!name.compare("MicroBooNE_CC1Mu3DInc_XSec_nu")) {
+      return (new MicroBooNE_CC1Mu3DInc_XSec_nu(samplekey));
+
+    } else if (!name.compare("MicroBooNE_NCpi0_XSec_0pNpPpi0_nu")) {
+      return (new MicroBooNE_NCpi0_XSec_nu<kNC0pNpPpi0>(samplekey));
+    } else if (!name.compare("MicroBooNE_NCpi0_XSec_XpPpi0_nu")) {
+      return (new MicroBooNE_NCpi0_XSec_nu<kNCXpPpi0>(samplekey));
+    } else if (!name.compare("MicroBooNE_NCpi0_XSec_0pNpCosThetaPi0_nu")) {
+      return (new MicroBooNE_NCpi0_XSec_nu<kNC0pNpCosThetaPi0>(samplekey));
+    } else if (!name.compare("MicroBooNE_NCpi0_XSec_XpCosThetaPi0_nu")) {
+      return (new MicroBooNE_NCpi0_XSec_nu<kNCXpCosThetaPi0>(samplekey));
+    } else if (!name.compare("MicroBooNE_NCpi0_XSec_XpPpi0CosThetaPi0_nu")) {
+      return (new MicroBooNE_NCpi0_XSec_nu<kNCXpPpi0CosThetaPi0>(samplekey));
+    } else if (!name.compare("MicroBooNE_NCpi0_XSec_AllNCpi0_nu")) {
+      return (new MicroBooNE_NCpi0_XSec_nu<kAllNCpi0>(samplekey));
     } else
 
 #endif
@@ -1205,7 +1253,9 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
         return (new MINERvA_CC0pi_XSec_1DQ2_TgtRatio_nu(samplekey));
 
         // Dan Ruterbories measurements of late 2018
-      } else if (!name.compare("MINERvA_CC0pi_XSec_2Dptpz_nu")) {
+      } else if ( !name.compare("MINERvA_CC0pi_XSec_2Dptpz_nu") ||
+                  !name.compare("MINERvA_CC0pi_XSec_2Dptpz_ME_nu") ||
+                  !name.compare("MINERvA_CC0pi_XSec_2Dptpz_LE_nu")) {
         return (new MINERvA_CC0pi_XSec_2D_nu(samplekey));
 
         // } else if (!name.compare("MINERvA_CC0pi_XSec_3DptpzTp_nu")) {
@@ -1226,7 +1276,13 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
         // C. Patrick's early 2018 measurements
       } else if (!name.compare("MINERvA_CC0pi_XSec_2Dptpz_antinu") ||
           !name.compare("MINERvA_CC0pi_XSec_2DQ2QEEnuQE_antinu") ||
-          !name.compare("MINERvA_CC0pi_XSec_2DQ2QEEnuTrue_antinu")) {
+          !name.compare("MINERvA_CC0pi_XSec_2DQ2QEEnuTrue_antinu") ||
+          // Medium energy
+          !name.compare("MINERvA_CC0pi_XSec_2Dptpz_ME_antinu") ||
+          // Low energy
+          !name.compare("MINERvA_CC0pi_XSec_2Dptpz_LE_antinu") ||
+          !name.compare("MINERvA_CC0pi_XSec_2DQ2QEEnuQE_LE_antinu") ||
+          !name.compare("MINERvA_CC0pi_XSec_2DQ2QEEnuTrue_LE_antinu")) {
         return (new MINERvA_CC0pi_XSec_2D_antinu(samplekey));
 
       } else if (!name.compare("MINERvA_CC0pi_XSec_1DQ2_antinu_H")) {

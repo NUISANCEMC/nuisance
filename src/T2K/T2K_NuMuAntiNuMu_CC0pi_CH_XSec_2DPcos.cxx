@@ -101,8 +101,9 @@ void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::FillEventVariables(FitEvent* event){
 
 void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::FillHistograms(){
 
+  // Not sure we should call this here since it fills just with fXVar
   Measurement1D::FillHistograms();
-  if (Signal){
+  if (Signal) {
     FillMCSlice( fXVar, fYVar, Weight );
   }
 
@@ -112,6 +113,11 @@ void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::ConvertEventRates(){
 
   for (size_t i = 0; i < nangbins; i++){
     fMCHist_Slices[i]->GetSumw2();
+    fMCHist_Slices_Fine[i]->GetSumw2();
+    for (size_t j = 0; j < fMCHist_Slices_Mode[i]->fAllLabels.size(); ++j) {
+      fMCHist_Slices_Mode[i]->fAllHists[j]->GetSumw2();
+      fMCHist_Slices_Fine_Mode[i]->fAllHists[j]->GetSumw2();
+    }
   }
 
   // Do standard conversion.
@@ -120,15 +126,25 @@ void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::ConvertEventRates(){
   // Scale MC slices by their bin area
   for (size_t i = 0; i < nangbins; ++i) {
     fMCHist_Slices[i]->Scale(1. / (angular_binning_costheta[i + 1] - angular_binning_costheta[i]));
+    fMCHist_Slices_Mode[i]->Scale(1. / (angular_binning_costheta[i + 1] - angular_binning_costheta[i]));
+    fMCHist_Slices_Fine[i]->Scale(1. / (angular_binning_costheta[i + 1] - angular_binning_costheta[i]));
+    fMCHist_Slices_Fine_Mode[i]->Scale(1. / (angular_binning_costheta[i + 1] - angular_binning_costheta[i]));
   }
 
   // Now Convert into 1D lists
   fMCHist->Reset();
+  fMCFine->Reset();
   int bincount = 0;
+  int bincount_fine = 0;
   for (size_t i = 0; i < nangbins; i++){
     for (int j = 0; j < fDataHist_Slices[i]->GetNbinsX(); j++){
       fMCHist->SetBinContent(bincount+1, fMCHist_Slices[i]->GetBinContent(j+1));
       bincount++;
+    }
+
+    for (int j = 0; j < fMCHist_Slices_Fine[i]->GetNbinsX(); j++){
+      fMCFine->SetBinContent(bincount_fine+1, fMCHist_Slices_Fine[i]->GetBinContent(j+1));
+      bincount_fine++;
     }
   }
 
@@ -140,6 +156,12 @@ void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::FillMCSlice(double x, double y, doub
   for (size_t i = 0; i < nangbins; ++i) {
     if ((y > angular_binning_costheta[i]) && (y <= angular_binning_costheta[i + 1])) {
       fMCHist_Slices[i]->Fill(x, w);
+      fMCHist_Slices_Fine[i]->Fill(x, w);
+      fMCHist_Slices_Mode[i]->Fill(Mode, x, w);
+      fMCHist_Slices_Fine_Mode[i]->Fill(Mode, x, w);
+
+      // Can exit loop after fill (no need to loop next bins)
+      break;
     }
   }
 }
@@ -188,7 +210,7 @@ void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::SetHistograms(){
   for (size_t i = 0; i < nangbins; i++){
 
     // Make slices for data
-    fDataHist_Slices.push_back((TH1D*)fInputFile->Get(Form("hXsec%sCC0piDataSlice_%zu",nuType.c_str(),i))->Clone());
+    fDataHist_Slices.push_back((TH1D*)fInputFile->Get(Form("hXsec%sCC0piDataSlice_%zu", nuType.c_str(), i))->Clone());
     fDataHist_Slices[i]->SetNameTitle(Form("%s_data_Slice%zu",name.c_str(), i),
 				      Form("%s_data_Slice%zu%s",name.c_str(), i, titles.c_str()));
     
@@ -202,15 +224,35 @@ void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::SetHistograms(){
     
     // Save MC slices
     fMCHist_Slices.push_back((TH1D*) fDataHist_Slices[i]->Clone());
-    fMCHist_Slices[i]->SetNameTitle(Form("%s_MC_Slice%zu",name.c_str(), i), 
-				    Form("%s_MC_Slice%zu%s",name.c_str(),i,titles.c_str()));
+    fMCHist_Slices[i]->SetNameTitle(Form("%s_MC_Slice%zu", name.c_str(), i), 
+				    Form("%s_MC_Slice%zu%s", name.c_str(), i, titles.c_str()));
+
+    fMCHist_Slices_Mode.push_back(new TrueModeStack(Form("%s_Slice%i_MODES", fSettings.GetName().c_str(), int(i)), ("True Channels"), fMCHist_Slices[i]));
+
+
+    // Make the fine and mode histograms
+    fMCHist_Slices_Fine.push_back(new TH1D(
+                        Form("%s_MC_Slice%zu_FINE", name.c_str(), i), 
+                        Form("%s_MC_Slice%zu_FINE%s", name.c_str(), i, titles.c_str()), 
+                        100, 
+                        fMCHist_Slices[i]->GetXaxis()->GetBinLowEdge(1), 
+                        fMCHist_Slices[i]->GetXaxis()->GetBinLowEdge(fMCHist_Slices[i]->GetXaxis()->GetNbins()+1)));
+
+    fMCHist_Slices_Fine_Mode.push_back(new TrueModeStack(Form("%s_Slice%i_MODES_FINE", fSettings.GetName().c_str(), int(i)), ("True Channels"), fMCHist_Slices_Fine[i]));
     
-    SetAutoProcessTH1(fDataHist_Slices[i],kCMD_Write);
-    SetAutoProcessTH1(fMCHist_Slices[i]);    
+
+    SetAutoProcessTH1(fDataHist_Slices[i], kCMD_Write);
+
+    SetAutoProcessTH1(fMCHist_Slices[i]);
+    SetAutoProcessTH1(fMCHist_Slices_Fine[i]);
+    // Auto process each slice stacked histgoram, only write (scaling happens for each hisotram)
+    SetAutoProcessTH1(fMCHist_Slices_Mode[i], kCMD_Write);
+    SetAutoProcessTH1(fMCHist_Slices_Fine_Mode[i], kCMD_Write);
+    // Auto-process each individual mode histogram, only scale (get written above)
+    for (size_t j = 0; j < fMCHist_Slices_Mode[i]->fAllLabels.size(); ++j) {
+      SetAutoProcessTH1(fMCHist_Slices_Mode[i]->fAllHists[j], kCMD_Scale, kCMD_Norm, kCMD_Reset);
+      SetAutoProcessTH1(fMCHist_Slices_Fine_Mode[i]->fAllHists[j], kCMD_Scale, kCMD_Norm, kCMD_Reset);
+    }
   } 
-
   return;
-
 };
-
-
