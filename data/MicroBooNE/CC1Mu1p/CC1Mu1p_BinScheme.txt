@@ -11,8 +11,8 @@ Bin # & Slice & Low edge & High edge
 7 & 0^{o} < #delta#alpha_{T} < 45^{o} & 0.3 & 0.35
 8 & 0^{o} < #delta#alpha_{T} < 45^{o} & 0.35 & 0.4
 9 & 0^{o} < #delta#alpha_{T} < 45^{o} & 0.4 & 0.47
-10 & #delta#alpha_{T} < 45^{o} & 0.47 & 0.55
-11 & #delta#alpha_{T} < 45^{o} & 0.55 & 0.9
+10 & 0^{o} < #delta#alpha_{T} < 45^{o} & 0.47 & 0.55
+11 & 0^{o} < #delta#alpha_{T} < 45^{o} & 0.55 & 0.9
 12 & 45^{o} < #delta#alpha_{T} < 90^{o} & 0 & 0.05
 13 & 45^{o} < #delta#alpha_{T} < 90^{o} & 0.05 & 0.1
 14 & 45^{o} < #delta#alpha_{T} < 90^{o} & 0.1 & 0.15
