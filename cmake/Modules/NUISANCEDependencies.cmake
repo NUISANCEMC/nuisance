@@ -119,7 +119,7 @@ endif()
 #### libraries are more likely to be in a useful order
 
 if (NEUT_ENABLED)
-  include(NEUT)
+  find_package(NEUT)
 
   if(NOT NEUT_FOUND)
     if(NEUT_REQUIRED)
