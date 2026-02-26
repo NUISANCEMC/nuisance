@@ -166,66 +166,77 @@ MicroBooNE_CC1Mu1p_XSec_2D_nu::MicroBooNE_CC1Mu1p_XSec_2D_nu(
     fDist = kDeltaPT;
     fSlice = kDeltaAlphaT;
     fSuffix = "SerialDeltaPT_DeltaAlphaT";
+    fSliceTitle = "#delta#alpha_{T} (deg)";
     fSettings.SetXTitle("#deltap_{T} (GeV/c)");
     fSettings.SetYTitle("d^{2}#sigma/d#delta#alpha_{T}d#deltap_{T} (cm^{2}/(deg)/(GeV/c)/^{40}Ar)");
   } else if (!name.compare("MicroBooNE_CC1Mu1p_XSec_2DDeltaPT_MuonCosTheta_nu")) {
     fDist = kDeltaPT;
     fSlice = kMuonCosTheta;
     fSuffix = "SerialDeltaPT_MuonCosTheta";
+    fSliceTitle = "cos#theta_{#mu}";
     fSettings.SetXTitle("#deltap_{T} (GeV/c)");
     fSettings.SetYTitle("d^{2}#sigma/dcos#theta_{#mu}d#deltap_{T} (cm^{2}/(GeV/c)/^{40}Ar)");
   } else if (!name.compare("MicroBooNE_CC1Mu1p_XSec_2DDeltaPT_ProtonCosTheta_nu")) {
     fDist = kDeltaPT;
     fSlice = kProtonCosTheta;
     fSuffix = "SerialDeltaPT_ProtonCosTheta";
+    fSliceTitle = "cos#theta_{p}";
     fSettings.SetXTitle("#deltap_{T} (GeV/c)");
     fSettings.SetYTitle("d^{2}#sigma/dcos#theta_{p}d#deltap_{T} (cm^{2}/(GeV/c)/^{40}Ar)");
   } else if (!name.compare("MicroBooNE_CC1Mu1p_XSec_2DDeltaAlphaT_DeltaPT_nu")) {
     fDist = kDeltaAlphaT;
     fSlice = kDeltaPT;
     fSuffix = "SerialDeltaAlphaT_DeltaPT";
+    fSliceTitle = "#deltap_{T} (GeV/c)";
     fSettings.SetXTitle("#delta#alpha_{T} (deg)");
     fSettings.SetYTitle("d^{2}#sigma/d#deltap_{T}d#delta#alpha_{T} (cm^{2}/(GeV/c)/(deg)/^{40}Ar)");
   } else if (!name.compare("MicroBooNE_CC1Mu1p_XSec_2DDeltaAlphaT_MuonCosTheta_nu")) {
     fDist = kDeltaAlphaT;
     fSlice = kMuonCosTheta;
     fSuffix = "SerialDeltaAlphaT_MuonCosTheta";
+    fSliceTitle = "cos#theta_{#mu}";
     fSettings.SetXTitle("#delta#alpha_{T} (deg)");
     fSettings.SetYTitle("d^{2}#sigma/dcos#theta_{#mu}d#delta#alpha_{T} (cm^{2}/(deg)/^{40}Ar)");
   } else if (!name.compare("MicroBooNE_CC1Mu1p_XSec_2DDeltaAlphaT_ProtonCosTheta_nu")) {
     fDist = kDeltaAlphaT;
     fSlice = kProtonCosTheta;
     fSuffix = "SerialDeltaAlphaT_ProtonCosTheta";
+    fSliceTitle = "cos#theta_{p}";
     fSettings.SetXTitle("#delta#alpha_{T} (deg)");
     fSettings.SetYTitle("d^{2}#sigma/dcos#theta_{p}d#delta#alpha_{T} (cm^{2}/(deg)/^{40}Ar)");
   } else if (!name.compare("MicroBooNE_CC1Mu1p_XSec_2DDeltaPhiT_DeltaPT_nu")) {
     fDist = kDeltaPhiT;
     fSlice = kDeltaPT;
     fSuffix = "SerialDeltaPhiT_DeltaPT";
+    fSliceTitle = "#deltap_{T} (GeV/c)";
     fSettings.SetXTitle("#delta#phi_{T} (deg)");
     fSettings.SetYTitle("d^{2}#sigma/dcos#theta_{p}d#delta#phi_{T} (cm^{2}/(deg)/^{40}Ar)");
   } else if (!name.compare("MicroBooNE_CC1Mu1p_XSec_2DDeltaPtx_DeltaPty_nu")) {
     fDist = kDeltaPtx;
     fSlice = kDeltaPty;
     fSuffix = "SerialDeltaPtx_DeltaPty";
+    fSliceTitle = "#deltap_{T,y} (GeV/c)";
     fSettings.SetXTitle("#deltap_{T,x} (GeV/c)");
     fSettings.SetYTitle("d^{2}#sigma/d#deltap_{T,y}d#deltap_{T,x} (cm^{2}/(GeV/c)^{2}/^{40}Ar)");
   } else if (!name.compare("MicroBooNE_CC1Mu1p_XSec_2DECal_DeltaPT_nu")) {
     fDist = kECal;
     fSlice = kDeltaPT;
     fSuffix = "SerialECal_DeltaPT";
+    fSliceTitle = "#deltap_{T} (GeV/c)";
     fSettings.SetXTitle("E^{cal} (GeV)");
     fSettings.SetYTitle("d^{2}#sigma/d#deltap_{T}dE^{ecal} (cm^{2}/(GeV/c)/(GeV)/^{40}Ar)");
   } else if (!name.compare("MicroBooNE_CC1Mu1p_XSec_2DECal_DeltaAlphaT_nu")) {
     fDist = kECal;
     fSlice = kDeltaAlphaT;
     fSuffix = "SerialECal_DeltaAlphaT";
+    fSliceTitle = "#delta#alpha_{T} (deg)";
     fSettings.SetXTitle("E^{cal} (GeV)");
     fSettings.SetYTitle("d^{2}#sigma/d#delta#alpha_{T}dE^{ecal} (cm^{2}/(deg)/(GeV)/^{40}Ar)");
   } else if (!name.compare("MicroBooNE_CC1Mu1p_XSec_2DECal_DeltaPty_nu")) {
     fDist = kECal;
     fSlice = kDeltaPty;
     fSuffix = "SerialECal_DeltaPty";
+    fSliceTitle = "#deltap_{T,y} (GeV/c)";
     fSettings.SetXTitle("E^{cal} (GeV)");
     fSettings.SetYTitle("d^{2}#sigma/d#deltap_{T,y}dE^{ecal} (cm^{2}/(GeV/c)/(GeV)/^{40}Ar)");
   } else {
@@ -311,9 +322,9 @@ void MicroBooNE_CC1Mu1p_XSec_2D_nu::FillEventVariables(FitEvent *event) {
   double MuonMass_GeV = 0.106;      // GeV
   double DeltaM2 = TMath::Power(NeutronMass_GeV, 2.) -
                    TMath::Power(ProtonMass_GeV, 2.);                 // GeV^2
-  double MuonEnergy = (event->GetHMFSParticle(13)->fP.E()) / 1000.0; // GeV/c
+  double MuonEnergy = (event->GetHMFSParticle(13)->fP.E()) / 1000.0; // GeV
                                                                      // Abi
-  double ProtonEnergy = signal_proton.E() / 1000.0; // GeV/c Abi;
+  double ProtonEnergy = signal_proton.E() / 1000.0; // GeV Abi;
   double ProtonKE = ProtonEnergy - ProtonMass_GeV;
 
   // ECal energy reconstruction
@@ -356,14 +367,9 @@ void MicroBooNE_CC1Mu1p_XSec_2D_nu::FillEventVariables(FitEvent *event) {
   //  https://journals.aps.org/prd/pdf/10.1103/PhysRevD.101.092001
 
   TVector3 UnitZ(0, 0, 1);
-  // double Ptx = ( UnitZ.Cross(vpmuT) ).Dot(vSumT) / vpmuT.Mag(); -original in
-  // code
-  double DeltaPtx = DeltaPT * TMath::Sin(DeltaAlphaT); // changed by Abi
-                                                       // 06/12/23
-  double Pty = -(vpmuT).Dot(vSumT) / vpmuT.Mag();
+  double DeltaPtx = ( UnitZ.Cross(vpmuT) ).Dot(vSumT) / vpmuT.Mag() / 1000.0; // GeV/c
+  double DeltaPty = -(vpmuT).Dot(vSumT) / vpmuT.Mag() / 1000.0; // GeV/c
 
-  double DeltaPty = DeltaPT * TMath::Sin(DeltaAlphaT); // changed by Abi
-                                                       // 06/12/23
   //----------------------------------------//
 
   if (fDist == kDeltaPT) {
@@ -535,6 +541,9 @@ void MicroBooNE_CC1Mu1p_XSec_2D_nu::SetHistograms() {
   TFile *inputFile = TFile::Open(inputFileName.c_str());
   assert(inputFile && inputFile->IsOpen());
 
+  // Read bin configuration from file
+  LoadBinScheme();
+
   std::string sample_name = fSettings.GetS("name");
 
   // Get data histogram
@@ -558,14 +567,19 @@ void MicroBooNE_CC1Mu1p_XSec_2D_nu::SetHistograms() {
   }
 
   // Set fine-grained MC 2D hist
+  double slicesMin = fBinScheme.GetSlices().front().GetSliceEdges().first;
+  double slicesMax = fBinScheme.GetSlices().back().GetSliceEdges().second;
+  double binsMin = DBL_MAX, binsMax = -DBL_MAX;
+  for (auto& s : fBinScheme.GetSlices()) {
+      binsMin = std::min(binsMin, s.GetBinsForTH1()[0]);
+      binsMax = std::max(binsMax, s.GetBinsForTH1()[s.GetNumberBins()]);
+  }
   fMCHist_Fine2D = new TH2D(Form("%s_MC_FINE_2D", sample_name.c_str()),
-			                      Form("%s_MC_FINE_2D; p_{#mu}^{reco} (GeV); cos#theta_{#mu}^{reco};%s", 
-				                         sample_name.c_str(), fSettings.GetYTitle().c_str()), 
-			                      100, 0.0, 0.9, 100, 0.0, 180.0);
+			                      Form("%s_MC_FINE_2D; %s; %s; %s", 
+				                         sample_name.c_str(),
+                                 fSettings.GetXTitle().c_str(), fSliceTitle.c_str(), fSettings.GetYTitle().c_str()), 
+			                      100, binsMin, binsMax, 100, slicesMin, slicesMax);
   SetAutoProcessTH1(fMCHist_Fine2D);
-
-  // Read bin configuration from file
-  LoadBinScheme();
 
   // Divide data in slices
   int slice_id = 0;
@@ -573,8 +587,9 @@ void MicroBooNE_CC1Mu1p_XSec_2D_nu::SetHistograms() {
 
     // Add data histogram to slice
     TString name  = Form("%s_data_Slice%lu", sample_name.c_str(), slice_id);
-    TString title = Form("%s_data_Slice%lu; p_{#mu}^{reco} (GeV);%s", 
-                          sample_name.c_str(), slice_id, fSettings.GetYTitle().c_str());
+    TString title = Form("%s_data_Slice%lu; %s; %s", 
+                          sample_name.c_str(), slice_id,
+                          fSettings.GetXTitle().c_str(), fSettings.GetYTitle().c_str());
     TH1D* temp_data = new TH1D(name, title, slice.GetNumberBins(), slice.GetBinsForTH1());
 
     std::vector<int> temp_global_bins = slice.GetGlobalBins();
@@ -603,8 +618,9 @@ void MicroBooNE_CC1Mu1p_XSec_2D_nu::SetHistograms() {
     // Add MC histogram to slice
     fMCHist_Slices.push_back((TH1D *)temp_data->Clone());
     name  = Form("%s_MC_Slice%lu", sample_name.c_str(), slice_id);
-    title = Form("%s_MC_Slice%lu; p_{#mu}^{reco} (GeV);%s",
-                  sample_name.c_str(), slice_id, fSettings.GetYTitle().c_str());
+    title = Form("%s_MC_Slice%lu; %s; %s",
+                  sample_name.c_str(), slice_id,
+                  fSettings.GetXTitle().c_str(), fSettings.GetYTitle().c_str());
     fMCHist_Slices[slice_id]->SetNameTitle(name, title);
     fMCHist_Slices[slice_id]->Reset();
 

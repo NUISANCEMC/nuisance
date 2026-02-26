@@ -129,6 +129,7 @@ private:
   std::string fSuffix;
   Distribution fSlice;
   Distribution fDist;
+  std::string fSliceTitle;
 
   BinScheme fBinScheme;
 
