@@ -182,9 +182,9 @@
 
 #ifdef MicroBooNE_ENABLED
 #include "MicroBooNE_CC1Mu1p_XSec_1D_nu.h"
-#include "MicroBooNE_CC1Mu2p_XSec_1D_nu.h"
 #include "MicroBooNE_CC1MuNp_XSec_1D_nu.h"
 #include "MicroBooNE_CCInc_XSec_2DPcos_nu.h"
+#include "MicroBooNE_CC1mu2p0pi_XSec_1D_nu.h"
 #include "MicroBooNE_BNB_NueCC0piNp_2022_XSec_1D_nu.h"
 #include "MicroBooNE_BNB_NueCC0piProtonKE_2022_XSec_1D_nu.h"
 #include "MicroBooNE_CC1Mu0pNp_XSec_nu.h"
@@ -1125,11 +1125,7 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
                !name.compare("MicroBooNE_CC1MuNp_XSec_1Dcosp_nu") ||
                !name.compare("MicroBooNE_CC1MuNp_XSec_1Dthetamup_nu")) {
       return (new MicroBooNE_CC1MuNp_XSec_1D_nu(samplekey));
-    }  else if (!name.compare("MicroBooNE_CC1Mu2p_XSec_1DOpening_Angle_Protons_Lab_nu") ||
-               !name.compare("MicroBooNE_CC1Mu2p_XSec_1DOpening_Angle_Mu_Both_nu") ||
-               !name.compare("MicroBooNE_CC1Mu2p_XSec_1DDeltaPT_nu")) {
-      return (new MicroBooNE_CC1Mu2p_XSec_1D_nu(samplekey));
-  } else if (!name.compare("MicroBooNE_CC1Mu1p_XSec_1DDeltaPT_nu") ||
+    } else if (!name.compare("MicroBooNE_CC1Mu1p_XSec_1DDeltaPT_nu") ||
                !name.compare("MicroBooNE_CC1Mu1p_XSec_1DDeltaAlphaT_nu") ||
                !name.compare("MicroBooNE_CC1Mu1p_XSec_1DDeltaPhiT_nu") ||
                !name.compare("MicroBooNE_CC1Mu1p_XSec_1DMuonCosTheta_nu") ||
@@ -1149,6 +1145,26 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
       return (new MicroBooNE_BNB_NueCC0piNp_2022_XSec_1D_nu(samplekey));
     }
       else if(!name.compare("MicroBooNE_BNB_NueCC0piProtonKE_2022_XSec_1DProtonKE_nu")) {
+    } else if (!name.compare("MicroBooNE_CC1mu2p0pi_XSec_1DDeltaPT_nu") ||
+               !name.compare("MicroBooNE_CC1mu2p0pi_XSec_1DCosPlPr_nu") ||
+               !name.compare("MicroBooNE_CC1mu2p0pi_XSec_1DCosMuPsum_nu") ||
+               !name.compare("MicroBooNE_CC1mu2p0pi_XSec_1DDeltaAlphaT_nu") ||
+               !name.compare("MicroBooNE_CC1mu2p0pi_XSec_1DDeltaPhiT_nu") ||
+               !name.compare("MicroBooNE_CC1mu2p0pi_XSec_1DMuonMomentum_nu") ||
+               !name.compare("MicroBooNE_CC1mu2p0pi_XSec_1DMuonCosTheta_nu") ||
+               !name.compare("MicroBooNE_CC1mu2p0pi_XSec_1DMuonPhi_nu") ||
+               !name.compare("MicroBooNE_CC1mu2p0pi_XSec_1DLeadingProtonMomentum_nu") ||
+               !name.compare("MicroBooNE_CC1mu2p0pi_XSec_1DLeadingProtonCosTheta_nu") ||
+               !name.compare("MicroBooNE_CC1mu2p0pi_XSec_1DLeadingProtonPhi_nu") ||
+               !name.compare("MicroBooNE_CC1mu2p0pi_XSec_1DRecoilProtonMomentum_nu") ||
+               !name.compare("MicroBooNE_CC1mu2p0pi_XSec_1DRecoilProtonCosTheta_nu") ||
+               !name.compare("MicroBooNE_CC1mu2p0pi_XSec_1DRecoilProtonPhi_nu") ) {
+      return (new MicroBooNE_CC1mu2p0pi_XSec_1D_nu(samplekey));
+    } else if (!name.compare("MicroBooNE_BNB_NueCC0piNp_2022_XSec_1DElecCosTheta_nu") ||
+               !name.compare("MicroBooNE_BNB_NueCC0piNp_2022_XSec_1DElecEnergy_nu") ||
+               !name.compare("MicroBooNE_BNB_NueCC0piNp_2022_XSec_1DProtonCosTheta_nu")) {
+      return (new MicroBooNE_BNB_NueCC0piNp_2022_XSec_1D_nu(samplekey));
+    } else if (!name.compare("MicroBooNE_BNB_NueCC0piProtonKE_2022_XSec_1DProtonKE_nu")) {
       return (new MicroBooNE_BNB_NueCC0piProtonKE_2022_XSec_1D_nu(samplekey));
     } else if (!name.compare("MicroBooNE_CC1Mu0pNp_XSec_EMu_nu")) {
       return (new MicroBooNE_CC1Mu0pNp_XSec_nu<kCC0pNpEMu>(samplekey));

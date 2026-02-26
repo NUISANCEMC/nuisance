@@ -54,53 +54,6 @@ bool isCC1MuNp(FitEvent* event, double EnuMin, double EnuMax) {
 
     //----------------------------------------//
 
-bool isCC1Mu2p(FitEvent* event, double EnuMin, double EnuMax) {
-  // Check CC inclusive
-  if (!SignalDef::isCCINC(event, 14, EnuMin, EnuMax)) return false;
-
-  // Veto events which don't have exactly 1 FS muon
-  if (event->NumFSMuon() != 1) return false;
-
-  // Muon momentum range
-  if (event->GetHMFSParticle(13)->fP.Vect().Mag() < 100) return false;
-  if (event->GetHMFSParticle(13)->fP.Vect().Mag() > 1200) return false;
-
-  // Check the existence of at least 2 protons in the final state
-  int NFSProtons = event->NumFSParticle(2212);
-  if (NFSProtons < 2) return false;
-
-  int ProtonCounter = 0;
-  std::vector<int> ProtonIndices = event->GetAllFSProtonIndices();
-
-  for (int i = 0; i < NFSProtons; i++) {
-
-    double mom = event->GetParticleMom( ProtonIndices.at(i) );
-    if (mom > 300 && mom < 1000) { ProtonCounter++; }
-
-  }
-
-  if (ProtonCounter != 2) { return false; }
-
-  // Reject events with neutral pions of any momenta
-  if (event->NumFSParticle(111) != 0) return false;
-
-  // Reject events with positively charged pions above 65 MeV/c
-  if (event->NumFSParticle(211) != 0) {
-    double ppiplus = event->GetHMFSParticle(211)->fP.Vect().Mag();
-    if (ppiplus > 65) { return false; }
-  }
-
-  // Reject events with negatively charged pions above 65 MeV/c
-  if (event->NumFSParticle(-211) != 0) {
-    double ppiminus = event->GetHMFSParticle(-211)->fP.Vect().Mag();
-    if (ppiminus > 65) { return false; }
-  }
-
-  return true;
-}
-
-    //----------------------------------------//
-
 std::vector<FitParticle*> GetCC1Mu1pProtonsInPS(FitEvent* event){
   std::vector<FitParticle*> protons_in_ps;
   for (auto proton : event->GetAllFSParticle(2212)) {
@@ -142,6 +95,65 @@ bool isCC1Mu1p(FitEvent* event, double EnuMin, double EnuMax) {
   return true;
 }
 
+bool isCC1mu2p0pi(FitEvent* event, double EnuMin, double EnuMax) {
+
+  // ==========================================================================
+  // Check CC inclusive
+  if (!SignalDef::isCCINC(event, 14, EnuMin, EnuMax)) return false;
+
+  // ==========================================================================
+  // Veto events which don't have exactly one muon with momentum 0.1 < X (GeV) < 1.2
+
+  if (event->NumFSMuon() != 1) return false;
+  double MuonMomentum = event->GetHMFSParticle(13)->fP.Vect().Mag();
+  if (!(MuonMomentum > 100. && MuonMomentum < 1200.)) return false;
+
+  // ==========================================================================
+  // Veto events which don't have exactly 2 FS protons with momentum 0.3 > X(GeV) > 1.0
+  std::vector<FitParticle*> ProtonParticles = event->GetAllFSProton();
+
+  double ProtonMomMinThreshold = 300.; //MeV
+  double ProtonMomMaxThreshold = 1000.0; //MeV
+
+  uint nProtons = 0;
+  for (uint i=0;i<ProtonParticles.size();i++) {
+    double ProtonMom = ProtonParticles[i]->fP.Vect().Mag();
+    if (ProtonMom > ProtonMomMinThreshold && ProtonMom < ProtonMomMaxThreshold) {
+      nProtons += 1;
+    }
+  }
+  if (nProtons != 2) return false;
+
+  // ==========================================================================
+  // Veto events with any charged pions with momentum > 65MeV
+  std::vector<FitParticle*> PiPlusParticles = event->GetAllFSPiPlus();
+  std::vector<FitParticle*> PiMinusParticles = event->GetAllFSPiMinus();
+
+  std::vector<FitParticle*> ChargedPionParticles;
+  for (uint i=0;i<PiPlusParticles.size();i++) {ChargedPionParticles.push_back(PiPlusParticles[i]);}
+  for (uint i=0;i<PiMinusParticles.size();i++) {ChargedPionParticles.push_back(PiMinusParticles[i]);}
+
+  double ChargedPionMomThreshold = 65.0;
+  uint nChargedPionsWithMomAboveThreshold = 0;
+  for (uint i=0;i<ChargedPionParticles.size();i++) {
+    if (ChargedPionParticles[i]->fP.Vect().Mag() > ChargedPionMomThreshold) {
+      nChargedPionsWithMomAboveThreshold += 1;
+    }
+  }
+  if (nChargedPionsWithMomAboveThreshold != 0) return false;
+
+  // ==========================================================================
+  // Veto events with any neutral pions
+  std::vector<FitParticle*> PiZeroParticles = event->GetAllFSPiZero();
+  uint nNeutralPions = PiZeroParticles.size();
+  if (nNeutralPions != 0) return false;
+
+  // ==========================================================================
+  // Events which have not yet failed the selection are defined as CC1mu2p0pi
+  return true;
+}
+
+
 bool isNCpi0(FitEvent* event) {
 
   // Check that we have a NC event
@@ -156,9 +168,6 @@ bool isNCpi0(FitEvent* event) {
 
 }
 
-
-
-    //----------------------------------------//
 
 bool isNueCC0piNp(FitEvent* event, double EnuMin, double EnuMax) {
   // Check CC nue
@@ -214,7 +223,6 @@ bool isNueCC0piProtonKE(FitEvent* event, double EnuMin, double EnuMax) {
   // Events that pass selection are either NueCC0piNp or NueCC0pi0p
   return true;
 }
-
 
   }  // namespace MicroBooNE
 }  // namespace SignalDef
