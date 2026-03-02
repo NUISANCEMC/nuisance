@@ -16,8 +16,8 @@
 *    You should have received a copy of the GNU General Public License
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
-#ifndef MICROBOONE_BNB_NUMUCC0Pi_2025_XSEC_NU_2D_H_SEEN
-#define MICROBOONE_BNB_NUMUCC0Pi_2025_XSEC_NU_2D_H_SEEN
+#ifndef MICROBOONE_BNB_MUCC0Pi_2025_XSEC_NU_H_SEEN
+#define MICROBOONE_BNB_MUCC0Pi_2025_XSEC_NU_H_SEEN
 
 
 
@@ -46,15 +46,15 @@ struct MyCut {
   }
 };
 
-class MicroBooNE_BNB_NumuCC0Pi_2025_XSec_nu_2D : public Measurement1D {
+class MicroBooNE_BNB_CC0Pi_2025_XSec_nu : public Measurement1D {
 
 public:
 
   /// Basic Constructor.
-  MicroBooNE_BNB_NumuCC0Pi_2025_XSec_nu_2D( nuiskey samplekey );
+  MicroBooNE_BNB_CC0Pi_2025_XSec_nu( nuiskey samplekey );
 
   /// Virtual Destructor
-  inline ~MicroBooNE_BNB_NumuCC0Pi_2025_XSec_nu_2D() {
+  inline ~MicroBooNE_BNB_CC0Pi_2025_XSec_nu() {
     fResidualHist = NULL;
     fChi2LessBinHist = NULL;
   };
@@ -79,6 +79,7 @@ public:
 private:
 
   void LoadBinDefinitions();
+  void LoadBinDefinitions(std::string binning_file_name) ;
 
   // Each bin is defined as a series of cuts that are applied to a FitEvent to
   // determine whether it belongs
@@ -90,6 +91,8 @@ private:
 
   // Additional smearing matrix used to transform the input MC predictions
   std::unique_ptr< TMatrixD > fAddSmear;
+  
+  bool is2D; 
 
 };
 

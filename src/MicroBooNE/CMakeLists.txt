@@ -22,7 +22,7 @@ set(MicroBooNE_Impl_Files
   MicroBooNE_CC1ENp_XSec_1D_nu.cxx
   MicroBooNE_CC1Mu2p_XSec_1D_nu.cxx
   MicroBooNE_CC1Mu1p_XSec_1D_nu.cxx
-  MicroBooNE_BNB_NumuCC0Pi_2025_XSec_nu_2D.cxx
+  MicroBooNE_BNB_CC0Pi_2025_XSec_nu.cxx
   MicroBooNE_SignalDef.cxx
 )
 
@@ -31,7 +31,7 @@ set(MicroBooNE_Hdr_Files
   MicroBooNE_CC1MuNp_XSec_1D_nu.h
   MicroBooNE_CC1Mu2p_XSec_1D_nu.h
   MicroBooNE_CC1Mu1p_XSec_1D_nu.h
-  MicroBooNE_BNB_NumuCC0Pi_2025_XSec_nu_2D.h
+  MicroBooNE_BNB_CC0Pi_2025_XSec_nu.h
   MicroBooNE_SignalDef.h
 )
 

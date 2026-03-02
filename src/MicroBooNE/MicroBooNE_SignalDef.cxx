@@ -209,7 +209,8 @@ bool isCC1Mu0pi_2025(FitEvent* event, double EnuMin, double EnuMax) {
   if (event->NumFSMuon() != 1) return false;
 
   // Muon momentum range
-  auto mu_mom = event->GetHMFSParticle(13)->p();
+  //auto mu_mom = event->GetHMFSParticle(13)->p();
+  auto mu_mom = event->GetHMFSParticle(13)->fP.Vect().Mag();
   if ((mu_mom < 100) || (mu_mom > 2000)) return false;
 
   // Reject events with neutral pions of any momenta
@@ -217,13 +218,15 @@ bool isCC1Mu0pi_2025(FitEvent* event, double EnuMin, double EnuMax) {
 
   // Reject events with positively charged pions above 70 MeV/c
   if (event->NumFSParticle(211) != 0) {
-    double ppiplus = event->GetHMFSParticle(211)->p();
+    //double ppiplus = event->GetHMFSParticle(211)->p();
+    double ppiplus = event->GetHMFSParticle(211)->fP.Vect().Mag();
     if (ppiplus > 70) { return false; }
   }
 
   // Reject events with negatively charged pions above 70 MeV/c
   if (event->NumFSParticle(-211) != 0) {
-    double ppiminus = event->GetHMFSParticle(-211)->p();
+   // double ppiminus = event->GetHMFSParticle(-211)->p();
+   double ppiminus = event->GetHMFSParticle(-211)->fP.Vect().Mag();
     if (ppiminus > 70) { return false; }
   }
 
