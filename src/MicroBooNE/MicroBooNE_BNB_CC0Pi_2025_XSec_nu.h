@@ -74,11 +74,9 @@ public:
   /// Work around some hard-coded assumptions in Measurement1D::GetLikelihood()
   double GetLikelihood() override;
   
-  void BinWidth_norm_2D(TH1D *input);
 
 private:
 
-  void LoadBinDefinitions();
   void LoadBinDefinitions(std::string binning_file_name) ;
 
   // Each bin is defined as a series of cuts that are applied to a FitEvent to
@@ -96,7 +94,9 @@ private:
 
 };
 
-
+////////
+/// Extra Function checking the input histogram used when validating
+///////
 inline bool CheckHist(const TH1D* h, std::ostream& out = std::cerr, bool verbose = true) {
   if (!h) { out << "[FAIL] Histogram pointer is null.\n"; return false; }
 
