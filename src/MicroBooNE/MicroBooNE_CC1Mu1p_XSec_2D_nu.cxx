@@ -586,8 +586,8 @@ void MicroBooNE_CC1Mu1p_XSec_2D_nu::SetHistograms() {
   for (const auto& slice : fBinScheme.GetSlices()) {
 
     // Add data histogram to slice
-    TString name  = Form("%s_data_Slice%lu", sample_name.c_str(), slice_id);
-    TString title = Form("%s_data_Slice%lu; %s; %s", 
+    TString name  = Form("%s_data_Slice%u", sample_name.c_str(), slice_id);
+    TString title = Form("%s_data_Slice%u; %s; %s",
                           sample_name.c_str(), slice_id,
                           fSettings.GetXTitle().c_str(), fSettings.GetYTitle().c_str());
     TH1D* temp_data = new TH1D(name, title, slice.GetNumberBins(), slice.GetBinsForTH1());
@@ -617,8 +617,8 @@ void MicroBooNE_CC1Mu1p_XSec_2D_nu::SetHistograms() {
 
     // Add MC histogram to slice
     fMCHist_Slices.push_back((TH1D *)temp_data->Clone());
-    name  = Form("%s_MC_Slice%lu", sample_name.c_str(), slice_id);
-    title = Form("%s_MC_Slice%lu; %s; %s",
+    name  = Form("%s_MC_Slice%u", sample_name.c_str(), slice_id);
+    title = Form("%s_MC_Slice%u; %s; %s",
                   sample_name.c_str(), slice_id,
                   fSettings.GetXTitle().c_str(), fSettings.GetYTitle().c_str());
     fMCHist_Slices[slice_id]->SetNameTitle(name, title);

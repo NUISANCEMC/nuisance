@@ -144,11 +144,10 @@ TrueModeStack::TrueModeStack(
     std::map<int, std::pair<std::string, std::string> > const &process_ids)
     : TrueModeStack(name, title) {
 
-  int i = 0;
-  TrueModeStack::AddMode(i++, "UNDEFINED", "Undefined", kRed + 1, 2, 3000);
+  TrueModeStack::AddMode(0, "UNDEFINED", "Undefined", kRed + 1, 2, 3000);
 
   for (auto const &pid : process_ids) {
-    TrueModeStack::AddMode(i++, "process_id_" + std::to_string(pid.first),
+    TrueModeStack::AddMode(pid.first, "process_id_" + std::to_string(pid.first),
                            pid.second.first, kBlack, 1, 1001);
   }
 

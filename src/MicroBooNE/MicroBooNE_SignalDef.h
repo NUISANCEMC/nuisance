@@ -32,13 +32,7 @@ namespace SignalDef {
  */
 bool isCC1MuNp(FitEvent* event, double EnuMin, double EnuMax);
 
-bool isCC1ENp(FitEvent* event, double EnuMin, double EnuMax);
-/**
- * numu CC with 1 muon (0.1 < Pmu < 1.2 GeV/c), 2 protons (0.3 < Pp < 1 GeV/c), no neutral pions (any momenta), and no charged pions above 65 MeV/c [any number of neutrons is allowed].
- *
- * publication reference to be updated
- */
-bool isCC1Mu2p(FitEvent* event, double EnuMin, double EnuMax);
+bool isCC1mu2p0pi(FitEvent* event, double EnuMin, double EnuMax);
 
 /**
  * numu CC with 1 muon (0.1 < Pmu < 1.2 GeV/c), 1 proton (0.3 < Pp < 1 GeV/c), no neutral pions (any momenta), and no charged pions above 70 MeV/c [any number of neutrons is allowed].
@@ -47,6 +41,23 @@ bool isCC1Mu2p(FitEvent* event, double EnuMin, double EnuMax);
  */
 bool isCC1Mu1p(FitEvent* event, double EnuMin, double EnuMax);
 std::vector<FitParticle*> GetCC1Mu1pProtonsInPS(FitEvent* event);
+
+/**
+ * nue CC with 1 electron (KE_e > 30 MeV), no charged pions above KE_pi > 40 MeV, and no neutral pions. 
+ * 1eNp0pi events w/ visible protons have KE_p >= 50 MeV : "isNueCC0piNp" signal fills E_e, cos th_e, and cos th_p
+ * 1e0p0pi events w/o visible protons have KE_p < 50 MeV, E_e > 0.5 GeV, and cos theta_e > 0.6 : "isNueCC0piProtonKE" signal fills KE_p
+ *
+ * Phys. Rev. D 106, L051102 DOI: https://doi.org/10.1103/PhysRevD.106.L051102
+ */
+bool isNueCC0piNp(FitEvent* event, double EnuMin, double EnuMax);
+bool isNueCC0piProtonKE(FitEvent* event, double EnuMin, double EnuMax);
+
+/**
+ * NCpi0 with 1 pi0 (0 < Ppi0 < 1.2 GeV/c).
+ *
+ * publication reference to be updated
+ */
+bool isNCpi0(FitEvent* event);
 
   }  // namespace MicroBooNE
 }  // namespace SignalDef
