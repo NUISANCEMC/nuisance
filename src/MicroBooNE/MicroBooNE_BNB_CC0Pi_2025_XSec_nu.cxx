@@ -82,6 +82,9 @@ std::map<int, double> BinWidthMap = {
 };
 
 }
+
+void ApplySmearing(StackBase* stack, TMatrixD* fAddSmear);
+void ApplyBinWidthNorm(StackBase* stack, std::map<int, double>& BinWidthMap);
 /////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////                                            
@@ -439,10 +442,10 @@ void MicroBooNE_BNB_CC0Pi_2025_XSec_nu::ConvertEventRates() {
  
   int num_bins = fMCHist->GetNbinsX();
   TMatrixD pred( num_bins, 1 );
+
   
   for ( int b = 0; b < num_bins; ++b ) {
     pred( b, 0 ) = fMCHist->GetBinContent( b + 1 );
-
   }
 
   //// Apply the additional smearing matrix to create a new prediction
@@ -452,7 +455,7 @@ void MicroBooNE_BNB_CC0Pi_2025_XSec_nu::ConvertEventRates() {
   // Also BinWith norm
 
  if(is2D == true){
- for ( int b = 0; b < num_bins; ++b ) {
+  for ( int b = 0; b < num_bins; ++b ) {
      double xsec = new_pred( b, 0 );
      //std::cout<<"After add smearing  :: "<< new_pred( b, 0 ) << std::endl;
      fMCHist->SetBinContent( b + 1, xsec); // / BinWidthMap[b + 1] 
@@ -466,11 +469,16 @@ void MicroBooNE_BNB_CC0Pi_2025_XSec_nu::ConvertEventRates() {
    }
  
  }
+ ////////////
+ ///// Apply smearing to the stack of modes
+ ////////
+ ApplySmearing(fMCHist_Modes, fAddSmear.get());
 
  //
 //////////////////////////////////////
 // Assuming that 2D is a function of bin num , and 1D is not therefore , and extra step is need to bin width Norm the 2D , 
 ///////////////////////////////////
+// Assumed this includes the modes hist
  Measurement1D::ConvertEventRates();
 
  if(is2D == true){
@@ -478,6 +486,11 @@ void MicroBooNE_BNB_CC0Pi_2025_XSec_nu::ConvertEventRates() {
     double xsec = fMCHist->GetBinContent(b+1);
     fMCHist->SetBinContent( b + 1, xsec / BinWidthMap[b + 1]); // / BinWidthMap[b + 1] 
   }
+  ///////////////
+  //  bin width norm the modes 
+  //////////
+  ApplyBinWidthNorm(fMCHist_Modes, BinWidthMap);
+ 
  }
 
 }
@@ -515,4 +528,52 @@ double MicroBooNE_BNB_CC0Pi_2025_XSec_nu::GetLikelihood() {
   fLikelihood = stat;
 
   return stat;
+}
+
+
+void ApplySmearing(StackBase* stack, TMatrixD* fAddSmear) {
+    // Loop over all histograms in the stack
+    for (size_t h = 0; h < stack->fAllHists.size(); ++h) {
+        TH1* fMCHist = stack->fAllHists[h];
+        if (!fMCHist) continue;
+
+        int num_bins = fMCHist->GetNbinsX();
+
+        // Build prediction vector from histogram
+        TMatrixD pred(num_bins, 1);
+        for (int b = 0; b < num_bins; ++b) {
+            pred(b, 0) = fMCHist->GetBinContent(b + 1);
+        }
+
+        // Apply smearing matrix
+        TMatrixD new_pred(*fAddSmear, TMatrixD::kMult, pred);
+
+        // Write smeared values back into histogram
+        for (int b = 0; b < num_bins; ++b) {
+            fMCHist->SetBinContent(b + 1, new_pred(b, 0));
+        }
+    }
+}
+
+void ApplyBinWidthNorm(StackBase* stack, std::map<int, double>& BinWidthMap) {
+    // Apply to all hists in the stack
+    for (size_t h = 0; h < stack->fAllHists.size(); ++h) {
+        TH1* hist = stack->fAllHists[h];
+        if (!hist) continue;
+
+        int num_bins = hist->GetNbinsX();
+        for (int b = 0; b < num_bins; ++b) {
+            double xsec = hist->GetBinContent(b + 1);
+            hist->SetBinContent(b + 1, xsec / BinWidthMap[b + 1]);
+        }
+    }
+
+    // Also apply to fTemplate if it exists
+    if (stack->fTemplate) {
+        int num_bins = stack->fTemplate->GetNbinsX();
+        for (int b = 0; b < num_bins; ++b) {
+            double xsec = stack->fTemplate->GetBinContent(b + 1);
+            stack->fTemplate->SetBinContent(b + 1, xsec / BinWidthMap[b + 1]);
+        }
+    }
 }
