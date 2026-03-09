@@ -394,22 +394,29 @@ void MicroBooNE_CC1MuNp_XSec_2025_nu::ConvertEventRates() {
   // Do the standard conversion
   Measurement1D::ConvertEventRates();
 
-  // TODO: Restore use of A_C once you make sure you aren't double-counting it
-  //// Build a column vector using the predicted cross sections
-  //int num_bins = fMCHist->GetNbinsX();
-  //TMatrixD pred( num_bins, 1 );
-  //for ( int b = 0; b < num_bins; ++b ) {
-  //  pred( b, 0 ) = fMCHist->GetBinContent( b + 1 );
-  //}
+  // Clone the binning from the MC histogram
+  fMCHistWithAC.reset(
+    dynamic_cast< TH1D* >( fMCHist->Clone() )
+  );
+  fMCHistWithAC->SetNameTitle( (fSettings.GetName() + "_MC_with_AC").c_str(),
+   fSettings.GetFullTitles().c_str() );
+  fMCHistWithAC->Reset();
 
-  //// Apply the additional smearing matrix to create a new prediction
-  //TMatrixD new_pred( *fAddSmear, TMatrixD::kMult, pred );
+  // Build a column vector using the predicted cross sections
+  int num_bins = fMCHist->GetNbinsX();
+  TMatrixD pred( num_bins, 1 );
+  for ( int b = 0; b < num_bins; ++b ) {
+    pred( b, 0 ) = fMCHist->GetBinContent( b + 1 );
+  }
 
-  //// Update the MC prediction histogram with the smeared version
-  //for ( int b = 0; b < num_bins; ++b ) {
-  //  double xsec = new_pred( b, 0 );
-  //  fMCHist->SetBinContent( b + 1, xsec );
-  //}
+  // Apply the additional smearing matrix A_C to create a new prediction
+  TMatrixD new_pred( *fAddSmear, TMatrixD::kMult, pred );
+
+  // Store it in our clone of the original MC prediction histogram
+  for ( int b = 0; b < num_bins; ++b ) {
+    double xsec = new_pred( b, 0 );
+    fMCHistWithAC->SetBinContent( b + 1, xsec );
+  }
 }
 
 double MicroBooNE_CC1MuNp_XSec_2025_nu::GetLikelihood() {
@@ -430,8 +437,8 @@ double MicroBooNE_CC1MuNp_XSec_2025_nu::GetLikelihood() {
       NUIS_ERR(FTL, "Norm-shape covariance not yet supported by"
         " the MicroBooNE_CC1MuNp_XSec_2025_nu sample" );
     }
-    stat = StatUtils::GetChi2FromCov( fDataHist, fMCHist, covar, NULL, 1.0,
-      1.0, fIsWriting ? fResidualHist : NULL );
+    stat = StatUtils::GetChi2FromCov( fDataHist, fMCHistWithAC.get(),
+      covar, NULL, 1.0, 1.0, fIsWriting ? fResidualHist : NULL );
   }
 
   fLikelihood = stat;

@@ -82,8 +82,12 @@ private:
   // particular event
   std::vector< size_t > fPassingBins;
 
-  // Additional smearing matrix used to transform the input MC predictions
-  std::unique_ptr< TMatrixD > fAddSmear;
+  // Additional smearing matrix A_C used to transform the input MC predictions
+  // when computing a chi-squared score
+  std::shared_ptr< TMatrixD > fAddSmear;
+
+  // Copy of MC histogram multiplied by the additional smearing matrix A_C
+  std::shared_ptr< TH1D > fMCHistWithAC;
 
 };
 
