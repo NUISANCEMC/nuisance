@@ -16,8 +16,8 @@
 *    You should have received a copy of the GNU General Public License
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
-#ifndef MICROBOONE_CC1MUNP_2D_NU_H_SEEN
-#define MICROBOONE_CC1MUNP_2D_NU_H_SEEN
+#ifndef MICROBOONE_CC1MUNP_2025_NU_H_SEEN
+#define MICROBOONE_CC1MUNP_2025_NU_H_SEEN
 
 #include <functional>
 #include <memory>
@@ -40,15 +40,17 @@ struct MyCut {
   }
 };
 
-class MicroBooNE_CC1MuNp_XSec_2D_nu : public Measurement1D {
+/// Implements comparisons with the MicroBooNE measurement described
+/// in Phys. Rev. D 112, 112004 (2025) https://doi.org/10.1103/8v2y-l89l
+class MicroBooNE_CC1MuNp_XSec_2025_nu : public Measurement1D {
 
 public:
 
   /// Basic Constructor.
-  MicroBooNE_CC1MuNp_XSec_2D_nu( nuiskey samplekey );
+  MicroBooNE_CC1MuNp_XSec_2025_nu( nuiskey samplekey );
 
   /// Virtual Destructor
-  inline ~MicroBooNE_CC1MuNp_XSec_2D_nu() {
+  inline ~MicroBooNE_CC1MuNp_XSec_2025_nu() {
     fResidualHist = NULL;
     fChi2LessBinHist = NULL;
   };

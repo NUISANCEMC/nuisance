@@ -20,7 +20,7 @@
 #include <fstream>
 #include <set>
 
-#include "MicroBooNE_CC1MuNp_XSec_2D_nu.h"
+#include "MicroBooNE_CC1MuNp_XSec_2025_nu.h"
 #include "MicroBooNE_SignalDef.h"
 #include "TH2D.h"
 #include "TMatrixD.h"
@@ -103,8 +103,8 @@ namespace {
 
 }
 
-MicroBooNE_CC1MuNp_XSec_2D_nu
-  ::MicroBooNE_CC1MuNp_XSec_2D_nu( nuiskey samplekey )
+MicroBooNE_CC1MuNp_XSec_2025_nu
+  ::MicroBooNE_CC1MuNp_XSec_2025_nu( nuiskey samplekey )
 {
   fSettings = LoadSampleSettings( samplekey );
   std::string name = fSettings.GetS( "name" );
@@ -112,7 +112,7 @@ MicroBooNE_CC1MuNp_XSec_2D_nu
   // The main histograms use the bin number on the x-axis
   fSettings.SetXTitle( "bin number" );
 
-  if ( !name.compare("MicroBooNE_CC1MuNp_XSec_2D_PpCosp_nu") ) {
+  if ( !name.compare("MicroBooNE_CC1MuNp_XSec_2025_nu") ) {
     fSettings.SetYTitle( "#sigma (cm^{2}/^{40}Ar)" );
   }
   else {
@@ -201,11 +201,11 @@ MicroBooNE_CC1MuNp_XSec_2D_nu
 }
 
 
-bool MicroBooNE_CC1MuNp_XSec_2D_nu::isSignal( FitEvent* event ) {
+bool MicroBooNE_CC1MuNp_XSec_2025_nu::isSignal( FitEvent* event ) {
   return SignalDef::MicroBooNE::isCC1MuNpFor2DAnalysis( event, EnuMin, EnuMax );
 }
 
-void MicroBooNE_CC1MuNp_XSec_2D_nu::FillEventVariables( FitEvent* event ) {
+void MicroBooNE_CC1MuNp_XSec_2025_nu::FillEventVariables( FitEvent* event ) {
 
   // Clear out the vector of passing bins, which may have already been filled
   // for the previous event
@@ -235,7 +235,7 @@ void MicroBooNE_CC1MuNp_XSec_2D_nu::FillEventVariables( FitEvent* event ) {
 
 }
 
-void MicroBooNE_CC1MuNp_XSec_2D_nu::LoadBinDefinitions() {
+void MicroBooNE_CC1MuNp_XSec_2025_nu::LoadBinDefinitions() {
   std::string binning_file_name( FitPar::GetDataBase()
     + "/MicroBooNE/CC1MuNp/2D/bin_defs.txt" );
 
@@ -371,7 +371,7 @@ void MicroBooNE_CC1MuNp_XSec_2D_nu::LoadBinDefinitions() {
 
 }
 
-void MicroBooNE_CC1MuNp_XSec_2D_nu::FillHistograms() {
+void MicroBooNE_CC1MuNp_XSec_2025_nu::FillHistograms() {
 
   if ( !Signal ) return;
 
@@ -390,7 +390,7 @@ void MicroBooNE_CC1MuNp_XSec_2D_nu::FillHistograms() {
 
 }
 
-void MicroBooNE_CC1MuNp_XSec_2D_nu::ConvertEventRates() {
+void MicroBooNE_CC1MuNp_XSec_2025_nu::ConvertEventRates() {
   // Do the standard conversion
   Measurement1D::ConvertEventRates();
 
@@ -412,14 +412,14 @@ void MicroBooNE_CC1MuNp_XSec_2D_nu::ConvertEventRates() {
   //}
 }
 
-double MicroBooNE_CC1MuNp_XSec_2D_nu::GetLikelihood() {
+double MicroBooNE_CC1MuNp_XSec_2025_nu::GetLikelihood() {
 
   if ( fNoData || !fDataHist ) return 0.;
 
   // Apply Masking to MC if Required.
   if ( fIsMask and fMaskHist ) {
     NUIS_ERR(FTL, "Bin masks not yet supported by"
-      " the MicroBooNE_CC1MuNp_XSec_2D_nu sample" );
+      " the MicroBooNE_CC1MuNp_XSec_2025_nu sample" );
     //PlotUtils::MaskBins(fMCHist, fMaskHist);
   }
 
@@ -428,7 +428,7 @@ double MicroBooNE_CC1MuNp_XSec_2D_nu::GetLikelihood() {
   if ( fIsChi2 ) {
     if ( fIsNS ) {
       NUIS_ERR(FTL, "Norm-shape covariance not yet supported by"
-        " the MicroBooNE_CC1MuNp_XSec_2D_nu sample" );
+        " the MicroBooNE_CC1MuNp_XSec_2025_nu sample" );
     }
     stat = StatUtils::GetChi2FromCov( fDataHist, fMCHist, covar, NULL, 1.0,
       1.0, fIsWriting ? fResidualHist : NULL );
