@@ -87,7 +87,7 @@ void MINERvA_CC1pip_XSec_1D_2017Update::SetupDataSettings(){
   std::string descrip =  distdescript + \
     "Target: CH \n"				       \
     "Flux: MINERvA Forward Horn Current numu ONLY \n"  \
-    "Signal: Any event with 1 muon, and 1pi+ or 1pi- in FS. W < 1.8";
+    "Signal: Any event with 1 muon, and 1pi+ or 1pi- in FS. Wexp < 1.4";
 
   fSettings.SetDescription(descrip);
   fSettings.SetDataInput( GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pip/070717/" + datafile + "_data.txt" );
