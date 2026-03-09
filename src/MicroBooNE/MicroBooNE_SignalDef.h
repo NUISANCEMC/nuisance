@@ -57,7 +57,7 @@ bool isNCpi0(FitEvent* event);
 
 // 2D CCNp analysis
 bool isMesonOrAntimeson( int pdg_code );
-bool isCC1MuNpFor2DAnalysis( FitEvent* event, double EnuMin, double EnuMax );
+bool isCC1MuNpFor2025Analysis( FitEvent* event, double EnuMin, double EnuMax );
 
   }  // namespace MicroBooNE
 }  // namespace SignalDef

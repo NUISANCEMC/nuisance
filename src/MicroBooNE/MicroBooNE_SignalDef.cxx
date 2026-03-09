@@ -259,10 +259,10 @@ bool isMesonOrAntimeson( int pdg_code ) {
   return true;
 }
 
-// Updated signal definition used for the newer 2D CCNp cross-section analysis.
+// Updated signal definition used for the newer 2025 CCNp cross-section analysis.
 // It is similar to the original isCC1MuNp definition but has a few small
 // differences.
-bool isCC1MuNpFor2DAnalysis( FitEvent* event, double EnuMin, double EnuMax ) {
+bool isCC1MuNpFor2025Analysis( FitEvent* event, double EnuMin, double EnuMax ) {
 
   // PDG codes of interest
   const int MUON = 13;

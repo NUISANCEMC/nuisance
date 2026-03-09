@@ -142,7 +142,7 @@ MicroBooNE_CC1MuNp_XSec_2025_nu
   this->LoadBinDefinitions();
 
   std::string data_file_name( FitPar::GetDataBase()
-    + "/MicroBooNE/CC1MuNp/2D/data_release.root" );
+    + "/MicroBooNE/CC1MuNp/2025/data_release.root" );
 
   // Load the additional smearing matrix
   TMatrixD* A_C = StatUtils::GetMatrixFromRootFile( data_file_name,
@@ -202,7 +202,7 @@ MicroBooNE_CC1MuNp_XSec_2025_nu
 
 
 bool MicroBooNE_CC1MuNp_XSec_2025_nu::isSignal( FitEvent* event ) {
-  return SignalDef::MicroBooNE::isCC1MuNpFor2DAnalysis( event, EnuMin, EnuMax );
+  return SignalDef::MicroBooNE::isCC1MuNpFor2025Analysis( event, EnuMin, EnuMax );
 }
 
 void MicroBooNE_CC1MuNp_XSec_2025_nu::FillEventVariables( FitEvent* event ) {
@@ -237,7 +237,7 @@ void MicroBooNE_CC1MuNp_XSec_2025_nu::FillEventVariables( FitEvent* event ) {
 
 void MicroBooNE_CC1MuNp_XSec_2025_nu::LoadBinDefinitions() {
   std::string binning_file_name( FitPar::GetDataBase()
-    + "/MicroBooNE/CC1MuNp/2D/bin_defs.txt" );
+    + "/MicroBooNE/CC1MuNp/2025/bin_defs.txt" );
 
   std::ifstream bin_file( binning_file_name );
   std::string dummy_str;
@@ -401,6 +401,7 @@ void MicroBooNE_CC1MuNp_XSec_2025_nu::ConvertEventRates() {
   fMCHistWithAC->SetNameTitle( (fSettings.GetName() + "_MC_with_AC").c_str(),
    fSettings.GetFullTitles().c_str() );
   fMCHistWithAC->Reset();
+  fMCHistWithAC->SetDirectory( nullptr );
 
   // Build a column vector using the predicted cross sections
   int num_bins = fMCHist->GetNbinsX();

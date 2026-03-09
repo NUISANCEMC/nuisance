@@ -76,7 +76,7 @@ private:
 
   // Each bin is defined as a series of cuts that are applied to a FitEvent to
   // determine whether it belongs
-  std::vector< std::vector<MyCut> > fBinDefinitions;
+  std::vector< std::vector< MyCut > > fBinDefinitions;
 
   // Temporary storage for the index of each bin that passed all cuts for any
   // particular event
@@ -89,6 +89,10 @@ private:
   // Copy of MC histogram multiplied by the additional smearing matrix A_C
   std::shared_ptr< TH1D > fMCHistWithAC;
 
+  // Histograms for individual blocks of bins
+  std::vector< std::shared_ptr< TH1D > > fMCHist_Blocks;
+  std::vector< std::shared_ptr< TH1D > > fDataHist_Blocks;
+  std::map<int, std::vector<TH1D *> > fMCModeHists_Slices;
 };
 
 #endif
