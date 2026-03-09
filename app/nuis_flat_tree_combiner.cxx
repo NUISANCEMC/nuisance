@@ -5,6 +5,7 @@
 #include "TChain.h"
 #include "TFile.h"
 #include "TTree.h"
+#include "TH1D.h"
 
 std::vector<std::string> inputdescriptors;
 std::string outputfilename;
@@ -71,6 +72,9 @@ int main(int argc, char const *argv[]) {
   size_t nents = ch.GetEntries();
   double ntrees = ch.GetNtrees();
 
+  // Turn on all branches to be safe
+  ch.SetBranchStatus("*", true);
+
   if (isdouble) {
     double fScaleFactor;
     ch.SetBranchAddress(branchname.c_str(), &fScaleFactor);
@@ -83,9 +87,7 @@ int main(int argc, char const *argv[]) {
       }
 
       ch.GetEntry(ent_it);
-
       fScaleFactor /= ntrees;
-
       outtree->Fill();
     }
   } else {
@@ -98,14 +100,23 @@ int main(int argc, char const *argv[]) {
       if ((nents/100) && ent_it && !(ent_it % (nents/100))) {
         std::cout << "Processed " << ent_it << "/" << nents << std::endl;
       }
-
       ch.GetEntry(ent_it);
-
       fScaleFactor /= ntrees;
-
       outtree->Fill();
     }
   }
+
+  // Check for the flat tree flux and event rate histograms
+  // Get it from 0th file for now
+  TFile *input = new TFile(inputdescriptors[0].c_str());
+  // Keep checking if not there?
+  TH1D *flux = (TH1D*)input->Get("FlatTree_FLUX");
+  TH1D *evt = (TH1D*)input->Get("FlatTree_EVT");
+  outfile->cd();
+  if (flux != NULL) flux->Write("FlatTree_FLUX");
+  if (evt != NULL) evt->Write("FlatTree_EVT");
+  input->Close();
+
 
   outfile->Write();
   outfile->Close();
