@@ -24,6 +24,7 @@
 #include "MicroBooNE_SignalDef.h"
 #include "TMatrixD.h"
 
+// Anonymous namespace
 namespace {
   constexpr int MASS_NUMBER_40AR = 40;
   constexpr int PROTON = 2212;
@@ -100,6 +101,90 @@ namespace {
     return 0.;
   }
 
+  // Loads a matrix from a text file following the format used
+  // in the data release for this MicroBooNE measurement
+  TMatrixD load_matrix( const std::string& input_file_name ) {
+
+    // Get the table of matrix element values
+    std::ifstream matrix_table_file( input_file_name );
+
+    // Peek at the file contents to decide whether we're working with
+    // a matrix or a column vector
+    std::string dummy;
+    matrix_table_file >> dummy >> dummy >> dummy;
+    bool is_matrix = ( dummy == "numYbins" );
+
+    // Return to the beginning of the file for parsing
+    matrix_table_file.seekg( 0 );
+
+    // Get the matrix or vector dimensions from the header line(s)
+    int num_x_bins, num_y_bins;
+
+    matrix_table_file >> dummy >> num_x_bins;
+    if ( is_matrix ) {
+      matrix_table_file >> dummy >> num_y_bins;
+
+      // Skip the next header line which contains the data column names
+      std::getline( matrix_table_file, dummy );
+    }
+    else {
+      num_y_bins = 1;
+    }
+
+    // Create a TMatrixD with the correct dimensions
+    TMatrixD matrix( num_x_bins, num_y_bins );
+
+    // Parse its contents from the remaining lines
+    std::string line;
+    while ( std::getline(matrix_table_file, line) ) {
+      int bin1, bin2;
+      double element;
+
+      std::stringstream temp_ss( line );
+      temp_ss >> bin1;
+      if ( is_matrix ) {
+        temp_ss >> bin2;
+      }
+      else {
+        bin2 = 0;
+      }
+      temp_ss >> element;
+
+      if ( bin1 < num_x_bins && bin2 < num_y_bins ) {
+        matrix( bin1, bin2 ) = element;
+      }
+    }
+
+    return matrix;
+  }
+
+  // Helper function that converts a TMatrixD into the TMatrixDSym*
+  // needed to initialize some class members inherited from Measurement1D.
+  // Assumes that the input is a square matrix (TODO: add error handling).
+  TMatrixDSym* to_symmetric_matrix( const TMatrixD& mat ) {
+    int num_rows = mat.GetNrows();
+    TMatrixDSym* sym = new TMatrixDSym( num_rows );
+    for ( int a = 0; a < num_rows; ++a ) {
+      for ( int b = 0; b < num_rows; ++b ) {
+        sym->operator()( a, b ) = mat( a, b );
+      }
+    }
+    return sym;
+  }
+
+  // Helper function that creates a TH1D from a TMatrixD. Currently
+  // assumes that the input matrix has a single column (TODO: Add
+  // error handling)
+  TH1D* to_histogram( const TMatrixD& vec ) {
+    int num_rows = vec.GetNrows();
+    auto* hist = new TH1D( "vec_hist", "", num_rows, 0., num_rows );
+    for ( int a = 0; a < num_rows; ++a ) {
+      double value = vec( a, 0 );
+      hist->SetBinContent( a, value );
+    }
+    return hist;
+  }
+
 }
 
 MicroBooNE_CC1MuNp_XSec_2025_nu
@@ -111,12 +196,9 @@ MicroBooNE_CC1MuNp_XSec_2025_nu
   // The main histograms use the bin number on the x-axis
   fSettings.SetXTitle( "bin number" );
 
-  if ( !name.compare("MicroBooNE_CC1MuNp_XSec_2025_nu") ) {
-    fSettings.SetYTitle( "#sigma (cm^{2}/^{40}Ar)" );
-  }
-  else {
-    assert( false );
-  }
+  // They also report total cross sections in each bin (not differential
+  // cross sections divided by the bin width)
+  fSettings.SetYTitle("#sigma (cm^{2}/^{40}Ar)");
 
   // Sample overview ---------------------------------------------------
   std::string descrip = name + " sample.\n" \
@@ -140,27 +222,31 @@ MicroBooNE_CC1MuNp_XSec_2025_nu
   // Get bin definitions
   this->LoadBinDefinitions();
 
-  std::string data_file_name( FitPar::GetDataBase()
-    + "/MicroBooNE/CC1MuNp/2025/data_release.root" );
+  std::string file_name_AC( FitPar::GetDataBase()
+    + "/MicroBooNE/CC1MuNp/2025/mat_table_add_smear.txt" );
 
   // Load the additional smearing matrix
-  TMatrixD* A_C = StatUtils::GetMatrixFromRootFile( data_file_name,
-    "add_smear" );
-  fAddSmear.reset( A_C );
+  TMatrixD A_C = load_matrix( file_name_AC );
+  fAddSmear = std::make_shared< TMatrixD >( A_C );
 
   // Load the measured data points
-  fDataHist = PlotUtils::GetTH1DFromRootFile( data_file_name,
-    "unfolded_signal" );
+  std::string file_name_data( FitPar::GetDataBase()
+    + "/MicroBooNE/CC1MuNp/2025/vec_table_unfolded_signal.txt" );
+  TMatrixD temp_data_mat = load_matrix( file_name_data );
+  fDataHist = to_histogram( temp_data_mat );
 
   fDataHist->SetNameTitle( (fSettings.GetName() + "_data").c_str(),
     fSettings.GetFullTitles().c_str() );
 
-  // Also retrieve the total covariance matrix and its inverse (pre-computed in
-  // the data release ROOT file for convenience)
-  //this->SetCovarFromRootFile( data_file_name, "cov_total" );
-  fFullCovar = StatUtils::GetCovarFromRootFile( data_file_name, "cov_total" );
-  covar = StatUtils::GetCovarFromRootFile( data_file_name,
-    "inverse_cov_total" );
+  // Also retrieve the total covariance matrix for the measurement
+  std::string cov_file_name( FitPar::GetDataBase()
+    + "/MicroBooNE/CC1MuNp/2025/mat_table_cov_total.txt" );
+  auto temp_cov_matrix = load_matrix( cov_file_name );
+  fFullCovar = to_symmetric_matrix( temp_cov_matrix );
+
+  // Now invert the covariance matrix and store the result
+  temp_cov_matrix.Invert();
+  covar = to_symmetric_matrix( temp_cov_matrix );
 
   //fDecomp = StatUtils::GetDecomp( fFullCovar );
   TDecompChol chol( *fFullCovar );
@@ -509,7 +595,7 @@ void MicroBooNE_CC1MuNp_XSec_2025_nu::Write( std::string drawOpt ) {
     // histogram
     int block_idx = -1; // dummy value
     int slice_idx = -1; // dummy value
-    for ( const auto& [ bl, hist_idx_vec ] : fBlockHandler->fBlockHists ) { 
+    for ( const auto& [ bl, hist_idx_vec ] : fBlockHandler->fBlockHists ) {
       for ( size_t h = 0u; h < hist_idx_vec.size(); ++h ) {
         int h_idx = hist_idx_vec.at( h );
         if ( h_idx == s ) {

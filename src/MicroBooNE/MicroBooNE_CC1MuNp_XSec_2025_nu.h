@@ -52,16 +52,16 @@ public:
   MicroBooNE_CC1MuNp_XSec_2025_nu( nuiskey samplekey );
 
   /// Virtual Destructor
-  inline ~MicroBooNE_CC1MuNp_XSec_2025_nu() {
+  inline virtual ~MicroBooNE_CC1MuNp_XSec_2025_nu() {
     fResidualHist = NULL;
     fChi2LessBinHist = NULL;
   };
 
   /// Apply signal definition
-  bool isSignal( FitEvent* nvect );
+  bool isSignal( FitEvent* nvect ) override;
 
   /// Fill kinematic distributions
-  void FillEventVariables( FitEvent* customEvent );
+  void FillEventVariables( FitEvent* customEvent ) override;
 
   virtual void FillHistograms() override;
 
