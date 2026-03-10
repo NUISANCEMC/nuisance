@@ -18,7 +18,9 @@
 // Constructor
 // =============================================================================
 
-MicroBooNEBlockHandler::MicroBooNEBlockHandler(const std::string& filename)
+MicroBooNEBlockHandler::MicroBooNEBlockHandler(
+  const std::string& hist_name_prefix, const std::string& filename )
+  : fNamePrefix( hist_name_prefix )
 {
   std::vector<Block> blocks = parseFile(filename);
   if (blocks.empty()) {
@@ -36,32 +38,32 @@ MicroBooNEBlockHandler::MicroBooNEBlockHandler(const std::string& filename)
 void MicroBooNEBlockHandler::printSummary(size_t nShow) const
 {
   // --- histograms ---
-  std::cout << "\nCreated " << hists.size() << " histogram(s).\n\n";
-  for (size_t i = 0; i < hists.size(); ++i) {
-    const auto& h = hists[i];
+  std::cout << "\nCreated " << fHists.size() << " histogram(s).\n\n";
+  for (size_t i = 0; i < fHists.size(); ++i) {
+    const auto& h = fHists[i];
     std::cout << "[" << std::setw(3) << i << "]  "
               << std::setw(42) << std::left << h->GetTitle()
               << "  nbins=" << h->GetNbinsX()
               << "  xaxis=\"" << h->GetXaxis()->GetTitle() << "\"\n";
   }
 
-  // --- binMap sample ---
-  std::cout << "\nbinMap has " << binMap.size() << " entries.\n";
+  // --- fBinMap sample ---
+  std::cout << "\nfBinMap has " << fBinMap.size() << " entries.\n";
   std::cout << "Sample (globalBin -> {histIdx, rootBin, width}):\n";
 
   std::vector<int> keys;
-  keys.reserve(binMap.size());
-  for (auto& kv : binMap) keys.push_back(kv.first);
+  keys.reserve(fBinMap.size());
+  for (auto& kv : fBinMap) keys.push_back(kv.first);
   std::sort(keys.begin(), keys.end());
 
   auto printBinEntry = [&](int k) {
-    const auto& e = binMap.at(k);
+    const auto& e = fBinMap.at(k);
     std::cout << "  globalBin " << std::setw(4) << k
               << "  ->  histIdx=" << std::setw(3) << e.histIdx
               << "  rootBin="    << std::setw(3) << e.rootBin
               << "  width="
               << std::setw(10) << std::setprecision(5) << e.width
-              << "  (\"" << hists[e.histIdx]->GetTitle() << "\")\n";
+              << "  (\"" << fHists[e.histIdx]->GetTitle() << "\")\n";
   };
 
   size_t n = std::min(nShow, keys.size());
@@ -70,27 +72,27 @@ void MicroBooNEBlockHandler::printSummary(size_t nShow) const
   size_t start = keys.size() > n ? keys.size() - n : n;
   for (size_t i = start; i < keys.size(); ++i) printBinEntry(keys[i]);
 
-  // --- blockBins summary ---
-  std::cout << "\nblockBins has " << blockBins.size() << " block(s).\n";
+  // --- fBlockBins summary ---
+  std::cout << "\nfBlockBins has " << fBlockBins.size() << " block(s).\n";
   std::vector<int> blockKeys;
-  blockKeys.reserve(blockBins.size());
-  for (auto& kv : blockBins) blockKeys.push_back(kv.first);
+  blockKeys.reserve(fBlockBins.size());
+  for (auto& kv : fBlockBins) blockKeys.push_back(kv.first);
   std::sort(blockKeys.begin(), blockKeys.end());
   for (int bk : blockKeys) {
-    const auto& v = blockBins.at(bk);
+    const auto& v = fBlockBins.at(bk);
     std::cout << "  block " << std::setw(2) << bk
               << "  ->  " << v.size() << " global bins"
               << "  [" << v.front() << " .. " << v.back() << "]\n";
   }
 
-  // --- blockHists summary ---
-  std::cout << "\nblockHists has " << blockHists.size() << " block(s).\n";
+  // --- fBlockHists summary ---
+  std::cout << "\nfBlockHists has " << fBlockHists.size() << " block(s).\n";
   std::vector<int> histBlockKeys;
-  histBlockKeys.reserve(blockHists.size());
-  for (auto& kv : blockHists) histBlockKeys.push_back(kv.first);
+  histBlockKeys.reserve(fBlockHists.size());
+  for (auto& kv : fBlockHists) histBlockKeys.push_back(kv.first);
   std::sort(histBlockKeys.begin(), histBlockKeys.end());
   for (int bk : histBlockKeys) {
-    const auto& v = blockHists.at(bk);
+    const auto& v = fBlockHists.at(bk);
     std::cout << "  block " << std::setw(2) << bk
               << "  ->  " << v.size() << " hist(s)"
               << "  [" << v.front() << " .. " << v.back() << "]\n";
@@ -245,7 +247,7 @@ std::vector<double> MicroBooNEBlockHandler::makeEdges(const std::vector<BinEdges
 }
 
 // =============================================================================
-// Core builder -- populates hists, binMap, blockBins, blockHists
+// Core builder -- populates fHists, fBinMap, fBlockBins, fBlockHists
 // =============================================================================
 
 void MicroBooNEBlockHandler::buildHistograms(const std::vector<Block>& blocks)
@@ -268,8 +270,8 @@ void MicroBooNEBlockHandler::buildHistograms(const std::vector<Block>& blocks)
         continue;
       }
 
-      std::string hname  = "h_block" + std::to_string(blk.blockIdx)
-                           + "_" + std::to_string(histCounter++);
+      std::string hname  = fNamePrefix + "_Block"
+                           + std::to_string(blk.blockIdx);
       std::string htitle = "Block " + std::to_string(blk.blockIdx)
                            + ": " + latexToRoot(blk.varName[0]);
 
@@ -278,18 +280,22 @@ void MicroBooNEBlockHandler::buildHistograms(const std::vector<Block>& blocks)
         (int)(edges.size() - 1), edges.data());
       h->GetXaxis()->SetTitle(
         axisLabel(blk.varName[0], blk.varUnit[0]).c_str());
+      h->SetDirectory( nullptr );
+      h->SetLineColor( kBlack );
+      h->SetLineWidth( 1 );
+      h->SetMarkerStyle( 1 );
 
-      int histIdx = (int)hists.size();
-      hists.push_back(h);
-      blockHists[blk.blockIdx].push_back(histIdx);
+      int histIdx = (int)fHists.size();
+      fHists.push_back(h);
+      fBlockHists[blk.blockIdx].push_back(histIdx);
 
       for (auto& bd : blk.bins) {
-        blockBins[blk.blockIdx].push_back(bd.globalIdx); // all bins
+        fBlockBins[blk.blockIdx].push_back(bd.globalIdx); // all bins
         if (std::isinf(bd.var0.lo) || std::isinf(bd.var0.hi)) continue;
         int    rb    = h->GetXaxis()->FindFixBin(
                            0.5 * (bd.var0.lo + bd.var0.hi));
         double width = bd.var0.hi - bd.var0.lo;
-        binMap[bd.globalIdx] = { histIdx, rb, width };
+        fBinMap[bd.globalIdx] = { histIdx, rb, width };
       }
     }
     else if (blk.varCount == 2) {
@@ -316,7 +322,8 @@ void MicroBooNEBlockHandler::buildHistograms(const std::vector<Block>& blocks)
       // var0-slice key -> histogram index
       std::map< std::pair<double,double>, int > sliceHistIdx;
 
-      for (auto& sliceEdge : sliceOrder) {
+      for ( size_t se = 0; se < sliceOrder.size(); ++se ) {
+        auto& sliceEdge = sliceOrder.at( se );
         auto key = std::make_pair(sliceEdge.lo, sliceEdge.hi);
         std::vector<double> edges = makeEdges(sliceMap[key]);
         if (edges.size() < 2) {
@@ -327,8 +334,9 @@ void MicroBooNEBlockHandler::buildHistograms(const std::vector<Block>& blocks)
           continue;
         }
 
-        std::string hname = "h_block" + std::to_string(blk.blockIdx)
-                            + "_" + std::to_string(histCounter++);
+        std::string hname = fNamePrefix + "_Block"
+                            + std::to_string(blk.blockIdx)
+                            + "_Slice" + std::to_string( se );
         std::string htitle = "Block " + std::to_string(blk.blockIdx)
                              + ": " + rangeStr(sliceEdge.lo, sliceEdge.hi,
                                                rootName0, rootUnit0);
@@ -337,24 +345,28 @@ void MicroBooNEBlockHandler::buildHistograms(const std::vector<Block>& blocks)
           hname.c_str(), htitle.c_str(),
           (int)(edges.size() - 1), edges.data());
         h->GetXaxis()->SetTitle(xAxisLabel.c_str());
+        h->SetDirectory( nullptr );
+        h->SetLineColor( kBlack );
+        h->SetLineWidth( 1 );
+        h->SetMarkerStyle( 1 );
 
-        int histIdx = (int)hists.size();
+        int histIdx = (int)fHists.size();
         sliceHistIdx[key] = histIdx;
-        hists.push_back(h);
-        blockHists[blk.blockIdx].push_back(histIdx);
+        fHists.push_back(h);
+        fBlockHists[blk.blockIdx].push_back(histIdx);
       }
 
-      // Populate binMap and blockBins.
-      // blockBins gets every bin in the block; binMap only gets finite ones.
+      // Populate fBinMap and fBlockBins.
+      // fBlockBins gets every bin in the block; fBinMap only gets finite ones.
       for (auto& bd : blk.bins) {
-        blockBins[blk.blockIdx].push_back(bd.globalIdx); // all bins
+        fBlockBins[blk.blockIdx].push_back(bd.globalIdx); // all bins
         if (std::isinf(bd.var1.lo) || std::isinf(bd.var1.hi)) continue;
         auto key = std::make_pair(bd.var0.lo, bd.var0.hi);
         auto it  = sliceHistIdx.find(key);
         if (it == sliceHistIdx.end()) continue; // slice skipped
 
         int         histIdx = it->second;
-        const auto& h       = hists[histIdx];
+        const auto& h       = fHists[histIdx];
         int rb = h->GetXaxis()->FindFixBin(
                      0.5 * (bd.var1.lo + bd.var1.hi));
 
@@ -366,14 +378,14 @@ void MicroBooNEBlockHandler::buildHistograms(const std::vector<Block>& blocks)
                     ? 1.0 : bd.var0.hi - bd.var0.lo;
         double w1 = bd.var1.hi - bd.var1.lo;
 
-        binMap[bd.globalIdx] = { histIdx, rb, w0 * w1 };
+        fBinMap[bd.globalIdx] = { histIdx, rb, w0 * w1 };
       }
     }
 
-    // Keep blockBins and blockHists entries in ascending order
-    auto& vb = blockBins[blk.blockIdx];
+    // Keep fBlockBins and fBlockHists entries in ascending order
+    auto& vb = fBlockBins[blk.blockIdx];
     std::sort(vb.begin(), vb.end());
-    auto& vh = blockHists[blk.blockIdx];
+    auto& vh = fBlockHists[blk.blockIdx];
     std::sort(vh.begin(), vh.end());
   }
 }

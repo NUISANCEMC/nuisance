@@ -18,11 +18,10 @@
 *******************************************************************************/
 
 #include <fstream>
-#include <set>
 
+#include "MicroBooNEBlockHandler.h"
 #include "MicroBooNE_CC1MuNp_XSec_2025_nu.h"
 #include "MicroBooNE_SignalDef.h"
-#include "TH2D.h"
 #include "TMatrixD.h"
 
 namespace {
@@ -418,6 +417,9 @@ void MicroBooNE_CC1MuNp_XSec_2025_nu::ConvertEventRates() {
     double xsec = new_pred( b, 0 );
     fMCHistWithAC->SetBinContent( b + 1, xsec );
   }
+
+  // Prepare the slice histograms now that everything else is ready
+  this->PrepareSlices();
 }
 
 double MicroBooNE_CC1MuNp_XSec_2025_nu::GetLikelihood() {
@@ -445,4 +447,210 @@ double MicroBooNE_CC1MuNp_XSec_2025_nu::GetLikelihood() {
   fLikelihood = stat;
 
   return stat;
+}
+
+void MicroBooNE_CC1MuNp_XSec_2025_nu::Write( std::string drawOpt ) {
+  // Write the standard information
+  Measurement1D::Write( drawOpt );
+
+  // To start extra chi-squared calculations, create a mask that excludes
+  // everything. Note that bins are kept if the mask entry is zero, and
+  // discarded otherwise.
+  int num_bins = fDataHist->GetNbinsX();
+  TH1I mask_all( "mask_all", "mask all", num_bins, 0., num_bins );
+  mask_all.SetDirectory( nullptr );
+  for ( int b = 1; b <= num_bins; ++b ) mask_all.SetBinContent( b, 1 );
+
+  // Compute chi-squared scores for each block of bins separately using
+  // masks. Store the results in TNamed objects in the output
+  // file.
+  std::shared_ptr< TH1I > block_mask;
+  for ( const auto& [ block_idx, bin_vec ] : fBlockHandler->fBlockBins ) {
+    // Clone the exclude-everything mask and zero out bins that belong
+    // to the current block (thus including them)
+    block_mask.reset(
+      dynamic_cast< TH1I* >( mask_all.Clone("block_mask") )
+    );
+
+    for ( int b : bin_vec ) block_mask->SetBinContent( b, 0 );
+
+    // Compute the chi-squared statistic for the current block using the mask
+    double chi2 = StatUtils::GetChi2FromCov( fDataHist, fMCHistWithAC.get(),
+      covar, block_mask.get(), 1.0, 1.0, nullptr );
+
+    // Create a TNamed object to store the result. We use a TNamed so that we
+    // can store the chi^2 value and number of bins together for convenient
+    // viewing
+    std::string param_name = fSettings.GetName() + "_Block"
+      + std::to_string( block_idx ) + "_Chi2";
+    std::string chi2_per_bin_str = std::to_string( chi2 )
+      + " / " + std::to_string( bin_vec.size() );
+    TNamed chi2_param( param_name.c_str(), chi2_per_bin_str.c_str() );
+
+    chi2_param.Write();
+  }
+
+  // Now we follow a similar procedure to compute and store chi-squared values
+  // for each individual slice histogram in multi-slice blocks
+  std::shared_ptr< TH1I > slice_mask;
+  int num_slices = fBlockHandler->fHists.size();
+  for ( int s = 0u; s < num_slices; ++s ) {
+
+    // Before doing anything else, write the histograms themselves for the
+    // current slice to the output file
+    fBlockHandler->fHists.at( s )->Write(); // data slice histogram
+    fMCHist_Slices.at( s )->Write(); // total MC slice histogram
+    for ( int m : fMCHist_Modes->fmodes ) {
+      // MC slice histogram for mode m
+      fMCModeHists_Slices.at( m ).at( s )->Write();
+    }
+
+    // Find the block and slice number within the block for the current slice
+    // histogram
+    int block_idx = -1; // dummy value
+    int slice_idx = -1; // dummy value
+    for ( const auto& [ bl, hist_idx_vec ] : fBlockHandler->fBlockHists ) { 
+      for ( size_t h = 0u; h < hist_idx_vec.size(); ++h ) {
+        int h_idx = hist_idx_vec.at( h );
+        if ( h_idx == s ) {
+          block_idx = bl;
+          slice_idx = h;
+        }
+      }
+    }
+
+    // If this is a 1D block, then there is only a single slice, and we have
+    // already computed a suitable chi^2 score in the block-by-block results
+    // above. We can therefore skip to the next slice.
+    if ( fBlockHandler->fBlockHists.size() <= 1u ) continue;
+
+    // Clone the exclude-everything mask and zero out bins that belong
+    // to the current slice (thus including them)
+    slice_mask.reset(
+      dynamic_cast< TH1I* >( mask_all.Clone("block_mask") )
+    );
+
+    int num_unmasked_bins = 0;
+    for ( const auto& [ mk, mv ] : fBlockHandler->fBinMap ) {
+      // Unmask only bins that belong to the current slice histogram
+      int hist_index = mv.histIdx;
+      if ( hist_index != s ) continue;
+      // Do the unmasking, taking into account the one-based indexing
+      // of the ROOT histograms and the zero-based bin indices from the table
+      // of block definitions
+      int global_bin = mk + 1;
+      slice_mask->SetBinContent( global_bin, 0 );
+      ++num_unmasked_bins;
+    }
+
+    // Compute the chi-squared statistic for the current block using the mask
+    double chi2 = StatUtils::GetChi2FromCov( fDataHist, fMCHistWithAC.get(),
+      covar, slice_mask.get(), 1.0, 1.0, nullptr );
+
+    // Create a TNamed object to store the result. We use a TNamed so that we
+    // can store the chi^2 value and number of bins together for convenient
+    // viewing
+    std::string param_name = fSettings.GetName() + "_Block"
+      + std::to_string( block_idx ) + "_Slice"
+      + std::to_string( slice_idx ) + "_Chi2";
+    std::string chi2_per_bin_str = std::to_string( chi2 )
+      + " / " + std::to_string( num_unmasked_bins );
+    TNamed chi2_param( param_name.c_str(), chi2_per_bin_str.c_str() );
+
+    chi2_param.Write();
+  }
+}
+
+void MicroBooNE_CC1MuNp_XSec_2025_nu::PrepareSlices() {
+  // Load the definitions of the blocks of bins
+  std::string block_file_name( FitPar::GetDataBase()
+    + "/MicroBooNE/CC1MuNp/2025/bin_blocks.txt" );
+
+  fBlockHandler = std::make_shared< MicroBooNEBlockHandler >(
+    fSettings.GetName(), block_file_name );
+
+  // Clone the data histograms owned by the block handler to create
+  // corresponding MC histograms
+  for ( auto& hist : fBlockHandler->fHists ) {
+    // Attach the MC suffix to the clone's name, then attach the data suffix
+    // to the original
+    auto mc_hist_name = hist->GetName() + std::string( "_MC" );
+    hist->SetName( (hist->GetName() + std::string( "_data" )).c_str() );
+    auto* temp_mc_hist = dynamic_cast< TH1D* >(
+      hist->Clone( mc_hist_name.c_str() )
+    );
+    temp_mc_hist->SetDirectory( nullptr );
+    temp_mc_hist->Reset();
+
+    temp_mc_hist->SetLineColor( kRed );
+    temp_mc_hist->SetLineStyle( 1 );
+    temp_mc_hist->SetLineWidth( 1 );
+
+    temp_mc_hist->SetFillColor( 0 );
+    temp_mc_hist->SetFillStyle( 1001 );
+
+    fMCHist_Slices.emplace_back( temp_mc_hist );
+
+    // Make MC slice histograms for individual scattering modes
+    for ( int m : fMCHist_Modes->fmodes ) {
+      auto mode_hist_name = temp_mc_hist->GetName()
+        + std::string( "_Mode" ) + std::to_string( m );
+      auto* temp_mode_hist = dynamic_cast< TH1D* >(
+        temp_mc_hist->Clone( mode_hist_name.c_str() )
+      );
+      temp_mode_hist->SetDirectory( nullptr );
+      temp_mode_hist->Reset();
+      fMCModeHists_Slices[ m ].emplace_back( temp_mode_hist );
+    }
+
+  }
+
+  // Now that all slice histograms have been created, populate them with
+  // corresponding entries from the full measurement histogram (that is
+  // organized in terms of global bin number).
+  // NOTE: Bins with one or more infinite edges are automatically skipped
+  // by the block handler, so we don't have to worry about bins that have
+  // no match in the slices
+  for ( const auto& [mk, mv] : fBlockHandler->fBinMap ) {
+    // The ROOT histogram used to store the global bin contents has one-based
+    // indices, but the input table used to define the blocks is zero-based
+    int global_bin = mk + 1;
+
+    // Zero-based index of the slice histogram to which this global bin belongs
+    int hist_idx = mv.histIdx; // position in the vector of slices
+
+    // One-based bin index to be populated in the target histogram
+    int local_bin = mv.rootBin;
+
+    // Product of finite bin widths for this bin (used to convert to a
+    // differential cross section)
+    double widths = mv.width;
+
+    // Retrieve the values of interest from the global histograms, dividing
+    // by the bin width(s) to obtain a differential xsec each time
+    double data_val = fDataHist->GetBinContent( global_bin ) / widths;
+    double data_err = fDataHist->GetBinError( global_bin ) / widths;
+    double mc_val = fMCHist->GetBinContent( global_bin ) / widths;
+    std::map< int, double > mode_vals;
+    for ( int m : fMCHist_Modes->fmodes ) {
+      int mode_idx = fMCHist_Modes->ConvertModeToIndex( m );
+      auto* mode_hist = fMCHist_Modes->GetHist( mode_idx );
+      double value = mode_hist->GetBinContent( global_bin );
+      mode_vals[ m ] = value / widths;
+    }
+
+    // Set the bin contents in the target slice histograms
+    auto& data_hist = fBlockHandler->fHists.at( hist_idx );
+    data_hist->SetBinContent( local_bin, data_val );
+    data_hist->SetBinError( local_bin, data_err );
+
+    auto& mc_hist = fMCHist_Slices.at( hist_idx );
+    mc_hist->SetBinContent( local_bin, mc_val );
+
+    for ( const auto& [ mode, val ] : mode_vals ) {
+      auto& mode_hist = fMCModeHists_Slices.at( mode ).at( hist_idx );
+      mode_hist->SetBinContent( local_bin, val );
+    }
+
+  }
 }

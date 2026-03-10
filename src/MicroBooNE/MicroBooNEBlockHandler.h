@@ -3,12 +3,12 @@
 // Parses a binning scheme definition file and exposes the result as four
 // public data members.
 //
-//   hists      -- std::vector< std::shared_ptr<TH1D> >
+//   fHists      -- std::vector< std::shared_ptr<TH1D> >
 //                 One histogram per 1D block; one per var0 slice for 2D blocks.
 //                 Bins with ±inf edges are omitted from the x-axis.
 //                 Titles and axis labels use ROOT TLatex conventions.
 //
-//   binMap     -- std::unordered_map< int, BinEntry >
+//   fBinMap     -- std::unordered_map< int, BinEntry >
 //                 Maps every GlobalBinIndex to the histogram and bin that holds
 //                 it, plus the product of the bin widths.
 //                 BinEntry { int histIdx,   // zero-based index into hists
@@ -16,11 +16,11 @@
 //                            double width } // product of var widths (finite dims)
 //                 Infinite-edge bins are omitted.
 //
-//   blockBins  -- std::unordered_map< int, std::vector<int> >
+//   fBlockBins  -- std::unordered_map< int, std::vector<int> >
 //                 Maps block index -> sorted list of ALL GlobalBinIndices in
 //                 that block (including infinite-edge bins).
 //
-//   blockHists -- std::unordered_map< int, std::vector<int> >
+//   fBlockHists -- std::unordered_map< int, std::vector<int> >
 //                 Maps block index -> sorted list of zero-based indices into
 //                 hists for all slice histograms belonging to that block.
 
@@ -79,16 +79,17 @@ public:
   // Public data members
   // ---------------------------------------------------------------------------
 
-  std::vector< std::shared_ptr<TH1D> > hists;
-  BinMap     binMap;
-  BlockBins  blockBins;
-  BlockHists blockHists;
+  std::vector< std::shared_ptr<TH1D> > fHists;
+  BinMap     fBinMap;
+  BlockBins  fBlockBins;
+  BlockHists fBlockHists;
 
   // ---------------------------------------------------------------------------
   // Constructor
   // ---------------------------------------------------------------------------
 
-  explicit MicroBooNEBlockHandler(const std::string& filename);
+  explicit MicroBooNEBlockHandler( const std::string& hist_name_prefix,
+    const std::string& filename);
 
   // ---------------------------------------------------------------------------
   // Diagnostics
@@ -97,6 +98,10 @@ public:
   void printSummary(size_t nShow = 10) const;
 
 private:
+
+  // Prefix for naming the generated histograms
+  std::string fNamePrefix;
+
   // ---------------------------------------------------------------------------
   // Parsing helpers
   // ---------------------------------------------------------------------------

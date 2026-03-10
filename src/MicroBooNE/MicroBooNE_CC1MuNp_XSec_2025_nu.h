@@ -25,6 +25,8 @@
 
 #include "Measurement1D.h"
 
+class MicroBooNEBlockHandler;
+
 class TH2D;
 
 struct MyCut {
@@ -70,9 +72,16 @@ public:
   /// Work around some hard-coded assumptions in Measurement1D::GetLikelihood()
   double GetLikelihood() override;
 
+  void Write( std::string drawOpt ) override;
+
 private:
 
+  // Sets up definitions for each bin based on an input file stored in the
+  // data/ area
   void LoadBinDefinitions();
+
+  // Sets up histograms that represent slices of the full measurement
+  void PrepareSlices();
 
   // Each bin is defined as a series of cuts that are applied to a FitEvent to
   // determine whether it belongs
@@ -89,10 +98,12 @@ private:
   // Copy of MC histogram multiplied by the additional smearing matrix A_C
   std::shared_ptr< TH1D > fMCHistWithAC;
 
-  // Histograms for individual blocks of bins
-  std::vector< std::shared_ptr< TH1D > > fMCHist_Blocks;
-  std::vector< std::shared_ptr< TH1D > > fDataHist_Blocks;
-  std::map<int, std::vector<TH1D *> > fMCModeHists_Slices;
+  // Manages slice histograms for the data
+  std::shared_ptr< MicroBooNEBlockHandler > fBlockHandler;
+
+  // Slice histograms for the MC
+  std::vector< std::shared_ptr< TH1D > > fMCHist_Slices;
+  std::map< int, std::vector< std::shared_ptr< TH1D > > > fMCModeHists_Slices;
 };
 
 #endif
