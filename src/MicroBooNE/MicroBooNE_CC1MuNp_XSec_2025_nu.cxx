@@ -19,6 +19,7 @@
 
 #include <fstream>
 
+#include "InteractionModes.h"
 #include "MicroBooNEBlockHandler.h"
 #include "MicroBooNE_CC1MuNp_XSec_2025_nu.h"
 #include "MicroBooNE_SignalDef.h"
@@ -180,7 +181,7 @@ namespace {
     auto* hist = new TH1D( "vec_hist", "", num_rows, 0., num_rows );
     for ( int a = 0; a < num_rows; ++a ) {
       double value = vec( a, 0 );
-      hist->SetBinContent( a, value );
+      hist->SetBinContent( a + 1, value ); // ROOT bin indices are one-based
     }
     return hist;
   }
@@ -558,7 +559,9 @@ void MicroBooNE_CC1MuNp_XSec_2025_nu::Write( std::string drawOpt ) {
       dynamic_cast< TH1I* >( mask_all.Clone("block_mask") )
     );
 
-    for ( int b : bin_vec ) block_mask->SetBinContent( b, 0 );
+    // Global bin indices are zero-based, while the ROOT histogram bins
+    // are one-based, so we correct for this here
+    for ( int b : bin_vec ) block_mask->SetBinContent( b + 1, 0 );
 
     // Compute the chi-squared statistic for the current block using the mask
     double chi2 = StatUtils::GetChi2FromCov( fDataHist, fMCHistWithAC.get(),
@@ -605,15 +608,20 @@ void MicroBooNE_CC1MuNp_XSec_2025_nu::Write( std::string drawOpt ) {
       }
     }
 
-    // If this is a 1D block, then there is only a single slice, and we have
-    // already computed a suitable chi^2 score in the block-by-block results
-    // above. We can therefore skip to the next slice.
-    if ( fBlockHandler->fBlockHists.size() <= 1u ) continue;
+    // NOTE: This continue statement has been removed since some 1D blocks
+    // include underflow or overflow bins that don't show up in their
+    // slice histogram. In some cases, the user may want to see both
+    // values, so it is easiest just to output all the information.
+    //
+    // OLD: If this is a 1D block, then there is only a single slice, and we
+    // have already computed a suitable chi^2 score in the block-by-block
+    // results above. We can therefore skip to the next slice.
+    //if ( fBlockHandler->fBlockHists.size() <= 1u ) continue;
 
     // Clone the exclude-everything mask and zero out bins that belong
     // to the current slice (thus including them)
     slice_mask.reset(
-      dynamic_cast< TH1I* >( mask_all.Clone("block_mask") )
+      dynamic_cast< TH1I* >( mask_all.Clone("slice_mask") )
     );
 
     int num_unmasked_bins = 0;
@@ -624,8 +632,8 @@ void MicroBooNE_CC1MuNp_XSec_2025_nu::Write( std::string drawOpt ) {
       // Do the unmasking, taking into account the one-based indexing
       // of the ROOT histograms and the zero-based bin indices from the table
       // of block definitions
-      int global_bin = mk + 1;
-      slice_mask->SetBinContent( global_bin, 0 );
+      int global_bin = mk;
+      slice_mask->SetBinContent( global_bin + 1, 0 );
       ++num_unmasked_bins;
     }
 
@@ -679,8 +687,12 @@ void MicroBooNE_CC1MuNp_XSec_2025_nu::PrepareSlices() {
 
     // Make MC slice histograms for individual scattering modes
     for ( int m : fMCHist_Modes->fmodes ) {
-      auto mode_hist_name = temp_mc_hist->GetName()
-        + std::string( "_Mode" ) + std::to_string( m );
+      // Convert the interaction mode integer into a string label
+      auto mode = static_cast< InputHandler::InteractionModes >( m );
+      std::ostringstream oss;
+      oss << '_' << mode;
+      auto mode_hist_name = temp_mc_hist->GetName() + oss.str();
+      // Set up the slice histogram for this mode
       auto* temp_mode_hist = dynamic_cast< TH1D* >(
         temp_mc_hist->Clone( mode_hist_name.c_str() )
       );
