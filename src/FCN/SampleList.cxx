@@ -1200,7 +1200,6 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
     } else
 
 #endif
-
 #ifdef MINERvA_ENABLED
       /*
       MINERvA Samples

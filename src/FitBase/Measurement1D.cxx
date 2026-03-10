@@ -639,7 +639,6 @@ void Measurement1D::FinaliseMeasurement() {
   // ***** norm-shape (NS) covariance modifications *****
 
   fIsNS = FitPar::Config().GetParB("UseNormShapeCovariance");
-
   if (fIsNS) {
     if (covar)
       delete covar;

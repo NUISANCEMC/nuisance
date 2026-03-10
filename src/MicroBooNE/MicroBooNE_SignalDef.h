@@ -55,7 +55,7 @@ std::vector<FitParticle*> GetCC1Mu1pProtonsInPS(FitEvent* event);
  */
 bool isNCpi0(FitEvent* event);
 
-// 2D CCNp analysis
+// 2025 numu CC 0pi Np analysis
 bool isMesonOrAntimeson( int pdg_code );
 bool isCC1MuNpFor2025Analysis( FitEvent* event, double EnuMin, double EnuMax );
 
