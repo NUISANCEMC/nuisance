@@ -60,14 +60,14 @@ public:
   }
 };
 
-class MicroBooNE_CC1Mu3DInc_XSec_nu : public Measurement1D {
+class MicroBooNE_BNB_NumuCCInc_2023_XSec_3D_nu : public Measurement1D {
 
 public:
   /// Basic Constructor.
-  MicroBooNE_CC1Mu3DInc_XSec_nu(nuiskey samplekey);
+  MicroBooNE_BNB_NumuCCInc_2023_XSec_3D_nu(nuiskey samplekey);
 
   /// Virtual Destructor
-  ~MicroBooNE_CC1Mu3DInc_XSec_nu() {};
+  ~MicroBooNE_BNB_NumuCCInc_2023_XSec_3D_nu() {};
 
   /// Apply signal definition
   bool isSignal(FitEvent* nvect);

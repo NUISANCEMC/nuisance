@@ -181,17 +181,17 @@
 #endif
 
 #ifdef MicroBooNE_ENABLED
-#include "MicroBooNE_CC1Mu1p_XSec_1D_nu.h"
-#include "MicroBooNE_CC1Mu1p_XSec_2D_nu.h"
-#include "MicroBooNE_CC1MuNp_XSec_1D_nu.h"
-#include "MicroBooNE_CCInc_XSec_2DPcos_nu.h"
-#include "MicroBooNE_CC1mu2p0pi_XSec_1D_nu.h"
+#include "MicroBooNE_BNB_NumuCC1p_2023_XSec_1D_nu.h"
+#include "MicroBooNE_BNB_NumuCC1p_2023_XSec_2D_nu.h"
+#include "MicroBooNE_BNB_NumuCC0PiNp_2020_XSec_nu.h"
+#include "MicroBooNE_BNB_NumuCCInc_2019_XSec_nu.h"
+#include "MicroBooNE_BNB_NumuCC0Pi2p_2022_XSec_nu.h"
 #include "MicroBooNE_BNB_NueCC0piNp_2022_XSec_1D_nu.h"
 #include "MicroBooNE_BNB_NueCC0piProtonKE_2022_XSec_1D_nu.h"
-#include "MicroBooNE_CC1Mu0pNp_XSec_nu.h"
-#include "MicroBooNE_CC1Mu3DInc_XSec_nu.h"
-#include "MicroBooNE_NCpi0_XSec_nu.h"
-#include "MicroBooNE_CC1MuNp_XSec_2025_nu.h"
+#include "MicroBooNE_BNB_NumuCC0pNp_2024_XSec_nu.h"
+#include "MicroBooNE_BNB_NumuCCInc_2023_XSec_3D_nu.h"
+#include "MicroBooNE_BNB_NCpi0_2024_XSec_nu.h"
+#include "MicroBooNE_BNB_NumuCC0PiNp_2025_XSec_nu.h"
 #endif
 
 #ifdef MINERvA_ENABLED
@@ -1119,14 +1119,14 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
     /*
     MicroBooNE Samples
     */
-    if (!name.compare("MicroBooNE_CCInc_XSec_2DPcos_nu")) {
-      return (new MicroBooNE_CCInc_XSec_2DPcos_nu(samplekey));
+    if (!name.compare("MicroBooNE_BNB_NumuCCInc_2019_XSec_nu")) {
+      return (new MicroBooNE_BNB_NumuCCInc_2019_XSec_nu(samplekey));
     } else if (!name.compare("MicroBooNE_CC1MuNp_XSec_1DPmu_nu") ||
                !name.compare("MicroBooNE_CC1MuNp_XSec_1Dcosmu_nu") ||
                !name.compare("MicroBooNE_CC1MuNp_XSec_1DPp_nu") ||
                !name.compare("MicroBooNE_CC1MuNp_XSec_1Dcosp_nu") ||
                !name.compare("MicroBooNE_CC1MuNp_XSec_1Dthetamup_nu")) {
-      return (new MicroBooNE_CC1MuNp_XSec_1D_nu(samplekey));
+      return (new MicroBooNE_BNB_NumuCC0PiNp_2020_XSec_nu(samplekey));
     } else if (!name.compare("MicroBooNE_CC1Mu1p_XSec_1DDeltaPT_nu") ||
                !name.compare("MicroBooNE_CC1Mu1p_XSec_1DDeltaAlphaT_nu") ||
                !name.compare("MicroBooNE_CC1Mu1p_XSec_1DDeltaPhiT_nu") ||
@@ -1139,7 +1139,7 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
                !name.compare("MicroBooNE_CC1Mu1p_XSec_1DDeltaPty_nu") ||
                !name.compare("MicroBooNE_CC1Mu1p_XSec_1DECal_nu") ||
                !name.compare("MicroBooNE_CC1Mu1p_XSec_1DEQE_nu")) {
-      return (new MicroBooNE_CC1Mu1p_XSec_1D_nu(samplekey));
+      return (new MicroBooNE_BNB_NumuCC1p_2023_XSec_1D_nu(samplekey));
     } else if (!name.compare("MicroBooNE_CC1Mu1p_XSec_2DDeltaPT_DeltaAlphaT_nu") ||
                !name.compare("MicroBooNE_CC1Mu1p_XSec_2DDeltaPT_MuonCosTheta_nu") ||
                !name.compare("MicroBooNE_CC1Mu1p_XSec_2DDeltaPT_ProtonCosTheta_nu") ||
@@ -1151,7 +1151,7 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
                !name.compare("MicroBooNE_CC1Mu1p_XSec_2DECal_DeltaPT_nu") ||
                !name.compare("MicroBooNE_CC1Mu1p_XSec_2DECal_DeltaAlphaT_nu") ||
                !name.compare("MicroBooNE_CC1Mu1p_XSec_2DECal_DeltaPty_nu")) {
-        return (new MicroBooNE_CC1Mu1p_XSec_2D_nu(samplekey));
+        return (new MicroBooNE_BNB_NumuCC1p_2023_XSec_2D_nu(samplekey));
     } else if(!name.compare("MicroBooNE_BNB_NueCC0piNp_2022_XSec_1DElecCosTheta_nu") ||
               !name.compare("MicroBooNE_BNB_NueCC0piNp_2022_XSec_1DElecEnergy_nu") ||
               !name.compare("MicroBooNE_BNB_NueCC0piNp_2022_XSec_1DProtonCosTheta_nu")) {
@@ -1170,7 +1170,7 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
                !name.compare("MicroBooNE_CC1mu2p0pi_XSec_1DRecoilProtonMomentum_nu") ||
                !name.compare("MicroBooNE_CC1mu2p0pi_XSec_1DRecoilProtonCosTheta_nu") ||
                !name.compare("MicroBooNE_CC1mu2p0pi_XSec_1DRecoilProtonPhi_nu") ) {
-      return (new MicroBooNE_CC1mu2p0pi_XSec_1D_nu(samplekey));
+      return (new MicroBooNE_BNB_NumuCC0Pi2p_2022_XSec_nu(samplekey));
     } else if (!name.compare("MicroBooNE_BNB_NueCC0piNp_2022_XSec_1DElecCosTheta_nu") ||
                !name.compare("MicroBooNE_BNB_NueCC0piNp_2022_XSec_1DElecEnergy_nu") ||
                !name.compare("MicroBooNE_BNB_NueCC0piNp_2022_XSec_1DProtonCosTheta_nu")) {
@@ -1178,52 +1178,52 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
     } else if (!name.compare("MicroBooNE_BNB_NueCC0piProtonKE_2022_XSec_1DProtonKE_nu")) {
       return (new MicroBooNE_BNB_NueCC0piProtonKE_2022_XSec_1D_nu(samplekey));
     } else if (!name.compare("MicroBooNE_CC1Mu0pNp_XSec_EMu_nu")) {
-      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<kCC0pNpEMu>(samplekey));
+      return (new MicroBooNE_BNB_NumuCC0pNp_2024_XSec_nu<kCC0pNpEMu>(samplekey));
     } else if (!name.compare("MicroBooNE_CC1Mu0pNp_XSec_CosThetaMu_nu")) {
-      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<kCC0pNpCosThetaMu>(samplekey));
+      return (new MicroBooNE_BNB_NumuCC0pNp_2024_XSec_nu<kCC0pNpCosThetaMu>(samplekey));
     } else if (!name.compare("MicroBooNE_CC1Mu0pNp_XSec_ENu_nu")) {
-      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<kCC0pNpEnu>(samplekey));
+      return (new MicroBooNE_BNB_NumuCC0pNp_2024_XSec_nu<kCC0pNpEnu>(samplekey));
     } else if (!name.compare("MicroBooNE_CC1Mu0pNp_XSec_TransferEnergy_nu")) {
-      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<kCC0pNpTransferEnergy>(samplekey));
+      return (new MicroBooNE_BNB_NumuCC0pNp_2024_XSec_nu<kCC0pNpTransferEnergy>(samplekey));
     } else if (!name.compare("MicroBooNE_CC1Mu0pNp_XSec_AvailEnergy_nu")) {
-      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<kCC0pNpAvailEnergy>(samplekey));
+      return (new MicroBooNE_BNB_NumuCC0pNp_2024_XSec_nu<kCC0pNpAvailEnergy>(samplekey));
     } else if (!name.compare("MicroBooNE_CC1Mu0pNp_XSec_ProtonKE_nu")) {
-      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<kCCProtonKE>(samplekey));
+      return (new MicroBooNE_BNB_NumuCC0pNp_2024_XSec_nu<kCCProtonKE>(samplekey));
     } else if (!name.compare("MicroBooNE_CC1Mu0pNp_XSec_ProtonCosTheta_nu")) {
-      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<kCCProtonCosTheta>(samplekey));
+      return (new MicroBooNE_BNB_NumuCC0pNp_2024_XSec_nu<kCCProtonCosTheta>(samplekey));
     } else if (!name.compare("MicroBooNE_CC1Mu0pNp_XSec_ProtonMult_nu")) {
-      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<kCCProtonMult>(samplekey));
+      return (new MicroBooNE_BNB_NumuCC0pNp_2024_XSec_nu<kCCProtonMult>(samplekey));
     } else if (!name.compare("MicroBooNE_CC1Mu0pNp_XSec_EMuCosThetaMu_nu")) {
-      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<kCC0pNpEMuCosThetaMu>(samplekey));
+      return (new MicroBooNE_BNB_NumuCC0pNp_2024_XSec_nu<kCC0pNpEMuCosThetaMu>(samplekey));
     } else if (!name.compare("MicroBooNE_CC1Mu0pNp_XSec_ProtonKECosTheta_nu")) {
-      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<kCCNpProtonKECosTheta>(samplekey));
+      return (new MicroBooNE_BNB_NumuCC0pNp_2024_XSec_nu<kCCNpProtonKECosTheta>(samplekey));
     } else if (!name.compare("MicroBooNE_CC1Mu0pNp_XSec_XpEMu_nu")) {
-      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<kCCXpEMu>(samplekey));
+      return (new MicroBooNE_BNB_NumuCC0pNp_2024_XSec_nu<kCCXpEMu>(samplekey));
     } else if (!name.compare("MicroBooNE_CC1Mu0pNp_XSec_XpCosThetaMu_nu")) {
-      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<kCCXpCosThetaMu>(samplekey));
+      return (new MicroBooNE_BNB_NumuCC0pNp_2024_XSec_nu<kCCXpCosThetaMu>(samplekey));
     } else if (!name.compare("MicroBooNE_CC1Mu0pNp_XSec_XpEMuCosThetaMu_nu")) {
-      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<kCCXpEMuCosThetaMu>(samplekey));
+      return (new MicroBooNE_BNB_NumuCC0pNp_2024_XSec_nu<kCCXpEMuCosThetaMu>(samplekey));
     } else if (!name.compare("MicroBooNE_CC1Mu0pNp_XSec_XpAvailEnergyCosThetaMuEMu_nu")) {
-      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<kCCXpAvailEnergyCosThetaMuEMu>(samplekey));
+      return (new MicroBooNE_BNB_NumuCC0pNp_2024_XSec_nu<kCCXpAvailEnergyCosThetaMuEMu>(samplekey));
     } else if (!name.compare("MicroBooNE_CC1Mu0pNp_XSec_All_nu")) {
-      return (new MicroBooNE_CC1Mu0pNp_XSec_nu<kAllCC>(samplekey));
-    } else if (!name.compare("MicroBooNE_CC1Mu3DInc_XSec_nu")) {
-      return (new MicroBooNE_CC1Mu3DInc_XSec_nu(samplekey));
+      return (new MicroBooNE_BNB_NumuCC0pNp_2024_XSec_nu<kAllCC>(samplekey));
+    } else if (!name.compare("MicroBooNE_BNB_NumuCCInc_2023_XSec_3D_nu")) {
+      return (new MicroBooNE_BNB_NumuCCInc_2023_XSec_3D_nu(samplekey));
 
     } else if (!name.compare("MicroBooNE_NCpi0_XSec_0pNpPpi0_nu")) {
-      return (new MicroBooNE_NCpi0_XSec_nu<kNC0pNpPpi0>(samplekey));
+      return (new MicroBooNE_BNB_NCpi0_2024_XSec_nu<kNC0pNpPpi0>(samplekey));
     } else if (!name.compare("MicroBooNE_NCpi0_XSec_XpPpi0_nu")) {
-      return (new MicroBooNE_NCpi0_XSec_nu<kNCXpPpi0>(samplekey));
+      return (new MicroBooNE_BNB_NCpi0_2024_XSec_nu<kNCXpPpi0>(samplekey));
     } else if (!name.compare("MicroBooNE_NCpi0_XSec_0pNpCosThetaPi0_nu")) {
-      return (new MicroBooNE_NCpi0_XSec_nu<kNC0pNpCosThetaPi0>(samplekey));
+      return (new MicroBooNE_BNB_NCpi0_2024_XSec_nu<kNC0pNpCosThetaPi0>(samplekey));
     } else if (!name.compare("MicroBooNE_NCpi0_XSec_XpCosThetaPi0_nu")) {
-      return (new MicroBooNE_NCpi0_XSec_nu<kNCXpCosThetaPi0>(samplekey));
+      return (new MicroBooNE_BNB_NCpi0_2024_XSec_nu<kNCXpCosThetaPi0>(samplekey));
     } else if (!name.compare("MicroBooNE_NCpi0_XSec_XpPpi0CosThetaPi0_nu")) {
-      return (new MicroBooNE_NCpi0_XSec_nu<kNCXpPpi0CosThetaPi0>(samplekey));
+      return (new MicroBooNE_BNB_NCpi0_2024_XSec_nu<kNCXpPpi0CosThetaPi0>(samplekey));
     } else if (!name.compare("MicroBooNE_NCpi0_XSec_AllNCpi0_nu")) {
-      return (new MicroBooNE_NCpi0_XSec_nu<kAllNCpi0>(samplekey));
-    } else if ( !name.compare("MicroBooNE_CC1MuNp_XSec_2025_nu") ) {
-      return ( new MicroBooNE_CC1MuNp_XSec_2025_nu(samplekey) );
+      return (new MicroBooNE_BNB_NCpi0_2024_XSec_nu<kAllNCpi0>(samplekey));
+    } else if ( !name.compare("MicroBooNE_BNB_NumuCC0PiNp_2025_XSec_nu") ) {
+      return ( new MicroBooNE_BNB_NumuCC0PiNp_2025_XSec_nu(samplekey) );
     } else
 
 #endif

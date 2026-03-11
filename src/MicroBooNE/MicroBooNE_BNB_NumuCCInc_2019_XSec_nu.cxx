@@ -17,7 +17,7 @@
  *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 
-#include "MicroBooNE_CCInc_XSec_2DPcos_nu.h"
+#include "MicroBooNE_BNB_NumuCCInc_2019_XSec_nu.h"
 
 namespace {
 // Mapping of polybins to costheta slices
@@ -51,12 +51,12 @@ static double const EdgesP[NRows][6] = {
 } // namespace
 
 //********************************************************************
-MicroBooNE_CCInc_XSec_2DPcos_nu::MicroBooNE_CCInc_XSec_2DPcos_nu(
+MicroBooNE_BNB_NumuCCInc_2019_XSec_nu::MicroBooNE_BNB_NumuCCInc_2019_XSec_nu(
     nuiskey samplekey) {
   //********************************************************************
 
   // Sample overview ---------------------------------------------------
-  std::string descrip = "MicroBooNE_CCInc_XSec_2DPcos_nu sample. \n"
+  std::string descrip = "MicroBooNE_BNB_NumuCCInc_2019_XSec_nu sample. \n"
                         "Target: Ar \n"
                         "Flux: BNB FHC numu \n"
                         "Signal: CC inclusive \n";
@@ -72,7 +72,7 @@ MicroBooNE_CCInc_XSec_2DPcos_nu::MicroBooNE_CCInc_XSec_2DPcos_nu(
   fSettings.DefineAllowedTargets("Ar");
 
   // Plot information
-  fSettings.SetTitle("MicroBooNE_CCInc_XSec_2DPcos_nu");
+  fSettings.SetTitle("MicroBooNE_BNB_NumuCCInc_2019_XSec_nu");
   fSettings.DefineAllowedSpecies("numu");
 
   FinaliseSampleSettings();
@@ -91,11 +91,11 @@ MicroBooNE_CCInc_XSec_2DPcos_nu::MicroBooNE_CCInc_XSec_2DPcos_nu(
   fSaveFine = false;
 };
 
-bool MicroBooNE_CCInc_XSec_2DPcos_nu::isSignal(FitEvent *event) {
+bool MicroBooNE_BNB_NumuCCInc_2019_XSec_nu::isSignal(FitEvent *event) {
   return SignalDef::isCCINC(event, 14, EnuMin, EnuMax);
 };
 
-void MicroBooNE_CCInc_XSec_2DPcos_nu::FillEventVariables(FitEvent *event) {
+void MicroBooNE_BNB_NumuCCInc_2019_XSec_nu::FillEventVariables(FitEvent *event) {
   if (event->NumFSParticle(13) == 0) {
     return;
   }
@@ -112,7 +112,7 @@ void MicroBooNE_CCInc_XSec_2DPcos_nu::FillEventVariables(FitEvent *event) {
   return;
 };
 
-void MicroBooNE_CCInc_XSec_2DPcos_nu::FillHistograms() {
+void MicroBooNE_BNB_NumuCCInc_2019_XSec_nu::FillHistograms() {
   Measurement1D::FillHistograms();
   if (Signal) {
     fMCHist_Fine2D->Fill(fXVar, fYVar, Weight);
@@ -120,7 +120,7 @@ void MicroBooNE_CCInc_XSec_2DPcos_nu::FillHistograms() {
   }
 }
 
-void MicroBooNE_CCInc_XSec_2DPcos_nu::ConvertEventRates() {
+void MicroBooNE_BNB_NumuCCInc_2019_XSec_nu::ConvertEventRates() {
   for (size_t i = 0; i < fMCHist_Slices.size(); i++) {
     fMCHist_Slices[i]->GetSumw2();
   }
@@ -173,7 +173,7 @@ void MicroBooNE_CCInc_XSec_2DPcos_nu::ConvertEventRates() {
   }
 }
 
-void MicroBooNE_CCInc_XSec_2DPcos_nu::FillMCSlice(double x, double y,
+void MicroBooNE_BNB_NumuCCInc_2019_XSec_nu::FillMCSlice(double x, double y,
                                                   double w) {
   if (y >= -1.00 && y < -0.50)
     fMCHist_Slices[0]->Fill(x, w);
@@ -195,7 +195,7 @@ void MicroBooNE_CCInc_XSec_2DPcos_nu::FillMCSlice(double x, double y,
     fMCHist_Slices[8]->Fill(x, w);
 }
 
-void MicroBooNE_CCInc_XSec_2DPcos_nu::SetHistograms() {
+void MicroBooNE_BNB_NumuCCInc_2019_XSec_nu::SetHistograms() {
 
   std::string sample_name = fSettings.GetName();
 

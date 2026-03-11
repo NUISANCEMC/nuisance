@@ -16,8 +16,8 @@
 *    You should have received a copy of the GNU General Public License
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
-#ifndef MICROBOONE_NCpi0_NU_H_SEEN
-#define MICROBOONE_NCpi0_NU_H_SEEN
+#ifndef MICROBOONE_CC1MU0pNp_NU_H_SEEN
+#define MICROBOONE_CC1MU0pNp_NU_H_SEEN
 
 #pragma once
 
@@ -28,26 +28,26 @@
 #include "WireCellHelper.h"
 
 template <distribution_t D, distribution_t... Ds>
-class NCpi0Helper : public IWireCellHelper<D, Ds...> {
+class CC1Mu0pNpHelper : public IWireCellHelper<D, Ds...> {
 public:
-  NCpi0Helper() :
+  CC1Mu0pNpHelper() :
     IWireCellHelper<D, Ds...>(FitPar::GetDataBase() +
-                              "/MicroBooNE/NCpi0/real_bins.txt")
+                              "/MicroBooNE/CC1Mu0pNp/real_bins.txt")
   {}
   // this gives us the measurements based on the blocks we requested
   void load_measurement() override {
 
     // load our histograms
     TFile* inputRootFile = TFile::Open((FitPar::GetDataBase() +
-                                       "/MicroBooNE/NCpi0/MicroBooNE_NCpi0_data_release.root").c_str());
-    TH1D* hFullData = (TH1D *)inputRootFile->Get("MicroBooNE_NCpi0_data");
-    TH2D* hFullCov =  (TH2D *)inputRootFile->Get("MicroBooNE_NCpi0_unfcov");
-    TH2D* hFullAc =   (TH2D *)inputRootFile->Get("MicroBooNE_NCpi0_Ac");
+                                       "/MicroBooNE/CC1Mu0pNp/MicroBooNE_CC1Mu0pNp_data_release.root").c_str());
+    TH1D* hFullData = (TH1D *)inputRootFile->Get("MicroBooNE_CC1Mu0pNp_data");
+    TH2D* hFullCov =  (TH2D *)inputRootFile->Get("MicroBooNE_CC1Mu0pNp_unfcov");
+    TH2D* hFullAc =   (TH2D *)inputRootFile->Get("MicroBooNE_CC1Mu0pNp_Ac");
 
     int full_bins = hFullData->GetNbinsX()+2;
-    auto m_fulldata = std::make_unique<TVectorD>   (full_bins, hFullData->GetArray());
-    auto m_fullcov  = std::make_unique<TMatrixDSym>(full_bins, hFullCov->GetArray(), "D");
-    auto m_fullac   = std::make_unique<TMatrixD>   (full_bins, full_bins, hFullAc->GetArray(), "D");
+    auto m_fulldata = std::make_unique<TVectorD> (full_bins, hFullData->GetArray());
+    auto m_fullcov  = std::make_unique<TMatrixD> (full_bins, full_bins, hFullCov->GetArray(), "D");
+    auto m_fullac   = std::make_unique<TMatrixD> (full_bins, full_bins, hFullAc->GetArray(), "D");
     // this needs to be transposed to get the right format for some reason
     m_fullac->Transpose(*m_fullac);
     m_fullcov->Transpose(*m_fullcov);
@@ -55,26 +55,24 @@ public:
     // form subset of histograms based on cached Ds
     // loop over the row
     int curr_bin_i = 0;
-    int offset = kNC0pNpPpi0;
     auto f_dist = (this->f_lookup).get_dists();
 
     for (auto it_i=f_dist.begin(); it_i != f_dist.end(); ++it_i) {
       distribution_t dist_i = *it_i;
-      int full_bin_i = dist_i - offset;
       // get the block measurements
       int block_bins_i = (this->f_lookup).get_nbins(dist_i);
       for(int i = 0; i < block_bins_i; i++){
-        (*(this->m_data))[curr_bin_i + i] = (*m_fulldata)(full_bin_i + i + 1);
+        (*(this->m_data))[curr_bin_i + i] = (*m_fulldata)(dist_i + i + 1);
+
         // now loop over the column
         int curr_bin_j = 0;
         for (auto it_j=f_dist.begin(); it_j != f_dist.end(); ++it_j) {
           distribution_t dist_j = *it_j;
-          int full_bin_j = dist_j - offset;
           // get the block measurements
           int block_bins_j = (this->f_lookup).get_nbins(dist_j);
           for(int j = 0; j < block_bins_j; j++){
-            (*(this->m_ac))(curr_bin_i + i, curr_bin_j + j) = (*m_fullac)(full_bin_i + i + 1, full_bin_j + j + 1);
-            (*(this->m_cov))(curr_bin_i + i, curr_bin_j + j) = (*m_fullcov)(full_bin_i + i + 1, full_bin_j + j + 1);
+            (*(this->m_ac))(curr_bin_i + i, curr_bin_j + j) = (*m_fullac)(dist_i + i + 1, dist_j + j + 1);
+            (*(this->m_cov))(curr_bin_i + i, curr_bin_j + j) = (*m_fullcov)(dist_i + i + 1, dist_j + j + 1);
           }
           curr_bin_j += block_bins_j;
         } // end column
@@ -87,14 +85,14 @@ public:
 };
 
 template <distribution_t D, distribution_t... Ds>
-class MicroBooNE_NCpi0_XSec_nu : public Measurement1D {
+class MicroBooNE_BNB_NumuCC0pNp_2024_XSec_nu : public Measurement1D {
 
 public:
   /// Basic Constructor.
-  MicroBooNE_NCpi0_XSec_nu(nuiskey samplekey);
+  MicroBooNE_BNB_NumuCC0pNp_2024_XSec_nu(nuiskey samplekey);
 
   /// Virtual Destructor
-  ~MicroBooNE_NCpi0_XSec_nu() {};
+  ~MicroBooNE_BNB_NumuCC0pNp_2024_XSec_nu() {};
 
   /// Apply signal definition
   bool isSignal(FitEvent* nvect);
@@ -115,9 +113,6 @@ private:
   LookupTable    fTable;
   dists_t        fDists;
   std::map<distribution_t, double> fXVars;
-  // keep track of how many species we have run over
-  // used to scale the NC cross-section appropriately
-  int fMultipleSpecies = 0;
 
 };
 #endif

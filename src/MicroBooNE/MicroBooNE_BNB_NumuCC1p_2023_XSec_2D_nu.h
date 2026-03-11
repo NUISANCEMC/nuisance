@@ -80,13 +80,13 @@ private:
   std::vector<Slice> slice_vec;
 };
 
-class MicroBooNE_CC1Mu1p_XSec_2D_nu : public Measurement1D {
+class MicroBooNE_BNB_NumuCC1p_2023_XSec_2D_nu : public Measurement1D {
 public:
   /// Basic Constructor
-  MicroBooNE_CC1Mu1p_XSec_2D_nu(nuiskey samplekey);
+  MicroBooNE_BNB_NumuCC1p_2023_XSec_2D_nu(nuiskey samplekey);
 
   /// Virtual Destructor
-  ~MicroBooNE_CC1Mu1p_XSec_2D_nu() {};
+  ~MicroBooNE_BNB_NumuCC1p_2023_XSec_2D_nu() {};
 
   /// Apply signal definition
   bool isSignal(FitEvent* nvect);

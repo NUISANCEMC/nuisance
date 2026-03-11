@@ -16,20 +16,20 @@
 *    You should have received a copy of the GNU General Public License
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
-#ifndef MICROBOONE_CC1MUNP_1D_NU_H_SEEN
-#define MICROBOONE_CC1MUNP_1D_NU_H_SEEN
+#ifndef MICROBOONE_CC1MU2P0PI_1D_NU_H_SEEN
+#define MICROBOONE_CC1MU2P0PI_1D_NU_H_SEEN
 
 #include "Measurement1D.h"
 
 class TH2D;
 
-class MicroBooNE_CC1MuNp_XSec_1D_nu : public Measurement1D {
+class MicroBooNE_BNB_NumuCC0Pi2p_2022_XSec_nu : public Measurement1D {
 public:
   /// Basic Constructor.
-  MicroBooNE_CC1MuNp_XSec_1D_nu(nuiskey samplekey);
+  MicroBooNE_BNB_NumuCC0Pi2p_2022_XSec_nu(nuiskey samplekey);
 
   /// Virtual Destructor
-  ~MicroBooNE_CC1MuNp_XSec_1D_nu() {};
+  ~MicroBooNE_BNB_NumuCC0Pi2p_2022_XSec_nu() {};
 
   /// Apply signal definition
   bool isSignal(FitEvent* nvect);
@@ -41,8 +41,9 @@ public:
   void ConvertEventRates();
 
 private:
-  TH2D* fSmearingMatrix;
-  enum Distribution { kPmu, kPp, kCosMu, kCosP, kThetaMuP };
+  TMatrixD* fSmearingMatrix;
+
+  enum Distribution { kDeltaPT, kCosPlPr, kCosMuPsum, kDeltaAlphaT, kDeltaPhiT, kMuonMomentum, kMuonCosTheta, kMuonPhi, kLeadingProtonMomentum, kLeadingProtonCosTheta, kLeadingProtonPhi, kRecoilProtonMomentum, kRecoilProtonCosTheta, kRecoilProtonPhi };
   Distribution fDist;
 };
 

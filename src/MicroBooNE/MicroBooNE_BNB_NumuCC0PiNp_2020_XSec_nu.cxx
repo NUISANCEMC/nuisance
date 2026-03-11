@@ -17,12 +17,12 @@
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 
-#include "MicroBooNE_CC1MuNp_XSec_1D_nu.h"
+#include "MicroBooNE_BNB_NumuCC0PiNp_2020_XSec_nu.h"
 #include "MicroBooNE_SignalDef.h"
 #include "TH2D.h"
 
 //********************************************************************
-MicroBooNE_CC1MuNp_XSec_1D_nu::MicroBooNE_CC1MuNp_XSec_1D_nu(nuiskey samplekey) {
+MicroBooNE_BNB_NumuCC0PiNp_2020_XSec_nu::MicroBooNE_BNB_NumuCC0PiNp_2020_XSec_nu(nuiskey samplekey) {
 //********************************************************************
   fSettings = LoadSampleSettings(samplekey);
   std::string name = fSettings.GetS("name");
@@ -120,12 +120,12 @@ MicroBooNE_CC1MuNp_XSec_1D_nu::MicroBooNE_CC1MuNp_XSec_1D_nu(nuiskey samplekey) 
 };
 
 
-bool MicroBooNE_CC1MuNp_XSec_1D_nu::isSignal(FitEvent* event) {
+bool MicroBooNE_BNB_NumuCC0PiNp_2020_XSec_nu::isSignal(FitEvent* event) {
   return SignalDef::MicroBooNE::isCC1MuNp(event, EnuMin, EnuMax);
 };
 
 
-void MicroBooNE_CC1MuNp_XSec_1D_nu::FillEventVariables(FitEvent* event) {
+void MicroBooNE_BNB_NumuCC0PiNp_2020_XSec_nu::FillEventVariables(FitEvent* event) {
   if (fDist == kPmu) {
     if (event->NumFSParticle(13) == 0) return;
     fXVar = event->GetHMFSParticle(13)->fP.Vect().Mag() / 1000;
@@ -152,7 +152,7 @@ void MicroBooNE_CC1MuNp_XSec_1D_nu::FillEventVariables(FitEvent* event) {
 }
 
 
-void MicroBooNE_CC1MuNp_XSec_1D_nu::ConvertEventRates() {
+void MicroBooNE_BNB_NumuCC0PiNp_2020_XSec_nu::ConvertEventRates() {
   // Do standard conversion
   Measurement1D::ConvertEventRates();
 

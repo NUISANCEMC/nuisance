@@ -17,14 +17,14 @@
  *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 
-#include "MicroBooNE_CC1Mu1p_XSec_1D_nu.h"
+#include "MicroBooNE_BNB_NumuCC1p_2023_XSec_1D_nu.h"
 #include "MicroBooNE_SignalDef.h"
 
 #include "TH1D.h"
 #include "TH2D.h"
 
 //********************************************************************
-MicroBooNE_CC1Mu1p_XSec_1D_nu::MicroBooNE_CC1Mu1p_XSec_1D_nu(
+MicroBooNE_BNB_NumuCC1p_2023_XSec_1D_nu::MicroBooNE_BNB_NumuCC1p_2023_XSec_1D_nu(
     nuiskey samplekey) {
   //********************************************************************
   fSettings = LoadSampleSettings(samplekey);
@@ -85,7 +85,7 @@ MicroBooNE_CC1Mu1p_XSec_1D_nu::MicroBooNE_CC1Mu1p_XSec_1D_nu(
     fSettings.SetYTitle("d#sigma/dE^{Cal} (cm^{2}/(GeV)/^{40}Ar)");
   } else {
     NUIS_ABORT(
-        "MicroBooNE_CC1Mu1p_XSec_1D_nu: Didn’t get a valid name: " << name);
+        "MicroBooNE_BNB_NumuCC1p_2023_XSec_1D_nu: Didn’t get a valid name: " << name);
   }
 
   // Sample overview ---------------------------------------------------
@@ -138,11 +138,11 @@ MicroBooNE_CC1Mu1p_XSec_1D_nu::MicroBooNE_CC1Mu1p_XSec_1D_nu(
   FinaliseMeasurement();
 }
 
-bool MicroBooNE_CC1Mu1p_XSec_1D_nu::isSignal(FitEvent *event) {
+bool MicroBooNE_BNB_NumuCC1p_2023_XSec_1D_nu::isSignal(FitEvent *event) {
   return SignalDef::MicroBooNE::isCC1Mu1p(event, EnuMin, EnuMax);
 }
 
-void MicroBooNE_CC1Mu1p_XSec_1D_nu::FillEventVariables(FitEvent *event) {
+void MicroBooNE_BNB_NumuCC1p_2023_XSec_1D_nu::FillEventVariables(FitEvent *event) {
 
   if (!isSignal(event)) { // double the work, but it lets us use the below
                           // functions without error checking
@@ -294,7 +294,7 @@ void MicroBooNE_CC1Mu1p_XSec_1D_nu::FillEventVariables(FitEvent *event) {
   }
 }
 
-void MicroBooNE_CC1Mu1p_XSec_1D_nu::ConvertEventRates() {
+void MicroBooNE_BNB_NumuCC1p_2023_XSec_1D_nu::ConvertEventRates() {
 
   // Apply Weiner-SVD additional smearing Ac
   int n = fMCHist->GetNbinsX();

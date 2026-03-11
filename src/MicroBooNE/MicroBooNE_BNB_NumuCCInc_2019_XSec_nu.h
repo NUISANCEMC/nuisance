@@ -23,13 +23,13 @@
 #include "MeasurementVariableBox2D.h"
 #include "TH2Poly.h"
 
-class MicroBooNE_CCInc_XSec_2DPcos_nu : public Measurement1D {
+class MicroBooNE_BNB_NumuCCInc_2019_XSec_nu : public Measurement1D {
 public:
   /// Basic Constructor.
-  MicroBooNE_CCInc_XSec_2DPcos_nu(nuiskey samplekey);
+  MicroBooNE_BNB_NumuCCInc_2019_XSec_nu(nuiskey samplekey);
 
   /// Virtual Destructor
-  ~MicroBooNE_CCInc_XSec_2DPcos_nu(){};
+  ~MicroBooNE_BNB_NumuCCInc_2019_XSec_nu(){};
 
   /// Numu CCinc Signal Definition
   bool isSignal(FitEvent *nvect);

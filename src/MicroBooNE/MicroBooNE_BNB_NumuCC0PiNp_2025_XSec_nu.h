@@ -44,15 +44,15 @@ struct MyCut {
 
 /// Implements comparisons with the MicroBooNE measurement described
 /// in Phys. Rev. D 112, 112004 (2025) https://doi.org/10.1103/8v2y-l89l
-class MicroBooNE_CC1MuNp_XSec_2025_nu : public Measurement1D {
+class MicroBooNE_BNB_NumuCC0PiNp_2025_XSec_nu : public Measurement1D {
 
 public:
 
   /// Basic Constructor.
-  MicroBooNE_CC1MuNp_XSec_2025_nu( nuiskey samplekey );
+  MicroBooNE_BNB_NumuCC0PiNp_2025_XSec_nu( nuiskey samplekey );
 
   /// Virtual Destructor
-  inline virtual ~MicroBooNE_CC1MuNp_XSec_2025_nu() {
+  inline virtual ~MicroBooNE_BNB_NumuCC0PiNp_2025_XSec_nu() {
     fResidualHist = NULL;
     fChi2LessBinHist = NULL;
   };

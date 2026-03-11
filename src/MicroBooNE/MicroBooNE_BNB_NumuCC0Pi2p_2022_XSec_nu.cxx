@@ -17,13 +17,13 @@
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 
-#include "MicroBooNE_CC1mu2p0pi_XSec_1D_nu.h"
+#include "MicroBooNE_BNB_NumuCC0Pi2p_2022_XSec_nu.h"
 #include "MicroBooNE_SignalDef.h"
 #include "TH2D.h"
 #include <cmath>
 
 //********************************************************************
-MicroBooNE_CC1mu2p0pi_XSec_1D_nu::MicroBooNE_CC1mu2p0pi_XSec_1D_nu(nuiskey samplekey) {
+MicroBooNE_BNB_NumuCC0Pi2p_2022_XSec_nu::MicroBooNE_BNB_NumuCC0Pi2p_2022_XSec_nu(nuiskey samplekey) {
 //********************************************************************
   fSettings = LoadSampleSettings(samplekey);
   std::string name = fSettings.GetS("name");
@@ -158,12 +158,12 @@ MicroBooNE_CC1mu2p0pi_XSec_1D_nu::MicroBooNE_CC1mu2p0pi_XSec_1D_nu(nuiskey sampl
 };
 
 
-bool MicroBooNE_CC1mu2p0pi_XSec_1D_nu::isSignal(FitEvent* event) {
+bool MicroBooNE_BNB_NumuCC0Pi2p_2022_XSec_nu::isSignal(FitEvent* event) {
   return SignalDef::MicroBooNE::isCC1mu2p0pi(event, EnuMin, EnuMax);
 };
 
 
-void MicroBooNE_CC1mu2p0pi_XSec_1D_nu::FillEventVariables(FitEvent* event) {
+void MicroBooNE_BNB_NumuCC0Pi2p_2022_XSec_nu::FillEventVariables(FitEvent* event) {
   fXVar = -999.;
   if (!isSignal(event)) {return;}
 
@@ -258,7 +258,7 @@ void MicroBooNE_CC1mu2p0pi_XSec_1D_nu::FillEventVariables(FitEvent* event) {
   
 }
 
-void MicroBooNE_CC1mu2p0pi_XSec_1D_nu::ConvertEventRates() {
+void MicroBooNE_BNB_NumuCC0Pi2p_2022_XSec_nu::ConvertEventRates() {
   // Do standard conversion
   Measurement1D::ConvertEventRates();
 

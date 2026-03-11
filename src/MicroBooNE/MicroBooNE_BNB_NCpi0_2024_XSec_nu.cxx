@@ -17,7 +17,7 @@
  *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 
-#include "MicroBooNE_NCpi0_XSec_nu.h"
+#include "MicroBooNE_BNB_NCpi0_2024_XSec_nu.h"
 #include "MicroBooNE_SignalDef.h"
 
 #include "TH1D.h"
@@ -26,12 +26,12 @@
 
 //********************************************************************
 template <distribution_t D, distribution_t... Ds>
-MicroBooNE_NCpi0_XSec_nu<D, Ds...>::MicroBooNE_NCpi0_XSec_nu(
+MicroBooNE_BNB_NCpi0_2024_XSec_nu<D, Ds...>::MicroBooNE_BNB_NCpi0_2024_XSec_nu(
     nuiskey samplekey) {
   //********************************************************************
 
   // Sample overview ---------------------------------------------------
-  std::string descrip = "MicroBooNE_NCpi0_XSec_nu sample. \n"
+  std::string descrip = "MicroBooNE_BNB_NCpi0_2024_XSec_nu sample. \n"
                         "Target: Ar \n"
                         "Flux: BNB FHC numu \n"
                         "Signal: NCpi0 WireCell \n";
@@ -48,7 +48,7 @@ MicroBooNE_NCpi0_XSec_nu<D, Ds...>::MicroBooNE_NCpi0_XSec_nu(
   fSettings.DefineAllowedTargets("Ar");
 
   // Plot information
-  fSettings.SetTitle("MicroBooNE_NCpi0_XSec_nu");
+  fSettings.SetTitle("MicroBooNE_BNB_NCpi0_2024_XSec_nu");
   //hack for now, need all species
   fSettings.DefineAllowedSpecies("numu, antinumu");
 
@@ -99,7 +99,7 @@ MicroBooNE_NCpi0_XSec_nu<D, Ds...>::MicroBooNE_NCpi0_XSec_nu(
 
 //********************************************************************
 template <distribution_t D, distribution_t... Ds>
-bool MicroBooNE_NCpi0_XSec_nu<D, Ds...>::isSignal(FitEvent *nvect)
+bool MicroBooNE_BNB_NCpi0_2024_XSec_nu<D, Ds...>::isSignal(FitEvent *nvect)
 {
   // if we find anything other numu assume multiple species
   if(nvect->GetBeamNeutrinoPDG() != 14) fMultipleSpecies = 1;
@@ -108,7 +108,7 @@ bool MicroBooNE_NCpi0_XSec_nu<D, Ds...>::isSignal(FitEvent *nvect)
 
 //********************************************************************
 template <distribution_t D, distribution_t... Ds>
-void MicroBooNE_NCpi0_XSec_nu<D, Ds...>::FillEventVariables(FitEvent *customEvent)
+void MicroBooNE_BNB_NCpi0_2024_XSec_nu<D, Ds...>::FillEventVariables(FitEvent *customEvent)
 {
 
   if (!isSignal(customEvent)) { // double the work, but it lets us use the below
@@ -166,7 +166,7 @@ void MicroBooNE_NCpi0_XSec_nu<D, Ds...>::FillEventVariables(FitEvent *customEven
 
 //********************************************************************
 template <distribution_t D, distribution_t... Ds>
-void MicroBooNE_NCpi0_XSec_nu<D, Ds...>::FillHistograms() {
+void MicroBooNE_BNB_NCpi0_2024_XSec_nu<D, Ds...>::FillHistograms() {
   // loop over our blocks and fill for each one of them
   for(auto it = fDists.begin(); it != fDists.end(); ++it){
     distribution_t dist = *it;
@@ -177,7 +177,7 @@ void MicroBooNE_NCpi0_XSec_nu<D, Ds...>::FillHistograms() {
 
 //********************************************************************
 template <distribution_t D, distribution_t... Ds>
-void MicroBooNE_NCpi0_XSec_nu<D, Ds...>::ConvertEventRates() {
+void MicroBooNE_BNB_NCpi0_2024_XSec_nu<D, Ds...>::ConvertEventRates() {
 
   // standard conversion
   Measurement1D::ConvertEventRates();
@@ -218,9 +218,10 @@ void MicroBooNE_NCpi0_XSec_nu<D, Ds...>::ConvertEventRates() {
   }
 }
 
-template class MicroBooNE_NCpi0_XSec_nu<kNC0pNpPpi0>;
-template class MicroBooNE_NCpi0_XSec_nu<kNCXpPpi0>;
-template class MicroBooNE_NCpi0_XSec_nu<kNC0pNpCosThetaPi0>;
-template class MicroBooNE_NCpi0_XSec_nu<kNCXpCosThetaPi0>;
-template class MicroBooNE_NCpi0_XSec_nu<kNCXpPpi0CosThetaPi0>;
-template class MicroBooNE_NCpi0_XSec_nu<kAllNCpi0>;
+template class MicroBooNE_BNB_NCpi0_2024_XSec_nu<kNC0pNpPpi0>;
+template class MicroBooNE_BNB_NCpi0_2024_XSec_nu<kNCXpPpi0>;
+template class MicroBooNE_BNB_NCpi0_2024_XSec_nu<kNC0pNpCosThetaPi0>;
+template class MicroBooNE_BNB_NCpi0_2024_XSec_nu<kNCXpCosThetaPi0>;
+template class MicroBooNE_BNB_NCpi0_2024_XSec_nu<kNCXpPpi0CosThetaPi0>;
+template class MicroBooNE_BNB_NCpi0_2024_XSec_nu<kAllNCpi0>;
+

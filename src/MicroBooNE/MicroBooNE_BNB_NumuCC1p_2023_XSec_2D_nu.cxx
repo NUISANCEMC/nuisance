@@ -17,7 +17,7 @@
  *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 
-#include "MicroBooNE_CC1Mu1p_XSec_2D_nu.h"
+#include "MicroBooNE_BNB_NumuCC1p_2023_XSec_2D_nu.h"
 #include "MicroBooNE_SignalDef.h"
 
 #include "TH1D.h"
@@ -150,11 +150,11 @@ Slice BinScheme::GetSliceFromGlobal(int global) {
       return slice;
     }
   }
-  NUIS_ABORT("MicroBooNE_CC1Mu1p_XSec_2D_nu: Invalid bin number in scheme!");
+  NUIS_ABORT("MicroBooNE_BNB_NumuCC1p_2023_XSec_2D_nu: Invalid bin number in scheme!");
 }
 
 //********************************************************************
-MicroBooNE_CC1Mu1p_XSec_2D_nu::MicroBooNE_CC1Mu1p_XSec_2D_nu(
+MicroBooNE_BNB_NumuCC1p_2023_XSec_2D_nu::MicroBooNE_BNB_NumuCC1p_2023_XSec_2D_nu(
     nuiskey samplekey) {
 //********************************************************************
   fSettings = LoadSampleSettings(samplekey);
@@ -241,7 +241,7 @@ MicroBooNE_CC1Mu1p_XSec_2D_nu::MicroBooNE_CC1Mu1p_XSec_2D_nu(
     fSettings.SetYTitle("d^{2}#sigma/d#deltap_{T,y}dE^{ecal} (cm^{2}/(GeV/c)/(GeV)/^{40}Ar)");
   } else {
     NUIS_ABORT(
-        "MicroBooNE_CC1Mu1p_XSec_2D_nu: Didn't get a valid name: " << name);
+        "MicroBooNE_BNB_NumuCC1p_2023_XSec_2D_nu: Didn't get a valid name: " << name);
   }
 
   // Sample overview ---------------------------------------------------
@@ -270,11 +270,11 @@ MicroBooNE_CC1Mu1p_XSec_2D_nu::MicroBooNE_CC1Mu1p_XSec_2D_nu(
   FinaliseMeasurement();
 }
 
-bool MicroBooNE_CC1Mu1p_XSec_2D_nu::isSignal(FitEvent *event) {
+bool MicroBooNE_BNB_NumuCC1p_2023_XSec_2D_nu::isSignal(FitEvent *event) {
   return SignalDef::MicroBooNE::isCC1Mu1p(event, EnuMin, EnuMax);
 }
 
-void MicroBooNE_CC1Mu1p_XSec_2D_nu::FillEventVariables(FitEvent *event) {
+void MicroBooNE_BNB_NumuCC1p_2023_XSec_2D_nu::FillEventVariables(FitEvent *event) {
 
   if (!isSignal(event)) { // double the work, but it lets us use the below
                           // functions without error checking
@@ -410,7 +410,7 @@ void MicroBooNE_CC1Mu1p_XSec_2D_nu::FillEventVariables(FitEvent *event) {
   }
   else {
     NUIS_ABORT(
-        "MicroBooNE_CC1Mu1p_XSec_2D_nu: Didn't get a valid distribution");
+        "MicroBooNE_BNB_NumuCC1p_2023_XSec_2D_nu: Didn't get a valid distribution");
   }
 
   if (fSlice == kDeltaPT) {
@@ -451,12 +451,12 @@ void MicroBooNE_CC1Mu1p_XSec_2D_nu::FillEventVariables(FitEvent *event) {
   }
   else {
     NUIS_ABORT(
-        "MicroBooNE_CC1Mu1p_XSec_2D_nu: Didn't get a valid slice");
+        "MicroBooNE_BNB_NumuCC1p_2023_XSec_2D_nu: Didn't get a valid slice");
   }
 
 }
 
-void MicroBooNE_CC1Mu1p_XSec_2D_nu::FillHistograms() {
+void MicroBooNE_BNB_NumuCC1p_2023_XSec_2D_nu::FillHistograms() {
   Measurement1D::FillHistograms();
   if (Signal) {
     fMCHist_Fine2D->Fill(fXVar, fYVar, Weight);
@@ -464,7 +464,7 @@ void MicroBooNE_CC1Mu1p_XSec_2D_nu::FillHistograms() {
   }
 }
 
-void MicroBooNE_CC1Mu1p_XSec_2D_nu::FillMCSlice(double x, double y,
+void MicroBooNE_BNB_NumuCC1p_2023_XSec_2D_nu::FillMCSlice(double x, double y,
                                                   double w) {
   // Fill corresponding MC slice histogram
   int slice_id = 0;
@@ -478,7 +478,7 @@ void MicroBooNE_CC1Mu1p_XSec_2D_nu::FillMCSlice(double x, double y,
   }
 }
 
-void MicroBooNE_CC1Mu1p_XSec_2D_nu::ConvertEventRates() {
+void MicroBooNE_BNB_NumuCC1p_2023_XSec_2D_nu::ConvertEventRates() {
 
   // Do standard conversion
   Measurement1D::ConvertEventRates();
@@ -533,7 +533,7 @@ void MicroBooNE_CC1Mu1p_XSec_2D_nu::ConvertEventRates() {
 
 }
 
-void MicroBooNE_CC1Mu1p_XSec_2D_nu::SetHistograms() {
+void MicroBooNE_BNB_NumuCC1p_2023_XSec_2D_nu::SetHistograms() {
 
   // Open input file
   std::string inputFileName = FitPar::GetDataBase() +
@@ -651,7 +651,7 @@ void MicroBooNE_CC1Mu1p_XSec_2D_nu::SetHistograms() {
 
 }
 
-void MicroBooNE_CC1Mu1p_XSec_2D_nu::LoadBinScheme() {
+void MicroBooNE_BNB_NumuCC1p_2023_XSec_2D_nu::LoadBinScheme() {
 
   // Open input file
   std::string binFileName = FitPar::GetDataBase() +

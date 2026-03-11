@@ -17,7 +17,7 @@
  *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 
-#include "MicroBooNE_CC1Mu3DInc_XSec_nu.h"
+#include "MicroBooNE_BNB_NumuCCInc_2023_XSec_3D_nu.h"
 #include "MicroBooNE_SignalDef.h"
 
 #include "TH1D.h"
@@ -25,12 +25,12 @@
 #include "WireCellHelper.h"
 
 //********************************************************************
-MicroBooNE_CC1Mu3DInc_XSec_nu::MicroBooNE_CC1Mu3DInc_XSec_nu(
+MicroBooNE_BNB_NumuCCInc_2023_XSec_3D_nu::MicroBooNE_BNB_NumuCCInc_2023_XSec_3D_nu(
   nuiskey samplekey) {
   //********************************************************************
 
   // Sample overview ---------------------------------------------------
-  std::string descrip = "MicroBooNE_CC1Mu3DInc_XSec_nu sample. \n"
+  std::string descrip = "MicroBooNE_BNB_NumuCCInc_2023_XSec_3D_nu sample. \n"
                         "Target: Ar \n"
                         "Flux: BNB FHC numu \n"
                         "Signal: CC 1Mu3DInc WireCell \n";
@@ -47,7 +47,7 @@ MicroBooNE_CC1Mu3DInc_XSec_nu::MicroBooNE_CC1Mu3DInc_XSec_nu(
   fSettings.DefineAllowedTargets("Ar");
 
   // Plot information
-  fSettings.SetTitle("MicroBooNE_CC1Mu3DInc_XSec_nu");
+  fSettings.SetTitle("MicroBooNE_BNB_NumuCCInc_2023_XSec_3D_nu");
   fSettings.DefineAllowedSpecies("numu");
 
   std::string sample_name = fSettings.GetName();
@@ -89,13 +89,13 @@ MicroBooNE_CC1Mu3DInc_XSec_nu::MicroBooNE_CC1Mu3DInc_XSec_nu(
 }
 
 //********************************************************************
-bool MicroBooNE_CC1Mu3DInc_XSec_nu::isSignal(FitEvent *nvect)
+bool MicroBooNE_BNB_NumuCCInc_2023_XSec_3D_nu::isSignal(FitEvent *nvect)
 {
   return SignalDef::isCCINC(nvect, 14, EnuMin, EnuMax);
 }
 
 //********************************************************************
-void MicroBooNE_CC1Mu3DInc_XSec_nu::FillEventVariables(FitEvent *customEvent)
+void MicroBooNE_BNB_NumuCCInc_2023_XSec_3D_nu::FillEventVariables(FitEvent *customEvent)
 {
 
   if (!isSignal(customEvent)) { // double the work, but it lets us use the below
@@ -115,7 +115,7 @@ void MicroBooNE_CC1Mu3DInc_XSec_nu::FillEventVariables(FitEvent *customEvent)
 }
 
 //********************************************************************
-void MicroBooNE_CC1Mu3DInc_XSec_nu::ConvertEventRates() {
+void MicroBooNE_BNB_NumuCCInc_2023_XSec_3D_nu::ConvertEventRates() {
 
   int n = fMCHist->GetNbinsX();
 

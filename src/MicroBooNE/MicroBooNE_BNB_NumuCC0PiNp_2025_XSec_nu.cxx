@@ -21,7 +21,7 @@
 
 #include "InteractionModes.h"
 #include "MicroBooNEBlockHandler.h"
-#include "MicroBooNE_CC1MuNp_XSec_2025_nu.h"
+#include "MicroBooNE_BNB_NumuCC0PiNp_2025_XSec_nu.h"
 #include "MicroBooNE_SignalDef.h"
 #include "TMatrixD.h"
 
@@ -188,8 +188,8 @@ namespace {
 
 }
 
-MicroBooNE_CC1MuNp_XSec_2025_nu
-  ::MicroBooNE_CC1MuNp_XSec_2025_nu( nuiskey samplekey )
+MicroBooNE_BNB_NumuCC0PiNp_2025_XSec_nu
+  ::MicroBooNE_BNB_NumuCC0PiNp_2025_XSec_nu( nuiskey samplekey )
 {
   fSettings = LoadSampleSettings( samplekey );
   std::string name = fSettings.GetS( "name" );
@@ -287,11 +287,11 @@ MicroBooNE_CC1MuNp_XSec_2025_nu
 }
 
 
-bool MicroBooNE_CC1MuNp_XSec_2025_nu::isSignal( FitEvent* event ) {
+bool MicroBooNE_BNB_NumuCC0PiNp_2025_XSec_nu::isSignal( FitEvent* event ) {
   return SignalDef::MicroBooNE::isCC1MuNpFor2025Analysis( event, EnuMin, EnuMax );
 }
 
-void MicroBooNE_CC1MuNp_XSec_2025_nu::FillEventVariables( FitEvent* event ) {
+void MicroBooNE_BNB_NumuCC0PiNp_2025_XSec_nu::FillEventVariables( FitEvent* event ) {
 
   // Clear out the vector of passing bins, which may have already been filled
   // for the previous event
@@ -321,7 +321,7 @@ void MicroBooNE_CC1MuNp_XSec_2025_nu::FillEventVariables( FitEvent* event ) {
 
 }
 
-void MicroBooNE_CC1MuNp_XSec_2025_nu::LoadBinDefinitions() {
+void MicroBooNE_BNB_NumuCC0PiNp_2025_XSec_nu::LoadBinDefinitions() {
   std::string binning_file_name( FitPar::GetDataBase()
     + "/MicroBooNE/CC1MuNp/2025/bin_defs.txt" );
 
@@ -457,7 +457,7 @@ void MicroBooNE_CC1MuNp_XSec_2025_nu::LoadBinDefinitions() {
 
 }
 
-void MicroBooNE_CC1MuNp_XSec_2025_nu::FillHistograms() {
+void MicroBooNE_BNB_NumuCC0PiNp_2025_XSec_nu::FillHistograms() {
 
   if ( !Signal ) return;
 
@@ -476,7 +476,7 @@ void MicroBooNE_CC1MuNp_XSec_2025_nu::FillHistograms() {
 
 }
 
-void MicroBooNE_CC1MuNp_XSec_2025_nu::ConvertEventRates() {
+void MicroBooNE_BNB_NumuCC0PiNp_2025_XSec_nu::ConvertEventRates() {
   // Do the standard conversion
   Measurement1D::ConvertEventRates();
 
@@ -509,14 +509,14 @@ void MicroBooNE_CC1MuNp_XSec_2025_nu::ConvertEventRates() {
   this->PrepareSlices();
 }
 
-double MicroBooNE_CC1MuNp_XSec_2025_nu::GetLikelihood() {
+double MicroBooNE_BNB_NumuCC0PiNp_2025_XSec_nu::GetLikelihood() {
 
   if ( fNoData || !fDataHist ) return 0.;
 
   // Apply Masking to MC if Required.
   if ( fIsMask and fMaskHist ) {
     NUIS_ERR(FTL, "Bin masks not yet supported by"
-      " the MicroBooNE_CC1MuNp_XSec_2025_nu sample" );
+      " the MicroBooNE_BNB_NumuCC0PiNp_2025_XSec_nu sample" );
     //PlotUtils::MaskBins(fMCHist, fMaskHist);
   }
 
@@ -525,7 +525,7 @@ double MicroBooNE_CC1MuNp_XSec_2025_nu::GetLikelihood() {
   if ( fIsChi2 ) {
     if ( fIsNS ) {
       NUIS_ERR(FTL, "Norm-shape covariance not yet supported by"
-        " the MicroBooNE_CC1MuNp_XSec_2025_nu sample" );
+        " the MicroBooNE_BNB_NumuCC0PiNp_2025_XSec_nu sample" );
     }
     stat = StatUtils::GetChi2FromCov( fDataHist, fMCHistWithAC.get(),
       covar, NULL, 1.0, 1.0, fIsWriting ? fResidualHist : NULL );
@@ -536,7 +536,7 @@ double MicroBooNE_CC1MuNp_XSec_2025_nu::GetLikelihood() {
   return stat;
 }
 
-void MicroBooNE_CC1MuNp_XSec_2025_nu::Write( std::string drawOpt ) {
+void MicroBooNE_BNB_NumuCC0PiNp_2025_XSec_nu::Write( std::string drawOpt ) {
   // Write the standard information
   Measurement1D::Write( drawOpt );
 
@@ -655,7 +655,7 @@ void MicroBooNE_CC1MuNp_XSec_2025_nu::Write( std::string drawOpt ) {
   }
 }
 
-void MicroBooNE_CC1MuNp_XSec_2025_nu::PrepareSlices() {
+void MicroBooNE_BNB_NumuCC0PiNp_2025_XSec_nu::PrepareSlices() {
   // Load the definitions of the blocks of bins
   std::string block_file_name( FitPar::GetDataBase()
     + "/MicroBooNE/CC1MuNp/2025/bin_blocks.txt" );
