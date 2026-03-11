@@ -17,9 +17,6 @@
  *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 
-// MicroBooNE BNB nue CC0pi https://doi.org/10.1103/PhysRevD.106.L051102
-// Only considers pure Np measurements : E_e, cos th_e, and cos th_p
-
 #include "MicroBooNE_BNB_NueCC0piNp_2022_XSec_1D_nu.h"
 #include "MicroBooNE_SignalDef.h"
 
@@ -61,7 +58,10 @@ MicroBooNE_BNB_NueCC0piNp_2022_XSec_1D_nu::MicroBooNE_BNB_NueCC0piNp_2022_XSec_1
   std::string descrip = name + " sample.\n"
                                "Target: Ar\n"
                                "Flux: BNB FHC Nue\n"
-                               "Signal: CC0piNp\n";
+                               "Signal: CC0piNp (Np measurements only)\n"
+                               "Reference: Phys. Rev. D 106, L051102 (2022)\n"
+                               "DOI: https://doi.org/10.1103/PhysRevD.106.L051102\n";
+
   fSettings.SetDescription(descrip);
   fSettings.SetTitle(name);
   fSettings.SetAllowedTypes("FULL,DIAG/FREE,SHAPE,FIX/SYSTCOV/STATCOV",

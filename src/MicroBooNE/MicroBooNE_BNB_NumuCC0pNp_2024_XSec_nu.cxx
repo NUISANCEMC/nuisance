@@ -34,7 +34,9 @@ MicroBooNE_BNB_NumuCC0pNp_2024_XSec_nu<D, Ds...>::MicroBooNE_BNB_NumuCC0pNp_2024
   std::string descrip = "MicroBooNE_BNB_NumuCC0pNp_2024_XSec_nu sample. \n"
                         "Target: Ar \n"
                         "Flux: BNB FHC numu \n"
-                        "Signal: CC 1Mu0pNp WireCell \n";
+                        "Signal: CC 1Mu0pNp WireCell \n"
+                        "Reference: Phys. Rev. Lett 133, 041801 (2024), Phys. Rev. D 110, 013006 (2024)\n"
+                        "DOI: https://doi.org/10.1103/PhysRevLett.133.041801, https://doi.org/10.1103/PhysRevD.110.013006\n";
 
   // Setup common settings
   fSettings = LoadSampleSettings(samplekey);

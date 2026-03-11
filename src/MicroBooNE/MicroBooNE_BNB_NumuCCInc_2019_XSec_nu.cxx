@@ -59,7 +59,9 @@ MicroBooNE_BNB_NumuCCInc_2019_XSec_nu::MicroBooNE_BNB_NumuCCInc_2019_XSec_nu(
   std::string descrip = "MicroBooNE_BNB_NumuCCInc_2019_XSec_nu sample. \n"
                         "Target: Ar \n"
                         "Flux: BNB FHC numu \n"
-                        "Signal: CC inclusive \n";
+                        "Signal: CC inclusive \n"
+                        "Reference: Phys. Rev. Lett. 123, 131801 (2019)\n"
+                        "DOI: https://doi.org/10.1103/PhysRevLett.123.131801\n";
 
   // Setup common settings
   fSettings = LoadSampleSettings(samplekey);

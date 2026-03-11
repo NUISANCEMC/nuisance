@@ -17,8 +17,6 @@
  *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 
-// MicroBooNE BNB nue CC0pi https://doi.org/10.1103/PhysRevD.106.L051102
-
 #include "MicroBooNE_BNB_NueCC0piProtonKE_2022_XSec_1D_nu.h"
 #include "MicroBooNE_SignalDef.h"
 
@@ -47,7 +45,10 @@ MicroBooNE_BNB_NueCC0piProtonKE_2022_XSec_1D_nu::MicroBooNE_BNB_NueCC0piProtonKE
   std::string descrip = name + " sample.\n"
                                "Target: Ar\n"
                                "Flux: BNB FHC Nue\n"
-                               "Signal: CC0pi 0p + Np\n";
+                               "Signal: CC0pi 0p + Np\n"
+                               "Reference: Phys. Rev. D 106, L051102 (2022)\n"
+                               "DOI: https://doi.org/10.1103/PhysRevD.106.L051102\n";
+
   fSettings.SetDescription(descrip);
   fSettings.SetTitle(name);
   fSettings.SetAllowedTypes("FULL,DIAG/FREE,SHAPE,FIX/SYSTCOV/STATCOV",

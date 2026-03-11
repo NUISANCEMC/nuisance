@@ -66,7 +66,9 @@ MicroBooNE_BNB_NumuCC0PiNp_2020_XSec_nu::MicroBooNE_BNB_NumuCC0PiNp_2020_XSec_nu
   std::string descrip = name + " sample.\n" \
                         "Target: Ar\n" \
                         "Flux: BNB FHC numu\n" \
-                        "Signal: CC1MuNp\n";
+                        "Signal: CC1MuNp\n"
+                        "Reference: Phys. Rev. D 102, 112013 (2020)\n"
+                        "DOI: https://doi.org/10.1103/PhysRevD.102.112013\n";
 
   fSettings.SetDescription(descrip);
   fSettings.SetTitle(name);
