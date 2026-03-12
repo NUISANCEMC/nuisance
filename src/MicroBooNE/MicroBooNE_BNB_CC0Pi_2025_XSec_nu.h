@@ -26,25 +26,13 @@
 #include <vector>
 
 #include "Measurement1D.h"
+#include "MicroBooNE_BNB_NumuCC0PiNp_2025_XSec_nu.h"
 
 #include <iostream>
 #include <fstream>
 #include "TH2D.h"
 
 class TH2D;
-
-struct MyCut {
-  MyCut( std::function< double(FitEvent*) > getter,
-    std::function< bool(double) > tester ) : getter_( getter ),
-    tester_( tester ) {}
-
-  std::function< double(FitEvent*) > getter_;
-  std::function< bool(double) > tester_;
-
-  inline bool evaluate( FitEvent* event ) const {
-    return tester_( getter_(event) );
-  }
-};
 
 class MicroBooNE_BNB_CC0Pi_2025_XSec_nu : public Measurement1D {
 
