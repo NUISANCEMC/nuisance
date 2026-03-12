@@ -8,10 +8,6 @@ public:
   T2K_CC1pip_CH_XSec_2Dpmucosmu_nu(nuiskey samplekey);
   virtual ~T2K_CC1pip_CH_XSec_2Dpmucosmu_nu() {};
 
-  // Functions to deal with the input data and covariance
-  //void SetDataValues(std::string fileLocation);
-  //void SetCovarMatrix(std::string covarFile);
-
   void FillEventVariables(FitEvent *event);
   bool isSignal(FitEvent *event);
 
@@ -21,8 +17,13 @@ public:
   void ConvertEventRates();
 
   private:
-    std::vector<TH1D*> fMCHist_Slices;
     std::vector<TH1D*> fDataHist_Slices;
+    std::vector<TH1D*> fMCHist_Slices;
+    std::vector<TH1D*> fMCHist_Slices_Fine;
+
+    std::vector<TrueModeStack*> fMCHist_Slices_Mode;
+    std::vector<TrueModeStack*> fMCHist_Slices_Fine_Mode;
+
     void FillMCSlice(double x, double y, double w);
     void SetHistograms();
 };

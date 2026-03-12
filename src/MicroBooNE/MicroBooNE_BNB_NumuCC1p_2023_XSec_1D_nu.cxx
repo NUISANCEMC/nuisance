@@ -19,9 +19,6 @@
 
 #include "MicroBooNE_BNB_NumuCC1p_2023_XSec_1D_nu.h"
 
-#include "TH1D.h"
-#include "TH2D.h"
-
 //********************************************************************
 MicroBooNE_BNB_NumuCC1p_2023_XSec_1D_nu::MicroBooNE_BNB_NumuCC1p_2023_XSec_1D_nu(
     nuiskey samplekey) {
@@ -31,7 +28,7 @@ MicroBooNE_BNB_NumuCC1p_2023_XSec_1D_nu::MicroBooNE_BNB_NumuCC1p_2023_XSec_1D_nu
   std::string name = fSettings.GetS("name");
   std::string objSuffix;
 
-  // work out which sample you need, and set axii
+  // work out which sample you need, and set axis
   if (!name.compare("MicroBooNE_CC1Mu1p_XSec_1DDeltaPT_nu")) {
     fDist = kDeltaPT;
     objSuffix = "DeltaPT";
