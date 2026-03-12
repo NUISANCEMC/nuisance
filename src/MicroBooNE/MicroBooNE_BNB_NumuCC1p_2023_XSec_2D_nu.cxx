@@ -18,7 +18,6 @@
  *******************************************************************************/
 
 #include "MicroBooNE_BNB_NumuCC1p_2023_XSec_2D_nu.h"
-#include "MicroBooNE_SignalDef.h"
 
 #include "TH1D.h"
 #include "TH2D.h"
@@ -273,9 +272,6 @@ MicroBooNE_BNB_NumuCC1p_2023_XSec_2D_nu::MicroBooNE_BNB_NumuCC1p_2023_XSec_2D_nu
   FinaliseMeasurement();
 }
 
-bool MicroBooNE_BNB_NumuCC1p_2023_XSec_2D_nu::isSignal(FitEvent *event) {
-  return SignalDef::MicroBooNE::isCC1Mu1p(event, EnuMin, EnuMax);
-}
 
 void MicroBooNE_BNB_NumuCC1p_2023_XSec_2D_nu::FillEventVariables(FitEvent *event) {
 
@@ -286,7 +282,7 @@ void MicroBooNE_BNB_NumuCC1p_2023_XSec_2D_nu::FillEventVariables(FitEvent *event
   }
 
   auto const &signal_proton =
-      *SignalDef::MicroBooNE::GetCC1Mu1pProtonsInPS(event).front();
+      *MicroBooNE_BNB_NumuCC1p_2023_XSec_1D_nu::GetCC1Mu1pProtonsInPS(event).front();
   TVector3 vpmu = event->GetHMFSParticle(13)->P3();
 
   // using definitions in

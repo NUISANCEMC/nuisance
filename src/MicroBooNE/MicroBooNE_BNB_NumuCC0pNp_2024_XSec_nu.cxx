@@ -18,7 +18,6 @@
  *******************************************************************************/
 
 #include "MicroBooNE_BNB_NumuCC0pNp_2024_XSec_nu.h"
-#include "MicroBooNE_SignalDef.h"
 
 #include "TH1D.h"
 #include "TH2D.h"

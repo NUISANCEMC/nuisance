@@ -18,7 +18,6 @@
 *******************************************************************************/
 
 #include "MicroBooNE_BNB_NumuCC0PiNp_2020_XSec_nu.h"
-#include "MicroBooNE_SignalDef.h"
 #include "TH2D.h"
 
 //********************************************************************
@@ -123,8 +122,31 @@ MicroBooNE_BNB_NumuCC0PiNp_2020_XSec_nu::MicroBooNE_BNB_NumuCC0PiNp_2020_XSec_nu
 
 
 bool MicroBooNE_BNB_NumuCC0PiNp_2020_XSec_nu::isSignal(FitEvent* event) {
-  return SignalDef::MicroBooNE::isCC1MuNp(event, EnuMin, EnuMax);
-};
+  // Check CC inclusive
+  if (!SignalDef::isCCINC(event, 14, EnuMin, EnuMax)) return false;
+
+  // Veto events which don't have exactly 1 FS muon
+  if (event->NumFSMuon() != 1) return false;
+
+  // Veto events with FS mesons
+  if (event->NumFSPions() != 0) return false;
+
+  // Veto events with FS electrons
+  if (event->NumFSElectron() != 0) return false;
+
+  // Veto events with FS photons
+  if (event->NumFSPhoton() != 0) return false;
+
+  // Muon momentum above threshold
+  if (event->GetHMFSParticle(13)->fP.Vect().Mag() < 100) return false;
+
+  // Leading proton within momentum range
+  if (event->NumFSParticle(2212) == 0) return false;
+  double plead = event->GetHMFSParticle(2212)->fP.Vect().Mag();
+  if (plead > 300 && plead < 1200) return true;
+
+  return false;
+}
 
 
 void MicroBooNE_BNB_NumuCC0PiNp_2020_XSec_nu::FillEventVariables(FitEvent* event) {

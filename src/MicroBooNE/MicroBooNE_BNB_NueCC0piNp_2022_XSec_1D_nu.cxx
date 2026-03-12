@@ -18,7 +18,6 @@
  *******************************************************************************/
 
 #include "MicroBooNE_BNB_NueCC0piNp_2022_XSec_1D_nu.h"
-#include "MicroBooNE_SignalDef.h"
 
 #include "TH1D.h"
 #include "TH2D.h"
@@ -88,7 +87,28 @@ MicroBooNE_BNB_NueCC0piNp_2022_XSec_1D_nu::MicroBooNE_BNB_NueCC0piNp_2022_XSec_1
 
 // check if event meets signal definition
 bool MicroBooNE_BNB_NueCC0piNp_2022_XSec_1D_nu::isSignal(FitEvent *event) {
-  return SignalDef::MicroBooNE::isNueCC0piNp(event, EnuMin, EnuMax);
+  // Check CC nue
+  if (!SignalDef::isCCINC(event, 12, EnuMin, EnuMax)) return false;
+
+  // Veto events which don't have exactly 1 FS electron
+  if (event->NumFSParticle(11) != 1 ) return false;
+
+  // Veto events where the electron doesn't have KE > 30 MeV
+  if (event->GetHMFSParticle(11)->KE() <= 30.0) return false;
+
+  // Veto events with neutral pions of any energy
+  if (event->NumFSParticle(111) != 0) return false;
+
+  // Veto events with charged pions with KE > 40MeV
+  if (event->NumFSParticle(211) != 0 && event->GetHMFSParticle(211)->KE() > 40.0) return false;
+  if (event->NumFSParticle(-211) != 0 && event->GetHMFSParticle(-211)->KE() > 40.0) return false;
+
+  // Np events must have at least 1 proton in FS with KE >= 50MeV
+  if (event->NumFSParticle(2212) == 0) return false;
+  if (event->GetHMFSParticle(2212)->KE() < 50.0) return false; 
+
+  // Events that pass selection are NueCC0piNp
+  return true;
 }
 
 void MicroBooNE_BNB_NueCC0piNp_2022_XSec_1D_nu::FillEventVariables(FitEvent *event) {  

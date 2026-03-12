@@ -26,6 +26,7 @@
 #include <fstream>
 
 class TH2D;
+class FitEvent;
 
 class MicroBooNE_BNB_NumuCC1p_2023_XSec_1D_nu : public Measurement1D {
 public:
@@ -35,8 +36,14 @@ public:
   /// Virtual Destructor
   ~MicroBooNE_BNB_NumuCC1p_2023_XSec_1D_nu() {};
 
+  /// NumuCC1p signal definition helpers
+  static std::vector<FitParticle*> GetCC1Mu1pProtonsInPS(FitEvent* event);
+  static bool isCC1pSignal(FitEvent* event, double EnuMin, double EnuMax);
+
   /// Apply signal definition
-  bool isSignal(FitEvent* nvect);
+  bool isSignal(FitEvent* event) {
+    return isCC1pSignal(event, EnuMin, EnuMax);
+  }
 
   /// Fill kinematic distributions
   void FillEventVariables(FitEvent* customEvent);

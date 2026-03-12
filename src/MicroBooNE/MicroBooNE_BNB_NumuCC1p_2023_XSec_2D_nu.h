@@ -21,6 +21,7 @@
 
 #include <TMatrixDfwd.h>
 #include "Measurement1D.h"
+#include "MicroBooNE_BNB_NumuCC1p_2023_XSec_1D_nu.h"
 
 #include <iostream>
 #include <fstream>
@@ -89,7 +90,9 @@ public:
   ~MicroBooNE_BNB_NumuCC1p_2023_XSec_2D_nu() {};
 
   /// Apply signal definition
-  bool isSignal(FitEvent* nvect);
+  bool isSignal(FitEvent* event) {
+    return MicroBooNE_BNB_NumuCC1p_2023_XSec_1D_nu::isCC1pSignal(event, EnuMin, EnuMax);
+  };
 
   /// Read histograms in a special way because format is different
   void SetHistograms();

@@ -18,7 +18,6 @@
  *******************************************************************************/
 
 #include "MicroBooNE_BNB_NumuCCInc_2023_XSec_3D_nu.h"
-#include "MicroBooNE_SignalDef.h"
 
 #include "TH1D.h"
 #include "TH2D.h"

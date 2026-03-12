@@ -57,6 +57,12 @@ public:
     fChi2LessBinHist = NULL;
   };
 
+  // Helper function that returns true if a given PDG code represents a meson or
+  // antimeson. Otherwise returns false. Based on points 10, 12, and 13 of the
+  // Particle Data Group's "Monte Carlo Particle Numbering Scheme"
+  // (2019 revision).
+  static bool isMesonOrAntimeson( int pdg_code );
+
   /// Apply signal definition
   bool isSignal( FitEvent* nvect ) override;
 

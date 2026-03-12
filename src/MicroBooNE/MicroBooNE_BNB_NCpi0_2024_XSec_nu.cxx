@@ -18,7 +18,6 @@
  *******************************************************************************/
 
 #include "MicroBooNE_BNB_NCpi0_2024_XSec_nu.h"
-#include "MicroBooNE_SignalDef.h"
 
 #include "TH1D.h"
 #include "TH2D.h"
@@ -105,8 +104,18 @@ bool MicroBooNE_BNB_NCpi0_2024_XSec_nu<D, Ds...>::isSignal(FitEvent *nvect)
 {
   // if we find anything other numu assume multiple species
   if(nvect->GetBeamNeutrinoPDG() != 14) fMultipleSpecies = 1;
-  return SignalDef::MicroBooNE::isNCpi0(nvect);
+
+  // Check that we have a NC event
+  int nu_pdg = nvect->GetBeamNeutrinoPDG();
+  if( !nvect->HasFSParticle(nu_pdg) ) return false;
+
+  // Check that we have a pi0 in ther right momentum range
+  if (nvect->NumFSParticle(111) != 1) return false;
+  double p = nvect->GetHMFSParticle(111)->fP.Vect().Mag();
+  if (p > 1200 || p<=0) return false;
+  return true;
 }
+
 
 //********************************************************************
 template <distribution_t D, distribution_t... Ds>

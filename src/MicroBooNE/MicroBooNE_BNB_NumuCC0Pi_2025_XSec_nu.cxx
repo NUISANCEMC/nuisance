@@ -20,7 +20,6 @@
 #include <fstream>
 
 #include "MicroBooNE_BNB_NumuCC0Pi_2025_XSec_nu.h"
-#include "MicroBooNE_SignalDef.h"
 #include "TMatrixD.h"
 
 namespace {
@@ -182,7 +181,32 @@ MicroBooNE_BNB_NumuCC0Pi_2025_XSec_nu::MicroBooNE_BNB_NumuCC0Pi_2025_XSec_nu( nu
 
 
 bool MicroBooNE_BNB_NumuCC0Pi_2025_XSec_nu::isSignal( FitEvent* event ) {
-   return SignalDef::MicroBooNE::isCC1Mu0pi_2025(event, EnuMin, EnuMax);
+  // Check CC inclusive
+  if (!SignalDef::isCCINC(event, 14, EnuMin, EnuMax)) return false;
+
+  // Veto events that don't have exactly 1 FS muon
+  if (event->NumFSMuon() != 1) return false;
+
+  // Muon momentum range
+  auto mu_mom = event->GetHMFSParticle(13)->fP.Vect().Mag();
+  if ((mu_mom < 100) || (mu_mom > 2000)) return false;
+
+  // Reject events with neutral pions of any momenta
+  if (event->NumFSParticle(111) != 0) return false;
+
+  // Reject events with positively charged pions above 70 MeV/c
+  if (event->NumFSParticle(211) != 0) {
+    double ppiplus = event->GetHMFSParticle(211)->fP.Vect().Mag();
+    if (ppiplus > 70) { return false; }
+  }
+
+  // Reject events with negatively charged pions above 70 MeV/c
+  if (event->NumFSParticle(-211) != 0) {
+    double ppiminus = event->GetHMFSParticle(-211)->fP.Vect().Mag();
+    if (ppiminus > 70) { return false; }
+  }
+
+  return true;
 }
 
 

@@ -18,7 +18,6 @@
  *******************************************************************************/
 
 #include "MicroBooNE_BNB_NueCC0piProtonKE_2022_XSec_1D_nu.h"
-#include "MicroBooNE_SignalDef.h"
 
 #include "TH1D.h"
 #include "TH2D.h"
@@ -75,7 +74,33 @@ MicroBooNE_BNB_NueCC0piProtonKE_2022_XSec_1D_nu::MicroBooNE_BNB_NueCC0piProtonKE
 
 // check if event meets signal definition
 bool MicroBooNE_BNB_NueCC0piProtonKE_2022_XSec_1D_nu::isSignal(FitEvent *event) {
-  return SignalDef::MicroBooNE::isNueCC0piProtonKE(event, EnuMin, EnuMax);
+  // Check CC nue
+  if (!SignalDef::isCCINC(event, 12, EnuMin, EnuMax)) return false;
+  
+  // Veto events which don't have exactly 1 FS electron
+  if (event->NumFSParticle(11) != 1 ) return false;
+  
+  // Veto events where the electron doesn't have KE > 30 MeV
+  if (event->GetHMFSParticle(11)->KE() <= 30.0) return false;
+  
+  // Veto events with neutral pions of any energy
+  if (event->NumFSParticle(111) != 0) return false;
+  
+  // Veto events with charged pions with KE > 40MeV
+  if (event->NumFSParticle(211) != 0 && event->GetHMFSParticle(211)->KE() > 40.0) return false;
+  if (event->NumFSParticle(-211) != 0 && event->GetHMFSParticle(-211)->KE() > 40.0) return false;
+
+  // Proton KE distribution includes Np and 0p events
+  // 0p events either have no final state proton or the leading proton has KE < 50MeV
+  if ((event->NumFSParticle(2212) != 0 && event->GetHMFSParticle(2212)->KE() < 50.) || event->NumFSParticle(2212) == 0 ) {
+    // additional phase space requirements on FS electron 
+    // Electron energy > 0.5 GeV and cos th_e > 0.6
+    TLorentzVector pe = event->GetHMFSParticle(11)->fP;
+    if (pe.E() <= 500. || pe.CosTheta() < 0.6 ) return false;
+  }
+  
+  // Events that pass selection are either NueCC0piNp or NueCC0pi0p
+  return true;
 }
 
 void MicroBooNE_BNB_NueCC0piProtonKE_2022_XSec_1D_nu::FillEventVariables(FitEvent *event) {

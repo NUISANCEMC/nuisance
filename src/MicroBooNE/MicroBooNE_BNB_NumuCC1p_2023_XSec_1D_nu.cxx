@@ -18,7 +18,6 @@
  *******************************************************************************/
 
 #include "MicroBooNE_BNB_NumuCC1p_2023_XSec_1D_nu.h"
-#include "MicroBooNE_SignalDef.h"
 
 #include "TH1D.h"
 #include "TH2D.h"
@@ -141,8 +140,45 @@ MicroBooNE_BNB_NumuCC1p_2023_XSec_1D_nu::MicroBooNE_BNB_NumuCC1p_2023_XSec_1D_nu
   FinaliseMeasurement();
 }
 
-bool MicroBooNE_BNB_NumuCC1p_2023_XSec_1D_nu::isSignal(FitEvent *event) {
-  return SignalDef::MicroBooNE::isCC1Mu1p(event, EnuMin, EnuMax);
+std::vector<FitParticle*> MicroBooNE_BNB_NumuCC1p_2023_XSec_1D_nu::GetCC1Mu1pProtonsInPS(FitEvent* event){
+  std::vector<FitParticle*> protons_in_ps;
+  for (auto proton : event->GetAllFSParticle(2212)) {
+    double mom = proton->p();
+    if (mom > 300 && mom < 1000) { protons_in_ps.push_back(proton); }
+  }
+  return protons_in_ps;
+}
+
+bool MicroBooNE_BNB_NumuCC1p_2023_XSec_1D_nu::isCC1pSignal(FitEvent *event, double EnuMin, double EnuMax) {
+  // Check CC inclusive
+  if (!SignalDef::isCCINC(event, 14, EnuMin, EnuMax)) return false;
+
+  // Veto events which don't have exactly 1 FS muon
+  if (event->NumFSMuon() != 1) return false;
+
+  // Muon momentum range
+  auto mu_mom = event->GetHMFSParticle(13)->p();
+  if ((mu_mom < 100) || (mu_mom > 1200)) return false;
+
+  // Check for only a single proton in the momentum PS
+  if (GetCC1Mu1pProtonsInPS(event).size() != 1) { return false; }
+
+  // Reject events with neutral pions of any momenta
+  if (event->NumFSParticle(111) != 0) return false;
+
+  // Reject events with positively charged pions above 70 MeV/c
+  if (event->NumFSParticle(211) != 0) {
+    double ppiplus = event->GetHMFSParticle(211)->p();
+    if (ppiplus > 70) { return false; }
+  }
+
+  // Reject events with negatively charged pions above 70 MeV/c
+  if (event->NumFSParticle(-211) != 0) {
+    double ppiminus = event->GetHMFSParticle(-211)->p();
+    if (ppiminus > 70) { return false; }
+  }
+
+  return true;
 }
 
 void MicroBooNE_BNB_NumuCC1p_2023_XSec_1D_nu::FillEventVariables(FitEvent *event) {
@@ -153,8 +189,7 @@ void MicroBooNE_BNB_NumuCC1p_2023_XSec_1D_nu::FillEventVariables(FitEvent *event
     return;
   }
 
-  auto const &signal_proton =
-      *SignalDef::MicroBooNE::GetCC1Mu1pProtonsInPS(event).front();
+  auto const &signal_proton = *GetCC1Mu1pProtonsInPS(event).front();
   TVector3 vpmu = event->GetHMFSParticle(13)->P3();
 
   // using definitions in
