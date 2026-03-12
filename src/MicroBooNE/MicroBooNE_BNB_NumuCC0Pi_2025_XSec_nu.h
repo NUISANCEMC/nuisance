@@ -34,15 +34,15 @@
 
 class TH2D;
 
-class MicroBooNE_BNB_CC0Pi_2025_XSec_nu : public Measurement1D {
+class MicroBooNE_BNB_NumuCC0Pi_2025_XSec_nu : public Measurement1D {
 
 public:
 
   /// Basic Constructor.
-  MicroBooNE_BNB_CC0Pi_2025_XSec_nu( nuiskey samplekey );
+  MicroBooNE_BNB_NumuCC0Pi_2025_XSec_nu( nuiskey samplekey );
 
   /// Virtual Destructor
-  inline ~MicroBooNE_BNB_CC0Pi_2025_XSec_nu() {
+  inline ~MicroBooNE_BNB_NumuCC0Pi_2025_XSec_nu() {
     fResidualHist = NULL;
     fChi2LessBinHist = NULL;
   };

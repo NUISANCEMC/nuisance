@@ -20,7 +20,7 @@
 #include <fstream>
 #include <set>
 
-#include "MicroBooNE_BNB_CC0Pi_2025_XSec_nu.h"
+#include "MicroBooNE_BNB_NumuCC0Pi_2025_XSec_nu.h"
 #include "MicroBooNE_SignalDef.h"
 #include "TMatrixD.h"
 
@@ -88,10 +88,10 @@ void ApplyBinWidthNorm(StackBase* stack, std::map<int, double>& BinWidthMap);
 /////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////                                            
-MicroBooNE_BNB_CC0Pi_2025_XSec_nu::MicroBooNE_BNB_CC0Pi_2025_XSec_nu( nuiskey samplekey )
+MicroBooNE_BNB_NumuCC0Pi_2025_XSec_nu::MicroBooNE_BNB_NumuCC0Pi_2025_XSec_nu( nuiskey samplekey )
 {
 
-  std::cout<<"inside::MicroBooNE_BNB_CC0Pi_2025_XSec_nu"<< std::endl;
+  std::cout<<"inside::MicroBooNE_BNB_NumuCC0Pi_2025_XSec_nu"<< std::endl;
   
   fSettings = LoadSampleSettings( samplekey );
   std::string name = fSettings.GetS( "name" );
@@ -258,13 +258,13 @@ MicroBooNE_BNB_CC0Pi_2025_XSec_nu::MicroBooNE_BNB_CC0Pi_2025_XSec_nu( nuiskey sa
 /////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////
-bool MicroBooNE_BNB_CC0Pi_2025_XSec_nu::isSignal( FitEvent* event ) {
+bool MicroBooNE_BNB_NumuCC0Pi_2025_XSec_nu::isSignal( FitEvent* event ) {
    return SignalDef::MicroBooNE::isCC1Mu0pi_2025(event, EnuMin, EnuMax);
 }
 /////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////
-void MicroBooNE_BNB_CC0Pi_2025_XSec_nu::FillEventVariables( FitEvent* event ) {
+void MicroBooNE_BNB_NumuCC0Pi_2025_XSec_nu::FillEventVariables( FitEvent* event ) {
 
   // Clear out the vector of passing bins, which may have already been filled
   // for the previous event
@@ -296,7 +296,7 @@ void MicroBooNE_BNB_CC0Pi_2025_XSec_nu::FillEventVariables( FitEvent* event ) {
 /////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////
-void MicroBooNE_BNB_CC0Pi_2025_XSec_nu::LoadBinDefinitions(std::string binning_file_name) {
+void MicroBooNE_BNB_NumuCC0Pi_2025_XSec_nu::LoadBinDefinitions(std::string binning_file_name) {
 
 
   std::cout<<"inside::LoadBinDefinitions"<<std::endl;
@@ -398,7 +398,7 @@ void MicroBooNE_BNB_CC0Pi_2025_XSec_nu::LoadBinDefinitions(std::string binning_f
 /////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////
-void MicroBooNE_BNB_CC0Pi_2025_XSec_nu::FillHistograms() {
+void MicroBooNE_BNB_NumuCC0Pi_2025_XSec_nu::FillHistograms() {
 
   if ( !Signal ) return;
 
@@ -435,7 +435,7 @@ void MicroBooNE_BNB_CC0Pi_2025_XSec_nu::FillHistograms() {
 /////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////
-void MicroBooNE_BNB_CC0Pi_2025_XSec_nu::ConvertEventRates() {
+void MicroBooNE_BNB_NumuCC0Pi_2025_XSec_nu::ConvertEventRates() {
   // Do the standard conversion
   // TODO: Restore use of A_C once you make sure you aren't double-counting it
   //// Build a column vector using the predicted cross sections
@@ -495,11 +495,11 @@ void MicroBooNE_BNB_CC0Pi_2025_XSec_nu::ConvertEventRates() {
 
 }
 
-double MicroBooNE_BNB_CC0Pi_2025_XSec_nu::GetLikelihood() {
+double MicroBooNE_BNB_NumuCC0Pi_2025_XSec_nu::GetLikelihood() {
 
   if ( fNoData || !fDataHist ) return 0.;
 
-   std::cout<<"inside ::MicroBooNE_BNB_CC0Pi_2025_XSec_nu::GetLikelihood "<< std::endl;
+   std::cout<<"inside ::MicroBooNE_BNB_NumuCC0Pi_2025_XSec_nu::GetLikelihood "<< std::endl;
    
    auto CheckingfDataHist = CheckHist(fDataHist );
    auto CheckingMCHist = CheckHist(fMCHist );
@@ -508,7 +508,7 @@ double MicroBooNE_BNB_CC0Pi_2025_XSec_nu::GetLikelihood() {
   // Apply Masking to MC if Required.
   if ( fIsMask and fMaskHist ) {
     NUIS_ERR(FTL, "Bin masks not yet supported by"
-      " the MicroBooNE_BNB_CC0Pi_2025_XSec_nu sample" );
+      " the MicroBooNE_BNB_NumuCC0Pi_2025_XSec_nu sample" );
     //PlotUtils::MaskBins(fMCHist, fMaskHist);
   } 
   
@@ -519,7 +519,7 @@ double MicroBooNE_BNB_CC0Pi_2025_XSec_nu::GetLikelihood() {
   if ( fIsChi2 ) {
     if ( fIsNS ) {
       NUIS_ERR(FTL, "Norm-shape covariance not yet supported by"
-        " the MicroBooNE_BNB_CC0Pi_2025_XSec_nu sample" );
+        " the MicroBooNE_BNB_NumuCC0Pi_2025_XSec_nu sample" );
     }
     stat = StatUtils::GetChi2FromCov( fDataHist, fMCHist, covar, NULL, 1.0,
       1.0, fIsWriting ? fResidualHist : NULL );
