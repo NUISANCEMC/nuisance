@@ -33,6 +33,7 @@ MicroBooNE_BNB_NumuCCInc_2023_XSec_3D_nu::MicroBooNE_BNB_NumuCCInc_2023_XSec_3D_
                         "Target: Ar \n"
                         "Flux: BNB FHC numu \n"
                         "Signal: CC 1Mu3DInc WireCell \n"
+                        "Contact: microboone_info@fnal.gov\n"
                         "Reference: Phys. Lett. B 870, 139939 (2025)\n"
                         "DOI: https://doi.org/10.1016/j.physletb.2025.139939\n";
 

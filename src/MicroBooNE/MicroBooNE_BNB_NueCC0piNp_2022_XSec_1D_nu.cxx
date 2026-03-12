@@ -58,6 +58,7 @@ MicroBooNE_BNB_NueCC0piNp_2022_XSec_1D_nu::MicroBooNE_BNB_NueCC0piNp_2022_XSec_1
                                "Target: Ar\n"
                                "Flux: BNB FHC Nue\n"
                                "Signal: CC0piNp (Np measurements only)\n"
+                               "Contact: microboone_info@fnal.gov\n"
                                "Reference: Phys. Rev. D 106, L051102 (2022)\n"
                                "DOI: https://doi.org/10.1103/PhysRevD.106.L051102\n";
 

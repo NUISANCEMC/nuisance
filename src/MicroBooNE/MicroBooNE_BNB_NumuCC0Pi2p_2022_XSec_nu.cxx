@@ -110,6 +110,7 @@ MicroBooNE_BNB_NumuCC0Pi2p_2022_XSec_nu::MicroBooNE_BNB_NumuCC0Pi2p_2022_XSec_nu
                         "Target: Ar\n" \
                         "Flux: BNB numu\n" \
                         "Signal: CC1mu2p0pi\n"
+                        "Contact: microboone_info@fnal.gov\n"
                         "Reference: Phys. Lett. B 872, 140052 (2026) \n"
                         "DOI: https://doi.org/10.1016/j.physletb.2025.140052 \n";
 

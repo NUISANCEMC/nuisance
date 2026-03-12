@@ -34,6 +34,7 @@ MicroBooNE_BNB_NCpi0_2024_XSec_nu<D, Ds...>::MicroBooNE_BNB_NCpi0_2024_XSec_nu(
                         "Target: Ar \n"
                         "Flux: BNB FHC numu \n"
                         "Signal: NCpi0 WireCell \n"
+                        "Contact: microboone_info@fnal.gov \n"
                         "Reference: Phys. Rev. Lett 134, 161802 (2025) \n"
                         "DOI: https://doi.org/10.1103/PhysRevLett.134.161802 \n";
 

@@ -92,6 +92,7 @@ MicroBooNE_BNB_NumuCC1p_2023_XSec_1D_nu::MicroBooNE_BNB_NumuCC1p_2023_XSec_1D_nu
                                "Target: Ar\n"
                                "Flux: BNB FHC numu\n"
                                "Signal: CC1Mu1p\n"
+                               "Contact: microboone_info@fnal.gov\n"
                                "Reference: Phys. Rev. Lett 131, 101802 (2023), Phys. Rev. D 108, 053002 (2023)\n"
                                "DOI: https://doi.org/10.1103/PhysRevLett.131.101802, https://doi.org/10.1103/PhysRevD.108.053002\n";
 
