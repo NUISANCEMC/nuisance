@@ -60,18 +60,50 @@ void T2K_CC1pip_CH_XSec_2Dpmucosmu_nu::SetHistograms() {
     TH1D *slice = (TH1D *)data->Get(Form("%s_%i", dataname.c_str(), i));
     slice = (TH1D *)slice->Clone((fName + Form("_data_Slice%i", i)).c_str());
     slice->Scale(1E-38);
-    slice->GetXaxis()->SetTitle("p_{#mu}");
+    slice->GetXaxis()->SetTitle("p_{#mu} (GeV/c)");
     slice->GetYaxis()->SetTitle(fSettings.GetYTitle().c_str());
     fDataHist_Slices.push_back(slice);
+
     fMCHist_Slices.push_back(
         (TH1D *)slice->Clone((fName + Form("_MC_Slice%i", i)).c_str()));
+    
     SetAutoProcessTH1(fDataHist_Slices[i], kCMD_Write);
     SetAutoProcessTH1(fMCHist_Slices[i]);
+
     fMCHist_Slices[i]->Reset();
     fMCHist_Slices[i]->SetLineColor(kRed);
-    //nbins += slice->GetXaxis()->GetNbins();
+
     // Skip the highest momentum bin because it's rubbish
     nbins += slice->GetXaxis()->GetNbins() - 1;
+
+    // Have our fMCHist_Slices now, make the mode histograms and finely binned histograms
+    fMCHist_Slices_Mode.push_back(new TrueModeStack(Form("%s_Slice%i_MODES", fSettings.GetName().c_str(), int(i)), ("True Channels"), fMCHist_Slices[i]));
+
+    // Make the fine and mode histograms
+    std::string titles = fSettings.GetFullTitles();
+    fMCHist_Slices_Fine.push_back(new TH1D(
+          Form("%s_MC_Slice%i_FINE", fName.c_str(), i), 
+          Form("%s_MC_Slice%i_FINE%s", fName.c_str(), i, titles.c_str()), 
+          100, 
+          fMCHist_Slices[i]->GetXaxis()->GetBinLowEdge(1), 
+          fMCHist_Slices[i]->GetXaxis()->GetBinLowEdge(fMCHist_Slices[i]->GetXaxis()->GetNbins()+1)));
+
+    fMCHist_Slices_Fine_Mode.push_back(new TrueModeStack(Form("%s_Slice%i_MODES_FINE", fSettings.GetName().c_str(), int(i)), ("True Channels"), fMCHist_Slices_Fine[i]));
+
+    SetAutoProcessTH1(fMCHist_Slices_Fine[i]);
+    SetAutoProcessTH1(fMCHist_Slices_Mode[i], kCMD_Write);
+    SetAutoProcessTH1(fMCHist_Slices_Fine_Mode[i], kCMD_Write);
+
+    fMCHist_Slices_Fine[i]->GetXaxis()->SetTitle("p_{#mu} (GeV/c)");
+    //fMCHist_Slices_Mode[i]->GetXaxis()->SetTitle("p_{#mu} (GeV/c)");
+    //fMCHist_Slices_Fine_Mode[i]->GetXaxis()->SetTitle("p_{#mu} (GeV/c)");
+
+    // Auto-process each individual mode histogram, only scale (get written above)
+    for (size_t j = 0; j < fMCHist_Slices_Mode[i]->fAllLabels.size(); ++j) {
+      SetAutoProcessTH1(fMCHist_Slices_Mode[i]->fAllHists[j], kCMD_Scale, kCMD_Norm, kCMD_Reset);
+      SetAutoProcessTH1(fMCHist_Slices_Fine_Mode[i]->fAllHists[j], kCMD_Scale, kCMD_Norm, kCMD_Reset);
+    }
+
   }
 
   fDataHist = new TH1D(dataname.c_str(), dataname.c_str(), nbins, 0, nbins);
@@ -80,9 +112,8 @@ void T2K_CC1pip_CH_XSec_2Dpmucosmu_nu::SetHistograms() {
   for (int i = 0; i < nslices; ++i) {
     // Skip the highest momentum bin because it's rubbish
     for (int j = 0; j < fDataHist_Slices[i]->GetXaxis()->GetNbins() - 1; ++j) {
-    //for (int j = 0; j < fDataHist_Slices[i]->GetXaxis()->GetNbins(); ++j) {
       fDataHist->SetBinContent(bincount,
-                               fDataHist_Slices[i]->GetBinContent(j + 1));
+          fDataHist_Slices[i]->GetBinContent(j + 1));
       fDataHist->SetBinError(bincount, fDataHist_Slices[i]->GetBinError(j + 1));
       TString title;
       if (j == 0) {
@@ -98,8 +129,8 @@ void T2K_CC1pip_CH_XSec_2Dpmucosmu_nu::SetHistograms() {
         }
       }
       title +=
-          Form("p_{#mu}=%.2f-%.2f", fDataHist_Slices[i]->GetBinLowEdge(j + 1),
-               fDataHist_Slices[i]->GetBinLowEdge(j + 2));
+        Form("p_{#mu}=%.2f-%.2f", fDataHist_Slices[i]->GetBinLowEdge(j + 1),
+            fDataHist_Slices[i]->GetBinLowEdge(j + 2));
       fDataHist->GetXaxis()->SetBinLabel(bincount, title);
       bincount++;
     }
@@ -109,11 +140,10 @@ void T2K_CC1pip_CH_XSec_2Dpmucosmu_nu::SetHistograms() {
 
   // Get the covariance
   TMatrixDSym *temp = StatUtils::GetCovarFromRootFile(fSettings.GetCovarInput(),
-                                                      "Covariance_pmu_thetamu");
+      "Covariance_pmu_thetamu");
   int ncovbins = temp->GetNrows();
-    // Skip the highest momentum bin because it's rubbish
+  // Skip the highest momentum bin because it's rubbish
   fFullCovar = new TMatrixDSym(ncovbins - 4);
-  //fFullCovar = new TMatrixDSym(ncovbins);
   if (fFullCovar->GetNrows() != fDataHist->GetXaxis()->GetNbins()*fDataHist->GetYaxis()->GetNbins()) {
     NUIS_ERR(FTL, "Number of bins in covariance matrix does not match data");
   }
@@ -121,13 +151,11 @@ void T2K_CC1pip_CH_XSec_2Dpmucosmu_nu::SetHistograms() {
   // Number of costhetamu slices is nslices
   // Number of pmu slices is
   int count1 = 0;
-    // Skip the highest momentum bin because it's rubbish
+  // Skip the highest momentum bin because it's rubbish
   for (int i = 0; i < ncovbins - 4; ++i) {
-  //for (int i = 0; i < ncovbins; ++i) {
     int count2 = 0;
     // Skip the highest momentum bin because it's rubbish
     for (int j = 0; j < ncovbins - 4; ++j) {
-    //for (int j = 0; j < ncovbins; ++j) {
       // 1E79 matched to diagonal error
       (*fFullCovar)(count1, count2) = (*temp)(i, j);
       count2++;
@@ -164,16 +192,29 @@ void T2K_CC1pip_CH_XSec_2Dpmucosmu_nu::ConvertEventRates() {
   const int nslices = 4;
   for (int i = 0; i < nslices; i++) {
     fMCHist_Slices[i]->GetSumw2();
+    fMCHist_Slices_Fine[i]->GetSumw2();
+    for (size_t j = 0; j < fMCHist_Slices_Mode[i]->fAllLabels.size(); ++j) {
+      fMCHist_Slices_Mode[i]->fAllHists[j]->GetSumw2();
+      fMCHist_Slices_Fine_Mode[i]->fAllHists[j]->GetSumw2();
+    }
   }
 
   // Do standard conversion.
   Measurement1D::ConvertEventRates();
 
   // First scale MC slices also by their width in Y and Z
-  fMCHist_Slices[0]->Scale(1.0 / 0.80);
-  fMCHist_Slices[1]->Scale(1.0 / 0.05);
-  fMCHist_Slices[2]->Scale(1.0 / 0.05);
-  fMCHist_Slices[3]->Scale(1.0 / 0.10);
+  for (int i = 0; i < nslices; ++i) {
+    double scaling = 1;
+    if      (i == 0) scaling = 1.0/0.80;
+    else if (i == 1) scaling = 1.0/0.05;
+    else if (i == 2) scaling = 1.0/0.05;
+    else if (i == 3) scaling = 1.0/0.10;
+
+    fMCHist_Slices[i]->Scale(scaling);
+    fMCHist_Slices_Fine[i]->Scale(scaling);
+    fMCHist_Slices_Mode[i]->Scale(scaling);
+    fMCHist_Slices_Fine_Mode[i]->Scale(scaling);
+  }
 
   // Now Convert into 1D list
   fMCHist->Reset();
@@ -187,22 +228,34 @@ void T2K_CC1pip_CH_XSec_2Dpmucosmu_nu::ConvertEventRates() {
 }
 
 void T2K_CC1pip_CH_XSec_2Dpmucosmu_nu::FillMCSlice(double pmu, double cosmu,
-                                                   double weight) {
+    double weight) {
+  int bin = -1;
   // Hard code the bin edges in here
   if (cosmu < 0.8) {
-    fMCHist_Slices[0]->Fill(pmu, weight);
+    bin = 0;
   } else if (cosmu > 0.8 && cosmu < 0.85) {
-    fMCHist_Slices[1]->Fill(pmu, weight);
+    bin = 1;
   } else if (cosmu > 0.85 && cosmu < 0.90) {
-    fMCHist_Slices[2]->Fill(pmu, weight);
+    bin = 2;
   } else if (cosmu > 0.90 && cosmu < 1.00) {
-    fMCHist_Slices[3]->Fill(pmu, weight);
+    bin = 3;
   }
+
+  if (bin == -1) {
+    std::cerr << "Bin -1 for event " << pmu << " " << cosmu << std::endl;
+    throw;
+  }
+
+  fMCHist_Slices[bin]->Fill(pmu, weight);
+  fMCHist_Slices_Fine[bin]->Fill(pmu, weight);
+  fMCHist_Slices_Mode[bin]->Fill(Mode, pmu, weight);
+  fMCHist_Slices_Fine_Mode[bin]->Fill(Mode, pmu, weight);
+
 };
 
 //********************************************************************
 bool T2K_CC1pip_CH_XSec_2Dpmucosmu_nu::isSignal(FitEvent *event) {
   //********************************************************************
   return SignalDef::isCC1pip_T2K_arxiv1909_03936(event, EnuMin, EnuMax,
-                                                 SignalDef::kMuonFwd);
+      SignalDef::kMuonFwd);
 };
