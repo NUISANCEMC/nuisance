@@ -18,128 +18,89 @@
 *******************************************************************************/
 
 #include <fstream>
-#include <set>
 
 #include "MicroBooNE_BNB_NumuCC0Pi_2025_XSec_nu.h"
 #include "MicroBooNE_SignalDef.h"
 #include "TMatrixD.h"
 
 namespace {
-  constexpr int MASS_NUMBER_40AR = 40;
-  constexpr int PROTON = 2212;
-  constexpr int MU_MINUS = 13;
-
-  constexpr double TARGET_MASS = 37.215526; // 40Ar, GeV
-  constexpr double NEUTRON_MASS = 0.93956541; // GeV
-  constexpr double PROTON_MASS = 0.93827208; // GeV
-  constexpr double MUON_MASS = 0.10565837; // GeV
-  constexpr double BINDING_ENERGY = 0.02478; // 40Ar, GeV
-
-/////////////////////////////////////////////////////////////////////
-// 2D Binning Map for Bin Width Norming when the input is a function of Bin Number 
-/////////////////////////////////////////////////////////////////////
-
-std::map<int, double> BinWidthMap = {
-
-{1,   0.063},
-{2,   0.077},
-{3,   0.063},
-{4,   0.077},
-{5,   0.027},
-{6,   0.018},
-{7,   0.015},
-{8,   0.015},
-{9,   0.012},
-{10,   0.015},
-{11,   0.018},
-{12,   0.048},
-{13,   0.024},
-{14,   0.016},
-{15,   0.02},
-{16,   0.012},
-{17,   0.016},
-{18,   0.012},
-{19,   0.012},
-{20,   0.1},
-{21,   0.05},
-{22,   0.015},
-{23,   0.015},
-{24,   0.012},
-{25,   0.008},
-{26,   0.33},
-{27,   0.033},
-{28,   0.033},
-{29,   0.0165},
-{30,   0.0165},
-{31,   0.011},
-{32,   0.28125},
-{33,   0.01125},
-{34,   0.0075},
-{35,   2.185},
-{36,   0.0575},
-{37,   0.0575}
-
-};
-
+  // 2D Binning Map for Bin Width Norming when the input is a function of Bin Number
+  std::map<int, double> BinWidthMap = {
+    {1,   0.063},
+    {2,   0.077},
+    {3,   0.063},
+    {4,   0.077},
+    {5,   0.027},
+    {6,   0.018},
+    {7,   0.015},
+    {8,   0.015},
+    {9,   0.012},
+    {10,   0.015},
+    {11,   0.018},
+    {12,   0.048},
+    {13,   0.024},
+    {14,   0.016},
+    {15,   0.02},
+    {16,   0.012},
+    {17,   0.016},
+    {18,   0.012},
+    {19,   0.012},
+    {20,   0.1},
+    {21,   0.05},
+    {22,   0.015},
+    {23,   0.015},
+    {24,   0.012},
+    {25,   0.008},
+    {26,   0.33},
+    {27,   0.033},
+    {28,   0.033},
+    {29,   0.0165},
+    {30,   0.0165},
+    {31,   0.011},
+    {32,   0.28125},
+    {33,   0.01125},
+    {34,   0.0075},
+    {35,   2.185},
+    {36,   0.0575},
+    {37,   0.0575}
+  };
 }
 
 void ApplySmearing(StackBase* stack, TMatrixD* fAddSmear);
+
 void ApplyBinWidthNorm(StackBase* stack, std::map<int, double>& BinWidthMap);
-/////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////                                            
+
 MicroBooNE_BNB_NumuCC0Pi_2025_XSec_nu::MicroBooNE_BNB_NumuCC0Pi_2025_XSec_nu( nuiskey samplekey )
 {
-
-  std::cout<<"inside::MicroBooNE_BNB_NumuCC0Pi_2025_XSec_nu"<< std::endl;
-  
   fSettings = LoadSampleSettings( samplekey );
   std::string name = fSettings.GetS( "name" );
 
-   std::cout<<"Input Sample Name: "<< name<< std::endl;
-
-  // The main histograms use the bin number on the x-axis
-
   std::string data_file_name;
   std::string binning_file_name;
-  std::string Type; 
+  std::string Type;
 
-  if ( !name.compare("MicroBooNE_BNB_CC0Pi_2025_XSec_2D_nu") ) {
-      is2D = true; 
-      fSettings.SetYTitle( "#sigma (cm^{2}/^{40}Ar)" );
-      fSettings.SetXTitle( "bin number" );
-  
-       data_file_name = FitPar::GetDataBase()+  "MicroBooNE/CC0pi_2025/2D/Extracted2DCrossSection_MicroBooNE_CC0PiSelection_BinningScheme1.root" ;
-    
-       binning_file_name =  FitPar::GetDataBase() + "MicroBooNE/CC0pi_2025/2D/bin_defsCC0pi_2025.txt" ;
-    
-       Type = "2D Costheta vs MuonMomentum (bin widths defined by Bin Number) : 37 bins";
+  if (!name.compare("MicroBooNE_BNB_CC0Pi_2025_XSec_2D_nu")) {
+    is2D = true;
+    fSettings.SetYTitle( "#sigma (cm^{2}/^{40}Ar)" );
+    fSettings.SetXTitle( "bin number" );
+    data_file_name = FitPar::GetDataBase() + "MicroBooNE/CC0pi_2025/2D/Extracted2DCrossSection_MicroBooNE_CC0PiSelection_BinningScheme1.root";
+    binning_file_name =  FitPar::GetDataBase() + "MicroBooNE/CC0pi_2025/2D/bin_defsCC0pi_2025.txt";
+    Type = "2D Costheta vs MuonMomentum : 37 bins";
   }
   else if (!name.compare("MicroBooNE_BNB_CC0Pi_2025_XSec_1Dpmu_nu")) {
-        is2D = false; 
-  
-        data_file_name = FitPar::GetDataBase()+ "MicroBooNE/CC0pi_2025/1D/Extracted1DCrossSection_MicroBooNE_CC0PiSelection_2025_MuonMomentum.root" ;
-  
-        binning_file_name =  FitPar::GetDataBase()+ "MicroBooNE/CC0pi_2025/1D/Muon_1D_CC0Pi_2025_bining_MuonMomentum.txt" ;
-
-        Type = "1D MuonMomentum : 14 bins";
-    
-  } 
-   else if (!name.compare("MicroBooNE_BNB_CC0Pi_2025_XSec_1Dcostheta_nu")) {
-    is2D = false; 
-  
-     data_file_name =  FitPar::GetDataBase()
-    +  "MicroBooNE/CC0pi_2025/1D/Extracted1DCrossSection_MicroBooNE_CC0PiSelection_2025_MuonCosTheta.root" ;
-    
-     binning_file_name =  FitPar::GetDataBase()
-    + "MicroBooNE/CC0pi_2025/1D/Muon_1D_CC0Pi_2025_bining_MuonCosTheta.txt" ;
-    
-    Type = "1D Costheta : (29 bins)";
-    
+    is2D = false;
+    data_file_name = FitPar::GetDataBase() + "MicroBooNE/CC0pi_2025/1D/Extracted1DCrossSection_MicroBooNE_CC0PiSelection_2025_MuonMomentum.root";
+    binning_file_name =  FitPar::GetDataBase() + "MicroBooNE/CC0pi_2025/1D/Muon_1D_CC0Pi_2025_bining_MuonMomentum.txt";
+    Type = "1D MuonMomentum : 14 bins";
   }
-  
+  else if (!name.compare("MicroBooNE_BNB_CC0Pi_2025_XSec_1Dcostheta_nu")) {
+    is2D = false;
+    data_file_name = FitPar::GetDataBase() + "MicroBooNE/CC0pi_2025/1D/Extracted1DCrossSection_MicroBooNE_CC0PiSelection_2025_MuonCosTheta.root";
+    binning_file_name =  FitPar::GetDataBase() + "MicroBooNE/CC0pi_2025/1D/Muon_1D_CC0Pi_2025_bining_MuonCosTheta.txt";
+    Type = "1D Costheta : (29 bins)";
+  }
   else {
-  std::cout<<" DIDN't FIND Name :  "<< name << std::endl; 
+    std::cout << "Invalid sample name: " << name << std::endl;
     assert( false );
   }
 
@@ -147,77 +108,48 @@ MicroBooNE_BNB_NumuCC0Pi_2025_XSec_nu::MicroBooNE_BNB_NumuCC0Pi_2025_XSec_nu( nu
   std::string descrip = name + " sample.\n" \
                         "Target: Ar\n" \
                         "Flux: BNB FHC numu\n" \
-                        "reference: https://arxiv.org/abs/2507.00921\n" \
-                        "Signal: CC0pi (yr 2025)\n" \
-                         + Type + "\n";
-                        
-  std::cout<<"descrip - Sample:: "<< descrip<<std::endl;
+                        "Signal: CC0pi\n" \
+                         + Type + "\n"
+                        "Contact: microboone_info@fnal.gov\n" \
+                        "Reference: Phys. Rev. D 112, 072007 (2025)\n" \
+                        "DOI: https://doi.org/10.1103/xfs2-94m3\n";
 
   fSettings.SetDescription( descrip );
   fSettings.SetTitle( name );
   fSettings.SetAllowedTypes( "FULL", "FIX/FULL" );
-  fSettings.SetEnuRange( 0.0, 10 ); /// using range we flux intergered 
+  fSettings.SetEnuRange( 0.0, 10 );
   fSettings.DefineAllowedTargets( "Ar" );
   fSettings.DefineAllowedSpecies( "numu" );
   FinaliseSampleSettings();
 
-  // Scale factor for the flux-averaged total cross section
-  // (10^{-38} cm^2 / Ar) in each bin
-  fScaleFactor =  MASS_NUMBER_40AR * GetEventHistogram()->Integral( "width" ) / (double)fNEvents / TotalIntegratedFlux();
-  
-    
+  // Scale factor for the flux-averaged total cross section (10^{-38} cm^2 / Ar) in each bin
+  fScaleFactor = 40 * GetEventHistogram()->Integral( "width" ) / (double)fNEvents / TotalIntegratedFlux();
 
   // Get bin definitions
   this->LoadBinDefinitions(binning_file_name);
 
-  if (is2D) {
-    std::cout << "is2D is set to true (2D mode enabled)." << std::endl;
-   } else {
-       std::cout << "is2D is set to false (1D mode enabled)." << std::endl;
-   }
-
-    
-  std::cout<<"Getting Root file from: "<< data_file_name<< std::endl;
-
   // Load the additional smearing matrix
-  TMatrixD* A_C = StatUtils::GetMatrixFromRootFile( data_file_name,
-    "AC_Matrix" );
-    
-    
+  TMatrixD* A_C = StatUtils::GetMatrixFromRootFile( data_file_name, "AC_Matrix" );
   fAddSmear.reset( A_C );
 
-
-
   // Load the measured data points
-  fDataHist = PlotUtils::GetTH1DFromRootFile( data_file_name,
-    "h_ExtractedCrossSectionUnfoldedData" );
-   bool check_fDataHist = CheckHist(fDataHist);
-   
-   
-    if (!check_fDataHist) {
-     std::cout<<"~~ERROR~~ Something wrong with fDataHist"<< std::endl; 
-   }
-   else { std::cout<<"Passed:fDataHist"<< std::endl; }
-    
-    fDataHist->SetNameTitle( (fSettings.GetName() + "_data").c_str(),
-    fSettings.GetFullTitles().c_str() );
+  fDataHist = PlotUtils::GetTH1DFromRootFile( data_file_name, "h_ExtractedCrossSectionUnfoldedData" );
+  bool check_fDataHist = CheckHist(fDataHist);
 
-  // Also retrieve the total covariance matrix and its inverse (pre-computed in
-  // the data release ROOT file for convenience)
-  //this->SetCovarFromRootFile( data_file_name, "cov_total" );
+  if (!check_fDataHist) {
+    std::cout<<"~~ERROR~~ Something wrong with fDataHist"<< std::endl;
+  }
+
+  fDataHist->SetNameTitle( (fSettings.GetName() + "_data").c_str(),
+  fSettings.GetFullTitles().c_str() );
+
+  // Also retrieve the total covariance matrix
   fFullCovar = StatUtils::GetCovarFromRootFile( data_file_name, "TotalCov_AfterUnfolding" );
-  //covar = StatUtils::GetCovarFromRootFile( data_file_name,
-  //  "inverse_cov_total" );
-   covar = StatUtils::GetInvert(fFullCovar, true);
+  covar = StatUtils::GetInvert(fFullCovar, true);
 
-  //fDecomp = StatUtils::GetDecomp( fFullCovar );
   TDecompChol chol( *fFullCovar );
   chol.Decompose();
-  fDecomp = new TMatrixDSym( fFullCovar->GetNrows(),
-    chol.GetU().GetMatrixArray(), "" );
-
-  // Push the diagonals of fFullCovar onto the data histogram
-  //StatUtils::SetDataErrorFromCov( fDataHist, fFullCovar, 1.0, false );
+  fDecomp = new TMatrixDSym( fFullCovar->GetNrows(), chol.GetU().GetMatrixArray(), "" );
 
   // Setup fMCHist from data
   fMCHist = dynamic_cast< TH1D* >( fDataHist->Clone() );
@@ -226,52 +158,40 @@ MicroBooNE_BNB_NumuCC0Pi_2025_XSec_nu::MicroBooNE_BNB_NumuCC0Pi_2025_XSec_nu( nu
   fMCHist->Reset();
 
   fMCStat = dynamic_cast< TH1D* >( fMCHist->Clone() );
-  
-   bool check_fMCHist = CheckHist(fMCHist);
- 
-    if (!check_fMCHist) {
-     std::cout<<"~~ERROR~~ Something wrong with fMCHist"<< std::endl; 
-   }
-   else { std::cout<<"Passed:fMCHist"<< std::endl; }
-    
-  
+
+  if (!CheckHist(fMCHist)) {
+    std::cout<<"~~ERROR~~ Something wrong with fMCHist"<< std::endl;
+  }
+
   fMCStat->Reset();
 
   // Since we're using a 1D histogram with bin number along the x-axis, it
   // doesn't make sense to subdivide the bins. Rather than doing that
-  // automatically, I just copy the original data histogram binning here. Thus,
+  // automatically, copy the original data histogram binning here. Thus,
   // MCFine ends up using the same bins as regular MC.
   fMCFine = dynamic_cast< TH1D* >( fMCHist->Clone() );
-  fMCFine->SetNameTitle( (fSettings.GetName() + "_MC_FINE").c_str(),
-    fSettings.GetFullTitles().c_str() );
+  fMCFine->SetNameTitle( (fSettings.GetName() + "_MC_FINE").c_str(), fSettings.GetFullTitles().c_str() );
   fMCFine->Reset();
 
   // Set up the MC modes histogram
-  fMCHist_Modes = new TrueModeStack( (fSettings.GetName() + "_MODES").c_str(),
-    "True Channels", fMCHist );
+  fMCHist_Modes = new TrueModeStack( (fSettings.GetName() + "_MODES").c_str(), "True Channels", fMCHist );
   fMCHist_Modes->SetTitleX( fDataHist->GetXaxis()->GetTitle() );
   fMCHist_Modes->SetTitleY( fDataHist->GetYaxis()->GetTitle() );
   this->SetAutoProcessTH1( fMCHist_Modes, kCMD_Reset, kCMD_Norm, kCMD_Write );
-
-  //this->FinaliseMeasurement();
 }
-/////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////
+
+
 bool MicroBooNE_BNB_NumuCC0Pi_2025_XSec_nu::isSignal( FitEvent* event ) {
    return SignalDef::MicroBooNE::isCC1Mu0pi_2025(event, EnuMin, EnuMax);
 }
-/////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////
-void MicroBooNE_BNB_NumuCC0Pi_2025_XSec_nu::FillEventVariables( FitEvent* event ) {
 
+
+void MicroBooNE_BNB_NumuCC0Pi_2025_XSec_nu::FillEventVariables( FitEvent* event ) {
   // Clear out the vector of passing bins, which may have already been filled
   // for the previous event
   fPassingBins.clear();
 
-  if ( event->NumFSParticle(MU_MINUS) == 0 ) return;
-   //if(isSignal( event )==false) return; 
+  if ( event->NumFSParticle(13) == 0 ) return;
 
   // Loop over each of the bin definitions. Keep track of the bins that
   // pass all cuts (and should thus be filled in this event)
@@ -291,29 +211,17 @@ void MicroBooNE_BNB_NumuCC0Pi_2025_XSec_nu::FillEventVariables( FitEvent* event 
     if ( passed_cuts ) fPassingBins.push_back( b );
 
   } // loop over bins
-
 }
-/////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////
+
+
 void MicroBooNE_BNB_NumuCC0Pi_2025_XSec_nu::LoadBinDefinitions(std::string binning_file_name) {
-
-
-  std::cout<<"inside::LoadBinDefinitions"<<std::endl;
-
-  std::cout<<"FitPar::GetDataBase() = " << FitPar::GetDataBase() << std::endl;
-  std::cout<<"Using Binning file :  " << binning_file_name << std::endl;
-
   std::ifstream bin_file( binning_file_name );
   std::string dummy_str;
   int bin_type, dummy_int;
   size_t num_true_bins;
 
-  // TODO: add I/O error handling hereg
   // Skip the output TDirectoryFile name and the input TTree name
   bin_file >> dummy_str >> dummy_str >> num_true_bins;
-
- std::cout<<" num_true_bins = "<< num_true_bins << std::endl;
 
   const std::string delimiter( "&&" );
   for ( size_t tb = 0u; tb < num_true_bins; ++tb ) {
@@ -355,23 +263,21 @@ void MicroBooNE_BNB_NumuCC0Pi_2025_XSec_nu::LoadBinDefinitions(std::string binni
 
       cut_ss >> var_name >> comp_op >> cut_val;
 
-      std::cout<<"inputs for fBinDefinitions  var_name  = " << var_name<< " comp_op: "<< comp_op << " cu_val: "<< cut_val<< std::endl;
-
       // Interpret the variable for this cut and set up a function
       // object that will calculate it from the input FitEvent
       std::function< double(FitEvent*) > getter;
        if ( var_name == "mc_p3_mu.Mag()" ) {
         getter = [=]( FitEvent* ev ) -> double {
-          return ev->GetHMFSParticle( MU_MINUS )->fP.Vect().Mag() / 1e3; // GeV
+          return ev->GetHMFSParticle( 13 )->fP.Vect().Mag() / 1e3; // GeV
         };
       }
       else if ( var_name == "mc_p3_mu.CosTheta()" ) {
         getter = [=]( FitEvent* ev ) -> double {
-          return ev->GetHMFSParticle( MU_MINUS )->fP.Vect().CosTheta();
+          return ev->GetHMFSParticle( 13 )->fP.Vect().CosTheta();
         };
       }
       else NUIS_ABORT( "Unrecognized cut variable " + var_name );
-     
+
       // Test the cut based on the appropriate comparison operator
       std::function< bool(double) > tester;
       if ( comp_op == ">=" ) {
@@ -393,126 +299,82 @@ void MicroBooNE_BNB_NumuCC0Pi_2025_XSec_nu::LoadBinDefinitions(std::string binni
     } while ( pos != std::string::npos );
 
   } // loop over true bins
-
 }
-/////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////
-void MicroBooNE_BNB_NumuCC0Pi_2025_XSec_nu::FillHistograms() {
 
+
+void MicroBooNE_BNB_NumuCC0Pi_2025_XSec_nu::FillHistograms() {
   if ( !Signal ) return;
 
-  // The histograms have bin number as the x-axis variable in 2D, so just fill them
-  // using the bin index of each bin that passed all cuts
-  // Added hack for 1D - input 1D histograms aren't a function of bin number 
-  //therefore as a workaround :  from bin number to bin center , filling value used are bin center
-  
+  // The histograms have bin number as the x-axis variable in 2D, so just fill
+  // them using the bin index of each bin that passed all cuts
+  // For 1D, fill values using bin center
   for ( const auto& bin : fPassingBins ) {
-   if(is2D){
-  
-    NUIS_LOG(DEB, "Fill MCHist: " << bin << ", " << Weight);
-    //std::cout<<"bin "<< bin << std::endl;
-    fMCHist->Fill( bin, Weight );
-    fMCStat->Fill( bin, 1.0 );
-    if ( fMCHist_Modes ) fMCHist_Modes->Fill( Mode, bin, Weight );
-    fMCFine->Fill( bin, Weight );
-    if ( fMCFine_Modes ) fMCFine_Modes->Fill( Mode, bin, Weight );
+    if (is2D) {
+      NUIS_LOG(DEB, "Fill MCHist: " << bin << ", " << Weight);
+      fMCHist->Fill( bin, Weight );
+      fMCStat->Fill( bin, 1.0 );
+      if ( fMCHist_Modes ) fMCHist_Modes->Fill( Mode, bin, Weight );
+      fMCFine->Fill( bin, Weight );
+      if ( fMCFine_Modes ) fMCFine_Modes->Fill( Mode, bin, Weight );
+    }
+    else {
+      double bin_center = fMCHist->GetXaxis()->GetBinCenter( bin + 1 );
+      NUIS_LOG(DEB, "Fill MCHist: " << bin << ", " << Weight);
+      fMCHist->Fill( bin_center, Weight );
+      fMCStat->Fill( bin_center, 1.0 );
+      if ( fMCHist_Modes ) fMCHist_Modes->Fill( Mode, bin_center, Weight );
+      fMCFine->Fill( bin, Weight );
+      if ( fMCFine_Modes ) fMCFine_Modes->Fill( Mode, bin_center, Weight );
+    }
   }
-   else{
-    double bin_center = fMCHist->GetXaxis()->GetBinCenter( bin + 1 );
-    NUIS_LOG(DEB, "Fill MCHist: " << bin << ", " << Weight);
-    //std::cout<<"bin "<< bin << std::endl;
-    fMCHist->Fill( bin_center, Weight );
-    fMCStat->Fill( bin_center, 1.0 );
-    if ( fMCHist_Modes ) fMCHist_Modes->Fill( Mode, bin_center, Weight );
-    fMCFine->Fill( bin, Weight );
-    if ( fMCFine_Modes ) fMCFine_Modes->Fill( Mode, bin_center, Weight );
-   } 
-   
-  }
-
 }
-/////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////
+
+
 void MicroBooNE_BNB_NumuCC0Pi_2025_XSec_nu::ConvertEventRates() {
-  // Do the standard conversion
-  // TODO: Restore use of A_C once you make sure you aren't double-counting it
-  //// Build a column vector using the predicted cross sections
- 
   int num_bins = fMCHist->GetNbinsX();
   TMatrixD pred( num_bins, 1 );
 
-  
   for ( int b = 0; b < num_bins; ++b ) {
     pred( b, 0 ) = fMCHist->GetBinContent( b + 1 );
   }
 
-  //// Apply the additional smearing matrix to create a new prediction
-   TMatrixD new_pred( *fAddSmear, TMatrixD::kMult, pred ); //turning this off 
-  
-  //// Update the MC prediction histogram with the smeared version
-  // Also BinWith norm
+  // Apply the additional smearing matrix to create a new prediction
+  TMatrixD new_pred( *fAddSmear, TMatrixD::kMult, pred );
 
- if(is2D == true){
-  for ( int b = 0; b < num_bins; ++b ) {
-     double xsec = new_pred( b, 0 );
-     //std::cout<<"After add smearing  :: "<< new_pred( b, 0 ) << std::endl;
-     fMCHist->SetBinContent( b + 1, xsec); // / BinWidthMap[b + 1] 
-   }
- }
- else {
- for ( int b = 0; b < num_bins; ++b ) {
-     double xsec = new_pred( b, 0 );
-     //std::cout<<"After add smearing  :: "<< new_pred( b, 0 ) << std::endl;
-     fMCHist->SetBinContent( b + 1, xsec); // 
-   }
- 
- }
- ////////////
- ///// Apply smearing to the stack of modes
- ////////
- ApplySmearing(fMCHist_Modes, fAddSmear.get());
-
- //
-//////////////////////////////////////
-// Assuming that 2D is a function of bin num , and 1D is not therefore , and extra step is need to bin width Norm the 2D , 
-///////////////////////////////////
-// Assumed this includes the modes hist
- Measurement1D::ConvertEventRates();
-
- if(is2D == true){
-  for ( int b = 0; b < num_bins; ++b ) {
-    double xsec = fMCHist->GetBinContent(b+1);
-    fMCHist->SetBinContent( b + 1, xsec / BinWidthMap[b + 1]); // / BinWidthMap[b + 1] 
+  // Update the MC prediction histogram with the smeared version
+  for ( int b = 0; b < num_bins; b++ ) {
+    double xsec = new_pred( b, 0 );
+    fMCHist->SetBinContent( b + 1, xsec);
   }
-  ///////////////
-  //  bin width norm the modes 
-  //////////
-  ApplyBinWidthNorm(fMCHist_Modes, BinWidthMap);
- 
- }
 
+  ApplySmearing(fMCHist_Modes, fAddSmear.get());
+
+  Measurement1D::ConvertEventRates();
+
+  // Bin width normalization: note 2D is vs. bin number, 1D is not
+  if (is2D) {
+    for ( int b = 0; b < num_bins; ++b ) {
+      double xsec = fMCHist->GetBinContent(b+1);
+      fMCHist->SetBinContent( b + 1, xsec / BinWidthMap[b + 1]);
+    }
+
+    // Bin width norm the modes
+    ApplyBinWidthNorm(fMCHist_Modes, BinWidthMap);
+  }
 }
 
-double MicroBooNE_BNB_NumuCC0Pi_2025_XSec_nu::GetLikelihood() {
 
+double MicroBooNE_BNB_NumuCC0Pi_2025_XSec_nu::GetLikelihood() {
   if ( fNoData || !fDataHist ) return 0.;
 
-   std::cout<<"inside ::MicroBooNE_BNB_NumuCC0Pi_2025_XSec_nu::GetLikelihood "<< std::endl;
-   
-   auto CheckingfDataHist = CheckHist(fDataHist );
-   auto CheckingMCHist = CheckHist(fMCHist );
-    
-   
+  auto CheckingfDataHist = CheckHist(fDataHist );
+  auto CheckingMCHist = CheckHist(fMCHist );
+
   // Apply Masking to MC if Required.
   if ( fIsMask and fMaskHist ) {
     NUIS_ERR(FTL, "Bin masks not yet supported by"
       " the MicroBooNE_BNB_NumuCC0Pi_2025_XSec_nu sample" );
-    //PlotUtils::MaskBins(fMCHist, fMaskHist);
-  } 
-  
-
+  }
 
   // Likelihood Calculation
   double stat = 0.;
@@ -532,48 +394,50 @@ double MicroBooNE_BNB_NumuCC0Pi_2025_XSec_nu::GetLikelihood() {
 
 
 void ApplySmearing(StackBase* stack, TMatrixD* fAddSmear) {
-    // Loop over all histograms in the stack
-    for (size_t h = 0; h < stack->fAllHists.size(); ++h) {
-        TH1* fMCHist = stack->fAllHists[h];
-        if (!fMCHist) continue;
+  // Loop over all histograms in the stack
+  for (size_t h = 0; h < stack->fAllHists.size(); ++h) {
+    TH1* fMCHist = stack->fAllHists[h];
+    if (!fMCHist) continue;
 
-        int num_bins = fMCHist->GetNbinsX();
+    int num_bins = fMCHist->GetNbinsX();
 
-        // Build prediction vector from histogram
-        TMatrixD pred(num_bins, 1);
-        for (int b = 0; b < num_bins; ++b) {
-            pred(b, 0) = fMCHist->GetBinContent(b + 1);
-        }
-
-        // Apply smearing matrix
-        TMatrixD new_pred(*fAddSmear, TMatrixD::kMult, pred);
-
-        // Write smeared values back into histogram
-        for (int b = 0; b < num_bins; ++b) {
-            fMCHist->SetBinContent(b + 1, new_pred(b, 0));
-        }
+    // Build prediction vector from histogram
+    TMatrixD pred(num_bins, 1);
+    for (int b = 0; b < num_bins; ++b) {
+      pred(b, 0) = fMCHist->GetBinContent(b + 1);
     }
+
+    // Apply smearing matrix
+    TMatrixD new_pred(*fAddSmear, TMatrixD::kMult, pred);
+
+    // Write smeared values back into histogram
+    for (int b = 0; b < num_bins; ++b) {
+      fMCHist->SetBinContent(b + 1, new_pred(b, 0));
+    }
+  }
 }
+
 
 void ApplyBinWidthNorm(StackBase* stack, std::map<int, double>& BinWidthMap) {
-    // Apply to all hists in the stack
-    for (size_t h = 0; h < stack->fAllHists.size(); ++h) {
-        TH1* hist = stack->fAllHists[h];
-        if (!hist) continue;
+  // Apply to all hists in the stack
+  for (size_t h = 0; h < stack->fAllHists.size(); ++h) {
+    TH1* hist = stack->fAllHists[h];
+    if (!hist) continue;
 
-        int num_bins = hist->GetNbinsX();
-        for (int b = 0; b < num_bins; ++b) {
-            double xsec = hist->GetBinContent(b + 1);
-            hist->SetBinContent(b + 1, xsec / BinWidthMap[b + 1]);
-        }
+    int num_bins = hist->GetNbinsX();
+    for (int b = 0; b < num_bins; ++b) {
+      double xsec = hist->GetBinContent(b + 1);
+      hist->SetBinContent(b + 1, xsec / BinWidthMap[b + 1]);
     }
+  }
 
-    // Also apply to fTemplate if it exists
-    if (stack->fTemplate) {
-        int num_bins = stack->fTemplate->GetNbinsX();
-        for (int b = 0; b < num_bins; ++b) {
-            double xsec = stack->fTemplate->GetBinContent(b + 1);
-            stack->fTemplate->SetBinContent(b + 1, xsec / BinWidthMap[b + 1]);
-        }
+  // Also apply to fTemplate if it exists
+  if (stack->fTemplate) {
+    int num_bins = stack->fTemplate->GetNbinsX();
+    for (int b = 0; b < num_bins; ++b) {
+      double xsec = stack->fTemplate->GetBinContent(b + 1);
+      stack->fTemplate->SetBinContent(b + 1, xsec / BinWidthMap[b + 1]);
     }
+  }
 }
+
