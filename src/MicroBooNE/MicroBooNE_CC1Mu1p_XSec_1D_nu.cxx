@@ -20,9 +20,6 @@
 #include "MicroBooNE_CC1Mu1p_XSec_1D_nu.h"
 #include "MicroBooNE_SignalDef.h"
 
-#include "TH1D.h"
-#include "TH2D.h"
-
 //********************************************************************
 MicroBooNE_CC1Mu1p_XSec_1D_nu::MicroBooNE_CC1Mu1p_XSec_1D_nu(
     nuiskey samplekey) {
@@ -32,7 +29,7 @@ MicroBooNE_CC1Mu1p_XSec_1D_nu::MicroBooNE_CC1Mu1p_XSec_1D_nu(
   std::string name = fSettings.GetS("name");
   std::string objSuffix;
 
-  // work out which sample you need, and set axii
+  // work out which sample you need, and set axis
   if (!name.compare("MicroBooNE_CC1Mu1p_XSec_1DDeltaPT_nu")) {
     fDist = kDeltaPT;
     objSuffix = "DeltaPT";
@@ -92,7 +89,8 @@ MicroBooNE_CC1Mu1p_XSec_1D_nu::MicroBooNE_CC1Mu1p_XSec_1D_nu(
   std::string descrip = name + " sample.\n"
                                "Target: Ar\n"
                                "Flux: BNB FHC numu\n"
-                               "Signal: CC1Mu1p\n";
+                               "Signal: CC1Mu1p\n"
+                               "Paper: Phys.Rev.Lett. 131 (2023) 10, 101802 (arxiv: 2301.03706 [hep-ex])\n";
   fSettings.SetDescription(descrip);
   fSettings.SetTitle(name);
   fSettings.SetAllowedTypes("FULL,DIAG/FREE,SHAPE,FIX/SYSTCOV/STATCOV",
