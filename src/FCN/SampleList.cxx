@@ -1157,9 +1157,9 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
                !name.compare("MicroBooNE_CC1Mu1p_XSec_2DECal_DeltaAlphaT_nu") ||
                !name.compare("MicroBooNE_CC1Mu1p_XSec_2DECal_DeltaPty_nu")) {
         return (new MicroBooNE_BNB_NumuCC1p_2023_XSec_2D_nu(samplekey));
-    } else if(!name.compare("MicroBooNE_BNB_NueCC0piNp_2022_XSec_1DElecCosTheta_nu") ||
-              !name.compare("MicroBooNE_BNB_NueCC0piNp_2022_XSec_1DElecEnergy_nu") ||
-              !name.compare("MicroBooNE_BNB_NueCC0piNp_2022_XSec_1DProtonCosTheta_nu")) {
+    } else if (!name.compare("MicroBooNE_BNB_NueCC0piNp_2022_XSec_1DElecCosTheta_nu") ||
+               !name.compare("MicroBooNE_BNB_NueCC0piNp_2022_XSec_1DElecEnergy_nu") ||
+               !name.compare("MicroBooNE_BNB_NueCC0piNp_2022_XSec_1DProtonCosTheta_nu")) {
       return (new MicroBooNE_BNB_NueCC0piNp_2022_XSec_1D_nu(samplekey));
     } else if (!name.compare("MicroBooNE_CC1mu2p0pi_XSec_1DDeltaPT_nu") ||
                !name.compare("MicroBooNE_CC1mu2p0pi_XSec_1DCosPlPr_nu") ||
