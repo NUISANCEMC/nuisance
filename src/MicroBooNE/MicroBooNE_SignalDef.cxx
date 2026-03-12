@@ -97,8 +97,42 @@ bool isCC1Mu1p(FitEvent* event, double EnuMin, double EnuMax) {
   return true;
 }
 
-bool isCC1mu2p0pi(FitEvent* event, double EnuMin, double EnuMax) {
+//----------------------------------------//
+bool isCC1Mu0pi_2025(FitEvent* event, double EnuMin, double EnuMax) {
+  // Check CC inclusive
+  if (!SignalDef::isCCINC(event, 14, EnuMin, EnuMax)) return false;
 
+  // Veto events which don't have exactly 1 FS muon
+  if (event->NumFSMuon() != 1) return false;
+
+  // Muon momentum range
+  //auto mu_mom = event->GetHMFSParticle(13)->p();
+  auto mu_mom = event->GetHMFSParticle(13)->fP.Vect().Mag();
+  if ((mu_mom < 100) || (mu_mom > 2000)) return false;
+
+  // Reject events with neutral pions of any momenta
+  if (event->NumFSParticle(111) != 0) return false;
+
+  // Reject events with positively charged pions above 70 MeV/c
+  if (event->NumFSParticle(211) != 0) {
+    //double ppiplus = event->GetHMFSParticle(211)->p();
+    double ppiplus = event->GetHMFSParticle(211)->fP.Vect().Mag();
+    if (ppiplus > 70) { return false; }
+  }
+
+  // Reject events with negatively charged pions above 70 MeV/c
+  if (event->NumFSParticle(-211) != 0) {
+   // double ppiminus = event->GetHMFSParticle(-211)->p();
+   double ppiminus = event->GetHMFSParticle(-211)->fP.Vect().Mag();
+    if (ppiminus > 70) { return false; }
+  }
+
+  return true;
+}
+ //----------------------------------------//
+ 
+
+bool isCC1mu2p0pi(FitEvent* event, double EnuMin, double EnuMax) {
   // ==========================================================================
   // Check CC inclusive
   if (!SignalDef::isCCINC(event, 14, EnuMin, EnuMax)) return false;

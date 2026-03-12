@@ -63,6 +63,13 @@ bool isNCpi0(FitEvent* event);
 bool isMesonOrAntimeson( int pdg_code );
 bool isCC1MuNpFor2025Analysis( FitEvent* event, double EnuMin, double EnuMax );
 
+ /*
+ * numu CC with 1 muon (0.1 < Pmu < 2.0 GeV/c), no neutral pions (any momenta), and no charged pions above 70 MeV/c [any number of neutrons is allowed].
+ *
+ * publication reference to be updated
+ */
+bool isCC1Mu0pi_2025(FitEvent* event, double EnuMin, double EnuMax);
+
   }  // namespace MicroBooNE
 }  // namespace SignalDef
 
