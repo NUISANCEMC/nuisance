@@ -204,7 +204,7 @@ void MicroBooNE_BNB_NumuCCInc_2019_XSec_nu::SetHistograms() {
 
   // Read in 1D Data Histograms
   fInputFile = new TFile((FitPar::GetDataBase() +
-                          "/MicroBooNE/CCinc/microboone_numu_cc_inclusive.root")
+                          "/MicroBooNE/BNB_NumuCCInc_2019/microboone_numu_cc_inclusive.root")
                              .c_str());
 
   // Read in 1D Data

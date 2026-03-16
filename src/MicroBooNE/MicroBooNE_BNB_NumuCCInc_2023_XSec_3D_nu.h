@@ -38,7 +38,7 @@ public:
 
     // load our histograms
     TFile* inputRootFile = TFile::Open((FitPar::GetDataBase() +
-                                       "/MicroBooNE/CCinc3D/MicroBooNE_CCInc3D_data_release.root").c_str());
+                                       "/MicroBooNE/BNB_NumuCCInc_2023/MicroBooNE_CCInc3D_data_release.root").c_str());
     TH1D* hFullData = (TH1D *)inputRootFile->Get("MicroBooNE_CCInc3D_data");
     TH2D* hFullCov =  (TH2D *)inputRootFile->Get("MicroBooNE_CCInc3D_unfcov");
     TH2D* hFullAc =   (TH2D *)inputRootFile->Get("MicroBooNE_CCInc3D_Ac");

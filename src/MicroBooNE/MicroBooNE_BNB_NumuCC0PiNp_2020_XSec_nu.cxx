@@ -27,31 +27,31 @@ MicroBooNE_BNB_NumuCC0PiNp_2020_XSec_nu::MicroBooNE_BNB_NumuCC0PiNp_2020_XSec_nu
   std::string name = fSettings.GetS("name");
   std::string objSuffix;
 
-  if (!name.compare("MicroBooNE_CC1MuNp_XSec_1DPmu_nu")) {
+  if (!name.compare("MicroBooNE_BNB_NumuCC0PiNp_2020_XSec_1DPmu_nu")) {
     fDist = kPmu;
     objSuffix = "mumom";
     fSettings.SetXTitle("P_{#mu}^{reco} (GeV)");
     fSettings.SetYTitle("d#sigma/dP_{#mu}^{reco} (cm^{2}/^{40}Ar)");
   }
-  else if (!name.compare("MicroBooNE_CC1MuNp_XSec_1Dcosmu_nu")) {
+  else if (!name.compare("MicroBooNE_BNB_NumuCC0PiNp_2020_XSec_1Dcosmu_nu")) {
     fDist = kCosMu;
     objSuffix = "muangle";
     fSettings.SetXTitle("cos#theta_{#mu}^{reco}");
     fSettings.SetYTitle("d#sigma/dcos#theta_{#mu}^{reco} (cm^{2}/^{40}Ar)");
   }
-  else if (!name.compare("MicroBooNE_CC1MuNp_XSec_1DPp_nu")) {
+  else if (!name.compare("MicroBooNE_BNB_NumuCC0PiNp_2020_XSec_1DPp_nu")) {
     fDist = kPp;
     objSuffix = "pmom";
     fSettings.SetXTitle("P_{p}^{reco} (GeV)");
     fSettings.SetYTitle("d#sigma/dP_{p}^{reco} (cm^{2}/GeV/^{40}Ar)");
   }
-  else if (!name.compare("MicroBooNE_CC1MuNp_XSec_1Dcosp_nu")) {
+  else if (!name.compare("MicroBooNE_BNB_NumuCC0PiNp_2020_XSec_1Dcosp_nu")) {
     fDist = kCosP;
     objSuffix = "pangle";
     fSettings.SetXTitle("cos#theta_{p}^{reco}");
     fSettings.SetYTitle("d#sigma/dcos#theta_{p}^{reco} (cm^{2}/^{40}Ar)");
   }
-  else if (!name.compare("MicroBooNE_CC1MuNp_XSec_1Dthetamup_nu")) {
+  else if (!name.compare("MicroBooNE_BNB_NumuCC0PiNp_2020_XSec_1Dthetamup_nu")) {
     fDist = kThetaMuP;
     objSuffix = "thetamup";
     fSettings.SetXTitle("#theta_{#mup}^{reco}");
@@ -79,7 +79,7 @@ MicroBooNE_BNB_NumuCC0PiNp_2020_XSec_nu::MicroBooNE_BNB_NumuCC0PiNp_2020_XSec_nu
   FinaliseSampleSettings();
 
   // Load data ---------------------------------------------------------
-  std::string inputFile = FitPar::GetDataBase() + "/MicroBooNE/CC1MuNp/CCNp_data_MC_cov_dataRelease.root";
+  std::string inputFile = FitPar::GetDataBase() + "/MicroBooNE/BNB_NumuCC0PiNp_2020/CCNp_data_MC_cov_dataRelease.root";
   SetDataFromRootFile(inputFile, "DataXsec_" + objSuffix);
   // Strangely, the data release is in xsec/nucleon but the paper is in xsec/40Ar nucleus, so scale up by 40 (number of nucleons in 40Ar)
   ScaleData(40.0*1E-38);

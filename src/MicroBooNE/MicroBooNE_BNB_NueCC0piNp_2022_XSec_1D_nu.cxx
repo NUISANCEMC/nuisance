@@ -73,7 +73,7 @@ MicroBooNE_BNB_NueCC0piNp_2022_XSec_1D_nu::MicroBooNE_BNB_NueCC0piNp_2022_XSec_1
   
   // Load data ---------------------------------------------------------
   std::string inputFile = FitPar::GetDataBase() +
-              "/MicroBooNE/NueCC0pi/NueCC0pi_xsec_data_cov.root";
+              "/MicroBooNE/BNB_NueCC0piNp_2022/NueCC0pi_xsec_data_cov.root";
   SetDataFromRootFile(inputFile, "DataXSec_" + objSuffix);
   ScaleData(1E-39);
 

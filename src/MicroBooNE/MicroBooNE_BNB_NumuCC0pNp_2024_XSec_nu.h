@@ -39,7 +39,7 @@ public:
 
     // load our histograms
     TFile* inputRootFile = TFile::Open((FitPar::GetDataBase() +
-                                       "/MicroBooNE/CC1Mu0pNp/MicroBooNE_CC1Mu0pNp_data_release.root").c_str());
+                                       "/MicroBooNE/BNB_NumuCC0pNp_2024/MicroBooNE_CC1Mu0pNp_data_release.root").c_str());
     TH1D* hFullData = (TH1D *)inputRootFile->Get("MicroBooNE_CC1Mu0pNp_data");
     TH2D* hFullCov =  (TH2D *)inputRootFile->Get("MicroBooNE_CC1Mu0pNp_unfcov");
     TH2D* hFullAc =   (TH2D *)inputRootFile->Get("MicroBooNE_CC1Mu0pNp_Ac");

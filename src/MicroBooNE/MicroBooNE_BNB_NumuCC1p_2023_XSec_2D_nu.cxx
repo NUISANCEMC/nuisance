@@ -161,77 +161,77 @@ MicroBooNE_BNB_NumuCC1p_2023_XSec_2D_nu::MicroBooNE_BNB_NumuCC1p_2023_XSec_2D_nu
   std::string name = fSettings.GetS("name");
 
   // work out which sample you need, and set axii
-  if (!name.compare("MicroBooNE_CC1Mu1p_XSec_2DDeltaPT_DeltaAlphaT_nu")) {
+  if (!name.compare("MicroBooNE_BNB_NumuCC1p_2023_XSec_2DDeltaPT_DeltaAlphaT_nu")) {
     fDist = kDeltaPT;
     fSlice = kDeltaAlphaT;
     fSuffix = "SerialDeltaPT_DeltaAlphaT";
     fSliceTitle = "#delta#alpha_{T} (deg)";
     fSettings.SetXTitle("#deltap_{T} (GeV/c)");
     fSettings.SetYTitle("d^{2}#sigma/d#delta#alpha_{T}d#deltap_{T} (cm^{2}/(deg)/(GeV/c)/^{40}Ar)");
-  } else if (!name.compare("MicroBooNE_CC1Mu1p_XSec_2DDeltaPT_MuonCosTheta_nu")) {
+  } else if (!name.compare("MicroBooNE_BNB_NumuCC1p_2023_XSec_2DDeltaPT_MuonCosTheta_nu")) {
     fDist = kDeltaPT;
     fSlice = kMuonCosTheta;
     fSuffix = "SerialDeltaPT_MuonCosTheta";
     fSliceTitle = "cos#theta_{#mu}";
     fSettings.SetXTitle("#deltap_{T} (GeV/c)");
     fSettings.SetYTitle("d^{2}#sigma/dcos#theta_{#mu}d#deltap_{T} (cm^{2}/(GeV/c)/^{40}Ar)");
-  } else if (!name.compare("MicroBooNE_CC1Mu1p_XSec_2DDeltaPT_ProtonCosTheta_nu")) {
+  } else if (!name.compare("MicroBooNE_BNB_NumuCC1p_2023_XSec_2DDeltaPT_ProtonCosTheta_nu")) {
     fDist = kDeltaPT;
     fSlice = kProtonCosTheta;
     fSuffix = "SerialDeltaPT_ProtonCosTheta";
     fSliceTitle = "cos#theta_{p}";
     fSettings.SetXTitle("#deltap_{T} (GeV/c)");
     fSettings.SetYTitle("d^{2}#sigma/dcos#theta_{p}d#deltap_{T} (cm^{2}/(GeV/c)/^{40}Ar)");
-  } else if (!name.compare("MicroBooNE_CC1Mu1p_XSec_2DDeltaAlphaT_DeltaPT_nu")) {
+  } else if (!name.compare("MicroBooNE_BNB_NumuCC1p_2023_XSec_2DDeltaAlphaT_DeltaPT_nu")) {
     fDist = kDeltaAlphaT;
     fSlice = kDeltaPT;
     fSuffix = "SerialDeltaAlphaT_DeltaPT";
     fSliceTitle = "#deltap_{T} (GeV/c)";
     fSettings.SetXTitle("#delta#alpha_{T} (deg)");
     fSettings.SetYTitle("d^{2}#sigma/d#deltap_{T}d#delta#alpha_{T} (cm^{2}/(GeV/c)/(deg)/^{40}Ar)");
-  } else if (!name.compare("MicroBooNE_CC1Mu1p_XSec_2DDeltaAlphaT_MuonCosTheta_nu")) {
+  } else if (!name.compare("MicroBooNE_BNB_NumuCC1p_2023_XSec_2DDeltaAlphaT_MuonCosTheta_nu")) {
     fDist = kDeltaAlphaT;
     fSlice = kMuonCosTheta;
     fSuffix = "SerialDeltaAlphaT_MuonCosTheta";
     fSliceTitle = "cos#theta_{#mu}";
     fSettings.SetXTitle("#delta#alpha_{T} (deg)");
     fSettings.SetYTitle("d^{2}#sigma/dcos#theta_{#mu}d#delta#alpha_{T} (cm^{2}/(deg)/^{40}Ar)");
-  } else if (!name.compare("MicroBooNE_CC1Mu1p_XSec_2DDeltaAlphaT_ProtonCosTheta_nu")) {
+  } else if (!name.compare("MicroBooNE_BNB_NumuCC1p_2023_XSec_2DDeltaAlphaT_ProtonCosTheta_nu")) {
     fDist = kDeltaAlphaT;
     fSlice = kProtonCosTheta;
     fSuffix = "SerialDeltaAlphaT_ProtonCosTheta";
     fSliceTitle = "cos#theta_{p}";
     fSettings.SetXTitle("#delta#alpha_{T} (deg)");
     fSettings.SetYTitle("d^{2}#sigma/dcos#theta_{p}d#delta#alpha_{T} (cm^{2}/(deg)/^{40}Ar)");
-  } else if (!name.compare("MicroBooNE_CC1Mu1p_XSec_2DDeltaPhiT_DeltaPT_nu")) {
+  } else if (!name.compare("MicroBooNE_BNB_NumuCC1p_2023_XSec_2DDeltaPhiT_DeltaPT_nu")) {
     fDist = kDeltaPhiT;
     fSlice = kDeltaPT;
     fSuffix = "SerialDeltaPhiT_DeltaPT";
     fSliceTitle = "#deltap_{T} (GeV/c)";
     fSettings.SetXTitle("#delta#phi_{T} (deg)");
     fSettings.SetYTitle("d^{2}#sigma/dcos#theta_{p}d#delta#phi_{T} (cm^{2}/(deg)/^{40}Ar)");
-  } else if (!name.compare("MicroBooNE_CC1Mu1p_XSec_2DDeltaPtx_DeltaPty_nu")) {
+  } else if (!name.compare("MicroBooNE_BNB_NumuCC1p_2023_XSec_2DDeltaPtx_DeltaPty_nu")) {
     fDist = kDeltaPtx;
     fSlice = kDeltaPty;
     fSuffix = "SerialDeltaPtx_DeltaPty";
     fSliceTitle = "#deltap_{T,y} (GeV/c)";
     fSettings.SetXTitle("#deltap_{T,x} (GeV/c)");
     fSettings.SetYTitle("d^{2}#sigma/d#deltap_{T,y}d#deltap_{T,x} (cm^{2}/(GeV/c)^{2}/^{40}Ar)");
-  } else if (!name.compare("MicroBooNE_CC1Mu1p_XSec_2DECal_DeltaPT_nu")) {
+  } else if (!name.compare("MicroBooNE_BNB_NumuCC1p_2023_XSec_2DECal_DeltaPT_nu")) {
     fDist = kECal;
     fSlice = kDeltaPT;
     fSuffix = "SerialECal_DeltaPT";
     fSliceTitle = "#deltap_{T} (GeV/c)";
     fSettings.SetXTitle("E^{cal} (GeV)");
     fSettings.SetYTitle("d^{2}#sigma/d#deltap_{T}dE^{ecal} (cm^{2}/(GeV/c)/(GeV)/^{40}Ar)");
-  } else if (!name.compare("MicroBooNE_CC1Mu1p_XSec_2DECal_DeltaAlphaT_nu")) {
+  } else if (!name.compare("MicroBooNE_BNB_NumuCC1p_2023_XSec_2DECal_DeltaAlphaT_nu")) {
     fDist = kECal;
     fSlice = kDeltaAlphaT;
     fSuffix = "SerialECal_DeltaAlphaT";
     fSliceTitle = "#delta#alpha_{T} (deg)";
     fSettings.SetXTitle("E^{cal} (GeV)");
     fSettings.SetYTitle("d^{2}#sigma/d#delta#alpha_{T}dE^{ecal} (cm^{2}/(deg)/(GeV)/^{40}Ar)");
-  } else if (!name.compare("MicroBooNE_CC1Mu1p_XSec_2DECal_DeltaPty_nu")) {
+  } else if (!name.compare("MicroBooNE_BNB_NumuCC1p_2023_XSec_2DECal_DeltaPty_nu")) {
     fDist = kECal;
     fSlice = kDeltaPty;
     fSuffix = "SerialECal_DeltaPty";
@@ -537,7 +537,7 @@ void MicroBooNE_BNB_NumuCC1p_2023_XSec_2D_nu::SetHistograms() {
 
   // Open input file
   std::string inputFileName = FitPar::GetDataBase() +
-                          "/MicroBooNE/CC1Mu1p/CC1Mu1p_DataRelease.root";
+                          "/MicroBooNE/BNB_NumuCC1p_2023/CC1Mu1p_DataRelease.root";
   TFile *inputFile = TFile::Open(inputFileName.c_str());
   assert(inputFile && inputFile->IsOpen());
 

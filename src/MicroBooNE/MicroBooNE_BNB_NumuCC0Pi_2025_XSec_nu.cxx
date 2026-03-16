@@ -78,24 +78,24 @@ MicroBooNE_BNB_NumuCC0Pi_2025_XSec_nu::MicroBooNE_BNB_NumuCC0Pi_2025_XSec_nu( nu
   std::string binning_file_name;
   std::string Type;
 
-  if (!name.compare("MicroBooNE_BNB_CC0Pi_2025_XSec_2D_nu")) {
+  if (!name.compare("MicroBooNE_BNB_NumuCC0Pi_2025_XSec_2D_nu")) {
     is2D = true;
     fSettings.SetYTitle( "#sigma (cm^{2}/^{40}Ar)" );
     fSettings.SetXTitle( "bin number" );
-    data_file_name = FitPar::GetDataBase() + "MicroBooNE/CC0pi_2025/2D/Extracted2DCrossSection_MicroBooNE_CC0PiSelection_BinningScheme1.root";
-    binning_file_name =  FitPar::GetDataBase() + "MicroBooNE/CC0pi_2025/2D/bin_defsCC0pi_2025.txt";
+    data_file_name = FitPar::GetDataBase() + "MicroBooNE/BNB_NumuCC0Pi_2025/2D/Extracted2DCrossSection_MicroBooNE_CC0PiSelection_BinningScheme1.root";
+    binning_file_name =  FitPar::GetDataBase() + "MicroBooNE/BNB_NumuCC0Pi_2025/2D/bin_defsCC0pi_2025.txt";
     Type = "2D Costheta vs MuonMomentum : 37 bins";
   }
-  else if (!name.compare("MicroBooNE_BNB_CC0Pi_2025_XSec_1Dpmu_nu")) {
+  else if (!name.compare("MicroBooNE_BNB_NumuCC0Pi_2025_XSec_1Dpmu_nu")) {
     is2D = false;
-    data_file_name = FitPar::GetDataBase() + "MicroBooNE/CC0pi_2025/1D/Extracted1DCrossSection_MicroBooNE_CC0PiSelection_2025_MuonMomentum.root";
-    binning_file_name =  FitPar::GetDataBase() + "MicroBooNE/CC0pi_2025/1D/Muon_1D_CC0Pi_2025_bining_MuonMomentum.txt";
+    data_file_name = FitPar::GetDataBase() + "MicroBooNE/BNB_NumuCC0Pi_2025/1D/Extracted1DCrossSection_MicroBooNE_CC0PiSelection_2025_MuonMomentum.root";
+    binning_file_name =  FitPar::GetDataBase() + "MicroBooNE/BNB_NumuCC0Pi_2025/1D/Muon_1D_CC0Pi_2025_bining_MuonMomentum.txt";
     Type = "1D MuonMomentum : 14 bins";
   }
-  else if (!name.compare("MicroBooNE_BNB_CC0Pi_2025_XSec_1Dcostheta_nu")) {
+  else if (!name.compare("MicroBooNE_BNB_NumuCC0Pi_2025_XSec_1Dcostheta_nu")) {
     is2D = false;
-    data_file_name = FitPar::GetDataBase() + "MicroBooNE/CC0pi_2025/1D/Extracted1DCrossSection_MicroBooNE_CC0PiSelection_2025_MuonCosTheta.root";
-    binning_file_name =  FitPar::GetDataBase() + "MicroBooNE/CC0pi_2025/1D/Muon_1D_CC0Pi_2025_bining_MuonCosTheta.txt";
+    data_file_name = FitPar::GetDataBase() + "MicroBooNE/BNB_NumuCC0Pi_2025/1D/Extracted1DCrossSection_MicroBooNE_CC0PiSelection_2025_MuonCosTheta.root";
+    binning_file_name =  FitPar::GetDataBase() + "MicroBooNE/BNB_NumuCC0Pi_2025/1D/Muon_1D_CC0Pi_2025_bining_MuonCosTheta.txt";
     Type = "1D Costheta : (29 bins)";
   }
   else {

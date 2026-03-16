@@ -226,7 +226,7 @@ MicroBooNE_BNB_NumuCC0PiNp_2025_XSec_nu
   this->LoadBinDefinitions();
 
   std::string file_name_AC( FitPar::GetDataBase()
-    + "/MicroBooNE/CC1MuNp/2025/mat_table_add_smear.txt" );
+    + "/MicroBooNE/BNB_NumuCC0PiNp_2025/mat_table_add_smear.txt" );
 
   // Load the additional smearing matrix
   TMatrixD A_C = load_matrix( file_name_AC );
@@ -234,7 +234,7 @@ MicroBooNE_BNB_NumuCC0PiNp_2025_XSec_nu
 
   // Load the measured data points
   std::string file_name_data( FitPar::GetDataBase()
-    + "/MicroBooNE/CC1MuNp/2025/vec_table_unfolded_signal.txt" );
+    + "/MicroBooNE/BNB_NumuCC0PiNp_2025/vec_table_unfolded_signal.txt" );
   TMatrixD temp_data_mat = load_matrix( file_name_data );
   fDataHist = to_histogram( temp_data_mat );
 
@@ -243,7 +243,7 @@ MicroBooNE_BNB_NumuCC0PiNp_2025_XSec_nu
 
   // Also retrieve the total covariance matrix for the measurement
   std::string cov_file_name( FitPar::GetDataBase()
-    + "/MicroBooNE/CC1MuNp/2025/mat_table_cov_total.txt" );
+    + "/MicroBooNE/BNB_NumuCC0PiNp_2025/mat_table_cov_total.txt" );
   auto temp_cov_matrix = load_matrix( cov_file_name );
   fFullCovar = to_symmetric_matrix( temp_cov_matrix );
 
@@ -395,7 +395,7 @@ void MicroBooNE_BNB_NumuCC0PiNp_2025_XSec_nu::FillEventVariables( FitEvent* even
 
 void MicroBooNE_BNB_NumuCC0PiNp_2025_XSec_nu::LoadBinDefinitions() {
   std::string binning_file_name( FitPar::GetDataBase()
-    + "/MicroBooNE/CC1MuNp/2025/bin_defs.txt" );
+    + "/MicroBooNE/BNB_NumuCC0PiNp_2025/bin_defs.txt" );
 
   std::ifstream bin_file( binning_file_name );
   std::string dummy_str;
@@ -730,7 +730,7 @@ void MicroBooNE_BNB_NumuCC0PiNp_2025_XSec_nu::Write( std::string drawOpt ) {
 void MicroBooNE_BNB_NumuCC0PiNp_2025_XSec_nu::PrepareSlices() {
   // Load the definitions of the blocks of bins
   std::string block_file_name( FitPar::GetDataBase()
-    + "/MicroBooNE/CC1MuNp/2025/bin_blocks.txt" );
+    + "/MicroBooNE/BNB_NumuCC0PiNp_2025/bin_blocks.txt" );
 
   fBlockHandler = std::make_shared< MicroBooNEBlockHandler >(
     fSettings.GetName(), block_file_name );
