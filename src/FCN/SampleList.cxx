@@ -1138,12 +1138,10 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
                !name.compare("MicroBooNE_BNB_NumuCC1p_2023_XSec_1DMuonCosTheta_nu") ||
                !name.compare("MicroBooNE_BNB_NumuCC1p_2023_XSec_1DProtonCosTheta_nu") ||
                !name.compare("MicroBooNE_BNB_NumuCC1p_2023_XSec_1DMuonMomentum_nu") ||
-               !name.compare("MicroBooNE_BNB_NumuCC1p_2023_XSec_1DProtonMomentum_nu") ||
                !name.compare("MicroBooNE_BNB_NumuCC1p_2023_XSec_1DDeltaPn_nu") ||
                !name.compare("MicroBooNE_BNB_NumuCC1p_2023_XSec_1DDeltaPtx_nu") ||
                !name.compare("MicroBooNE_BNB_NumuCC1p_2023_XSec_1DDeltaPty_nu") ||
-               !name.compare("MicroBooNE_BNB_NumuCC1p_2023_XSec_1DECal_nu") ||
-               !name.compare("MicroBooNE_BNB_NumuCC1p_2023_XSec_1DEQE_nu")) {
+               !name.compare("MicroBooNE_BNB_NumuCC1p_2023_XSec_1DECal_nu")) {
       return (new MicroBooNE_BNB_NumuCC1p_2023_XSec_1D_nu(samplekey));
     } else if (!name.compare("MicroBooNE_BNB_NumuCC1p_2023_XSec_2DDeltaPT_DeltaAlphaT_nu") ||
                !name.compare("MicroBooNE_BNB_NumuCC1p_2023_XSec_2DDeltaPT_MuonCosTheta_nu") ||
