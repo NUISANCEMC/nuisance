@@ -288,9 +288,17 @@ int NEUTInputHandler::GetNeutParticleStatus(NeutPart *part) {
   } else if (part->fIsAlive == true && part->fStatus == 0) {
     state = kFinalState;
 
+  } else if (part->fIsAlive == false && part->fStatus == 7){
+    state = kNuclearRemnant;
+
+  } else if (part->fIsAlive == true && part->fStatus == 8){
+    state = kFinalState;
+  
+  } else if (part->fIsAlive == true && (part->fStatus == 4 || part->fStatus == 7 || part->fStatus == 8)){
+    state = kFinalState;
+  
   } else if (!part->fIsAlive &&
-             (part->fStatus == 1 || part->fStatus == 3 || part->fStatus == 4 ||
-              part->fStatus == 7 || part->fStatus == 8)) {
+             (part->fStatus == 1 || part->fStatus == 3 || part->fStatus == 4)) {
     state = kFSIState;
 
     // There's one hyper weird case where fStatus = -3. This apparently
@@ -308,7 +316,8 @@ int NEUTInputHandler::GetNeutParticleStatus(NeutPart *part) {
       state=kFinalState;
   }
     else if (part->fIsAlive && part->fStatus == 10){
-      state = kNuclearRemnant;
+      //state = kNuclearRemnant;
+      state = kFinalState;
 
 
     // Warn if we still find alive particles without classifying them
