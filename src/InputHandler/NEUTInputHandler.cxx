@@ -285,10 +285,10 @@ int NEUTInputHandler::GetNeutParticleStatus(NeutPart *part) {
               abs(part->fPID) == 12)) {
     state = kFinalState;
 
-  } else if (part->fIsAlive == true && part->fStatus == 0) {
-    state = kFinalState;
+  } else if (part->fIsAlive == true && part->fPID == 16011) {
+    state = kNuclearRemnant;
 
-  } else if (part->fIsAlive == false && part->fStatus == 7) {
+  }else if (part->fIsAlive == true && part->fStatus == 0) {
     state = kFinalState;
 
   } else if (part->fIsAlive == true && (part->fStatus == 4 || part->fStatus == 7 || part->fStatus == 8)){
