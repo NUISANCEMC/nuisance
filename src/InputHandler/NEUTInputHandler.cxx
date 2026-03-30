@@ -295,7 +295,7 @@ int NEUTInputHandler::GetNeutParticleStatus(NeutPart *part) {
     state = kFinalState;
   
   } else if (!part->fIsAlive &&
-             (part->fStatus == 1 || part->fStatus == 3 || part->fStatus == 4)) {
+             (part->fStatus == 1 || part->fStatus == 3 || part->fStatus == 4) || part->fStatus == 7 || part->fStatus == 8) {
     state = kFSIState;
 
     // There's one hyper weird case where fStatus = -3. This apparently
