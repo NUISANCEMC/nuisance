@@ -288,12 +288,9 @@ int NEUTInputHandler::GetNeutParticleStatus(NeutPart *part) {
   } else if (part->fIsAlive == true && part->fStatus == 0) {
     state = kFinalState;
 
-  } else if (part->fIsAlive == false && part->fStatus == 7){
-    state = kNuclearRemnant;
-
-  } else if (part->fIsAlive == true && part->fStatus == 8){
+  } else if (part->fIsAlive == false && part->fStatus == 7) {
     state = kFinalState;
-  
+
   } else if (part->fIsAlive == true && (part->fStatus == 4 || part->fStatus == 7 || part->fStatus == 8)){
     state = kFinalState;
   
