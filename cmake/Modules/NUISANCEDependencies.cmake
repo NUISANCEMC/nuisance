@@ -42,9 +42,9 @@ if (T2KReWeight_ENABLED)
     SET(T2KReWeight_ENABLED FALSE)
   else()
     SET(T2KReWeight_ENABLED TRUE)
-    
+
     add_library(NUISANCET2KReWeight INTERFACE)
-    set_target_properties(NUISANCET2KReWeight PROPERTIES 
+    set_target_properties(NUISANCET2KReWeight PROPERTIES
       INTERFACE_COMPILE_OPTIONS "-DT2KReWeight_ENABLED"
       INTERFACE_LINK_LIBRARIES T2KReWeight::All)
     install(TARGETS NUISANCET2KReWeight
@@ -105,14 +105,14 @@ if (nusystematics_ENABLED)
   else()
     SET(nusystematics_ENABLED TRUE)
     add_library(NUISANCEnusystematics INTERFACE)
-    set_target_properties(NUISANCEnusystematics PROPERTIES 
+    set_target_properties(NUISANCEnusystematics PROPERTIES
       INTERFACE_COMPILE_OPTIONS "-Dnusystematics_ENABLED"
       INTERFACE_LINK_LIBRARIES nusyst::all)
     install(TARGETS NUISANCEnusystematics
       EXPORT nuisance-targets)
     target_link_libraries(GeneratorCompileDependencies INTERFACE NUISANCEnusystematics)
   endif()
-  
+
 endif()
 
 #### Put the generators after the reweighting tools that may depend on them so that
@@ -146,7 +146,7 @@ if (NEUT_ENABLED)
     endif()
 
     add_library(NUISANCENEUT INTERFACE)
-    set_target_properties(NUISANCENEUT PROPERTIES 
+    set_target_properties(NUISANCENEUT PROPERTIES
       INTERFACE_COMPILE_OPTIONS "${NUISANCENEUT_COMPILE_OPTIONS}"
       INTERFACE_LINK_LIBRARIES NEUT::All)
     install(TARGETS NUISANCENEUT
@@ -184,7 +184,7 @@ if (GENIE_ENABLED)
     endif()
 
     add_library(NUISANCEGENIE INTERFACE)
-    set_target_properties(NUISANCEGENIE PROPERTIES 
+    set_target_properties(NUISANCEGENIE PROPERTIES
       INTERFACE_COMPILE_OPTIONS "${NUISANCEGENIE_COMPILE_OPTIONS}"
       INTERFACE_LINK_LIBRARIES GENIE::All)
     install(TARGETS NUISANCEGENIE
@@ -207,10 +207,14 @@ if (NuWro_ENABLED)
     target_link_libraries(GeneratorCompileDependencies INTERFACE NuWro::All)
   endif()
 
+  if(DEFINED NUWRO_VERSION_MAJOR)
+    target_compile_definitions(GeneratorCompileDependencies INTERFACE NUWRO_VERSION_MAJOR=${NUWRO_VERSION_MAJOR})
+  endif()
+
 endif()
 
 if (Prob3plusplus_ENABLED)
-  
+
   CPMFindPackage(
       NAME Prob3plusplus
       VERSION 3.10.4
@@ -233,7 +237,7 @@ if (Prob3plusplus_ENABLED)
 
   if(Prob3plusplus_ENABLED)
     add_library(NUISANCEProb3plusplus INTERFACE)
-    set_target_properties(NUISANCEProb3plusplus PROPERTIES 
+    set_target_properties(NUISANCEProb3plusplus PROPERTIES
       INTERFACE_COMPILE_OPTIONS "-DProb3plusplus_ENABLED"
       INTERFACE_LINK_LIBRARIES Prob3plusplus::All)
     target_link_libraries(GeneratorCompileDependencies INTERFACE NUISANCEProb3plusplus)

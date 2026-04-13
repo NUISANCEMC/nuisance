@@ -155,7 +155,7 @@ FitEvent *NuWroInputHandler::GetNuisanceEvent(const UInt_t ent,
 #endif
   // Setup Input scaling for joint inputs
   fNUISANCEEvent->InputWeight = GetInputWeight(entry);
-  
+
   return fNUISANCEEvent;
 }
 
@@ -193,7 +193,11 @@ int NuWroInputHandler::ConvertNuwroMode(event *e) {
   }
 
   // Pion production
-  if (e->flag.res || e->flag.res_delta) {
+  if (e->flag.res
+#if NUWRO_VERSION_MAJOR >= 20
+    || e->flag.res_delta
+#endif
+    ) {
 
     int npions = event1_nof(e, pion_pdg) + event1_nof(e, pion_plus_pdg) +
       event1_nof(e, pion_minus_pdg);
@@ -225,7 +229,7 @@ int NuWroInputHandler::ConvertNuwroMode(event *e) {
           if (event1_nof(e, proton_pdg) && event1_nof(e, pion_pdg))
             return 12;
           if (event1_nof(e, neutron_pdg) && event1_nof(e, pion_plus_pdg))
-            return 13;	  
+            return 13;
 	}
       } else {
 	// Now NC
@@ -250,7 +254,7 @@ int NuWroInputHandler::ConvertNuwroMode(event *e) {
       else
 	return 46*nu_nubar;
     }
-    
+
     // Eta production
     if (event1_nof(e, eta_pdg)) {
       if (e->flag.cc)
@@ -278,7 +282,7 @@ int NuWroInputHandler::ConvertNuwroMode(event *e) {
 
   // Coherent
   if (e->flag.coh) {
-    if (e->flag.cc && (event1_nof(e, pion_minus_pdg) + 
+    if (e->flag.cc && (event1_nof(e, pion_minus_pdg) +
 		       event1_nof(e, pion_plus_pdg)))
       return 16*nu_nubar;
     else if (event1_nof(e, pion_pdg))
@@ -291,17 +295,17 @@ int NuWroInputHandler::ConvertNuwroMode(event *e) {
       return 26*nu_nubar;
     else
       return 46*nu_nubar;
-  } 
+  }
 
   // This is QE hyperon production
   // There is a specific flag (e->flag.hyp), but I don't want to make this version dependent
   // For want of a better plan, I'm following the GENIE approach of calling this QE
   if (e->dyn == 10) return 1*nu_nubar;
-  
+
   // Lepton-lepton scattering
   // This does have a flag (e->flag.lep), but this should avoid version dependence...
   if (e->dyn == 12) return InputHandler::kNuElectronElastic*nu_nubar;
-  
+
   // If we got here, something is wrong, see what happened...
   NUIS_ERR(WRN, "Unable to interpret NuWro event, dumping info...");
   Print();
@@ -442,11 +446,15 @@ void NuWroInputHandler::Print(){
 	   << "\t\t|->       dis = " << fNuWroEvent->flag.dis << std::endl
 	   << "\t\t|->       coh = " << fNuWroEvent->flag.coh << std::endl
 	   << "\t\t|->       mec = " << fNuWroEvent->flag.mec << std::endl
+#if NUWRO_VERSION_MAJOR >= 20
 	   << "\t\t|->       hyp = " << fNuWroEvent->flag.hyp << std::endl
+#endif
 	   << "\t\t|->        nc = " << fNuWroEvent->flag.nc << std::endl
 	   << "\t\t|->        cc = " << fNuWroEvent->flag.cc << std::endl
 	   << "\t\t|->      anty = " << fNuWroEvent->flag.anty << std::endl
+#if NUWRO_VERSION_MAJOR >= 20
 	   << "\t\t|-> res_delta = " << fNuWroEvent->flag.res_delta << std::endl
+#endif
 	   << "\t\t|->      npi+ = " << event1_nof(fNuWroEvent, 211) << std::endl
            << "\t\t|->      npi- = " << event1_nof(fNuWroEvent, -211) << std::endl
            << "\t\t|->      npi0 = " << event1_nof(fNuWroEvent, 111) << std::endl
@@ -456,7 +464,7 @@ void NuWroInputHandler::Print(){
            << "\t\t|->   nlambda = " << event1_nof(fNuWroEvent, 3122) << std::endl
 	   << "\t\t|->   nsigma+ = " << event1_nof(fNuWroEvent, 3222) << std::endl
            << "\t\t|->   nsigma- = " << event1_nof(fNuWroEvent, 3112) << std::endl
-	   << "\t\t|->   nsigma0 = " << event1_nof(fNuWroEvent, 3212) << std::endl	
+	   << "\t\t|->   nsigma0 = " << event1_nof(fNuWroEvent, 3212) << std::endl
            << "\t\t|->   nproton = " << event1_nof(fNuWroEvent, 2212) << std::endl
            << "\t\t|->  nneutron = " << event1_nof(fNuWroEvent, 2112) << std::endl
            << "\t\t|->         W = " << fNuWroEvent->W());
