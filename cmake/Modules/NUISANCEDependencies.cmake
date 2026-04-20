@@ -129,6 +129,15 @@ if (NEUT_ENABLED)
   else()
     SET(NEUT_ENABLED TRUE)
 
+    if(NOT TARGET NEUT::All)
+      if(TARGET NEUT::ReWeight)
+        add_library(NEUT::All INTERFACE IMPORTED)
+        target_link_libraries(NEUT::All INTERFACE NEUT::ReWeight)
+      else()
+        message(FATAL_ERROR "Adding NEUT, however, NEUT_FOUND: ${NEUT_FOUND}, but NEUT::All is not defined, and neither is NEUT::ReWeight, I don't know how to proceed. Configure with -DNEUT_ENABLED=OFF if you do not need NEUT support.")
+      endif()
+    endif()
+
     SET(NUISANCENEUT_COMPILE_OPTIONS)
     LIST(APPEND NUISANCENEUT_COMPILE_OPTIONS -DNEUT_ENABLED=1)
 
