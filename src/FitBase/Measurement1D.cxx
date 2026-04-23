@@ -133,8 +133,8 @@ Measurement1D::~Measurement1D(void) {
     delete fInvNormalCovar;
   // ***** end NS covar modifications *****
 
-  delete fResidualHist;
-  delete fChi2LessBinHist;
+  if ( fResidualHist ) delete fResidualHist;
+  if ( fChi2LessBinHist ) delete fChi2LessBinHist;
 }
 
 //********************************************************************
