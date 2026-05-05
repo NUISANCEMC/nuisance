@@ -130,6 +130,12 @@ public:
   bool kRemoveNuclearParticles;
   TTreePerfStats *fTTreePerformance;
   int fSkip;
+
+  // TEST
+  std::vector<TH1D *> tmp_flux_hists;
+  std::vector<TH1D *> tmp_evt_hists;
+  std::vector<int> tmp_nevents;
+
 };
 /*! @} */
 #endif

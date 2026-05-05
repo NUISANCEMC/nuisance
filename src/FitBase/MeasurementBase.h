@@ -325,6 +325,7 @@ protected:
 
   // TEMP OBJECTS TO HANDLE MERGE
   double fXVar, fYVar, fZVar, Mode, Weight;
+  bool UseWeightFromMeas{false};
   bool Signal;
   int ievt;
   int fNEvents;
