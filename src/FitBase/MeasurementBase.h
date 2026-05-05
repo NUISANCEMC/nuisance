@@ -347,10 +347,13 @@ protected:
 
   bool fIsJoint;
 
+  bool fLogNormalData{false};
 
 
   double fNPOT, fFluxIntegralOverride, fTargetVolume, fTargetMaterialDensity;
   double fEvtRateScaleFactor;
+
+  double fXsecOffset{1E-38};
 
 };
 

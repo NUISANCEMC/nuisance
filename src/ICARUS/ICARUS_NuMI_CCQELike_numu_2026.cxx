@@ -28,7 +28,13 @@ ICARUS_NuMI_CCQELike_numu_2026::ICARUS_NuMI_CCQELike_numu_2026(
 
   fSettings = LoadSampleSettings( samplekey );
   std::string name = fSettings.GetS("name");
-  std::string CovMode = "Linear";
+
+  bool IsLogMode = false;
+  if( fSettings.Has("LogData") ){
+    IsLogMode = fSettings.GetB("LogData");
+  }
+  std::string CovMode = IsLogMode ? "Log" :"Linear";
+  NUIS_LOG(SAM, "CovMode: "+CovMode);
 
   int numubar_start_index = -1;
   if(fSettings.Has("numubar_start_index")){
@@ -80,10 +86,18 @@ ICARUS_NuMI_CCQELike_numu_2026::ICARUS_NuMI_CCQELike_numu_2026(
   FinaliseSampleSettings();
 
   // Load data ---------------------------------------------------------
+
+  fLogNormalData = IsLogMode;
+
   std::string inputFile_xsec_value = FitPar::GetDataBase() +
               "ICARUS/NuMI/CCQELike_numu_2016/nuis_ICARUS_NuMI_1muNp0pi_2026_SimFit_"+fVarName+"_xsec_values_"+CovMode+".txt";
   SetDataFromTextFile(inputFile_xsec_value);
-  ScaleData(1E-38);
+  if(IsLogMode){
+    fXsecOffset=1.;
+  }
+  else{
+    ScaleData(1E-38);
+  }
 
   if(numubar_start_index>=0){
     int NInputFiles = GetInput()->tmp_flux_hists.size();
@@ -119,7 +133,7 @@ ICARUS_NuMI_CCQELike_numu_2026::ICARUS_NuMI_CCQELike_numu_2026(
 
     UseWeightFromMeas = true;
 
-    NUIS_LOG(SAM, "numu/numubar separate mode");
+    NUIS_LOG(SAM, "numu/numubar separate sample mode");
     NUIS_LOG(SAM, "- numu:");
     NUIS_LOG(SAM, "Event integral = " << EvtIntegral_numu);
     NUIS_LOG(SAM, "Nevent = " << NEvent_numu);
@@ -135,11 +149,12 @@ ICARUS_NuMI_CCQELike_numu_2026::ICARUS_NuMI_CCQELike_numu_2026(
   else{
     fScaleFactor = GetEventHistogram()->Integral("width") / fNEvents * 1.0E-38 /
                  TotalIntegratedFlux() * 40;
-    std::cout << "Combined sample Mode" << std::endl;
-    std::cout << "Event integral = " << GetEventHistogram()->Integral("width") << std::endl;
-    std::cout << "Nevent = " << fNEvents << std::endl;
-    std::cout << "Flux integral = " << TotalIntegratedFlux() << std::endl;
-    std::cout << "-> fScaleFactor = " << fScaleFactor << std::endl;
+    NUIS_LOG(SAM, "numu+numubar combined sample mode");
+    NUIS_LOG(SAM, "Event integral = " << GetEventHistogram()->Integral("width"));
+    NUIS_LOG(SAM, "Nevent = " << fNEvents);
+    NUIS_LOG(SAM, "Flux integral = " << TotalIntegratedFlux());
+    NUIS_LOG(SAM, "-> fScaleFactor = " << fScaleFactor);
+
   }
 
   std::string inputFile_xsec_cov = FitPar::GetDataBase() +
