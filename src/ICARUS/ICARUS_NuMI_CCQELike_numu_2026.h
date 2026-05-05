@@ -23,9 +23,20 @@
 #include "Measurement1D.h"
 
 // Implemented May 2026 by Jaesung Kim
+// jae.sung.kim.3426@gmail.com
+// https://arxiv.org/abs/2604.24925
 class ICARUS_NuMI_CCQELike_numu_2026 : public Measurement1D {
 
 public:
+
+enum Distribution {
+    kMuonCos=0,
+    kMuonProtonCos=1,
+    kdeltaPT=2,
+    kdeltaalphaT=3,
+    kAngular=4,
+    kTKI=5,
+  };
 
   ICARUS_NuMI_CCQELike_numu_2026( nuiskey samplekey );
   virtual ~ICARUS_NuMI_CCQELike_numu_2026() {}
@@ -33,15 +44,15 @@ public:
   void FillEventVariables( FitEvent* event );
   bool isSignal( FitEvent* event );
 
+  /// override the base class method
+  void FillHistograms();
+
 private:
 
-  enum Distribution {
-  kMuonCos=0,
-  kMuonProtonCos=1,
-  kdeltaPT=2,
-  kdeltaalphaT=3
-  };
-  bool isTKI{false};
+  bool ApplyMuonPCut{false};
+
+  bool IsCorrelatedFit{false};
+  double YVarOffset{-999.};
 
   Distribution fDist;
   std::string fVarName;

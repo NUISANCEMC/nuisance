@@ -26,6 +26,31 @@ ICARUS_NuMI_CCQELike_numu_2026::ICARUS_NuMI_CCQELike_numu_2026(
   nuiskey samplekey )
 {
 
+  // ICARUS NuMI cross section
+  // Beam: NuMI FHC (Run1: 06/2022~07/2022, Run2: 02/2023~06/2023)
+  // Signal: 1muNp0pi
+  // Note:
+  // - ICARUS NuMI is ~105mrad offaxis, thus contains singificant anti-muon neutrino 
+  //   contribution in FHC mode beam
+  // - The proton requirement reduces the event rate from RHC, but the flux integral is affected;
+  //   Flux integral, FHC:RHC = 1.7:1.0
+  // - Ideally, a sample generated with (numu+numubar) flux can be used,
+  //   but practically, users generate numu and numubar seperately
+  // - Then numu and numubar requires different fScaleFcator, but when both files are given with "input=" parameter,
+  //   we cannot do that properly
+  // - So when using separately generated numu and numubar sample, one can do in the card,
+  //   <sample name="ICARUS_NuMI_CCQELike_numu_2026_(VariableName)", input="GENIE:numu_0.root,numu_1.root,numu_2.root,numubar_0.root,numubar_1.root,numubar_2.root" numubar_start_index="10" />
+  //   - In input, first list the numu samples, then numubar
+  //   - Put the number of numu files in "numubar_start_index="; this indicates which indexe the numubar file starts
+  // - The measurement has symmetric error in log(xsec); log-normal distribution
+  //   - The covariance matrix makes the most sense in log-space
+  //   - The erorr are in linear scale is asymmetric; higher erorr > lower error
+  //   - We also provide "linearlized" covariance matrix, averaging (higher erorr, lower error),
+  //     but this is an approximation
+  //   - To convert the xsec in log-space and use the log-covariance (i.e., most accurate calculation), add
+  //     LogData="true" in the sample;
+  //     <sample name="ICARUS_NuMI_CCQELike_numu_2026_(VariableName)", input="GENIE:numu_0.root,numu_1.root,numu_2.root,numubar_0.root,numubar_1.root,numubar_2.root" numubar_start_index="10" LogData="true"/>
+
   fSettings = LoadSampleSettings( samplekey );
   std::string name = fSettings.GetS("name");
 
@@ -42,29 +67,49 @@ ICARUS_NuMI_CCQELike_numu_2026::ICARUS_NuMI_CCQELike_numu_2026(
   }
 
   if (!name.compare("ICARUS_NuMI_CCQELike_numu_2026_MuonCos")) {
-    isTKI = false;
+    ApplyMuonPCut = false;
+    IsCorrelatedFit = false;
     fDist = kMuonCos;
     fVarName = "MuonCos";
     fSettings.SetXTitle("cos(#theta_{#mu})");
     fSettings.SetYTitle("d#sigma/dcos(#theta_{#mu}) (cm^{2}/Ar)");
   } else if (!name.compare("ICARUS_NuMI_CCQELike_numu_2026_MuonProtonCos")) {
-    isTKI = false;
+    ApplyMuonPCut = false;
+    IsCorrelatedFit = false;
     fDist = kMuonProtonCos;
     fVarName = "MuonProtonCos";
     fSettings.SetXTitle("cos(#theta_{#mu,p})");
     fSettings.SetYTitle("d#sigma/dcos(#theta_{#mu,p}) (cm^{2}/Ar)");
   } else if (!name.compare("ICARUS_NuMI_CCQELike_numu_2026_deltaPT")) {
-    isTKI = true;
+    ApplyMuonPCut = true;
+    IsCorrelatedFit = false;
     fDist = kdeltaPT;
     fVarName = "deltaPT";
     fSettings.SetXTitle("#deltap_{T} (GeV/c)");
     fSettings.SetYTitle("d#sigma/d#deltap_{T} (cm^{2}/(GeV/c)Ar)");
   } else if (!name.compare("ICARUS_NuMI_CCQELike_numu_2026_deltaalphaT")) {
-    isTKI = true;
+    ApplyMuonPCut = true;
+    IsCorrelatedFit = false;
     fDist = kdeltaalphaT;
     fVarName = "deltaalphaT";
     fSettings.SetXTitle("#delta#alpha_{T} (degree)");
     fSettings.SetYTitle("d#sigma/d#delta#alpha_{T} (cm^{2}/(degree)Ar)");
+  } else if (!name.compare("ICARUS_NuMI_CCQELike_numu_2026_MuonCos_and_MuonProtonCos")) {
+    ApplyMuonPCut = false;
+    IsCorrelatedFit = true;
+    YVarOffset = 2.0;
+    fDist = kAngular;
+    fVarName = "MuonCos_and_MuonProtonCos";
+    fSettings.SetXTitle("cos(#theta_{#mu}) and cos(#theta_{#mu,p})");
+    fSettings.SetYTitle("d#sigma/dX (cm^{2}/Ar)");
+  } else if (!name.compare("ICARUS_NuMI_CCQELike_numu_2026_deltaPT_and_deltaalphaT")) {
+    ApplyMuonPCut = true;
+    IsCorrelatedFit = true;
+    YVarOffset = 0.8;
+    fDist = kTKI;
+    fVarName = "deltaPT_and_deltaalphaT";
+    fSettings.SetXTitle("#deltap_{T} and #delta#alpha_{T}");
+    fSettings.SetYTitle("d#sigma/dX (cm^{2}/Ar)");
   } else {
     NUIS_ABORT(
         "ICARUS_NuMI_CCQELike_numu_2026: Didn’t get a valid name: " << name);
@@ -165,21 +210,30 @@ ICARUS_NuMI_CCQELike_numu_2026::ICARUS_NuMI_CCQELike_numu_2026(
 
 }
 
-void ICARUS_NuMI_CCQELike_numu_2026::FillEventVariables( FitEvent* event ) {
+void ICARUS_NuMI_CCQELike_numu_2026::FillEventVariables( FitEvent* event ){
 
   SignalDef::helper_ICARUS_NuMI_CCQELike_numu helper_meas = SignalDef::isICARUS_NuMI_CCQELike_numu(event, EnuMin, EnuMax);
 
   bool pass = helper_meas.IsSignal;
-  if(isTKI) pass = pass && helper_meas.IsMuonPLT0p8;
+  if(ApplyMuonPCut) pass = pass && helper_meas.IsMuonPLT0p8;
 
   if(!pass) return;
-  
+
   Weight = helper_meas.IsAntiNu ? weight_numubar : weight_numu;
 
   if(fDist==kMuonCos) fXVar = helper_meas.MuonCos;
   else if(fDist==kMuonProtonCos) fXVar = helper_meas.MuonProtonCos;
   else if(fDist==kdeltaPT) fXVar = helper_meas.deltaPT;
   else if(fDist==kdeltaalphaT) fXVar = helper_meas.deltaalphaT;
+  else if(fDist==kAngular){
+    fXVar = helper_meas.MuonCos;
+    fYVar = helper_meas.MuonProtonCos;
+  }
+  else if(fDist==kTKI){
+    fXVar = helper_meas.deltaPT;
+    if(fXVar>=0.8) fXVar = -999.;
+    fYVar = helper_meas.deltaalphaT;
+  }
   else{
     NUIS_ABORT(
         "ICARUS_NuMI_CCQELike_numu_2026: " << fVarName << " is not supported\n");
@@ -192,9 +246,41 @@ bool ICARUS_NuMI_CCQELike_numu_2026::isSignal( FitEvent* event ) {
   SignalDef::helper_ICARUS_NuMI_CCQELike_numu helper_meas = SignalDef::isICARUS_NuMI_CCQELike_numu(event, EnuMin, EnuMax);
 
   bool pass = helper_meas.IsSignal;
-  if(isTKI) pass = pass && helper_meas.IsMuonPLT0p8;
+  if(ApplyMuonPCut) pass = pass && helper_meas.IsMuonPLT0p8;
 
   Weight = helper_meas.IsAntiNu ? weight_numubar : weight_numu;
 
   return pass;
+}
+
+void ICARUS_NuMI_CCQELike_numu_2026::FillHistograms(){
+
+  if(!IsCorrelatedFit) Measurement1D::FillHistograms();
+  else{
+
+    if (Signal) {
+
+      for(int ivar=0; ivar<2; ivar++){
+
+        double this_var = (ivar==0) ? fXVar : fYVar+YVarOffset;
+
+        fMCHist->Fill(this_var, Weight);
+        fMCStat->Fill(this_var, 1.0);
+        if (fMCHist_Modes){
+          fMCHist_Modes->Fill(Mode, this_var, Weight);
+        }
+
+        fMCFine->Fill(this_var, Weight);
+        if (fMCFine_Modes){
+          fMCFine_Modes->Fill(Mode, this_var, Weight);
+        }
+
+      }
+
+    }
+
+    return;
+
+  }
+
 }

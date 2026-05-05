@@ -1747,7 +1747,9 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
            if (!name.compare("ICARUS_NuMI_CCQELike_numu_2026_MuonCos") ||
                !name.compare("ICARUS_NuMI_CCQELike_numu_2026_MuonProtonCos") ||
                !name.compare("ICARUS_NuMI_CCQELike_numu_2026_deltaPT") ||
-               !name.compare("ICARUS_NuMI_CCQELike_numu_2026_deltaalphaT")) {
+               !name.compare("ICARUS_NuMI_CCQELike_numu_2026_deltaalphaT") ||
+               !name.compare("ICARUS_NuMI_CCQELike_numu_2026_MuonCos_and_MuonProtonCos") ||
+               !name.compare("ICARUS_NuMI_CCQELike_numu_2026_deltaPT_and_deltaalphaT") ) {
       return (new ICARUS_NuMI_CCQELike_numu_2026(samplekey));
   } else
 #endif
