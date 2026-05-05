@@ -131,7 +131,9 @@ public:
   TTreePerfStats *fTTreePerformance;
   int fSkip;
 
-  // TEST
+  // (05/05/2026) Added by Jaesung Kim;
+  // For ICARUS_NuMI_1muNp0pi_2026, where both numu and numubar samples are used
+  // Saving flux/evt/nevents for each input file lists
   std::vector<TH1D *> tmp_flux_hists;
   std::vector<TH1D *> tmp_evt_hists;
   std::vector<int> tmp_nevents;
