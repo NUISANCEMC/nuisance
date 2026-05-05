@@ -36,12 +36,12 @@ ICARUS_NuMI_CCQELike_numu_2026::ICARUS_NuMI_CCQELike_numu_2026(
   //   Flux integral, FHC:RHC = 1.7:1.0
   // - Ideally, a sample generated with (numu+numubar) flux can be used,
   //   but practically, users generate numu and numubar seperately
-  // - Then numu and numubar requires different fScaleFcator, but when both files are given with "input=" parameter,
+  // - Then numu and numubar requires different fScaleFcator, but when both files are given in a single "input=" parameter,
   //   we cannot do that properly
-  // - So when using separately generated numu and numubar sample, one can do in the card,
+  // - So when using numu and numubar sample generated separately, one can do below in the card;
   //   <sample name="ICARUS_NuMI_CCQELike_numu_2026_(VariableName)", input="GENIE:numu_0.root,numu_1.root,numu_2.root,numubar_0.root,numubar_1.root,numubar_2.root" numubar_start_index="10" />
-  //   - In input, first list the numu samples, then numubar
-  //   - Put the number of numu files in "numubar_start_index="; this indicates which indexe the numubar file starts
+  //   - In input, first put the numu samples, then numubar
+  //   - Put the number of numu files in "numubar_start_index="; this indicates which index the numubar file starts
   // - The measurement has symmetric error in log(xsec); log-normal distribution
   //   - The covariance matrix makes the most sense in log-space
   //   - The erorr are in linear scale is asymmetric; higher erorr > lower error
