@@ -30,9 +30,9 @@ ICARUS_NuMI_CCQELike_numu_2026::ICARUS_NuMI_CCQELike_numu_2026(
   // Beam: NuMI FHC (Run1: 06/2022~07/2022, Run2: 02/2023~06/2023)
   // Signal: 1muNp0pi
   // Note:
-  // - ICARUS NuMI is ~105mrad offaxis, thus contains singificant anti-muon neutrino 
+  // - ICARUS NuMI is ~105 mrad offaxis, thus contains singificant anti-muon neutrino 
   //   contribution in FHC mode beam
-  // - The proton requirement reduces the event rate from RHC, but the flux integral is affected;
+  // - The proton requirement reduces the event rate from numubar, but the flux integral is affected;
   //   Flux integral, FHC:RHC = 1.7:1.0
   // - Ideally, a sample generated with (numu+numubar) flux can be used,
   //   but practically, users generate numu and numubar seperately
