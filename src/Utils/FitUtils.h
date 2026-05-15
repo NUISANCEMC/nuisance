@@ -196,6 +196,15 @@ double CosThAdler(TLorentzVector Pnu, TLorentzVector Pmu, TLorentzVector Ppi,
                   TLorentzVector Pprot);
 double PhiAdler(TLorentzVector Pnu, TLorentzVector Pmu, TLorentzVector Ppi,
                 TLorentzVector Pprot);
+
+// ICARUS
+
+double CalcTKI_deltaPT(const TVector3 vec_p_mu, const TVector3 vec_p_pro, const TVector3 vec_p_nu);
+double CalcTKI_deltaPTx(const TVector3 vec_p_mu, const TVector3 vec_p_pro, const TVector3 vec_p_nu);
+double CalcTKI_deltaPTy(const TVector3 vec_p_mu, const TVector3 vec_p_pro, const TVector3 vec_p_nu);
+double CalcTKI_deltaalphaT(const TVector3 vec_p_mu, const TVector3 vec_p_pro, const TVector3 vec_p_nu);
+double CalcTKI_deltaphiT(const TVector3 vec_p_mu, const TVector3 vec_p_pro, const TVector3 vec_p_nu);
+
 } // namespace FitUtils
 
 /*! @} */

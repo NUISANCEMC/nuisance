@@ -359,7 +359,7 @@ void Measurement1D::SetCorrelationFromTextFile(std::string covfile, int dim) {
     for (int j = 0; j < fDataHist->GetNbinsX(); j++) {
       (*fFullCovar)(i, j) = (*correlation)(i, j) *
                             fDataHist->GetBinError(i + 1) *
-                            fDataHist->GetBinError(j + 1) * 1.E76;
+                            fDataHist->GetBinError(j + 1) * (1/fXsecOffset/fXsecOffset);
     }
   }
 
@@ -389,7 +389,7 @@ void Measurement1D::SetCorrelationFromMultipleTextFiles(std::string corrfiles,
     for (int i = 0; i < fDataHist->GetNbinsX(); i++) {
       for (int j = 0; j < fDataHist->GetNbinsX(); j++) {
         (*temp_cov)(i, j) = (*temp_cov)(i, j) * fDataHist->GetBinError(i + 1) *
-                            fDataHist->GetBinError(j + 1) * 1.E76;
+                            fDataHist->GetBinError(j + 1) * (1/fXsecOffset/fXsecOffset);
       }
     }
 
@@ -422,7 +422,7 @@ void Measurement1D::SetCorrelationFromRootFile(std::string covfile,
     for (int j = 0; j < fDataHist->GetNbinsX(); j++) {
       (*fFullCovar)(i, j) = (*correlation)(i, j) *
                             fDataHist->GetBinError(i + 1) *
-                            fDataHist->GetBinError(j + 1) * 1.E76;
+                            fDataHist->GetBinError(j + 1) * (1/fXsecOffset/fXsecOffset);
     }
   }
 
@@ -610,8 +610,8 @@ void Measurement1D::FinaliseMeasurement() {
 
   // Push the diagonals of fFullCovar onto the data histogram, and check that they are consisntent
   // This is a useful check for inconsistent data releases, or inconsistent covariance matrix units, or simply wrong data releases...
-  // Assumes that the covariance matrix should be scaled by 1E-38
-  StatUtils::SetDataErrorFromCov(fDataHist, fFullCovar, 1E-38);
+  // Assumes that the covariance matrix should be scaled by fXsecOffset (default: 1E-38)
+  StatUtils::SetDataErrorFromCov(fDataHist, fFullCovar, fXsecOffset);
 
   // If shape only, set covar and fDecomp using the shape-only matrix (if set)
   if (fIsShape && fShapeCovar && FitPar::Config().GetParB("UseShapeCovar")) {
@@ -643,10 +643,10 @@ void Measurement1D::FinaliseMeasurement() {
     if (covar)
       delete covar;
 
-    fNSCovar = StatUtils::ExtractNSCovar(fFullCovar, fDataHist, 1e-38);
+    fNSCovar = StatUtils::ExtractNSCovar(fFullCovar, fDataHist, fXsecOffset);
 
-    fDataNSHist = StatUtils::InitToNS(fDataHist, 1e-38);
-    StatUtils::SetDataErrorFromCov(fDataNSHist, fNSCovar, 1e-38, false);
+    fDataNSHist = StatUtils::InitToNS(fDataHist, fXsecOffset);
+    StatUtils::SetDataErrorFromCov(fDataNSHist, fNSCovar, fXsecOffset, false);
 
     covar = StatUtils::GetInvert(fNSCovar);
     fInvNormalCovar = StatUtils::GetInvert(fFullCovar);
@@ -665,11 +665,11 @@ void Measurement1D::FinaliseMeasurement() {
   // Setup fMCFine, provide option to create it before in the sample constructor first
   if (!fMCFine){
     fMCFine = new TH1D("mcfine", "mcfine", fDataHist->GetNbinsX() * 8,
-		       fMCHist->GetBinLowEdge(1),
-		       fMCHist->GetBinLowEdge(fDataHist->GetNbinsX() + 1));
+           fMCHist->GetBinLowEdge(1),
+           fMCHist->GetBinLowEdge(fDataHist->GetNbinsX() + 1));
   }
   fMCFine->SetNameTitle((fSettings.GetName() + "_MC_FINE").c_str(),
-			(fSettings.GetFullTitles()).c_str());
+      (fSettings.GetFullTitles()).c_str());
   fMCFine->Reset();
 
   // Setup MC Stat
@@ -702,7 +702,7 @@ void Measurement1D::FinaliseMeasurement() {
     if (drawopts.find("FINE") != std::string::npos){
 
       fMCFine_Modes = new TrueModeStack((fSettings.GetName() + "_FINE_MODES").c_str(),
-					("True Channels"), fMCFine);
+          ("True Channels"), fMCFine);
       fMCFine_Modes ->SetTitleX(fDataHist->GetXaxis()->GetTitle());
       fMCFine_Modes ->SetTitleY(fDataHist->GetYaxis()->GetTitle());
 
@@ -975,12 +975,12 @@ void Measurement1D::FillHistograms() {
       fMCHist->Fill(fMCHist->GetBinCenter(1), Weight);
       fMCStat->Fill(fMCStat->GetBinCenter(1), 1.0);
       if (fMCHist_Modes)
-	fMCHist_Modes->Fill(Mode, fMCHist->GetBinCenter(1), Weight);
+  fMCHist_Modes->Fill(Mode, fMCHist->GetBinCenter(1), Weight);
     } else {
       fMCHist->Fill(fXVar, Weight);
       fMCStat->Fill(fXVar, 1.0);
       if (fMCHist_Modes)
-	fMCHist_Modes->Fill(Mode, fXVar, Weight);
+  fMCHist_Modes->Fill(Mode, fXVar, Weight);
     }
 
     fMCFine->Fill(fXVar, Weight);
@@ -1087,6 +1087,40 @@ void Measurement1D::ScaleEvents() {
                          fMCFine->GetBinContent(i + 1) * statratiofine[i]);
   }
 
+  if(fLogNormalData){
+
+    for (int i = 0; i < fMCHist->GetNbinsX(); i++) {
+      double orig_val = fMCHist->GetBinContent(i + 1);
+      double orig_err = fMCHist->GetBinError(i + 1);
+
+      double log_val = std::log(orig_val);
+      double log_val_up = std::log(orig_val+orig_err);
+      double log_val_dn = std::log(orig_val-orig_err);
+      double log_val_up_diff = abs(log_val-log_val_up);
+      double log_val_dn_diff = abs(log_val-log_val_dn);
+      double log_val_avg_diff = (log_val_up_diff+log_val_dn_diff)/2.;
+
+      fMCHist->SetBinContent(i + 1, log_val);
+      fMCHist->SetBinError(i + 1, log_val_avg_diff);
+    }
+
+    for (int i = 0; i < fMCFine->GetNbinsX(); i++) {
+      double orig_val = fMCFine->GetBinContent(i + 1);
+      double orig_err = fMCFine->GetBinError(i + 1);
+      
+      double log_val = std::log(orig_val);
+      double log_val_up = std::log(orig_val+orig_err);
+      double log_val_dn = std::log(orig_val-orig_err);
+      double log_val_up_diff = abs(log_val-log_val_up);
+      double log_val_dn_diff = abs(log_val-log_val_dn);
+      double log_val_avg_diff = (log_val_up_diff+log_val_dn_diff)/2.;
+      
+      fMCFine->SetBinContent(i + 1, log_val);
+      fMCFine->SetBinError(i + 1, log_val_avg_diff);
+    }     
+
+  }
+
   // Clean up
   delete[] statratio;
   delete[] statratiofine;
@@ -1157,7 +1191,7 @@ double Measurement1D::GetLikelihood() {
   // ***** NS covar modifications *****
 
   if (fIsNS) {
-    fMCNSHist = StatUtils::InitToNS(fMCHist, 1e-38);
+    fMCNSHist = StatUtils::InitToNS(fMCHist, fXsecOffset);
   }
 
   // ***** end NS covar modifications *****
@@ -1180,7 +1214,7 @@ double Measurement1D::GetLikelihood() {
       stat = StatUtils::GetChi2FromDiag(fDataHist, fMCHist, fMaskHist);
     } else if (!fIsDiag and !fIsRawEvents) {
       stat = StatUtils::GetChi2FromCov(fDataHist, fMCHist, covar, fMaskHist, 1,
-                                       1E76, fIsWriting ? fResidualHist : NULL);
+                                       1/fXsecOffset/fXsecOffset, fIsWriting ? fResidualHist : NULL);
       if (fChi2LessBinHist && fIsWriting) {
         for (int xi = 0; xi < fDataHist->GetNbinsX(); ++xi) {
           TH1I *binmask = fMaskHist
@@ -1209,12 +1243,12 @@ double Measurement1D::GetLikelihood() {
       masked_mc->Scale(scaleF);
 
       NUIS_LOG(REC, "Shape Norm Decomp mcinteg: "
-                        << masked_mc->Integral() * 1E38
-                        << ", datainteg: " << masked_data->Integral() * 1E38
+                        << masked_mc->Integral() * (1/fXsecOffset)
+                        << ", datainteg: " << masked_data->Integral() * (1/fXsecOffset)
                         << ", normerror: " << fNormError);
 
       double normpen =
-          std::pow((masked_data->Integral() - masked_mc->Integral()) * 1E38,
+          std::pow((masked_data->Integral() - masked_mc->Integral()) * (1/fXsecOffset),
                    2) /
           fNormError;
 
@@ -1610,7 +1644,7 @@ void Measurement1D::WriteShapePlot() {
   if (!fShapeCovar) SetShapeCovar();
 
   // Don't check error
-  if (fShapeCovar) StatUtils::SetDataErrorFromCov(dataShape, fShapeCovar, 1E-38, false);
+  if (fShapeCovar) StatUtils::SetDataErrorFromCov(dataShape, fShapeCovar, fXsecOffset, false);
 
   double shapeScale = 1.0;
   if (fIsRawEvents) {
@@ -1991,8 +2025,8 @@ void Measurement1D::SetCovarMatrixFromCorrText(std::string corrFile, int dim) {
     std::vector<double> entries = GeneralUtils::ParseToDbl(line, " ");
     for (std::vector<double>::iterator iter = entries.begin();
          iter != entries.end(); iter++) {
-      double val = (*iter) * this->fDataHist->GetBinError(row + 1) * 1E38 *
-                   this->fDataHist->GetBinError(column + 1) * 1E38;
+      double val = (*iter) * this->fDataHist->GetBinError(row + 1) * (1/fXsecOffset) *
+                   this->fDataHist->GetBinError(column + 1) * (1/fXsecOffset);
       if (val == 0) {
         NUIS_ABORT("Found a zero value in the covariance matrix, assuming "
                    "this is an error!");
@@ -2031,7 +2065,7 @@ void Measurement1D::SetCovarFromDataFile(std::string covarFile,
   covPlot->SetDirectory(0);
   // Scale the covariance matrix if it comes in normal units
   if (FullUnits) {
-    covPlot->Scale(1.E76);
+    covPlot->Scale(1/fXsecOffset/fXsecOffset);
   }
 
   int dim = covPlot->GetNbinsX();

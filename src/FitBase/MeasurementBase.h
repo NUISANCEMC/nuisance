@@ -325,6 +325,7 @@ protected:
 
   // TEMP OBJECTS TO HANDLE MERGE
   double fXVar, fYVar, fZVar, Mode, Weight;
+  bool UseWeightFromMeas{false};
   bool Signal;
   int ievt;
   int fNEvents;
@@ -346,10 +347,13 @@ protected:
 
   bool fIsJoint;
 
+  bool fLogNormalData{false};
 
 
   double fNPOT, fFluxIntegralOverride, fTargetVolume, fTargetMaterialDensity;
   double fEvtRateScaleFactor;
+
+  double fXsecOffset{1E-38};
 
 };
 
