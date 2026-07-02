@@ -206,17 +206,12 @@ size_t NOvARwgtEngine::GetWeightGeneratorIndex(std::string const &strname) {
              std::distance(novarwgt::kCVTuneSA.SystKnobs().begin(), loc);
     }
 
-  // CVTune2024_NoGSF must be checked BEFORE CVTune2024
-  // because CVTune2024 is a prefix of CVTune2024_NoGSF
-  } else if (strname.find("CVTune2024_NoGSF") == 0) {
+  } else if (strname.find("CVTune2024NoGSF") == 0) {
     if (upos == std::string::npos) {
       return kCVTune2024NoGSF;
     }
-    // The knob name follows the second underscore, e.g. "CVTune2024_NoGSF_KnobName"
-    size_t upos2 = strname.find_first_of("_", upos + 1);
-    std::string knobname = (upos2 == std::string::npos)
-                               ? strname.substr(upos + 1)
-                               : strname.substr(upos2 + 1);
+
+    std::string knobname = strname.substr(upos + 1);
     if (novarwgt::kCVTune2024_NoGSF.SystKnobs().count(knobname)) {
       auto loc = novarwgt::kCVTune2024_NoGSF.SystKnobs().find(knobname);
       return kCVTune2024NoGSF + 1 +
