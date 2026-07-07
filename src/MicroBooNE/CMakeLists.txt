@@ -17,26 +17,35 @@
 #    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 set(MicroBooNE_Impl_Files
-  MicroBooNE_CCInc_XSec_2DPcos_nu.cxx
-  MicroBooNE_CC1MuNp_XSec_1D_nu.cxx
-  MicroBooNE_CC1ENp_XSec_1D_nu.cxx
-  MicroBooNE_CC1Mu2p_XSec_1D_nu.cxx
-  MicroBooNE_CC1Mu1p_XSec_1D_nu.cxx
-  MicroBooNE_CC1Mu0pNp_XSec_nu.cxx
-  MicroBooNE_CC1Mu3DInc_XSec_nu.cxx
-  MicroBooNE_NCpi0_XSec_nu.cxx
-  MicroBooNE_SignalDef.cxx
+  MicroBooNE_BNB_NumuCC1p_2023_XSec_2D_nu.cxx
+  MicroBooNE_BNB_NumuCCInc_2019_XSec_nu.cxx
+  MicroBooNE_BNB_NumuCC0PiNp_2020_XSec_nu.cxx
+  MicroBooNE_BNB_NumuCC0Pi2p_2022_XSec_nu.cxx
+  MicroBooNE_BNB_NumuCC1p_2023_XSec_1D_nu.cxx
+  MicroBooNE_BNB_NueCC0piNp_2022_XSec_1D_nu.cxx
+  MicroBooNE_BNB_NueCC0piProtonKE_2022_XSec_1D_nu.cxx
+  MicroBooNE_BNB_NumuCC0pNp_2024_XSec_nu.cxx
+  MicroBooNE_BNB_NumuCCInc_2023_XSec_3D_nu.cxx
+  MicroBooNE_BNB_NCpi0_2024_XSec_nu.cxx
+  MicroBooNE_BNB_NumuCC0PiNp_2025_XSec_nu.cxx
+  MicroBooNE_BNB_NumuCC0Pi_2025_XSec_nu.cxx
+  MicroBooNEBlockHandler.cxx
 )
 
 set(MicroBooNE_Hdr_Files
-  MicroBooNE_CCInc_XSec_2DPcos_nu.h
-  MicroBooNE_CC1MuNp_XSec_1D_nu.h
-  MicroBooNE_CC1Mu2p_XSec_1D_nu.h
-  MicroBooNE_CC1Mu1p_XSec_1D_nu.h
-  MicroBooNE_CC1Mu0pNp_XSec_nu.h
-  MicroBooNE_CC1Mu3DInc_XSec_nu.h
-  MicroBooNE_NCpi0_XSec_nu.h
-  MicroBooNE_SignalDef.h
+  MicroBooNE_BNB_NumuCC1p_2023_XSec_2D_nu.h
+  MicroBooNE_BNB_NumuCCInc_2019_XSec_nu.h
+  MicroBooNE_BNB_NumuCC0PiNp_2020_XSec_nu.h
+  MicroBooNE_BNB_NumuCC1p_2023_XSec_1D_nu.h
+  MicroBooNE_BNB_NumuCC0Pi2p_2022_XSec_nu.h
+  MicroBooNE_BNB_NueCC0piNp_2022_XSec_1D_nu.h
+  MicroBooNE_BNB_NueCC0piProtonKE_2022_XSec_1D_nu.h
+  MicroBooNE_BNB_NumuCC0pNp_2024_XSec_nu.h
+  MicroBooNE_BNB_NumuCCInc_2023_XSec_3D_nu.h
+  MicroBooNE_BNB_NCpi0_2024_XSec_nu.h
+  MicroBooNE_BNB_NumuCC0PiNp_2025_XSec_nu.h
+  MicroBooNE_BNB_NumuCC0Pi_2025_XSec_nu.h
+  MicroBooNEBlockHandler.h
 )
 
 add_library(MicroBooNE SHARED ${MicroBooNE_Impl_Files})
