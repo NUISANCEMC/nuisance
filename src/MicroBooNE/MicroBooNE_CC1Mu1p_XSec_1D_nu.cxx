@@ -220,27 +220,28 @@ void MicroBooNE_CC1Mu1p_XSec_1D_nu::FillEventVariables(FitEvent *event) {
   // For the calculation of p_n, back to the Minerva PRL
   // https://journals.aps.org/prl/pdf/10.1103/PhysRevLett.121.022504
 
-  double R =
-      MA + vpmuL.Mag() + vpL.Mag() - MuonEnergy - ProtonEnergy; // Equation 8
-
+  // Momenta come back in MeV/c, but calculation is in GeV/c. Convert and ensure the
+  // calculation keep the sign of the longitudinal momenta.
+  // This is done correctly in FitUtils::Get_pn_reco_Ar_HMProton.
+  // Possibly leverage that calculation here in the future to reduce repeated work.
+  double MuonPL = vpmuL.Z() / 1000.;   // GeV/c
+  double ProtonPL = vpL.Z() / 1000.;   // GeV/c
+                                       
+  // Equation 8
+  double R = MA + MuonPL + ProtonPL - MuonEnergy - ProtonEnergy;
   // Equation 7
+  double PL = 0.5 * R - (MAPrime * MAPrime + DeltaPT * DeltaPT) / (2 * R);
 
-  double PL =
-      0.5 * R - (MAPrime * MAPrime + vSumT.Mag() * vSumT.Mag()) / (2 * R);
-
-  double DeltaPn =
-      TMath::Sqrt((vSumT.Mag() * vSumT.Mag()) + (PL * PL)) / 1000.0;
+  double DeltaPn = TMath::Sqrt((DeltaPT * DeltaPT) + (PL * PL)); // GeV/c
   //  https://journals.aps.org/prd/pdf/10.1103/PhysRevD.101.092001
 
+  // Use Equation 12 directly to avoid issues with passing calculations in degrees
+  // to trig functions that expect radians.
   TVector3 UnitZ(0, 0, 1);
-  // double Ptx = ( UnitZ.Cross(vpmuT) ).Dot(vSumT) / vpmuT.Mag(); -original in
-  // code
-  double DeltaPtx = DeltaPT * TMath::Sin(DeltaAlphaT); // changed by Abi
-                                                       // 06/12/23
-  double Pty = -(vpmuT).Dot(vSumT) / vpmuT.Mag();
+  double DeltaPtx =
+      (UnitZ.Cross(vpmuT)).Dot(vSumT) / vpmuT.Mag() / 1000.;      // GeV/c
 
-  double DeltaPty = DeltaPT * TMath::Sin(DeltaAlphaT); // changed by Abi
-                                                       // 06/12/23
+  double DeltaPty = -(vpmuT).Dot(vSumT) / vpmuT.Mag() / 1000.;    // GeV/c
   //----------------------------------------//
 
   if (fDist == kDeltaPT) {
