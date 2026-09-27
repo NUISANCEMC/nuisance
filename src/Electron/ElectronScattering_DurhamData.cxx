@@ -345,6 +345,9 @@ bool ElectronScattering_DurhamData::isSignal(FitEvent* event) {
     return false;
   }
 
+  // Fill the cut variables here rather than relying on the call order.
+  FillEventVariables(event);
+
   // std::cout << "fXVar = " << fXVar << " " << fXLowLim << " " << fXHighLim <<
   // std::endl;
   // std::cout << "fYVar = " << fYVar << " " << fYLowLim << " " << fYHighLim <<
