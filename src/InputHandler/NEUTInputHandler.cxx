@@ -346,8 +346,8 @@ void NEUTInputHandler::CalcNUISANCEKinematics() {
 
   if (fNUISANCEEvent->fBound ||
       (!fNUISANCEEvent->fBound &&
-       abs(fNUISANCEEvent->Mode) ==
-           16)) { // Make special exception for coherent events (mode 16)
+       (abs(fNUISANCEEvent->Mode) == 16 || abs(fNUISANCEEvent->Mode) == 36))) {
+    // Make special exception for coherent events (mode 16, 36)
     fNUISANCEEvent->fTargetPDG = TargetUtils::GetTargetPDGFromZA(
         fNUISANCEEvent->fTargetZ, fNUISANCEEvent->fTargetA);
   } else {
