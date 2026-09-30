@@ -162,6 +162,9 @@ void MicroBooNE_NCpi0_XSec_nu<D, Ds...>::FillEventVariables(FitEvent *customEven
     fXVars[dist] = (localbin < 0) ? -999 : localbin + curr_bin;
     curr_bin += nblockbins;
   }
+
+  // Seed fXVar for callers that read GetXVar() instead of FillHistograms.
+  fXVar = fXVars[*fDists.begin()];
 }
 
 //********************************************************************
