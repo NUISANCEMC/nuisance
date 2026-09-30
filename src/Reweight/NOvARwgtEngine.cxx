@@ -6,6 +6,7 @@
 #include "NOvARwgt/rwgt/tunes/Tunes2018.h"
 #include "NOvARwgt/rwgt/tunes/Tunes2020.h"
 #include "NOvARwgt/rwgt/tunes/TunesSA.h"
+#include "NOvARwgt/rwgt/tunes/Tunes2024.h"
 
 #include "NOvARwgt/rwgt/EventRecord.h"
 #include "NOvARwgt/rwgt/ISystKnob.h"
@@ -15,11 +16,13 @@
 #include "Framework/Utils/AppInit.h"
 #include "Framework/Utils/RunOpt.h"
 
-static size_t const kCVTune2017 = 100;
-static size_t const kCVTune2018 = 200;
-static size_t const kCVTune2020 = 300;
-static size_t const kCVTuneSA = 400;
-static size_t const kNoSuchKnob = std::numeric_limits<size_t>::max();
+static size_t const kCVTune2017    = 100;
+static size_t const kCVTune2018    = 200;
+static size_t const kCVTune2020    = 300;
+static size_t const kCVTuneSA      = 400;
+static size_t const kCVTune2024    = 500;
+static size_t const kCVTune2024NoGSF = 600;
+static size_t const kNoSuchKnob    = std::numeric_limits<size_t>::max();
 
 novarwgt::Tune const *TuneFactory(size_t e) {
   switch (e) {
@@ -34,6 +37,12 @@ novarwgt::Tune const *TuneFactory(size_t e) {
   }
   case kCVTuneSA: {
     return &novarwgt::kCVTuneSA;
+  }
+  case kCVTune2024: {
+    return &novarwgt::kCVTune2024;
+  }
+  case kCVTune2024NoGSF: {
+    return &novarwgt::kCVTune2024_NoGSF;
   }
   default: {
     return NULL;
@@ -51,8 +60,12 @@ void NOvARwgtEngine::InitializeKnobs() {
   fTuneEnums[kCVTune2020] = 2;
   fTunes.push_back(TuneFactory(kCVTuneSA));
   fTuneEnums[kCVTuneSA] = 3;
-  fTuneInUse = {false, false, false, false};
-  fTuneValues = {0, 0, 0, 0};
+  fTunes.push_back(TuneFactory(kCVTune2024));
+  fTuneEnums[kCVTune2024] = 4;
+  fTunes.push_back(TuneFactory(kCVTune2024NoGSF));
+  fTuneEnums[kCVTune2024NoGSF] = 5;
+  fTuneInUse  = {false, false, false, false, false, false};
+  fTuneValues = {0, 0, 0, 0, 0, 0};
 
   size_t ctr = 0;
 
@@ -103,6 +116,30 @@ void NOvARwgtEngine::InitializeKnobs() {
     fKnobInUse.push_back(false);
     fKnobValues.push_back(0);
   }
+
+  tune_ctr = 0;
+  NUIS_LOG(FIT, "NOvARwgt kCVTune2024 sub-knobs:");
+  for (auto &k : novarwgt::kCVTune2024.SystKnobs()) {
+    NUIS_LOG(FIT, "\t" << kCVTune2024 + 1 + tune_ctr << ": " << k.first);
+    fKnobs.push_back(k.second);
+    fKnobTunes.push_back(&novarwgt::kCVTune2024);
+    fKnobTuneidx.push_back(4);
+    fKnobEnums[kCVTune2024 + 1 + tune_ctr++] = ctr++;
+    fKnobInUse.push_back(false);
+    fKnobValues.push_back(0);
+  }
+
+  tune_ctr = 0;
+  NUIS_LOG(FIT, "NOvARwgt kCVTune2024_NoGSF sub-knobs:");
+  for (auto &k : novarwgt::kCVTune2024_NoGSF.SystKnobs()) {
+    NUIS_LOG(FIT, "\t" << kCVTune2024NoGSF + 1 + tune_ctr << ": " << k.first);
+    fKnobs.push_back(k.second);
+    fKnobTunes.push_back(&novarwgt::kCVTune2024_NoGSF);
+    fKnobTuneidx.push_back(5);
+    fKnobEnums[kCVTune2024NoGSF + 1 + tune_ctr++] = ctr++;
+    fKnobInUse.push_back(false);
+    fKnobValues.push_back(0);
+  }
 }
 
 void NOvARwgtEngine::InitializeGENIE() {
@@ -132,7 +169,6 @@ size_t NOvARwgtEngine::GetWeightGeneratorIndex(std::string const &strname) {
     std::string knobname = strname.substr(upos + 1);
     if (novarwgt::kCVTune2017.SystKnobs().count(knobname)) {
       auto loc = novarwgt::kCVTune2017.SystKnobs().find(knobname);
-
       return kCVTune2017 + 1 +
              std::distance(novarwgt::kCVTune2017.SystKnobs().begin(), loc);
     }
@@ -144,10 +180,10 @@ size_t NOvARwgtEngine::GetWeightGeneratorIndex(std::string const &strname) {
     std::string knobname = strname.substr(upos + 1);
     if (novarwgt::kCVTune2018.SystKnobs().count(knobname)) {
       auto loc = novarwgt::kCVTune2018.SystKnobs().find(knobname);
-
       return kCVTune2018 + 1 +
              std::distance(novarwgt::kCVTune2018.SystKnobs().begin(), loc);
     }
+
   } else if (strname.find("CVTune2020") == 0) {
     if (upos == std::string::npos) {
       return kCVTune2020;
@@ -155,10 +191,10 @@ size_t NOvARwgtEngine::GetWeightGeneratorIndex(std::string const &strname) {
     std::string knobname = strname.substr(upos + 1);
     if (novarwgt::kCVTune2020.SystKnobs().count(knobname)) {
       auto loc = novarwgt::kCVTune2020.SystKnobs().find(knobname);
-
       return kCVTune2020 + 1 +
              std::distance(novarwgt::kCVTune2020.SystKnobs().begin(), loc);
     }
+
   } else if (strname.find("CVTuneSA") == 0) {
     if (upos == std::string::npos) {
       return kCVTuneSA;
@@ -166,11 +202,34 @@ size_t NOvARwgtEngine::GetWeightGeneratorIndex(std::string const &strname) {
     std::string knobname = strname.substr(upos + 1);
     if (novarwgt::kCVTuneSA.SystKnobs().count(knobname)) {
       auto loc = novarwgt::kCVTuneSA.SystKnobs().find(knobname);
-
       return kCVTuneSA + 1 +
              std::distance(novarwgt::kCVTuneSA.SystKnobs().begin(), loc);
     }
+
+  } else if (strname.find("CVTune2024NoGSF") == 0) {
+    if (upos == std::string::npos) {
+      return kCVTune2024NoGSF;
+    }
+
+    std::string knobname = strname.substr(upos + 1);
+    if (novarwgt::kCVTune2024_NoGSF.SystKnobs().count(knobname)) {
+      auto loc = novarwgt::kCVTune2024_NoGSF.SystKnobs().find(knobname);
+      return kCVTune2024NoGSF + 1 +
+             std::distance(novarwgt::kCVTune2024_NoGSF.SystKnobs().begin(), loc);
+    }
+
+  } else if (strname.find("CVTune2024") == 0) {
+    if (upos == std::string::npos) {
+      return kCVTune2024;
+    }
+    std::string knobname = strname.substr(upos + 1);
+    if (novarwgt::kCVTune2024.SystKnobs().count(knobname)) {
+      auto loc = novarwgt::kCVTune2024.SystKnobs().find(knobname);
+      return kCVTune2024 + 1 +
+             std::distance(novarwgt::kCVTune2024.SystKnobs().begin(), loc);
+    }
   }
+
   return kNoSuchKnob;
 }
 
@@ -180,8 +239,6 @@ void NOvARwgtEngine::IncludeDial(std::string name, double startval) {
     NUIS_ABORT("[ERROR]: Invalid NOvARwgt Engine name: " << name);
   }
   bool IsTune = !(we_indx % 100);
-  // NUIS_LOG(FIT, "Including dial: " << name << " -> " << we_indx << " is tune? "
-  //                                  << IsTune);
   if (IsTune) {
     auto tune_idx = fTuneEnums[we_indx];
     fTuneValues[tune_idx] = startval;
@@ -196,8 +253,6 @@ void NOvARwgtEngine::IncludeDial(std::string name, double startval) {
 void NOvARwgtEngine::SetDialValue(int nuisenum, double val) {
   size_t we_indx = (nuisenum % NUIS_DIAL_OFFSET);
   bool IsTune = !(we_indx % 100);
-  // NUIS_LOG(FIT, "SetDialValue(" << val << "): " << nuisenum << " -> " << we_indx
-  //                               << " is tune? " << IsTune);
 
   if (IsTune) {
     auto tune_idx = fTuneEnums[we_indx];
@@ -226,8 +281,6 @@ bool NOvARwgtEngine::IsDialIncluded(std::string name) {
 bool NOvARwgtEngine::IsDialIncluded(int nuisenum) {
   size_t we_indx = (nuisenum % NUIS_DIAL_OFFSET);
   bool IsTune = !(we_indx % 100);
-  // NUIS_LOG(FIT, "IsDialIncluded: " << nuisenum << " -> " << we_indx
-  //                                  << " is tune? " << IsTune);
 
   if (IsTune) {
     auto tune_idx = fTuneEnums[we_indx];
@@ -247,8 +300,6 @@ double NOvARwgtEngine::GetDialValue(int nuisenum) {
     NUIS_ABORT("[ERROR]: Invalid NOvARwgt Engine enum: " << nuisenum);
   }
   bool IsTune = !(we_indx % 100);
-  // NUIS_LOG(FIT, "GetDialValue: " << nuisenum << " -> " << we_indx
-  //                                << " is tune? " << IsTune);
 
   if (IsTune) {
     auto tune_idx = fTuneEnums[we_indx];
@@ -270,7 +321,6 @@ double NOvARwgtEngine::GetDialValue(int nuisenum) {
 double NOvARwgtEngine::CalcWeight(BaseFitEvt *evt) {
   double rw_weight = 1.0;
 
-  // Make nom weight
   if (!evt) {
     NUIS_ABORT("evt not found : " << evt);
   }
@@ -292,38 +342,24 @@ double NOvARwgtEngine::CalcWeight(BaseFitEvt *evt) {
       novarwgt::ConvertGenieEvent(evt->genie_event->event);
 
   for (size_t k_it = 0; k_it < fKnobs.size(); ++k_it) {
-    // NUIS_LOG(FIT, "-- knob: " << k_it << " = " << fKnobInUse[k_it]);
-
     if (!fKnobInUse[k_it]) {
       continue;
     }
-
-    // NUIS_LOG(FIT, "\t" << fKnobs[k_it]->Name() << " = " << fKnobValues[k_it]);
 
     double wght = fKnobTunes[k_it]->EventSystKnobWeight(
         fKnobs[k_it]->Name(), fKnobValues[k_it], rcd, {},
         fTuneInUse[fKnobTuneidx[k_it]] && fTuneValues[fKnobTuneidx[k_it]]);
 
-    // // have to divide out the CV weight for this, ugly hack because the last
-    // // parameter doesn't do what I want
-    // if (fTuneInUse[fKnobTuneidx[k_it]] && fTuneValues[fKnobTuneidx[k_it]]) {
-    //   wght /= fKnobTunes[k_it]->EventSystKnobWeight(fKnobs[k_it]->Name(), 0,
-    //                                                 rcd, {}, false);
-    // }
-
     rw_weight *= wght;
   }
 
   for (size_t k_it = 0; k_it < fTunes.size(); ++k_it) {
-    // NUIS_LOG(FIT, "-- tune: " << k_it << " = " << fTuneInUse[k_it]);
-
     if (!fTuneInUse[k_it]) {
       continue;
     }
     if (!fTuneValues[k_it]) {
       continue;
     }
-    // NUIS_LOG(FIT, "\t" << fTuneValues[k_it]);
 
     double wght = fTunes[k_it]->EventWeight(rcd);
     rw_weight *= wght;
