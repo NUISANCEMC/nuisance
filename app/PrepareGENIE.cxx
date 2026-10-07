@@ -74,6 +74,10 @@ bool CheckConfig(std::string filename) {
     if (name.find("XSecModel") != std::string::npos && name.find("MEC-CC") != std::string::npos && name.find("SuSAv2MECPXSec") != std::string::npos) {
       ShouldScale = true;
     }
+    // The same thing applies to the Martini-Ericson-Chanfray-Marteau model
+    if (name.find("XSecModel") != std::string::npos && name.find("MEC-CC") != std::string::npos && name.find("MartiniEricsonChanfrayMarteauMECPXSec2024") != std::string::npos) {
+      ShouldScale = true;
+    }
   }
   f->Close();
   if (!ShouldScale) {
