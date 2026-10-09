@@ -299,7 +299,7 @@ void MeasurementBase::FillHistogramsFromBox(MeasurementVariableBox *var,
 }
 
 void MeasurementBase::FillHistograms(double weight) {
-  Weight = weight * GetBox()->GetSampleWeight();
+  if(!UseWeightFromMeas) Weight = weight * GetBox()->GetSampleWeight();
   FillHistograms();
   FillExtraHistograms(GetBox(), Weight);
 }
