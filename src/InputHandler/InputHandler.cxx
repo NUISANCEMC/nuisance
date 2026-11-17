@@ -224,6 +224,11 @@ void InputHandlerBase::RegisterJointInput(std::string input, int n, TH1D *f,
   jointindexhigh.push_back(fNEvents + n);
   fNEvents += n;
 
+  // TEST
+  tmp_flux_hists.push_back( (TH1D *)f->Clone() );
+  tmp_evt_hists.push_back( (TH1D *)e->Clone() );
+  tmp_nevents.push_back(n);
+
   // Add to the total flux/event hist
   if (!fFluxHist) fFluxHist = (TH1D *)f->Clone();
   else fFluxHist->Add(f);

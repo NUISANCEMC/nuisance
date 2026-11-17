@@ -376,6 +376,9 @@
 #include "K2K_NC1pi0_Evt_1Dppi0_nu.h"
 #endif
 
+// ICARUS
+#include "ICARUS_NuMI_CCQELike_numu_2026.h"
+
 // MC Studies
 #include "ExpMultDist_CCQE_XSec_1DVar_FakeStudy.h"
 #include "ExpMultDist_CCQE_XSec_2DVar_FakeStudy.h"
@@ -1739,6 +1742,16 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
                      Fake Studies
                      */
                 } else
+#endif
+#ifdef ICARUS_ENABLED
+           if (!name.compare("ICARUS_NuMI_CCQELike_numu_2026_MuonCos") ||
+               !name.compare("ICARUS_NuMI_CCQELike_numu_2026_MuonProtonCos") ||
+               !name.compare("ICARUS_NuMI_CCQELike_numu_2026_deltaPT") ||
+               !name.compare("ICARUS_NuMI_CCQELike_numu_2026_deltaalphaT") ||
+               !name.compare("ICARUS_NuMI_CCQELike_numu_2026_MuonCos_and_MuonProtonCos") ||
+               !name.compare("ICARUS_NuMI_CCQELike_numu_2026_deltaPT_and_deltaalphaT") ) {
+      return (new ICARUS_NuMI_CCQELike_numu_2026(samplekey));
+  } else
 #endif
                   if (name.find("ExpMultDist_CCQE_XSec_1D") != std::string::npos &&
                       name.find("_FakeStudy") != std::string::npos) {

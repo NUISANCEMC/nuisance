@@ -43,7 +43,8 @@ SET(ExperimentDirs
 	MINERvA
 	MiniBooNE
 	SciBooNE
-	T2K)
+	T2K
+  ICARUS)
 
 #Sets the default state of all experimental subdirectories
 if(NOT DEFINED EXPERIMENTS_ENABLED)
