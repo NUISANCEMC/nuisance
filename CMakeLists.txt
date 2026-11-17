@@ -42,7 +42,14 @@ endif()
 
 LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
 
-include(CPM)
+# download CPM.cmake
+file(
+  DOWNLOAD
+  https://github.com/cpm-cmake/CPM.cmake/releases/download/v0.38.8/CPM.cmake
+  ${CMAKE_CURRENT_BINARY_DIR}/cmake/CPM.cmake
+)
+include(${CMAKE_CURRENT_BINARY_DIR}/cmake/CPM.cmake)
+
 if(DEFINED ENV{NuHepMCModules_ROOT})
   include($ENV{NuHepMCModules_ROOT}/NuHepMCModules.cmake)
 else()
