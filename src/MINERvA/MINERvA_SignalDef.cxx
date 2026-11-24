@@ -155,6 +155,30 @@ bool isCC1pip_MINERvA_2017(FitEvent *event, double EnuMin, double EnuMax) {
   return true;
 };
 
+// MINERvA Nuke antineutrino CC inclusive (RHC) arXiv:2604.07091
+bool isNukeCCinc_antinu_MINERvA(FitEvent *event, double EnuMin, double EnuMax) {
+
+  // PDGnu == -14 && PDGLep == -13
+  if (!isCCINC(event, -14, EnuMin, EnuMax))
+    return false;
+
+  TLorentzVector Pnu = event->GetHMISParticle(-14)->fP;
+  TLorentzVector Pmu = event->GetHMFSParticle(-13)->fP;
+
+  // 2 < Emu < 20 GeV
+  double Emu = Pmu.E() / 1.E3;
+  if (Emu < 2. || Emu > 20.)
+    return false;
+
+  // thmu < 17 deg
+  double th_nu_mu = FitUtils::th(Pmu, Pnu) * 180. / M_PI;
+  if (th_nu_mu >= 17.)
+    return false;
+
+  return true;
+}
+
+//********************************************************************
 bool isNukeCC1pip_MINERvA(FitEvent *event, double EnuMin, double EnuMax) {
 
   if (!isCCINC(event, 14, EnuMin, EnuMax))
