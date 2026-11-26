@@ -98,9 +98,9 @@ MINERvA_NukeCCinc_XSec_1Dptmu_antinu::MINERvA_NukeCCinc_XSec_1Dptmu_antinu(nuisk
   // Define Sample Settings common to all data distributions
   fSettings = LoadSampleSettings(samplekey);
   fSettings.SetAllowedTypes("FIX,FREE,SHAPE/DIAG,FULL/NORM/MASK", "FIX/FULL");
-  // Flux integral and signal over 0-120 GeV (no Enu cut in the measurement;
+  // Flux integral and signal over 0-100 GeV (no Enu cut in the measurement;
   // the 2 < Emu < 20 GeV cut is in the signal definition)
-  fSettings.SetEnuRange(0., 120.0);
+  fSettings.SetEnuRange(0., 100.0);
   fSettings.DefineAllowedTargets("C,H,Fe,Pb");
   // Flux-averaged xsec: the flux comes from the input file, which must be
   // generated with this sample's histogram from
