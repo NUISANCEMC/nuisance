@@ -23,7 +23,7 @@
   Signal: numubar CC inclusive, 1 mu+, 2 < Emu < 20 GeV, thmu < 17 deg
   arXiv:2604.07091
   PRL DOI: https://doi.org/10.1103/n7s9-8btb
-  Zenodo DOI: https://doi.org/10.5281/zenodo.24306935
+  Zenodo DOI: https://doi.org/10.5281/zenodo.24306934
 */
 
 #include "MINERvA_SignalDef.h"
