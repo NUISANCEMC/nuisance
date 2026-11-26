@@ -61,6 +61,12 @@ namespace SignalDef {
   bool isCC1pip_MINERvA_2017(FitEvent *event, double EnuMin, double EnuMax);
   bool isNukeCC1pip_MINERvA(FitEvent *event, double EnuMin, double EnuMax);
 
+  /// MINERvA Nuke antineutrino CC inclusive (RHC)
+  /// numubar CC inclusive (isCCINC with nuPDG=-14, i.e. requires a mu+),
+  /// 2 < Emu < 20 GeV, thmu < 17 deg
+  /// arXiv:2604.07091
+  bool isNukeCCinc_antinu_MINERvA(FitEvent *event, double EnuMin, double EnuMax);
+
   // *********************************
   /// MINERvA CCNpi+/- signal definition from 2016 publication
   /// Different to CC1pi+/- listed above; additional has W < 1.8 GeV

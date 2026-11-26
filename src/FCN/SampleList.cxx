@@ -283,6 +283,8 @@
 #include "MINERvA_NukeCC0pi_XSec_2D_nu.h"
 // MINERvA Nuke CC1pip 1d
 #include "MINERvA_NukeCC1pip_XSec_1D_nu.h"
+// MINERvA Nuke CCinc antinu 1d arXiv:2604.07091
+#include "MINERvA_NukeCCinc_XSec_1Dptmu_antinu.h"
 
 #endif
 
@@ -1541,6 +1543,15 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
           !name.compare("MINERvA_NukeCC1pip_Fe_XSec_1DTpi_nu")  ||
           !name.compare("MINERvA_NukeCC1pip_Fe_XSec_1Dthpi_nu")) {
             return (new MINERvA_NukeCC1pip_XSec_1D_nu(samplekey));
+
+          } else if ( !name.compare("MINERvA_NukeCCinc_CH_XSec_1Dptmu_antinu") ||
+                      !name.compare("MINERvA_NukeCCinc_C_XSec_1Dptmu_antinu")  ||
+                      !name.compare("MINERvA_NukeCCinc_Fe_XSec_1Dptmu_antinu") ||
+                      !name.compare("MINERvA_NukeCCinc_Pb_XSec_1Dptmu_antinu") ||
+                      !name.compare("MINERvA_NukeCCinc_CH_C_Flux_XSec_1Dptmu_antinu")  ||
+                      !name.compare("MINERvA_NukeCCinc_CH_Fe_Flux_XSec_1Dptmu_antinu") ||
+                      !name.compare("MINERvA_NukeCCinc_CH_Pb_Flux_XSec_1Dptmu_antinu")) {
+            return (new MINERvA_NukeCCinc_XSec_1Dptmu_antinu(samplekey));
 
             /*
                T2K Samples
